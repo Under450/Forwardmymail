@@ -1,54 +1,927 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Forwardmymail | Premium UK Mail Forwarding</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              brand: {
-                50: '#f4f7fb',
-                100: '#eef2f6',
-                200: '#dce4ed',
-                300: '#c0cedd',
-                400: '#94acbf',
-                500: '#64879f',
-                600: '#3e6380', // Slate Blue
-                700: '#0f2e5a', // Deep Royal Navy (Primary)
-                800: '#0a2245',
-                900: '#071832', // Midnight
-              }
-            },
-            fontFamily: {
-              sans: ['Inter', 'system-ui', 'sans-serif'],
-            },
-          }
-        }
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>ForwardMyMail – UK Mail Forwarding & Scanning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-alt: #0b1020;
+      --card: #111827;
+      --accent: #ff7a1a;
+      --accent-soft: rgba(255,122,26,0.15);
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --radius: 16px;
+      --radius-pill: 999px;
+      --shadow: 0 18px 40px rgba(0,0,0,0.55);
+      --transition: 180ms ease-out;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #111827 0, var(--bg) 38%);
+      color: var(--text);
+      scroll-behavior: smooth;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page { min-height: 100vh; }
+
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    /* NAVBAR */
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: 62px;
+      background: linear-gradient(to bottom,
+        rgba(5,8,20,0.98),
+        rgba(5,8,20,0.9),
+        transparent
+      );
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(31,41,55,0.7);
+    }
+
+    .navbar-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
+
+    .brand-mark {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: radial-gradient(circle at top, #ffb347, var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      box-shadow: 0 6px 14px rgba(255,122,26,0.55);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.4rem;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding-bottom: 0.12rem;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -0.2rem;
+      width: 0;
+      height: 2px;
+      border-radius: 999px;
+      background: var(--accent);
+      transition: width var(--transition);
+    }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      padding: 0.4rem 1.2rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      background: radial-gradient(circle at top, #ffb347, var(--accent));
+      color: #111827;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(255,122,26,0.55);
+      transition: transform var(--transition), box-shadow var(--transition);
+      white-space: nowrap;
+    }
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px rgba(255,122,26,0.6);
+    }
+
+    @media (max-width: 800px) {
+      .nav-links { display: none; }
+    }
+
+    /* HERO */
+
+    .hero {
+      padding: 4.2rem 0 4rem;
+    }
+
+    .hero-inner {
+      display: grid;
+      gap: 2.6rem;
+      text-align: left;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.2rem 0.8rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(17,24,39,0.85);
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 6px rgba(34,197,94,0.22);
+    }
+
+    .hero-title {
+      font-size: clamp(2.3rem, 4vw, 3.3rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin: 0 0 1rem;
+      font-weight: 800;
+    }
+
+    .hero-title span {
+      color: var(--accent);
+    }
+
+    .hero-subtitle {
+      max-width: 640px;
+      color: var(--muted);
+      font-size: 0.98rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2.2rem;
+    }
+
+    .hero-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .metric {
+      min-width: 140px;
+      padding: 0.8rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(31,41,55,0.9);
+      background: rgba(15,23,42,0.9);
+      box-shadow: 0 12px 26px rgba(0,0,0,0.5);
+    }
+
+    .metric strong {
+      display: block;
+      color: var(--text);
+      font-size: 1.1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8rem 1.6rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition),
+                  box-shadow var(--transition), transform var(--transition),
+                  border-color var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top, #ffb347, var(--accent));
+      color: #111827;
+      box-shadow: 0 18px 36px rgba(255,122,26,0.6);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 45px rgba(255,122,26,0.7);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border-color: rgba(148,163,184,0.8);
+    }
+    .btn-secondary:hover {
+      background: rgba(15,23,42,0.9);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* SECTIONS GENERIC */
+
+    section {
+      padding: 4rem 0;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 2.4rem;
+    }
+
+    .section-kicker {
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .section-subtitle {
+      max-width: 640px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    /* GRID CARDS */
+
+    .cards-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    @media (max-width: 960px) {
+      .cards-3 {
+        grid-template-columns: minmax(0, 1fr);
       }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
+    }
+
+    .card {
+      background: radial-gradient(circle at top, #111827, var(--card));
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 1.6rem 1.7rem 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card h3 {
+      margin: 0 0 0.6rem;
+      font-size: 1.05rem;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(15,23,42,0.95);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-list {
+      list-style: none;
+      padding: 0;
+      margin: 1.1rem 0 0;
+      font-size: 0.86rem;
+      color: var(--text);
+    }
+
+    .card-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .card-list li::before {
+      content: "✓";
+      color: var(--accent);
+      font-size: 0.9rem;
+      margin-top: 0.05rem;
+    }
+
+    /* PRICING */
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.6rem;
+    }
+
+    @media (max-width: 960px) {
+      .pricing-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
-    </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0"
-  }
-}
-</script>
+    }
+
+    .price-card {
+      position: relative;
+      padding: 1.8rem 1.8rem 1.7rem;
+      border-radius: 22px;
+      background: radial-gradient(circle at top, #020617, #020617 60%, #000 100%);
+      border: 1px solid rgba(31,41,55,0.9);
+      box-shadow: var(--shadow);
+    }
+
+    .price-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.15rem 0.7rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #fed7aa;
+      font-size: 0.75rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .price-amount {
+      font-size: 1.7rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+
+    .price-caption {
+      font-size: 0.84rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    /* HOW IT WORKS */
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.3rem;
+    }
+
+    @media (max-width: 960px) {
+      .steps { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    .step {
+      text-align: center;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 0.6rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 12px 24px rgba(255,122,26,0.6);
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    /* FAQ */
+
+    .faq-grid {
+      max-width: 720px;
+      margin: 0 auto;
+      display: grid;
+      gap: 1rem;
+    }
+
+    details.faq-item {
+      background: radial-gradient(circle at top, #111827, #020617);
+      border-radius: 16px;
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 0.9rem 1.1rem;
+      box-shadow: var(--shadow);
+      font-size: 0.9rem;
+    }
+
+    .faq-item summary {
+      list-style: none;
+      cursor: pointer;
+      position: relative;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item summary::after {
+      content: "+";
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .faq-item[open] summary::after {
+      content: "−";
+    }
+
+    .faq-item p {
+      margin: 0.7rem 0 0.2rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* CTA */
+
+    .cta-band {
+      background: radial-gradient(circle at top, #020617, #000 70%);
+      border-top: 1px solid rgba(31,41,55,0.9);
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+      padding: 3.4rem 0;
+    }
+
+    .cta-inner {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .cta-buttons {
+      margin-top: 1.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    /* FOOTER */
+
+    footer {
+      padding: 1.8rem 0 2.2rem;
+      border-top: 1px solid rgba(31,41,55,0.9);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+    }
+
+    .footer-links a {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+  </style>
 </head>
-  <body class="bg-slate-50 text-slate-900 antialiased selection:bg-brand-100 selection:text-brand-900">
-    <div id="root"></div>
-  </body>
+<body>
+  <div class="page">
+    <!-- NAVBAR -->
+    <header class="navbar">
+      <div class="container navbar-inner">
+        <a href="#top" class="brand">
+          <div class="brand-mark">FM</div>
+          <span>ForwardMyMail</span>
+        </a>
+        <nav class="nav-links">
+          <a href="#services">Services</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+        <a href="#login" class="nav-cta">Client login</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- HERO -->
+      <section class="hero">
+        <div class="container hero-inner">
+          <div>
+            <div class="hero-tag">
+              <span class="hero-dot"></span>
+              UK virtual address • Mail forwarding • Parcel handling
+            </div>
+            <h1 class="hero-title">
+              A professional UK address with
+              <span>mail forwarding & scanning</span> built in.
+            </h1>
+            <p class="hero-subtitle">
+              ForwardMyMail gives you a central UK address for business or personal use.
+              We receive your post, scan what you need, forward parcels worldwide and provide
+              compliant director service addresses for UK companies.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#pricing" class="btn btn-primary">View packages</a>
+              <a href="#how-it-works" class="btn btn-secondary">How it works</a>
+            </div>
+
+            <div class="hero-metrics">
+              <div class="metric">
+                <strong>Same-day</strong>
+                Scanning on most items received before 3pm
+              </div>
+              <div class="metric">
+                <strong>UK-based</strong>
+                Secure handling & GDPR-aligned processes
+              </div>
+              <div class="metric">
+                <strong>All-in-one</strong>
+                Mail, parcels & company address in one place
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVICES -->
+      <section id="services">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-kicker">Services</div>
+            <h2 class="section-title">Everything you need in one UK address</h2>
+            <p class="section-subtitle">
+              Use your ForwardMyMail address for personal post, registered office,
+              directors’ service address and parcels. Choose which items are scanned,
+              stored or forwarded on.
+            </p>
+          </div>
+
+          <div class="cards-3">
+            <article class="card">
+              <div class="card-icon">🏢</div>
+              <h3>Virtual Office & Mail Forwarding</h3>
+              <p>
+                Use a professional UK street address instead of your home address
+                on Companies House, invoices and correspondence.
+              </p>
+              <ul class="card-list">
+                <li>Personal or business use</li>
+                <li>Letters and small packets accepted</li>
+                <li>Forward to any UK or international address</li>
+                <li>Simple, transparent forwarding fees</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-icon">📄</div>
+              <h3>Secure Mail Scanning</h3>
+              <p>
+                See your post quickly without waiting for the envelope. We scan
+                and upload PDFs to your account.
+              </p>
+              <ul class="card-list">
+                <li>Same-day scanning on most items</li>
+                <li>High-resolution searchable PDFs</li>
+                <li>Optional physical destruction after scan</li>
+                <li>GDPR-aligned handling procedures</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-icon">📦</div>
+              <h3>Parcel Handling & Consolidation</h3>
+              <p>
+                Receive parcels from couriers and retailers, then forward
+                them on in one shipment or individually.
+              </p>
+              <ul class="card-list">
+                <li>Signed-for parcel acceptance</li>
+                <li>Short-term storage options</li>
+                <li>Consolidation to reduce shipping costs</li>
+                <li>Tracked forwarding using major carriers</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- COMPANY SERVICES -->
+      <section>
+        <div class="container">
+          <div class="section-header">
+            <div class="section-kicker">Company address</div>
+            <h2 class="section-title">Compliant addresses for UK companies</h2>
+            <p class="section-subtitle">
+              Use ForwardMyMail as your registered office and directors’ service
+              address without exposing your home details on public records.
+            </p>
+          </div>
+
+          <div class="cards-3">
+            <article class="card">
+              <div class="card-icon">🏛️</div>
+              <h3>Registered Office Address</h3>
+              <p>
+                A Companies House and HMRC compliant registered office address in
+                the UK, with all statutory mail scanned or forwarded.
+              </p>
+              <ul class="card-list">
+                <li>Accepted by Companies House & HMRC</li>
+                <li>Official mail scanning included</li>
+                <li>Forwarding on request</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-icon">👤</div>
+              <h3>Directors’ Service Address</h3>
+              <p>
+                Shield directors’ home details with a professional correspondence
+                address shown on the public register instead.
+              </p>
+              <ul class="card-list">
+                <li>Separate from your registered office if needed</li>
+                <li>Individual or multiple directors covered</li>
+                <li>Mail scanning and forwarding options</li>
+              </ul>
+            </article>
+
+            <article class="card">
+              <div class="card-icon">📝</div>
+              <h3>Company Formation Support</h3>
+              <p>
+                Optional company set-up with our address from day one, keeping
+                your details consistent and professional.
+              </p>
+              <ul class="card-list">
+                <li>New UK limited company formation</li>
+                <li>Registered office & director address from day 1</li>
+                <li>Ongoing mail handling on one platform</li>
+              </ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRICING -->
+      <section id="pricing">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-kicker">Pricing</div>
+            <h2 class="section-title">Simple monthly packages</h2>
+            <p class="section-subtitle">
+              Choose a package that matches how you use your address. Scanning and
+              forwarding allowances can be adjusted as your volume grows.
+            </p>
+          </div>
+
+          <div class="pricing-grid">
+            <article class="price-card">
+              <div class="price-pill">Personal</div>
+              <h3>Mail Scan & Forward</h3>
+              <div class="price-amount">£X.XX / month</div>
+              <div class="price-caption">Ideal for individuals and light use</div>
+              <ul class="card-list">
+                <li>Use of UK mailing address</li>
+                <li>Inclusive letter scanning allowance</li>
+                <li>Optional forwarding per item + postage</li>
+                <li>Online viewing & simple controls</li>
+              </ul>
+              <a href="#signup" class="btn btn-primary" style="margin-top:1.2rem;">Choose Personal</a>
+            </article>
+
+            <article class="price-card">
+              <div class="price-pill">Business</div>
+              <h3>Virtual Office & Scanning</h3>
+              <div class="price-amount">£Y.YY / month</div>
+              <div class="price-caption">For small businesses and contractors</div>
+              <ul class="card-list">
+                <li>Business use of address</li>
+                <li>Higher scanning allowance</li>
+                <li>Registered office mail included</li>
+                <li>Discounted forwarding fees</li>
+              </ul>
+              <a href="#signup" class="btn btn-primary" style="margin-top:1.2rem;">Choose Business</a>
+            </article>
+
+            <article class="price-card">
+              <div class="price-pill">Ultimate</div>
+              <h3>Ultimate + Parcel Handling</h3>
+              <div class="price-amount">£Z.ZZ / month</div>
+              <div class="price-caption">All-inclusive mail & parcel solution</div>
+              <ul class="card-list">
+                <li>Virtual office + director service address</li>
+                <li>Generous mail scanning allowance</li>
+                <li>Parcel acceptance & storage included</li>
+                <li>Discounted consolidation & forwarding</li>
+              </ul>
+              <a href="#signup" class="btn btn-primary" style="margin-top:1.2rem;">Choose Ultimate</a>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- HOW IT WORKS -->
+      <section id="how-it-works">
+        <div class="container">
+          <div class="section-header">
+            <div class="section-kicker">Process</div>
+            <h2 class="section-title">How ForwardMyMail works</h2>
+            <p class="section-subtitle">
+              Getting started takes just a few minutes. Once your account is active,
+              you can manage everything from a simple online dashboard.
+            </p>
+          </div>
+
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">1</div>
+              <div class="step-title">Choose a package</div>
+              Select the level of scanning, forwarding and parcel handling that
+              suits your usage.
+            </div>
+            <div class="step">
+              <div class="step-number">2</div>
+              <div class="step-title">Complete verification</div>
+              Provide ID and address documents so we can comply with UK
+              anti-money-laundering regulations.
+            </div>
+            <div class="step">
+              <div class="step-number">3</div>
+              <div class="step-title">Update your address</div>
+              Start using your new ForwardMyMail address with banks, clients,
+              suppliers and Companies House.
+            </div>
+            <div class="step">
+              <div class="step-number">4</div>
+              <div class="step-title">Control everything online</div>
+              Decide what is scanned, stored, destroyed or forwarded with just
+              a few clicks.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq">
+        <div class="container">
+          <div class="section-header">
+            <h2 class="section-title">Frequently asked questions</h2>
+            <p class="section-subtitle">
+              A quick overview of how the service works. You can also contact us
+              directly if you have more specific requirements.
+            </p>
+          </div>
+
+          <div class="faq-grid">
+            <details class="faq-item">
+              <summary>Can I use this address with Companies House and HMRC?</summary>
+              <p>
+                Yes, versions of our address can be used as a registered office
+                and directors’ service address, provided you hold an active
+                subscription for those services.
+              </p>
+            </details>
+
+            <details class="faq-item">
+              <summary>How do you charge for forwarding post and parcels?</summary>
+              <p>
+                Postage and courier fees are charged in addition to your monthly
+                plan. We pass on carrier charges plus a small handling fee per
+                item or per consolidated shipment.
+              </p>
+            </details>
+
+            <details class="faq-item">
+              <summary>Do you open and scan all my mail automatically?</summary>
+              <p>
+                You can choose automatic scanning or “scan on request”. For
+                sensitive items we can simply notify you of receipt without
+                opening until you confirm.
+              </p>
+            </details>
+
+            <details class="faq-item">
+              <summary>Can you accept parcels from all couriers and retailers?</summary>
+              <p>
+                We can accept parcels from the main UK carriers and most
+                retailers, subject to size, weight and contents restrictions.
+                Hazardous or prohibited items cannot be stored or forwarded.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="cta-band" id="signup">
+        <div class="container">
+          <div class="cta-inner">
+            <div class="section-kicker">Get started</div>
+            <h2 class="section-title">Ready to set up your UK forwarding address?</h2>
+            <p class="section-subtitle">
+              Choose a package, complete verification and start using your new UK
+              address within days. Existing mail-forwarding users can transfer
+              from another provider with our help.
+            </p>
+            <div class="cta-buttons">
+              <a href="#pricing" class="btn btn-primary">Choose a package</a>
+              <a href="#login" class="btn btn-secondary">Talk to us first</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLACEHOLDER LOGIN ANCHOR -->
+      <section id="login" style="padding:2.5rem 0 0;">
+        <div class="container">
+          <p style="font-size:0.82rem;color:var(--muted);max-width:640px;">
+            Client login will be linked here to your external portal or app when
+            ready. For now, you can leave this as an anchor so the navigation
+            scrolls correctly.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container footer-row">
+        <div>© ForwardMyMail. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="#top">Back to top</a>
+          <a href="#faq">FAQ</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#login">Client login</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
 </html>
