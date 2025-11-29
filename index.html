@@ -88,16 +88,15 @@
     }
 
     .brand-icon {
-      width: 32px;
       height: 32px;
-      border-radius: 12px;
-      background: var(--primary);
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--white);
-      font-size: 18px;
-      font-weight: 700;
+    }
+
+    .brand-icon img {
+      height: 32px;
+      width: auto;
+      display: block;
     }
 
     .nav-links {
@@ -267,28 +266,6 @@
       opacity: 0.9;
     }
 
-    .hero-card-caption {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      font-size: 0.85rem;
-    }
-
-    .hero-card-caption strong {
-      color: var(--white);
-      background: var(--primary);
-      align-self: flex-start;
-      padding: 0.25rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-    }
-
-    .hero-card-caption span {
-      color: var(--text-muted);
-    }
-
-    /* SECTION GENERIC */
     section {
       padding: 3.5rem 0;
     }
@@ -493,7 +470,7 @@
       border-color: var(--accent);
       box-shadow: 0 18px 42px rgba(37, 99, 235, 0.35);
       transform: translateY(-4px);
-      padding-top: 2.7rem; /* extra space for full-width badge */
+      padding-top: 2.7rem;
     }
 
     .badge {
@@ -642,22 +619,15 @@
 
     .about-image-placeholder {
       border-radius: 26px;
-      background: linear-gradient(135deg, #f97316, #facc15);
-      height: 260px;
-      position: relative;
       overflow: hidden;
       box-shadow: var(--shadow-card);
     }
 
-    .about-image-placeholder::after {
-      content: "ABOUT / TEAM IMAGE";
-      position: absolute;
-      bottom: 1rem;
-      left: 1.3rem;
-      font-size: 0.8rem;
-      color: rgba(30, 64, 175, 0.95);
-      letter-spacing: 0.08em;
-      font-weight: 600;
+    .about-image-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .about-kicker {
@@ -872,9 +842,8 @@
       color: #e5edff;
     }
 
-    .footer-brand .brand-icon {
-      background: #1d4ed8;
-      box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.3);
+    .footer-brand .brand-icon img {
+      height: 28px;
     }
 
     .footer-heading {
@@ -916,61 +885,30 @@
       color: rgba(148, 163, 184, 0.9);
     }
 
-    /* RESPONSIVE */
     @media (max-width: 960px) {
-      .navbar-inner {
-        gap: 0.8rem;
-      }
-      .nav-links {
-        display: none;
-      }
-      .hero-inner {
-        grid-template-columns: 1fr;
-      }
-      .hero-card {
-        max-width: 460px;
-        margin-inline: auto;
-      }
-      .steps {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      .services-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-      .pricing-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .navbar-inner { gap: 0.8rem; }
+      .nav-links { display: none; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-card { max-width: 460px; margin-inline: auto; }
+      .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pricing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .feature-band-inner,
       .about-grid,
       .contact-grid,
-      .pricing-extra-grid {
-        grid-template-columns: 1fr;
-      }
-      .footer-top {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .pricing-extra-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width: 680px) {
-      .hero {
-        padding-top: 2.5rem;
-      }
+      .hero { padding-top: 2.5rem; }
       .steps,
       .services-grid,
       .pricing-grid,
-      .footer-top {
-        grid-template-columns: 1fr;
-      }
-      .hero-actions {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .navbar-inner {
-        padding-inline: 1rem;
-      }
-      .container {
-        padding-inline: 1rem;
-      }
+      .footer-top { grid-template-columns: 1fr; }
+      .hero-actions { flex-direction: column; align-items: flex-start; }
+      .navbar-inner { padding-inline: 1rem; }
+      .container { padding-inline: 1rem; }
     }
   </style>
 </head>
@@ -981,8 +919,7 @@
       <div class="container navbar-inner">
         <a href="#top" class="brand">
           <div class="brand-icon">
-            <!-- Replace with SVG logo -->
-            <span>✉</span>
+            <img src="forwardmymail-logo.png" alt="Forwardmymail logo">
           </div>
           <span>Forwardmymail</span>
         </a>
@@ -1034,8 +971,7 @@
 
           <aside class="hero-card" aria-label="Secure & confidential mail handling">
             <div class="hero-image-placeholder">
-              <!-- Replace 'secure-confidential.jpg' with your actual path -->
-              <img src="forwardmymail-logo.png" alt="Secure and confidential mail handling in our facility." />
+              <img src="forwardmymail-logo.png" alt="Forwardmymail secure & confidential">
               <div class="hero-image-overlay">
                 <div class="hero-image-overlay-title">Secure &amp; Confidential</div>
                 <div class="hero-image-overlay-text">
@@ -1362,14 +1298,13 @@
         <div class="container">
           <div class="about-grid">
             <div class="about-image-placeholder">
-              <!-- Replace with about/team photo -->
+              <img src="forwardmymail-officelogo2.png" alt="Forwardmymail office and team">
             </div>
             <div>
               <div class="about-kicker">Built for Modern Business</div>
               <h2 class="about-title">Created to bridge the gap between traditional mail and digital workflows.</h2>
               <p class="about-text">
-                Forwardmymail was founded to give remote directors, global entrepreneurs, and digital-first teams a stable UK base without the overhead of a traditional office.
-                Whether you are an expat, a start-up, or an e-commerce seller, our service keeps your company compliant while protecting your privacy.
+                Forwardmymail was founded to give remote directors, global entrepreneurs, and digital-first teams a stable UK base without the overhead of a traditional office. Whether you are an expat, a start-up, or an e-commerce seller, our service keeps your company compliant while protecting your privacy.
               </p>
               <p class="about-text">
                 Our mission is simple: provide a prestigious address and seamless mail handling so you can focus on growing your business, wherever you are in the world.
@@ -1517,8 +1452,7 @@
           <div class="footer-brand">
             <div class="footer-brand-title">
               <div class="brand-icon">
-                <!-- Replace with SVG logo -->
-                <span>✉</span>
+                <img src="forwardmymail-logo.png" alt="Forwardmymail logo">
               </div>
               <span>Forwardmymail</span>
             </div>
