@@ -88,16 +88,15 @@
     }
 
     .brand-icon {
-      width: 32px;
       height: 32px;
-      border-radius: 12px;
-      background: var(--primary);
       display: flex;
       align-items: center;
-      justify-content: center;
-      color: var(--white);
-      font-size: 18px;
-      font-weight: 700;
+    }
+
+    .brand-icon img {
+      height: 32px;
+      width: auto;
+      display: block;
     }
 
     .nav-links {
@@ -265,27 +264,6 @@
     .hero-image-overlay-text {
       font-size: 0.85rem;
       opacity: 0.9;
-    }
-
-    .hero-card-caption {
-      margin-top: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      font-size: 0.85rem;
-    }
-
-    .hero-card-caption strong {
-      color: var(--white);
-      background: var(--primary);
-      align-self: flex-start;
-      padding: 0.25rem 0.8rem;
-      border-radius: 999px;
-      font-size: 0.8rem;
-    }
-
-    .hero-card-caption span {
-      color: var(--text-muted);
     }
 
     /* SECTION GENERIC */
@@ -872,9 +850,8 @@
       color: #e5edff;
     }
 
-    .footer-brand .brand-icon {
-      background: #1d4ed8;
-      box-shadow: 0 0 0 1px rgba(191, 219, 254, 0.3);
+    .footer-brand .brand-icon img {
+      height: 28px;
     }
 
     .footer-heading {
@@ -981,8 +958,8 @@
       <div class="container navbar-inner">
         <a href="#top" class="brand">
           <div class="brand-icon">
-            <!-- Replace with SVG logo -->
-            <span>✉</span>
+            <!-- Replace logo-forwardmymail.png with the actual filename of your logo -->
+            <img src="logo-forwardmymail.png" alt="Forwardmymail logo">
           </div>
           <span>Forwardmymail</span>
         </a>
@@ -1034,8 +1011,8 @@
 
           <aside class="hero-card" aria-label="Secure & confidential mail handling">
             <div class="hero-image-placeholder">
-              <!-- Replace 'secure-confidential.jpg' with your actual path -->
-              <img src="secure-confidential.jpg" alt="Secure and confidential mail handling in our facility." />
+              <!-- Replace secure-confidential.jpg with your actual image file for this card -->
+              <img src="secure-confidential.jpg" alt="Secure & confidential city skyscrapers">
               <div class="hero-image-overlay">
                 <div class="hero-image-overlay-title">Secure &amp; Confidential</div>
                 <div class="hero-image-overlay-text">
@@ -1517,8 +1494,7 @@
           <div class="footer-brand">
             <div class="footer-brand-title">
               <div class="brand-icon">
-                <!-- Replace with SVG logo -->
-                <span>✉</span>
+                <img src="logo-forwardmymail.png" alt="Forwardmymail logo">
               </div>
               <span>Forwardmymail</span>
             </div>
