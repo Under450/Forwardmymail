@@ -538,10 +538,24 @@
       margin-top: 2rem;
       background: var(--white);
       border-radius: var(--radius-lg);
-      padding: 1.4rem 1.3rem;
       border: 1px solid var(--border-subtle);
       box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
       font-size: 0.9rem;
+      overflow: hidden;
+    }
+
+    .pricing-extra-header {
+      background: var(--primary);
+      color: #e5edff;
+      padding: 0.6rem 1.1rem;
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .pricing-extra-body {
+      padding: 1.1rem 1.1rem 1.3rem;
     }
 
     .pricing-extra-grid {
@@ -675,10 +689,24 @@
       list-style: none;
       font-weight: 600;
       color: var(--primary);
+      display: flex;
+      align-items: center;
     }
 
     summary::-webkit-details-marker {
       display: none;
+    }
+
+    summary::after {
+      content: "+";
+      margin-left: auto;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    details[open] summary::after {
+      content: "−";
     }
 
     details[open] {
@@ -1227,64 +1255,66 @@
           </div>
 
           <div class="pricing-extra">
-            <strong>Ultimate + Parcel Handling Package</strong>
-            <p style="margin: 0.5rem 0 0.2rem; color: var(--text-muted);">
-              Usage rates apply beyond inclusive allowances and can be tailored to your volume. Example rates:
-            </p>
+            <div class="pricing-extra-header">Ultimate + Parcel Handling Package</div>
+            <div class="pricing-extra-body">
+              <p style="margin: 0.3rem 0 0.2rem; color: var(--text-muted);">
+                Usage rates apply beyond inclusive allowances and can be tailored to your volume. Example rates:
+              </p>
 
-            <div class="pricing-extra-grid">
-              <div>
-                <div class="pricing-extra-title">Mail &amp; Scanning</div>
-                <table class="pricing-table">
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Example rate</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Letters</td>
-                      <td>£0.25–£0.75 per item + postage</td>
-                    </tr>
-                    <tr>
-                      <td>Additional scanning</td>
-                      <td>£0.40–£0.80 per page beyond allowance</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="pricing-extra-grid">
+                <div>
+                  <div class="pricing-extra-title">Mail &amp; Scanning</div>
+                  <table class="pricing-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Example rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Letters</td>
+                        <td>£0.25–£0.75 per item + postage</td>
+                      </tr>
+                      <tr>
+                        <td>Additional scanning</td>
+                        <td>£0.40–£0.80 per page beyond allowance</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div>
+                  <div class="pricing-extra-title">Parcels &amp; Storage</div>
+                  <table class="pricing-table">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Example rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Standard parcels (up to ~5kg)</td>
+                        <td>£1.50–£3.00 per parcel + postage</td>
+                      </tr>
+                      <tr>
+                        <td>Oversize / heavy / courier</td>
+                        <td>Special handling fee per item</td>
+                      </tr>
+                      <tr>
+                        <td>Long-term storage</td>
+                        <td>First 5 days free, then daily rate</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div>
-                <div class="pricing-extra-title">Parcels &amp; Storage</div>
-                <table class="pricing-table">
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Example rate</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Standard parcels (up to ~5kg)</td>
-                      <td>£1.50–£3.00 per parcel + postage</td>
-                    </tr>
-                    <tr>
-                      <td>Oversize / heavy / courier</td>
-                      <td>Special handling fee per item</td>
-                    </tr>
-                    <tr>
-                      <td>Long-term storage</td>
-                      <td>First 5 days free, then daily rate</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="pricing-compliance">
+                <strong>UK Compliance Notice:</strong>
+                In line with UK Anti-Money Laundering (AML) regulations, we are required to verify the identity and address of all customers. This is a secure digital process completed after sign-up.
               </div>
-            </div>
-
-            <div class="pricing-compliance">
-              <strong>UK Compliance Notice:</strong>
-              In line with UK Anti-Money Laundering (AML) regulations, we are required to verify the identity and address of all customers. This is a secure digital process completed after sign-up.
             </div>
           </div>
         </div>
@@ -1474,7 +1504,7 @@
             <div class="footer-heading">Company</div>
             <ul class="footer-links">
               <li><a href="#about">About Us</a></li>
-              <li><a href="#pricing">Pricing</b></li>
+              <li><a href="#pricing">Pricing</a></li>
               <li><a href="#contact">Contact</a></li>
               <li><a href="https://portal.example.com">Client Login</a></li>
             </ul>
