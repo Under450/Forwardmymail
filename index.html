@@ -233,21 +233,38 @@
 
     .hero-image-placeholder {
       border-radius: 20px;
-      background: linear-gradient(135deg, #0f172a, #1d4ed8);
-      height: 260px;
-      position: relative;
       overflow: hidden;
+      position: relative;
+      height: 260px;
+      background: #020617;
     }
 
-    .hero-image-placeholder::after {
-      content: "HERO IMAGE / CITYSCAPE";
+    .hero-image-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-image-overlay {
       position: absolute;
-      bottom: 1rem;
-      left: 1rem;
-      font-size: 0.8rem;
-      color: rgba(241, 245, 249, 0.9);
-      letter-spacing: 0.08em;
-      font-weight: 500;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.1rem 1.3rem;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.0));
+      color: #e5edff;
+    }
+
+    .hero-image-overlay-title {
+      font-weight: 600;
+      font-size: 0.98rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .hero-image-overlay-text {
+      font-size: 0.85rem;
+      opacity: 0.9;
     }
 
     .hero-card-caption {
@@ -318,6 +335,23 @@
       padding: 1.35rem 1.2rem;
       border: 1px solid var(--border-subtle);
       box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, color 0.2s ease;
+    }
+
+    .step-card:hover {
+      background: var(--primary);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .step-card:hover .step-title,
+    .step-card:hover .step-text {
+      color: #e5edff;
+    }
+
+    .step-card:hover .step-icon {
+      background: var(--white);
+      color: var(--primary);
     }
 
     .step-icon {
@@ -1000,11 +1034,14 @@
 
           <aside class="hero-card" aria-label="Secure & confidential mail handling">
             <div class="hero-image-placeholder">
-              <!-- Replace with hero image -->
-            </div>
-            <div class="hero-card-caption">
-              <strong>Secure &amp; Confidential</strong>
-              <span>Your mail is received, logged, and processed in our monitored facility before being forwarded or scanned to your secure online portal.</span>
+              <!-- Replace 'secure-confidential.jpg' with your actual path -->
+              <img src="secure-confidential.jpg" alt="Secure and confidential mail handling in our facility." />
+              <div class="hero-image-overlay">
+                <div class="hero-image-overlay-title">Secure &amp; Confidential</div>
+                <div class="hero-image-overlay-text">
+                  Your mail, handled professionally in our secure facility.
+                </div>
+              </div>
             </div>
           </aside>
         </div>
