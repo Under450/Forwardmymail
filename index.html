@@ -452,26 +452,32 @@
       flex-direction: column;
       box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
       position: relative;
+      overflow: hidden;
     }
 
     .pricing-card.highlight {
       border-color: var(--accent);
       box-shadow: 0 18px 42px rgba(37, 99, 235, 0.35);
       transform: translateY(-4px);
+      padding-top: 2.7rem; /* extra space for full-width badge */
     }
 
     .badge {
       position: absolute;
-      top: 1rem;
-      right: 1.2rem;
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
+      top: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      background: var(--accent-soft);
-      color: var(--accent);
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
+      background: linear-gradient(to right, var(--accent), #1d4ed8);
+      color: #e5edff;
+      padding: 0.35rem 0.6rem;
       font-weight: 700;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+      z-index: 2;
     }
 
     .pricing-name {
@@ -1468,7 +1474,7 @@
             <div class="footer-heading">Company</div>
             <ul class="footer-links">
               <li><a href="#about">About Us</a></li>
-              <li><a href="#pricing">Pricing</a></li>
+              <li><a href="#pricing">Pricing</b></li>
               <li><a href="#contact">Contact</a></li>
               <li><a href="https://portal.example.com">Client Login</a></li>
             </ul>
