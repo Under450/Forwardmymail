@@ -75,26 +75,28 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1rem 1.5rem;
+      padding: 0.8rem 1.5rem;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.5rem;
       font-weight: 700;
       color: var(--primary);
       letter-spacing: 0.02em;
+      font-size: 1rem;
     }
 
     .brand-icon {
-      height: 32px;
+      height: 30px;
+      width: auto;
       display: flex;
       align-items: center;
     }
 
     .brand-icon img {
-      height: 32px;
+      height: 30px;
       width: auto;
       display: block;
     }
@@ -743,11 +745,12 @@
       width: 30px;
       height: 30px;
       border-radius: 999px;
-      background: var(--bg-soft);
+      background: var(--accent-soft);
+      border: 1px solid rgba(12, 96, 255, 0.25);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--primary);
+      color: var(--accent);
       font-size: 0.9rem;
     }
 
@@ -843,7 +846,7 @@
     }
 
     .footer-brand .brand-icon img {
-      height: 28px;
+      height: 30px;
     }
 
     .footer-heading {
@@ -868,9 +871,25 @@
     .footer-links a {
       color: rgba(226, 232, 240, 0.85);
       font-size: 0.86rem;
+      cursor: pointer;
     }
 
     .footer-links a:hover {
+      color: #e5edff;
+    }
+
+    /* Make policy buttons look like links */
+    .footer-links button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgba(226,232,240,0.85);
+      cursor: pointer;
+      text-align: left;
+    }
+    .footer-links button:hover {
       color: #e5edff;
     }
 
@@ -883,6 +902,113 @@
       gap: 0.7rem;
       font-size: 0.78rem;
       color: rgba(148, 163, 184, 0.9);
+    }
+
+    /* POLICY MODALS */
+    .policy-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 80;
+    }
+
+    .policy-modal.active {
+      display: block;
+    }
+
+    .policy-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    .policy-dialog {
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(900px, 94vw);
+      max-height: 88vh;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.35);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .policy-header {
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+      color: #e5edff;
+    }
+
+    .policy-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .policy-close {
+      border: none;
+      background: rgba(15, 23, 42, 0.25);
+      color: #e5edff;
+      border-radius: 999px;
+      width: 30px;
+      height: 30px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .policy-close:hover {
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    .policy-body {
+      padding: 1.2rem 1.4rem 1.5rem;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: #f5f7fb;
+    }
+
+    .policy-body h3 {
+      margin-top: 1.1rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.95rem;
+      color: var(--primary);
+    }
+
+    .policy-body p {
+      margin: 0.25rem 0 0.55rem;
+    }
+
+    .policy-body ul {
+      margin: 0.25rem 0 0.6rem 1.2rem;
+      padding: 0;
+    }
+
+    .policy-body li {
+      margin-bottom: 0.25rem;
+    }
+
+    .policy-note {
+      margin-top: 0.9rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 10px;
+      background: var(--bg-soft);
+      border: 1px dashed var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
     @media (max-width: 960px) {
@@ -909,6 +1035,10 @@
       .hero-actions { flex-direction: column; align-items: flex-start; }
       .navbar-inner { padding-inline: 1rem; }
       .container { padding-inline: 1rem; }
+      .policy-dialog {
+        top: 4%;
+        max-height: 92vh;
+      }
     }
   </style>
 </head>
@@ -919,7 +1049,7 @@
       <div class="container navbar-inner">
         <a href="#top" class="brand">
           <div class="brand-icon">
-            <img src="forwardmymail-logo.png" alt="Forwardmymail logo">
+            <img src="forwardmymail-header-logo.png" alt="Forward My Mail logo">
           </div>
           <span>Forwardmymail</span>
         </a>
@@ -934,7 +1064,7 @@
         </nav>
 
         <div class="nav-actions">
-          <a href="https://portal.example.com" class="btn btn-outline">Client Login</a>
+          <a href="#" class="btn btn-outline">Client Login</a>
           <a href="#pricing" class="btn btn-primary">Get Started</a>
         </div>
       </div>
@@ -971,7 +1101,7 @@
 
           <aside class="hero-card" aria-label="Secure & confidential mail handling">
             <div class="hero-image-placeholder">
-              <img src="forwardmymail-logo.png" alt="Forwardmymail secure & confidential">
+              <img src="forwardmymail-logo.png" alt="Secure & confidential mail in our facility">
               <div class="hero-image-overlay">
                 <div class="hero-image-overlay-title">Secure &amp; Confidential</div>
                 <div class="hero-image-overlay-text">
@@ -1452,7 +1582,7 @@
           <div class="footer-brand">
             <div class="footer-brand-title">
               <div class="brand-icon">
-                <img src="forwardmymail-logo.png" alt="Forwardmymail logo">
+                <img src="forwardmymail-header-logo.png" alt="Forward My Mail logo">
               </div>
               <span>Forwardmymail</span>
             </div>
@@ -1477,17 +1607,17 @@
               <li><a href="#about">About Us</a></li>
               <li><a href="#pricing">Pricing</a></li>
               <li><a href="#contact">Contact</a></li>
-              <li><a href="https://portal.example.com">Client Login</a></li>
+              <li><a href="#">Client Login</a></li>
             </ul>
           </div>
 
           <div>
             <div class="footer-heading">Legal</div>
             <ul class="footer-links">
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Terms &amp; Conditions</a></li>
-              <li><a href="#">Cookie Policy</a></li>
-              <li><a href="#">Acceptable Use</a></li>
+              <li><button type="button" data-policy-modal="modal-privacy">Privacy Policy</button></li>
+              <li><button type="button" data-policy-modal="modal-terms">Terms &amp; Conditions</button></li>
+              <li><button type="button" data-policy-modal="modal-cookies">Cookie Policy</button></li>
+              <li><button type="button" data-policy-modal="modal-acceptable">Acceptable Use</button></li>
             </ul>
           </div>
         </div>
@@ -1499,5 +1629,480 @@
       </div>
     </footer>
   </div>
+
+  <!-- POLICY MODALS -->
+
+  <!-- Privacy Policy -->
+  <div id="modal-privacy" class="policy-modal" aria-hidden="true">
+    <div class="policy-backdrop"></div>
+    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+      <div class="policy-header">
+        <h2 id="privacy-title">Privacy Policy</h2>
+        <button class="policy-close" type="button" aria-label="Close privacy policy">&times;</button>
+      </div>
+      <div class="policy-body">
+        <p>
+          This Privacy Policy explains how Forwardmymail Ltd (“Forwardmymail”, “we”, “us”, “our”) collects, uses and protects your
+          personal data when you visit this website, contact us, or use our mail handling and virtual address services.
+        </p>
+
+        <h3>1. Who we are</h3>
+        <p>
+          Forwardmymail Ltd is a company registered in England and Wales. We act as the “data controller” for the personal
+          data we collect and process in connection with this website and our services.
+        </p>
+
+        <h3>2. What personal data we collect</h3>
+        <p>We may collect and process the following categories of personal data:</p>
+        <ul>
+          <li>Identity data – name, title, date of birth, identification numbers and documents (for KYC/AML checks).</li>
+          <li>Contact data – email address, telephone number, correspondence address and emergency contact details.</li>
+          <li>Account data – login credentials, profile information, communication preferences and support history.</li>
+          <li>Mail handling data – sender details, addressee details and digital scans of mail that we open on your instructions.</li>
+          <li>Transaction data – plan type, payment history, invoices and other records relating to your use of our services.</li>
+          <li>Technical data – IP address, browser type, device identifiers and similar information collected through cookies and analytics.</li>
+          <li>Marketing and communications data – your preferences for receiving marketing from us and your communication choices.</li>
+        </ul>
+
+        <h3>3. How we collect your data</h3>
+        <p>We collect personal data in the following ways:</p>
+        <ul>
+          <li>Directly from you when you complete forms on our website, sign up for a plan, contact us or upload documents.</li>
+          <li>Automatically when you interact with our website through cookies, server logs and similar technologies.</li>
+          <li>
+            From third parties such as payment processors, identity verification providers, credit reference agencies or
+            regulatory bodies where required for compliance.
+          </li>
+        </ul>
+
+        <h3>4. How we use your personal data</h3>
+        <p>We use your personal data for the following purposes:</p>
+        <ul>
+          <li>To set up and manage your account and provide our mail forwarding, scanning and address services.</li>
+          <li>To perform identity, anti-money laundering (AML) and “know your customer” (KYC) checks where required by law.</li>
+          <li>To communicate with you about your account, renewals, service changes and support requests.</li>
+          <li>To process payments, issue invoices and maintain financial records.</li>
+          <li>To operate, secure and improve this website and our customer portal.</li>
+          <li>To send you service updates and, where permitted, carefully selected marketing communications (you can opt out at any time).</li>
+          <li>To comply with our legal and regulatory obligations and respond to law-enforcement or regulatory requests.</li>
+        </ul>
+
+        <h3>5. Legal basis for processing</h3>
+        <p>We rely on the following legal bases under UK data protection law:</p>
+        <ul>
+          <li><strong>Contract:</strong> processing necessary to enter into or perform a contract with you.</li>
+          <li><strong>Legal obligation:</strong> processing necessary for us to comply with laws, including AML/KYC regulations.</li>
+          <li><strong>Legitimate interests:</strong> processing for our legitimate business interests that are not overridden by your rights.</li>
+          <li><strong>Consent:</strong> where required for certain cookies or marketing communications – you can withdraw consent at any time.</li>
+        </ul>
+
+        <h3>6. Who we share your data with</h3>
+        <p>We may share your personal data with the following categories of recipients where appropriate:</p>
+        <ul>
+          <li>Service providers who supply IT hosting, customer support, payment processing and identity verification.</li>
+          <li>Professional advisers such as lawyers, accountants and auditors.</li>
+          <li>Regulators, law-enforcement agencies and HMRC where required by law or in connection with suspected fraud or crime.</li>
+          <li>Couriers and postal services where we forward items in accordance with your instructions.</li>
+          <li>Any purchaser of our business or assets, in which case your data may be transferred as part of the transaction.</li>
+        </ul>
+        <p>We do not sell your personal data to third parties.</p>
+
+        <h3>7. International transfers</h3>
+        <p>
+          Where we transfer personal data outside the UK or European Economic Area, we take steps to ensure that an appropriate level of protection
+          is in place, for example by using standard contractual clauses approved by the UK ICO or EU Commission.
+        </p>
+
+        <h3>8. Data retention</h3>
+        <p>
+          We keep personal data only for as long as necessary for the purposes described in this policy, including to satisfy any legal, accounting
+          or reporting requirements. This typically includes:
+        </p>
+        <ul>
+          <li>Customer account and transaction records – normally kept for up to 6 years after the end of our relationship.</li>
+          <li>ID and KYC documentation – retained for the period required by AML regulations and then securely deleted.</li>
+          <li>Mail scans – retained in your portal while your account is active and for a limited period after closure, unless you ask us to delete them earlier where permitted.</li>
+        </ul>
+
+        <h3>9. How we protect your data</h3>
+        <p>
+          We use a combination of technical and organisational measures to safeguard your data, including access controls, encryption in transit,
+          secure storage and regular monitoring. However, no system can be completely secure and you are responsible for keeping your
+          login details confidential.
+        </p>
+
+        <h3>10. Your rights</h3>
+        <p>Under UK data protection law you may have the right to:</p>
+        <ul>
+          <li>Request access to the personal data we hold about you.</li>
+          <li>Request correction of inaccurate or incomplete data.</li>
+          <li>Request deletion of your data where there is no lawful reason for us to continue processing it.</li>
+          <li>Object to processing based on legitimate interests and to direct marketing.</li>
+          <li>Request restriction of processing in certain circumstances.</li>
+          <li>Request transfer of your data to you or another provider (data portability).</li>
+          <li>Withdraw consent where we rely on it for processing.</li>
+        </ul>
+        <p>
+          To exercise any of these rights, please contact us using the details below. We may need to verify your identity before responding.
+        </p>
+
+        <h3>11. Contact and complaints</h3>
+        <p>
+          If you have any questions about this Privacy Policy or how we handle your data, please contact:
+        </p>
+        <p>
+          Forwardmymail Ltd<br>
+          8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom<br>
+          Email: info@forwardmymail.co.uk
+        </p>
+        <p>
+          You also have the right to lodge a complaint with the UK Information Commissioner’s Office (ICO) if you are unhappy with how we use your data.
+        </p>
+
+        <h3>12. Changes to this policy</h3>
+        <p>
+          We may update this Privacy Policy from time to time to reflect changes in law or our practices. The updated version will be posted
+          on this page with a revised “last updated” date.
+        </p>
+
+        <div class="policy-note">
+          This Privacy Policy is provided as a template for general information only and does not constitute legal advice. You should obtain
+          independent legal advice to ensure it is appropriate for your business and complies with all applicable laws.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Terms & Conditions -->
+  <div id="modal-terms" class="policy-modal" aria-hidden="true">
+    <div class="policy-backdrop"></div>
+    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+      <div class="policy-header">
+        <h2 id="terms-title">Website Terms &amp; Conditions</h2>
+        <button class="policy-close" type="button" aria-label="Close terms and conditions">&times;</button>
+      </div>
+      <div class="policy-body">
+        <p>
+          These Website Terms and Conditions (“Terms”) govern your use of the Forwardmymail Ltd website and any online portals or services
+          made available through it (collectively, the “Site”). By accessing or using the Site, you agree to be bound by these Terms.
+        </p>
+
+        <h3>1. About us</h3>
+        <p>
+          This Site is operated by Forwardmymail Ltd (“Forwardmymail”, “we”, “us”, “our”), a company registered in England and Wales.
+          Our registered office is at 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom.
+        </p>
+
+        <h3>2. Use of the Site</h3>
+        <p>Subject to these Terms, we grant you a limited, non-exclusive, non-transferable right to access and use the Site for:</p>
+        <ul>
+          <li>Viewing information about our services, pricing and contact details; and</li>
+          <li>Managing your Forwardmymail account where you are an existing customer.</li>
+        </ul>
+        <p>You must not use the Site:</p>
+        <ul>
+          <li>For any unlawful purpose or in breach of any applicable law or regulation.</li>
+          <li>To attempt to gain unauthorised access to our systems or another user’s account.</li>
+          <li>To transmit any malicious code, spam or harmful content.</li>
+          <li>In a way that could damage, disable, overburden or impair the Site or our infrastructure.</li>
+        </ul>
+
+        <h3>3. Account registration and security</h3>
+        <p>
+          Certain services (including the customer portal) require you to create an account and choose a username and password.
+          You are responsible for keeping your login details confidential and for all activity that occurs under your account.
+          You agree to notify us immediately if you suspect unauthorised access or use.
+        </p>
+
+        <h3>4. Our services</h3>
+        <p>
+          Information on the Site about our virtual address, mail forwarding, scanning and related services is provided for general guidance only.
+          The detailed terms on which we supply services will be set out in a separate service agreement, order form or plan description provided
+          at the time you sign up. If there is any conflict between these Terms and your service agreement, the service agreement shall prevail.
+        </p>
+
+        <h3>5. Pricing and payment</h3>
+        <p>
+          Prices displayed on the Site are indicative and may be subject to change. All prices are shown exclusive of VAT unless stated otherwise.
+          Your final price, billing frequency, payment method and any usage-based charges will be confirmed during the sign-up process.
+        </p>
+
+        <h3>6. Intellectual property</h3>
+        <p>
+          All content on the Site, including text, graphics, logos, icons, images, software and layout, is owned by or licensed to Forwardmymail
+          and is protected by copyright and other intellectual property rights. You may view and print content for your own internal use but must
+          not copy, reproduce, modify, distribute or create derivative works without our prior written consent.
+        </p>
+
+        <h3>7. Third-party links</h3>
+        <p>
+          The Site may contain links to third-party websites and resources. These links are provided for convenience only and do not imply any
+          endorsement or responsibility by us for the content or availability of those sites. You access third-party sites at your own risk.
+        </p>
+
+        <h3>8. Availability of the Site</h3>
+        <p>
+          We aim to keep the Site available and secure, but we do not guarantee that it will be uninterrupted, error-free or free from viruses.
+          We may suspend or withdraw all or part of the Site for maintenance, upgrades or other reasons without notice.
+        </p>
+
+        <h3>9. Liability</h3>
+        <p>
+          Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud or any other liability that
+          cannot be excluded under English law.
+        </p>
+        <p>
+          To the maximum extent permitted by law, we exclude all implied conditions, warranties, representations or other terms that may apply
+          to the Site or any content on it. We will not be liable for any loss or damage arising from or in connection with:
+        </p>
+        <ul>
+          <li>Your use of or inability to use the Site; or</li>
+          <li>Your reliance on any content displayed on the Site.</li>
+        </ul>
+        <p>
+          In particular, we will not be liable for loss of profits, business, goodwill, data or any indirect or consequential loss.
+        </p>
+
+        <h3>10. Indemnity</h3>
+        <p>
+          You agree to indemnify and hold Forwardmymail harmless from any claims, losses, damages, costs and expenses (including reasonable
+          legal fees) arising out of your breach of these Terms or misuse of the Site.
+        </p>
+
+        <h3>11. Changes to these Terms</h3>
+        <p>
+          We may update these Terms from time to time. Any changes will be posted on this page with an updated “last updated” date.
+          Your continued use of the Site after changes are posted will constitute your acceptance of the revised Terms.
+        </p>
+
+        <h3>12. Governing law and jurisdiction</h3>
+        <p>
+          These Terms, and any dispute or claim arising out of or in connection with them, are governed by the laws of England and Wales.
+          The courts of England and Wales shall have exclusive jurisdiction, except that consumers resident elsewhere in the UK may bring claims
+          in their local courts.
+        </p>
+
+        <h3>13. Contact</h3>
+        <p>
+          If you have any questions about these Terms, please contact us at info@forwardmymail.co.uk.
+        </p>
+
+        <div class="policy-note">
+          These Terms are provided as a template and may need to be tailored to your specific service agreements and regulatory requirements.
+          Independent legal advice is recommended before relying on them.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cookie Policy -->
+  <div id="modal-cookies" class="policy-modal" aria-hidden="true">
+    <div class="policy-backdrop"></div>
+    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="cookies-title">
+      <div class="policy-header">
+        <h2 id="cookies-title">Cookie Policy</h2>
+        <button class="policy-close" type="button" aria-label="Close cookie policy">&times;</button>
+      </div>
+      <div class="policy-body">
+        <p>
+          This Cookie Policy explains how Forwardmymail Ltd (“Forwardmymail”, “we”, “us”, “our”) uses cookies and similar technologies on this
+          website and in our online customer portal.
+        </p>
+
+        <h3>1. What are cookies?</h3>
+        <p>
+          Cookies are small text files that are stored on your device when you visit a website. They help the site to recognise your device and
+          remember certain information about your visit, such as preferences and settings.
+        </p>
+
+        <h3>2. Types of cookies we use</h3>
+        <p>We may use the following categories of cookies:</p>
+        <ul>
+          <li>
+            <strong>Strictly necessary cookies</strong> – required for the operation of the website and portal, such as cookies that allow you
+            to log in and manage your account.
+          </li>
+          <li>
+            <strong>Performance and analytics cookies</strong> – used to collect anonymous information about how visitors use our site, such as
+            which pages are most popular and any error messages. This helps us improve the site.
+          </li>
+          <li>
+            <strong>Functional cookies</strong> – used to remember your choices and preferences (for example, language settings).
+          </li>
+          <li>
+            <strong>Marketing cookies</strong> – if used, these help us measure the effectiveness of our advertising and may be set by third-party
+            providers such as analytics or advertising partners.
+          </li>
+        </ul>
+
+        <h3>3. Examples of cookies</h3>
+        <p>Examples of the types of cookies that may be set include:</p>
+        <ul>
+          <li><strong>Session cookies</strong> – temporary cookies that are deleted when you close your browser and are used to maintain your session.</li>
+          <li><strong>Persistent cookies</strong> – remain on your device for a set period or until you delete them and help remember your settings.</li>
+          <li><strong>Third-party cookies</strong> – set by external providers such as analytics services. We do not control these cookies directly.</li>
+        </ul>
+
+        <h3>4. Cookie consent and control</h3>
+        <p>
+          When you first visit our site, you may be presented with a cookie banner or pop-up explaining the types of cookies we use.
+          Where required by law, we will only use non-essential cookies (such as analytics or marketing cookies) with your consent.
+        </p>
+        <p>You can manage your cookie preferences in several ways:</p>
+        <ul>
+          <li>Adjusting your choices in any on-site cookie banner or settings panel (where available).</li>
+          <li>Changing your browser settings to block or delete cookies, or to alert you before cookies are set.</li>
+          <li>Opting out of certain third-party cookies directly with the relevant provider (for example, analytics or advertising networks).</li>
+        </ul>
+        <p>
+          Please note that disabling some cookies may affect the functionality of the site or portal and your ability to use certain features.
+        </p>
+
+        <h3>5. Other tracking technologies</h3>
+        <p>
+          We may use similar technologies such as pixels or local storage to support site functionality and analytics. These operate in a
+          similar way to cookies and are treated in the same way for the purposes of this policy.
+        </p>
+
+        <h3>6. Updates to this Cookie Policy</h3>
+        <p>
+          We may update this Cookie Policy from time to time to reflect changes in technology or legal requirements. Any updates will be posted
+          on this page with a revised “last updated” date.
+        </p>
+
+        <h3>7. Contact</h3>
+        <p>
+          If you have any questions about our use of cookies, please contact us at info@forwardmymail.co.uk.
+        </p>
+
+        <div class="policy-note">
+          This Cookie Policy is a general template and should be aligned with the exact cookies and tools actually used on your site,
+          including any analytics, advertising or third-party plugins.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acceptable Use Policy -->
+  <div id="modal-acceptable" class="policy-modal" aria-hidden="true">
+    <div class="policy-backdrop"></div>
+    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="acceptable-title">
+      <div class="policy-header">
+        <h2 id="acceptable-title">Acceptable Use Policy</h2>
+        <button class="policy-close" type="button" aria-label="Close acceptable use policy">&times;</button>
+      </div>
+      <div class="policy-body">
+        <p>
+          This Acceptable Use Policy (“Policy”) sets out the rules that apply to your use of the Forwardmymail website, customer portal and
+          mail handling services (together, the “Services”). It is designed to protect both you and us, and to ensure that our Services are
+          used lawfully and responsibly.
+        </p>
+
+        <h3>1. Prohibited uses</h3>
+        <p>You must not use the Services:</p>
+        <ul>
+          <li>For any unlawful purpose or in connection with any illegal activity.</li>
+          <li>To promote or facilitate fraud, money laundering, tax evasion or other financial crime.</li>
+          <li>To receive, store or forward items that are illegal, dangerous or prohibited by postal or courier regulations.</li>
+          <li>To impersonate any person or entity or misrepresent your affiliation with any person or entity.</li>
+          <li>To send unsolicited bulk communications (spam) or conduct phishing, scams or deceptive practices.</li>
+          <li>To upload or transmit any content that is defamatory, obscene, threatening, discriminatory or otherwise objectionable.</li>
+        </ul>
+
+        <h3>2. Security and system integrity</h3>
+        <p>You agree that you will not:</p>
+        <ul>
+          <li>Attempt to gain unauthorised access to our systems, networks or the accounts of other users.</li>
+          <li>Probe, scan or test the vulnerability of any system or network without our prior written consent.</li>
+          <li>Interfere with or disrupt the operation of the Services, including by introducing malware or conducting denial-of-service attacks.</li>
+          <li>Use automated tools (such as bots or scrapers) to access or collect data from the Services without permission.</li>
+        </ul>
+
+        <h3>3. Use of addresses and mail forwarding</h3>
+        <p>When using any Forwardmymail address or mail forwarding service you must:</p>
+        <ul>
+          <li>Provide accurate and complete information about your identity, business and intended use of the address.</li>
+          <li>Ensure that your use of the address complies with all applicable laws and regulatory requirements.</li>
+          <li>Not use the address for activities that could damage our reputation or cause regulatory or legal issues.</li>
+          <li>Promptly update us if your contact details, ownership or business activities change.</li>
+        </ul>
+
+        <h3>4. Content you provide</h3>
+        <p>
+          You are responsible for all information, documents and content that you provide to us or upload to the portal. You must ensure that
+          you have the necessary rights to use and share such content and that it does not infringe any third-party rights, including
+          intellectual property and privacy rights.
+        </p>
+
+        <h3>5. Monitoring and enforcement</h3>
+        <p>
+          We reserve the right, but are not obliged, to monitor use of the Services and to investigate any suspected breach of this Policy.
+          Where we reasonably believe that a breach has occurred, we may:
+        </p>
+        <ul>
+          <li>Issue a warning and request that the breach is remedied.</li>
+          <li>Temporarily or permanently suspend access to the Services or your account.</li>
+          <li>Refuse to receive, store or forward specific items of mail.</li>
+          <li>Report the matter to relevant authorities, regulators or law-enforcement agencies.</li>
+          <li>Take legal action to recover any losses or costs incurred.</li>
+        </ul>
+
+        <h3>6. Reporting concerns</h3>
+        <p>
+          If you become aware of any misuse of the Services or any activity that may breach this Policy, please contact us immediately at
+          info@forwardmymail.co.uk.
+        </p>
+
+        <h3>7. Changes to this Policy</h3>
+        <p>
+          We may update this Acceptable Use Policy from time to time. Any changes will be posted on our website with an updated “last updated”
+          date and will apply from the date of publication.
+        </p>
+
+        <div class="policy-note">
+          This Acceptable Use Policy is a general template and may need to be adapted to reflect your specific risk profile, regulatory regime
+          and service terms. You should take legal advice where necessary.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Modal logic – all on one page, no navigation / scroll-to-top issues
+    document.addEventListener('DOMContentLoaded', function () {
+      // Open modals
+      document.querySelectorAll('[data-policy-modal]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var id = btn.getAttribute('data-policy-modal');
+          var modal = document.getElementById(id);
+          if (modal) {
+            modal.classList.add('active');
+            modal.setAttribute('aria-hidden', 'false');
+          }
+        });
+      });
+
+      // Close on X or backdrop
+      document.querySelectorAll('.policy-close, .policy-backdrop').forEach(function (el) {
+        el.addEventListener('click', function () {
+          var modal = el.closest('.policy-modal');
+          if (modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+          }
+        });
+      });
+
+      // Close on ESC
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+          document.querySelectorAll('.policy-modal.active').forEach(function (modal) {
+            modal.classList.remove('active');
+            modal.setAttribute('aria-hidden', 'true');
+          });
+        }
+      });
+    });
+  </script>
 </body>
 </html>
