@@ -1,15 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Forwardmymail – UK Virtual Address & Mail Forwarding</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Premium UK virtual business address, mail forwarding, digital scanning and registered office services." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-  <style>
+<meta charset="utf-8"/>
+<title>Forwardmymail – UK Virtual Address &amp; Mail Forwarding</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="Premium UK virtual business address, mail forwarding, digital scanning and registered office services." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
     :root {
       --primary: #0b2a5b;
       --primary-dark: #071c3d;
@@ -1040,1044 +1040,727 @@
         max-height: 92vh;
       }
     }
-  </style>
+  
+/* Modal print button and details styling */
+.policy-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.policy-actions .btn{cursor:pointer;border:1px solid #ddd;background:#f7f7f7;padding:6px 10px;border-radius:6px}
+.policy-body details{border:1px solid #eee;border-radius:6px;padding:.5rem .75rem;margin:.5rem 0}
+.policy-body details>summary{cursor:pointer;font-weight:600;margin:-.5rem -.75rem .5rem -.75rem;padding:.5rem .75rem}
+.policy-body details[open]{background:#fafafa}
+
+/* Terms mini TOC */
+.terms-toc{border:1px solid #e6e6e6;background:#fafafa;border-radius:8px;padding:10px 12px;margin:8px 0 12px}
+.terms-toc__title{font-weight:600;margin-bottom:6px}
+.terms-toc__list{list-style:none;padding:0;margin:0;columns:2;column-gap:24px}
+.terms-toc__list li{margin:4px 0;break-inside:avoid}
+.terms-toc__link{text-decoration:none;border-bottom:1px dashed #999}
+.terms-toc__link:hover{border-bottom-color:#333}
+.policy-body :target{scroll-margin-top: 80px;}
+</style>
 </head>
 <body>
-  <div class="page">
-    <!-- NAVBAR -->
-    <header class="navbar">
-      <div class="container navbar-inner">
-        <a href="#top" class="brand">
-          <div class="brand-icon">
-            <img src="logo.png" alt="Forward My Mail logo">
-          </div>
-        </a>
-
-        <nav class="nav-links" aria-label="Main navigation">
-          <a href="#how-it-works">How It Works</a>
-          <a href="#services">Services</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#about">About</a>
-          <a href="#faqs">FAQs</a>
-          <a href="#contact">Contact</a>
-        </nav>
-
-        <div class="nav-actions">
-  <a href="https://forwardmymail.getzendo.io/login"
-     class="btn btn-outline"
-     target="_blank"
-     rel="noopener">
+<div class="page">
+<!-- NAVBAR -->
+<header class="navbar">
+<div class="container navbar-inner">
+<a class="brand" href="#top">
+<div class="brand-icon">
+<img alt="Forward My Mail logo" src="logo.png"/>
+</div>
+</a>
+<nav aria-label="Main navigation" class="nav-links">
+<a href="#how-it-works">How It Works</a>
+<a href="#services">Services</a>
+<a href="#pricing">Pricing</a>
+<a href="#about">About</a>
+<a href="#faqs">FAQs</a>
+<a href="#contact">Contact</a>
+</nav>
+<div class="nav-actions">
+<a class="btn btn-outline" href="https://forwardmymail.getzendo.io/login" rel="noopener" target="_blank">
     Client Login
   </a>
-  <a href="#pricing" class="btn btn-primary">Get Started</a>
+<a class="btn btn-primary" href="#pricing">Get Started</a>
 </div>
-      </div>
-    </header>
-
-    <main id="top">
-      <!-- HERO -->
-      <section class="hero">
-        <div class="container hero-inner">
-          <div>
-            <div class="pill">
-              <span class="pill-dot"></span>
-              <span>The UK’s Trusted Virtual Address Service</span>
-            </div>
-
-            <h1 class="hero-title">
+</div>
+</header>
+<main id="top">
+<!-- HERO -->
+<section class="hero">
+<div class="container hero-inner">
+<div>
+<div class="pill">
+<span class="pill-dot"></span>
+<span>The UK’s Trusted Virtual Address Service</span>
+</div>
+<h1 class="hero-title">
               A Prestigious UK Business Address Wherever You Are.
             </h1>
-
-            <p class="hero-subtitle">
+<p class="hero-subtitle">
               Secure mail forwarding, digital scanning, and official registered office services. Establish a professional presence at our UK business centre while we handle your incoming post.
             </p>
-
-            <div class="hero-actions">
-              <a href="#pricing" class="btn btn-primary">Get Your Address</a>
-              <a href="#services" class="btn btn-outline">View Services</a>
-            </div>
-
-            <div class="hero-meta">
-              <span><strong>UK-based support</strong> during business hours</span>
-              <span><strong>No hidden fees</strong>, clear pricing</span>
-            </div>
-          </div>
-
-          <aside class="hero-card" aria-label="Secure & confidential mail handling">
-            <div class="hero-image-placeholder">
-              <img src="forwardmymail-logo.png" alt="Secure & confidential mail in our facility">
-              <div class="hero-image-overlay">
-                <div class="hero-image-overlay-title">Secure &amp; Confidential</div>
-                <div class="hero-image-overlay-text">
+<div class="hero-actions">
+<a class="btn btn-primary" href="#pricing">Get Your Address</a>
+<a class="btn btn-outline" href="#services">View Services</a>
+</div>
+<div class="hero-meta">
+<span><strong>UK-based support</strong> during business hours</span>
+<span><strong>No hidden fees</strong>, clear pricing</span>
+</div>
+</div>
+<aside aria-label="Secure &amp; confidential mail handling" class="hero-card">
+<div class="hero-image-placeholder">
+<img alt="Secure &amp; confidential mail in our facility" src="forwardmymail-logo.png"/>
+<div class="hero-image-overlay">
+<div class="hero-image-overlay-title">Secure &amp; Confidential</div>
+<div class="hero-image-overlay-text">
                   Your mail, handled professionally in our secure facility.
                 </div>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <!-- HOW IT WORKS -->
-      <section id="how-it-works">
-        <div class="container">
-          <div class="section-header">
-            <div class="section-kicker">How It Works</div>
-            <h2 class="section-title">Simple, compliant mail handling in four steps</h2>
-            <p class="section-subtitle">
+</div>
+</div>
+</aside>
+</div>
+</section>
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+<div class="container">
+<div class="section-header">
+<div class="section-kicker">How It Works</div>
+<h2 class="section-title">Simple, compliant mail handling in four steps</h2>
+<p class="section-subtitle">
               From sign-up to scanning, we handle the admin so you can focus on running your business.
             </p>
-          </div>
-
-          <div class="steps">
-            <div class="step-card">
-              <div class="step-icon">1</div>
-              <div class="step-title">Sign Up</div>
-              <div class="step-text">
+</div>
+<div class="steps">
+<div class="step-card">
+<div class="step-icon">1</div>
+<div class="step-title">Sign Up</div>
+<div class="step-text">
                 Choose a plan, complete checkout, and instantly reserve your new UK business address.
               </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-icon">2</div>
-              <div class="step-title">Verify ID</div>
-              <div class="step-text">
+</div>
+<div class="step-card">
+<div class="step-icon">2</div>
+<div class="step-title">Verify ID</div>
+<div class="step-text">
                 Complete a quick online identity check (KYC) so we can meet UK AML regulations.
               </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-icon">3</div>
-              <div class="step-title">We Receive Mail</div>
-              <div class="step-text">
+</div>
+<div class="step-card">
+<div class="step-icon">3</div>
+<div class="step-title">We Receive Mail</div>
+<div class="step-text">
                 Use your Forwardmymail address on Companies House, invoices, and websites. We accept mail on your behalf.
               </div>
-            </div>
-
-            <div class="step-card">
-              <div class="step-icon">4</div>
-              <div class="step-title">You Manage Online</div>
-              <div class="step-text">
+</div>
+<div class="step-card">
+<div class="step-icon">4</div>
+<div class="step-title">You Manage Online</div>
+<div class="step-text">
                 Log in to your secure portal to read scans, download documents, or request forwarding instantly.
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- SERVICES -->
-      <section id="services">
-        <div class="container">
-          <div class="section-header">
-            <div class="section-kicker">Our Services</div>
-            <h2 class="section-title">Everything You Need to Run a UK Business Remotely</h2>
-            <p class="section-subtitle">
+</div>
+</div>
+</div>
+</section>
+<!-- SERVICES -->
+<section id="services">
+<div class="container">
+<div class="section-header">
+<div class="section-kicker">Our Services</div>
+<h2 class="section-title">Everything You Need to Run a UK Business Remotely</h2>
+<p class="section-subtitle">
               From basic mail forwarding to full corporate compliance, Forwardmymail provides the infrastructure for your success.
             </p>
-          </div>
-
-          <div class="services-grid">
-            <article class="service-card">
-              <div class="service-icon">📨</div>
-              <h3 class="service-title">Mail Forwarding</h3>
-              <p class="service-text">
+</div>
+<div class="services-grid">
+<article class="service-card">
+<div class="service-icon">📨</div>
+<h3 class="service-title">Mail Forwarding</h3>
+<p class="service-text">
                 Have letters and parcels sent to your UK address and forwarded to you anywhere in the world.
               </p>
-              <ul class="service-list">
-                <li>Daily or weekly forwarding options</li>
-                <li>Mail receipt &amp; sorting</li>
-                <li>Clear, competitive postage rates</li>
-              </ul>
-            </article>
-
-            <article class="service-card">
-              <div class="service-icon">📁</div>
-              <h3 class="service-title">Digital Mailroom</h3>
-              <p class="service-text">
+<ul class="service-list">
+<li>Daily or weekly forwarding options</li>
+<li>Mail receipt &amp; sorting</li>
+<li>Clear, competitive postage rates</li>
+</ul>
+</article>
+<article class="service-card">
+<div class="service-icon">📁</div>
+<h3 class="service-title">Digital Mailroom</h3>
+<p class="service-text">
                 We open, scan, and securely upload your mail to your private portal so you can read it from any device.
               </p>
-              <ul class="service-list">
-                <li>High-quality PDF scans</li>
-                <li>Optional OCR text search</li>
-                <li>Secure cloud storage</li>
-              </ul>
-            </article>
-
-            <article class="service-card">
-              <div class="service-icon">🏢</div>
-              <h3 class="service-title">Virtual Business Address</h3>
-              <p class="service-text">
+<ul class="service-list">
+<li>High-quality PDF scans</li>
+<li>Optional OCR text search</li>
+<li>Secure cloud storage</li>
+</ul>
+</article>
+<article class="service-card">
+<div class="service-icon">🏢</div>
+<h3 class="service-title">Virtual Business Address</h3>
+<p class="service-text">
                 A professional trading address for your website, invoices, and marketing materials.
               </p>
-              <ul class="service-list">
-                <li>Established business centre location</li>
-                <li>Enhance your brand image</li>
-                <li>Keep your home address private</li>
-              </ul>
-            </article>
-
-            <article class="service-card">
-              <div class="service-icon">📑</div>
-              <h3 class="service-title">Registered Office</h3>
-              <p class="service-text">
+<ul class="service-list">
+<li>Established business centre location</li>
+<li>Enhance your brand image</li>
+<li>Keep your home address private</li>
+</ul>
+</article>
+<article class="service-card">
+<div class="service-icon">📑</div>
+<h3 class="service-title">Registered Office</h3>
+<p class="service-text">
                 Use our address as your official registered office for Companies House and HMRC.
               </p>
-              <ul class="service-list">
-                <li>Government mail handling included</li>
-                <li>Meets UK Ltd legal requirements</li>
-                <li>Compliance-friendly processes</li>
-              </ul>
-            </article>
-
-            <article class="service-card">
-              <div class="service-icon">👤</div>
-              <h3 class="service-title">Director Service Address</h3>
-              <p class="service-text">
+<ul class="service-list">
+<li>Government mail handling included</li>
+<li>Meets UK Ltd legal requirements</li>
+<li>Compliance-friendly processes</li>
+</ul>
+</article>
+<article class="service-card">
+<div class="service-icon">👤</div>
+<h3 class="service-title">Director Service Address</h3>
+<p class="service-text">
                 Keep director home addresses off the public register while remaining fully compliant.
               </p>
-              <ul class="service-list">
-                <li>Public record privacy</li>
-                <li>Statutory mail handling</li>
-                <li>Covers all listed directors</li>
-              </ul>
-            </article>
-
-            <article class="service-card">
-              <div class="service-icon">📜</div>
-              <h3 class="service-title">Company Formation</h3>
-              <p class="service-text">
+<ul class="service-list">
+<li>Public record privacy</li>
+<li>Statutory mail handling</li>
+<li>Covers all listed directors</li>
+</ul>
+</article>
+<article class="service-card">
+<div class="service-icon">📜</div>
+<h3 class="service-title">Company Formation</h3>
+<p class="service-text">
                 Ready to incorporate? We can form your UK limited company and set up your address in one step.
               </p>
-              <ul class="service-list">
-                <li>Digital documents included</li>
-                <li>Fast track formation options</li>
-                <li>UK compliance guidance</li>
-              </ul>
-            </article>
-          </div>
-
-          <div class="services-footer-note">
-            <span>Also available:</span> <strong>Parcel handling &amp; storage solutions</strong>
-          </div>
-        </div>
-      </section>
-
-      <!-- DARK FEATURE BAND -->
-      <section class="feature-band">
-        <div class="container feature-band-inner">
-          <div>
-            <div class="feature-item-title">UK-Based Support</div>
-            <div class="feature-item-text">
+<ul class="service-list">
+<li>Digital documents included</li>
+<li>Fast track formation options</li>
+<li>UK compliance guidance</li>
+</ul>
+</article>
+</div>
+<div class="services-footer-note">
+<span>Also available:</span> <strong>Parcel handling &amp; storage solutions</strong>
+</div>
+</div>
+</section>
+<!-- DARK FEATURE BAND -->
+<section class="feature-band">
+<div class="container feature-band-inner">
+<div>
+<div class="feature-item-title">UK-Based Support</div>
+<div class="feature-item-text">
               Speak to a real person in the UK by phone or email during standard business hours whenever you need help.
             </div>
-          </div>
-          <div>
-            <div class="feature-item-title">No Hidden Fees</div>
-            <div class="feature-item-text">
+</div>
+<div>
+<div class="feature-item-title">No Hidden Fees</div>
+<div class="feature-item-text">
               Transparent pricing with no “per scan handling” charges. You always see exactly what you are paying for.
             </div>
-          </div>
-          <div>
-            <div class="feature-item-title">Secure &amp; Compliant</div>
-            <div class="feature-item-text">
+</div>
+<div>
+<div class="feature-item-title">Secure &amp; Compliant</div>
+<div class="feature-item-text">
               Processes designed around HMRC and ICO requirements. Your data and mail are handled with bank-grade security practices.
             </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PRICING -->
-      <section id="pricing">
-        <div class="container">
-          <div class="section-header">
-            <div class="section-kicker">Pricing</div>
-            <h2 class="section-title">Simple, Transparent Pricing</h2>
-            <p class="section-subtitle">
+</div>
+</div>
+</section>
+<!-- PRICING -->
+<section id="pricing">
+<div class="container">
+<div class="section-header">
+<div class="section-kicker">Pricing</div>
+<h2 class="section-title">Simple, Transparent Pricing</h2>
+<p class="section-subtitle">
               All plans include access to your secure online portal. Prices shown exclude VAT.
             </p>
-          </div>
-
-          <div class="pricing-grid">
-            <article class="pricing-card">
-              <div class="pricing-name">Personal Mailbox</div>
-              <p class="pricing-price">£99<span>/year</span></p>
-              <p class="pricing-description">
+</div>
+<div class="pricing-grid">
+<article class="pricing-card">
+<div class="pricing-name">Personal Mailbox</div>
+<p class="pricing-price">£99<span>/year</span></p>
+<p class="pricing-description">
                 Ideal for individuals needing a secure UK mailing address without business use.
               </p>
-              <ul class="pricing-list">
-                <li>Premium UK mailing address</li>
-                <li>Mail receipt &amp; sorting</li>
-                <li>Scan or forward options</li>
-                <li>Secure online portal access</li>
-              </ul>
-              <a href="https://forwardmymail.getzendo.io/service/personal-mailbox/subscription"
-   class="btn btn-primary">Choose Plan</a>
-            </article>
-
-            <article class="pricing-card">
-              <div class="pricing-name">Business Address</div>
-              <p class="pricing-price">£149<span>/year</span></p>
-              <p class="pricing-description">
+<ul class="pricing-list">
+<li>Premium UK mailing address</li>
+<li>Mail receipt &amp; sorting</li>
+<li>Scan or forward options</li>
+<li>Secure online portal access</li>
+</ul>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/personal-mailbox/subscription">Choose Plan</a>
+</article>
+<article class="pricing-card">
+<div class="pricing-name">Business Address</div>
+<p class="pricing-price">£149<span>/year</span></p>
+<p class="pricing-description">
                 Perfect for freelancers and small businesses that need a professional trading address.
               </p>
-              <ul class="pricing-list">
-                <li>Use on website &amp; invoices</li>
-                <li>Mail scanning &amp; forwarding</li>
-                <li>Unlimited mail receipt</li>
-                <li>Junk mail filtering</li>
-                <li>Free initial setup</li>
-              </ul>
-              <a href="https://forwardmymail.getzendo.io/service/business-addresss/subscription"class="btn btn-primary">Choose Plan</a>
-            </article>
-
-            <article class="pricing-card highlight">
-              <span class="badge">Most popular</span>
-              <div class="pricing-name">Registered Office</div>
-              <p class="pricing-price">£189<span>/year</span></p>
-              <p class="pricing-description">
+<ul class="pricing-list">
+<li>Use on website &amp; invoices</li>
+<li>Mail scanning &amp; forwarding</li>
+<li>Unlimited mail receipt</li>
+<li>Junk mail filtering</li>
+<li>Free initial setup</li>
+</ul>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/business-address/subscription">Choose Plan</a>
+</article>
+<article class="pricing-card highlight">
+<span class="badge">Most popular</span>
+<div class="pricing-name">Registered Office</div>
+<p class="pricing-price">£189<span>/year</span></p>
+<p class="pricing-description">
                 A complete compliance package for UK limited companies, including director address protection.
               </p>
-              <ul class="pricing-list">
-                <li>Everything in Business Address</li>
-                <li>Registered office address</li>
-                <li>Director service address</li>
-                <li>Official government mail handling</li>
-                <li>Compliance checks included</li>
-              </ul>
-              <a href="https://forwardmymail.getzendo.io/service/registered-office/subscription"class="btn btn-primary">Choose Plan</a>
-            </article>
-
-            <article class="pricing-card">
-              <div class="pricing-name">Full Virtual Office</div>
-              <p class="pricing-price">£299<span>/year</span></p>
-              <p class="pricing-description">
+<ul class="pricing-list">
+<li>Everything in Business Address</li>
+<li>Registered office address</li>
+<li>Director service address</li>
+<li>Official government mail handling</li>
+<li>Compliance checks included</li>
+</ul>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/registered-office/subscription">Choose Plan</a>
+</article>
+<article class="pricing-card">
+<div class="pricing-name">Full Virtual Office</div>
+<p class="pricing-price">£299<span>/year</span></p>
+<p class="pricing-description">
                 The ultimate professional image for your company with enhanced communication features.
               </p>
-              <ul class="pricing-list">
-                <li>Everything in Registered Office</li>
-                <li>UK local phone number</li>
-                <li>Call answering service</li>
-                <li>Parcel handling options</li>
-              </ul>
-              <a href="https://forwardmymail.getzendo.io/service/full-virtual-office/subscription"class="btn btn-primary">Choose Plan</a>
-            </article>
-          </div>
-
-          <div class="pricing-extra">
-            <div class="pricing-extra-header">Ultimate + Parcel Handling Package</div>
-            <div class="pricing-extra-body">
-              <p style="margin: 0.3rem 0 0.2rem; color: var(--text-muted);">
+<ul class="pricing-list">
+<li>Everything in Registered Office</li>
+<li>UK local phone number</li>
+<li>Call answering service</li>
+<li>Parcel handling options</li>
+</ul>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/full-virtual-office/subscription">Choose Plan</a>
+</article>
+</div>
+<div class="pricing-extra">
+<div class="pricing-extra-header">Ultimate + Parcel Handling Package</div>
+<div class="pricing-extra-body">
+<p style="margin: 0.3rem 0 0.2rem; color: var(--text-muted);">
                 Usage rates apply beyond inclusive allowances and can be tailored to your volume. Example rates:
               </p>
-
-              <div class="pricing-extra-grid">
-                <div>
-                  <div class="pricing-extra-title">Mail &amp; Scanning</div>
-                  <table class="pricing-table">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th>Example rate</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Letters</td>
-                        <td>£0.25–£0.75 per item + postage</td>
-                      </tr>
-                      <tr>
-                        <td>Additional scanning</td>
-                        <td>£0.40–£0.80 per page beyond allowance</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div>
-                  <div class="pricing-extra-title">Parcels &amp; Storage</div>
-                  <table class="pricing-table">
-                    <thead>
-                      <tr>
-                        <th>Item</th>
-                        <th>Example rate</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td>Standard parcels (up to ~5kg)</td>
-                        <td>£1.50–£3.00 per parcel + postage</td>
-                      </tr>
-                      <tr>
-                        <td>Oversize / heavy / courier</td>
-                        <td>Special handling fee per item</td>
-                      </tr>
-                      <tr>
-                        <td>Long-term storage</td>
-                        <td>First 5 days free, then daily rate</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div class="pricing-compliance">
-                <strong>UK Compliance Notice:</strong>
+<div class="pricing-extra-grid">
+<div>
+<div class="pricing-extra-title">Mail &amp; Scanning</div>
+<table class="pricing-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Example rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Letters</td>
+<td>£0.25–£0.75 per item + postage</td>
+</tr>
+<tr>
+<td>Additional scanning</td>
+<td>£0.40–£0.80 per page beyond allowance</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div>
+<div class="pricing-extra-title">Parcels &amp; Storage</div>
+<table class="pricing-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Example rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard parcels (up to ~5kg)</td>
+<td>£1.50–£3.00 per parcel + postage</td>
+</tr>
+<tr>
+<td>Oversize / heavy / courier</td>
+<td>Special handling fee per item</td>
+</tr>
+<tr>
+<td>Long-term storage</td>
+<td>First 5 days free, then daily rate</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="pricing-compliance">
+<strong>UK Compliance Notice:</strong>
                 In line with UK Anti-Money Laundering (AML) regulations, we are required to verify the identity and address of all customers. This is a secure digital process completed after sign-up.
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ABOUT -->
-      <section id="about">
-        <div class="container">
-          <div class="about-grid">
-            <div class="about-image-placeholder">
-              <img src="forwardmymail-officelogo2.png" alt="Forwardmymail office and team">
-            </div>
-            <div>
-              <div class="about-kicker">Built for Modern Business</div>
-              <h2 class="about-title">Created to bridge the gap between traditional mail and digital workflows.</h2>
-              <p class="about-text">
+</div>
+</div>
+</div>
+</section>
+<!-- ABOUT -->
+<section id="about">
+<div class="container">
+<div class="about-grid">
+<div class="about-image-placeholder">
+<img alt="Forwardmymail office and team" src="forwardmymail-officelogo2.png"/>
+</div>
+<div>
+<div class="about-kicker">Built for Modern Business</div>
+<h2 class="about-title">Created to bridge the gap between traditional mail and digital workflows.</h2>
+<p class="about-text">
                 Forwardmymail was founded to give remote directors, global entrepreneurs, and digital-first teams a stable UK base without the overhead of a traditional office. Whether you are an expat, a start-up, or an e-commerce seller, our service keeps your company compliant while protecting your privacy.
               </p>
-              <p class="about-text">
+<p class="about-text">
                 Our mission is simple: provide a prestigious address and seamless mail handling so you can focus on growing your business, wherever you are in the world.
               </p>
-
-              <div class="about-metrics">
-                <div class="metric">
-                  <div class="metric-number">100+</div>
-                  <div class="metric-label">Happy clients</div>
-                </div>
-                <div class="metric">
-                  <div class="metric-number">000's</div>
-                  <div class="metric-label">Of items processed</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- FAQ -->
-      <section id="faqs">
-        <div class="container">
-          <div class="section-header">
-            <div class="section-kicker">FAQs</div>
-            <h2 class="section-title">Frequently Asked Questions</h2>
-            <p class="section-subtitle">
+<div class="about-metrics">
+<div class="metric">
+<div class="metric-number">100+</div>
+<div class="metric-label">Happy clients</div>
+</div>
+<div class="metric">
+<div class="metric-number">000's</div>
+<div class="metric-label">Of items processed</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ -->
+<section id="faqs">
+<div class="container">
+<div class="section-header">
+<div class="section-kicker">FAQs</div>
+<h2 class="section-title">Frequently Asked Questions</h2>
+<p class="section-subtitle">
               Answers to the most common questions about addresses, scanning, and compliance. Contact us if you need anything more specific.
             </p>
-          </div>
-
-          <div class="faq-grid">
-            <details>
-              <summary>Can I use this address as my Registered Office?</summary>
-              <p>
+</div>
+<div class="faq-grid">
+<details>
+<summary>Can I use this address as my Registered Office?</summary>
+<p>
                 Yes, if you choose a plan that includes Registered Office service. We will receive and process official mail from Companies House and HMRC on your behalf.
               </p>
-            </details>
-
-            <details>
-              <summary>Do you open my mail by default?</summary>
-              <p>
+</details>
+<details>
+<summary>Do you open my mail by default?</summary>
+<p>
                 For scanning and digital mailroom services, we open mail in our secure facility to create PDF copies. If you only require forwarding, we can forward sealed items according to your preferences.
               </p>
-            </details>
-
-            <details>
-              <summary>Can non-UK residents use this service?</summary>
-              <p>
+</details>
+<details>
+<summary>Can non-UK residents use this service?</summary>
+<p>
                 Yes. Many of our clients are based overseas but need a compliant UK address. Additional ID documentation may be required depending on your country of residence.
               </p>
-            </details>
-
-            <details>
-              <summary>What identification do you require?</summary>
-              <p>
+</details>
+<details>
+<summary>What identification do you require?</summary>
+<p>
                 We will ask for standard KYC documentation such as a government-issued photo ID and proof of address. All documents are handled and stored securely.
               </p>
-            </details>
-
-            <details>
-              <summary>How long does it take to set everything up?</summary>
-              <p>
+</details>
+<details>
+<summary>How long does it take to set everything up?</summary>
+<p>
                 In most cases, your address is ready as soon as payment is complete and your ID has been verified. Many customers are fully set up within one working day.
               </p>
-            </details>
-          </div>
-        </div>
-      </section>
-
-      <!-- CONTACT -->
-      <section id="contact">
-        <div class="container">
-          <div class="section-header">
-            <div class="section-kicker">Contact</div>
-            <h2 class="section-title">Get in Touch</h2>
-            <p class="section-subtitle">
+</details>
+</div>
+</div>
+</section>
+<!-- CONTACT -->
+<section id="contact">
+<div class="container">
+<div class="section-header">
+<div class="section-kicker">Contact</div>
+<h2 class="section-title">Get in Touch</h2>
+<p class="section-subtitle">
               Need help choosing a plan or have a compliance question? Send us a message and a member of the team will get back to you.
             </p>
-          </div>
-
-          <div class="contact-grid">
-            <div>
-              <div class="contact-item">
-                <div class="contact-icon">✉</div>
-                <div>
-                  <div class="contact-label">Email</div>
-                  <div>info@forwardmymail.co.uk</div>
-                </div>
-              </div>
-
-              <div class="contact-item">
-                <div class="contact-icon">📞</div>
-                <div>
-                  <div class="contact-label">Phone</div>
-                  <div>01543 406028</div>
-                  <div>Mon–Fri, 9am–5.00pm GMT</div>
-                </div>
-              </div>
-
-              <div class="contact-item">
-                <div class="contact-icon">📍</div>
-                <div>
-                  <div class="contact-label">Office</div>
-                  <div>8a Bore Street</div>
-                  <div>Lichfield</div>
-                   <div>Staffordshire</div>
-                  <div>WS13 6LL</div>
-                </div>
-              </div>
-            </div>
-
-            <form class="contact-form">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="name">Name</label>
-                  <input id="name" type="text" placeholder="John Smith" />
-                </div>
-                <div class="form-group">
-                  <label for="email">Email</label>
-                  <input id="email" type="email" placeholder="john@yourcompany.com" />
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="company">Company (optional)</label>
-                <input id="company" type="text" placeholder="Your Business Ltd" />
-              </div>
-
-              <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" placeholder="How can we help?"></textarea>
-              </div>
-
-              <button type="submit" class="btn btn-primary">Send Message</button>
-            </form>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-top">
-          <div class="footer-brand">
-            <div class="footer-brand-title">
-              <div class="brand-icon">
-                <img src="logo.png" alt="Forward My Mail logo">
-              </div>
-            </div>
-            <p style="margin: 0;">
+</div>
+<div class="contact-grid">
+<div>
+<div class="contact-item">
+<div class="contact-icon">✉</div>
+<div>
+<div class="contact-label">Email</div>
+<div>info@forwardmymail.co.uk</div>
+</div>
+</div>
+<div class="contact-item">
+<div class="contact-icon">📞</div>
+<div>
+<div class="contact-label">Phone</div>
+<div>01543 406028</div>
+<div>Mon–Fri, 9am–5.00pm GMT</div>
+</div>
+</div>
+<div class="contact-item">
+<div class="contact-icon">📍</div>
+<div>
+<div class="contact-label">Office</div>
+<div>8a Bore Street</div>
+<div>Lichfield</div>
+<div>Staffordshire</div>
+<div>WS13 6LL</div>
+</div>
+</div>
+</div>
+<form class="contact-form">
+<div class="form-row">
+<div class="form-group">
+<label for="name">Name</label>
+<input id="name" placeholder="John Smith" type="text"/>
+</div>
+<div class="form-group">
+<label for="email">Email</label>
+<input id="email" placeholder="john@yourcompany.com" type="email"/>
+</div>
+</div>
+<div class="form-group">
+<label for="company">Company (optional)</label>
+<input id="company" placeholder="Your Business Ltd" type="text"/>
+</div>
+<div class="form-group">
+<label for="message">Message</label>
+<textarea id="message" placeholder="How can we help?"></textarea>
+</div>
+<button class="btn btn-primary" type="submit">Send Message</button>
+</form>
+</div>
+</div>
+</section>
+</main>
+<!-- FOOTER -->
+<footer class="footer">
+<div class="container">
+<div class="footer-top">
+<div class="footer-brand">
+<div class="footer-brand-title">
+<div class="brand-icon">
+<img alt="Forward My Mail logo" src="logo.png"/>
+</div>
+</div>
+<p style="margin: 0;">
               Premium mail handling and virtual office services for businesses worldwide.
             </p>
-          </div>
-
-          <div>
-            <div class="footer-heading">Services</div>
-            <ul class="footer-links">
-              <li><a href="#services">Mail Forwarding</a></li>
-              <li><a href="#services">Digital Mailroom</a></li>
-              <li><a href="#services">Registered Office</a></li>
-              <li><a href="#services">Company Formation</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <div class="footer-heading">Company</div>
-            <ul class="footer-links">
-              <li><a href="#about">About Us</a></li>
-              <li><a href="#pricing">Pricing</a></li>
-              <li><a href="#contact">Contact</a></li>
-              <li>
-  <a href="https://forwardmymail.getzendo.io/login"
-     target="_blank"
-     rel="noopener">
+</div>
+<div>
+<div class="footer-heading">Services</div>
+<ul class="footer-links">
+<li><a href="#services">Mail Forwarding</a></li>
+<li><a href="#services">Digital Mailroom</a></li>
+<li><a href="#services">Registered Office</a></li>
+<li><a href="#services">Company Formation</a></li>
+</ul>
+</div>
+<div>
+<div class="footer-heading">Company</div>
+<ul class="footer-links">
+<li><a href="#about">About Us</a></li>
+<li><a href="#pricing">Pricing</a></li>
+<li><a href="#contact">Contact</a></li>
+<li>
+<a href="https://forwardmymail.getzendo.io/login" rel="noopener" target="_blank">
     Client Login
   </a>
 </li>
-          </div>
-
-          <div>
-            <div class="footer-heading">Legal</div>
-            <ul class="footer-links">
-              <li><button type="button" data-policy-modal="modal-privacy">Privacy Policy</button></li>
-              <li><button type="button" data-policy-modal="modal-terms">Terms &amp; Conditions</button></li>
-              <li><button type="button" data-policy-modal="modal-cookies">Cookie Policy</button></li>
-              <li><button type="button" data-policy-modal="modal-acceptable">Acceptable Use</button></li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="footer-bottom">
-          <span>© 2025 Forwardmymail Ltd. All rights reserved. Registered in England &amp; Wales.</span>
-          <span>Supervised for UK AML compliance. We do not support illegal activities.</span>
-        </div>
-      </div>
-    </footer>
-  </div>
-
-  <!-- POLICY MODALS -->
-
-  <!-- Privacy Policy -->
-  <div id="modal-privacy" class="policy-modal" aria-hidden="true">
-    <div class="policy-backdrop"></div>
-    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
-      <div class="policy-header">
-        <h2 id="privacy-title">Privacy Policy</h2>
-        <button class="policy-close" type="button" aria-label="Close privacy policy">&times;</button>
-      </div>
-      <div class="policy-body">
-        <p>
-          This Privacy Policy explains how Forwardmymail Ltd (“Forwardmymail”, “we”, “us”, “our”) collects, uses and protects your
-          personal data when you visit this website, contact us, or use our mail handling and virtual address services.
-        </p>
-
-        <h3>1. Who we are</h3>
-        <p>
-          Forwardmymail Ltd is a company registered in England and Wales. We act as the “data controller” for the personal
-          data we collect and process in connection with this website and our services.
-        </p>
-
-        <h3>2. What personal data we collect</h3>
-        <p>We may collect and process the following categories of personal data:</p>
-        <ul>
-          <li>Identity data – name, title, date of birth, identification numbers and documents (for KYC/AML checks).</li>
-          <li>Contact data – email address, telephone number, correspondence address and emergency contact details.</li>
-          <li>Account data – login credentials, profile information, communication preferences and support history.</li>
-          <li>Mail handling data – sender details, addressee details and digital scans of mail that we open on your instructions.</li>
-          <li>Transaction data – plan type, payment history, invoices and other records relating to your use of our services.</li>
-          <li>Technical data – IP address, browser type, device identifiers and similar information collected through cookies and analytics.</li>
-          <li>Marketing and communications data – your preferences for receiving marketing from us and your communication choices.</li>
-        </ul>
-
-        <h3>3. How we collect your data</h3>
-        <p>We collect personal data in the following ways:</p>
-        <ul>
-          <li>Directly from you when you complete forms on our website, sign up for a plan, contact us or upload documents.</li>
-          <li>Automatically when you interact with our website through cookies, server logs and similar technologies.</li>
-          <li>
-            From third parties such as payment processors, identity verification providers, credit reference agencies or
-            regulatory bodies where required for compliance.
-          </li>
-        </ul>
-
-        <h3>4. How we use your personal data</h3>
-        <p>We use your personal data for the following purposes:</p>
-        <ul>
-          <li>To set up and manage your account and provide our mail forwarding, scanning and address services.</li>
-          <li>To perform identity, anti-money laundering (AML) and “know your customer” (KYC) checks where required by law.</li>
-          <li>To communicate with you about your account, renewals, service changes and support requests.</li>
-          <li>To process payments, issue invoices and maintain financial records.</li>
-          <li>To operate, secure and improve this website and our customer portal.</li>
-          <li>To send you service updates and, where permitted, carefully selected marketing communications (you can opt out at any time).</li>
-          <li>To comply with our legal and regulatory obligations and respond to law-enforcement or regulatory requests.</li>
-        </ul>
-
-        <h3>5. Legal basis for processing</h3>
-        <p>We rely on the following legal bases under UK data protection law:</p>
-        <ul>
-          <li><strong>Contract:</strong> processing necessary to enter into or perform a contract with you.</li>
-          <li><strong>Legal obligation:</strong> processing necessary for us to comply with laws, including AML/KYC regulations.</li>
-          <li><strong>Legitimate interests:</strong> processing for our legitimate business interests that are not overridden by your rights.</li>
-          <li><strong>Consent:</strong> where required for certain cookies or marketing communications – you can withdraw consent at any time.</li>
-        </ul>
-
-        <h3>6. Who we share your data with</h3>
-        <p>We may share your personal data with the following categories of recipients where appropriate:</p>
-        <ul>
-          <li>Service providers who supply IT hosting, customer support, payment processing and identity verification.</li>
-          <li>Professional advisers such as lawyers, accountants and auditors.</li>
-          <li>Regulators, law-enforcement agencies and HMRC where required by law or in connection with suspected fraud or crime.</li>
-          <li>Couriers and postal services where we forward items in accordance with your instructions.</li>
-          <li>Any purchaser of our business or assets, in which case your data may be transferred as part of the transaction.</li>
-        </ul>
-        <p>We do not sell your personal data to third parties.</p>
-
-        <h3>7. International transfers</h3>
-        <p>
-          Where we transfer personal data outside the UK or European Economic Area, we take steps to ensure that an appropriate level of protection
-          is in place, for example by using standard contractual clauses approved by the UK ICO or EU Commission.
-        </p>
-
-        <h3>8. Data retention</h3>
-        <p>
-          We keep personal data only for as long as necessary for the purposes described in this policy, including to satisfy any legal, accounting
-          or reporting requirements. This typically includes:
-        </p>
-        <ul>
-          <li>Customer account and transaction records – normally kept for up to 6 years after the end of our relationship.</li>
-          <li>ID and KYC documentation – retained for the period required by AML regulations and then securely deleted.</li>
-          <li>Mail scans – retained in your portal while your account is active and for a limited period after closure, unless you ask us to delete them earlier where permitted.</li>
-        </ul>
-
-        <h3>9. How we protect your data</h3>
-        <p>
-          We use a combination of technical and organisational measures to safeguard your data, including access controls, encryption in transit,
-          secure storage and regular monitoring. However, no system can be completely secure and you are responsible for keeping your
-          login details confidential.
-        </p>
-
-        <h3>10. Your rights</h3>
-        <p>Under UK data protection law you may have the right to:</p>
-        <ul>
-          <li>Request access to the personal data we hold about you.</li>
-          <li>Request correction of inaccurate or incomplete data.</li>
-          <li>Request deletion of your data where there is no lawful reason for us to continue processing it.</li>
-          <li>Object to processing based on legitimate interests and to direct marketing.</li>
-          <li>Request restriction of processing in certain circumstances.</li>
-          <li>Request transfer of your data to you or another provider (data portability).</li>
-          <li>Withdraw consent where we rely on it for processing.</li>
-        </ul>
-        <p>
-          To exercise any of these rights, please contact us using the details below. We may need to verify your identity before responding.
-        </p>
-
-        <h3>11. Contact and complaints</h3>
-        <p>
-          If you have any questions about this Privacy Policy or how we handle your data, please contact:
-        </p>
-        <p>
-          Forwardmymail Ltd<br>
-          8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom<br>
-          Email: info@forwardmymail.co.uk
-        </p>
-        <p>
-          You also have the right to lodge a complaint with the UK Information Commissioner’s Office (ICO) if you are unhappy with how we use your data.
-        </p>
-
-        <h3>12. Changes to this policy</h3>
-        <p>
-          We may update this Privacy Policy from time to time to reflect changes in law or our practices. The updated version will be posted
-          on this page with a revised “last updated” date.
-        </p>
-
-        <div class="policy-note">
-          This Privacy Policy is provided as a template for general information only and does not constitute legal advice. You should obtain
-          independent legal advice to ensure it is appropriate for your business and complies with all applicable laws.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Terms & Conditions -->
-  <div id="modal-terms" class="policy-modal" aria-hidden="true">
-    <div class="policy-backdrop"></div>
-    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="terms-title">
-      <div class="policy-header">
-        <h2 id="terms-title">Website Terms &amp; Conditions</h2>
-        <button class="policy-close" type="button" aria-label="Close terms and conditions">&times;</button>
-      </div>
-      <div class="policy-body">
-        <p>
-          These Website Terms and Conditions (“Terms”) govern your use of the Forwardmymail Ltd website and any online portals or services
-          made available through it (collectively, the “Site”). By accessing or using the Site, you agree to be bound by these Terms.
-        </p>
-
-        <h3>1. About us</h3>
-        <p>
-          This Site is operated by Forwardmymail Ltd (“Forwardmymail”, “we”, “us”, “our”), a company registered in England and Wales.
-          Our registered office is at 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom.
-        </p>
-
-        <h3>2. Use of the Site</h3>
-        <p>Subject to these Terms, we grant you a limited, non-exclusive, non-transferable right to access and use the Site for:</p>
-        <ul>
-          <li>Viewing information about our services, pricing and contact details; and</li>
-          <li>Managing your Forwardmymail account where you are an existing customer.</li>
-        </ul>
-        <p>You must not use the Site:</p>
-        <ul>
-          <li>For any unlawful purpose or in breach of any applicable law or regulation.</li>
-          <li>To attempt to gain unauthorised access to our systems or another user’s account.</li>
-          <li>To transmit any malicious code, spam or harmful content.</li>
-          <li>In a way that could damage, disable, overburden or impair the Site or our infrastructure.</li>
-        </ul>
-
-        <h3>3. Account registration and security</h3>
-        <p>
-          Certain services (including the customer portal) require you to create an account and choose a username and password.
-          You are responsible for keeping your login details confidential and for all activity that occurs under your account.
-          You agree to notify us immediately if you suspect unauthorised access or use.
-        </p>
-
-        <h3>4. Our services</h3>
-        <p>
-          Information on the Site about our virtual address, mail forwarding, scanning and related services is provided for general guidance only.
-          The detailed terms on which we supply services will be set out in a separate service agreement, order form or plan description provided
-          at the time you sign up. If there is any conflict between these Terms and your service agreement, the service agreement shall prevail.
-        </p>
-
-        <h3>5. Pricing and payment</h3>
-        <p>
-          Prices displayed on the Site are indicative and may be subject to change. All prices are shown exclusive of VAT unless stated otherwise.
-          Your final price, billing frequency, payment method and any usage-based charges will be confirmed during the sign-up process.
-        </p>
-
-        <h3>6. Intellectual property</h3>
-        <p>
-          All content on the Site, including text, graphics, logos, icons, images, software and layout, is owned by or licensed to Forwardmymail
-          and is protected by copyright and other intellectual property rights. You may view and print content for your own internal use but must
-          not copy, reproduce, modify, distribute or create derivative works without our prior written consent.
-        </p>
-
-        <h3>7. Third-party links</h3>
-        <p>
-          The Site may contain links to third-party websites and resources. These links are provided for convenience only and do not imply any
-          endorsement or responsibility by us for the content or availability of those sites. You access third-party sites at your own risk.
-        </p>
-
-        <h3>8. Availability of the Site</h3>
-        <p>
-          We aim to keep the Site available and secure, but we do not guarantee that it will be uninterrupted, error-free or free from viruses.
-          We may suspend or withdraw all or part of the Site for maintenance, upgrades or other reasons without notice.
-        </p>
-
-        <h3>9. Liability</h3>
-        <p>
-          Nothing in these Terms excludes or limits liability for death or personal injury caused by negligence, fraud or any other liability that
-          cannot be excluded under English law.
-        </p>
-        <p>
-          To the maximum extent permitted by law, we exclude all implied conditions, warranties, representations or other terms that may apply
-          to the Site or any content on it. We will not be liable for any loss or damage arising from or in connection with:
-        </p>
-        <ul>
-          <li>Your use of or inability to use the Site; or</li>
-          <li>Your reliance on any content displayed on the Site.</li>
-        </ul>
-        <p>
-          In particular, we will not be liable for loss of profits, business, goodwill, data or any indirect or consequential loss.
-        </p>
-
-        <h3>10. Indemnity</h3>
-        <p>
-          You agree to indemnify and hold Forwardmymail harmless from any claims, losses, damages, costs and expenses (including reasonable
-          legal fees) arising out of your breach of these Terms or misuse of the Site.
-        </p>
-
-        <h3>11. Changes to these Terms</h3>
-        <p>
-          We may update these Terms from time to time. Any changes will be posted on this page with an updated “last updated” date.
-          Your continued use of the Site after changes are posted will constitute your acceptance of the revised Terms.
-        </p>
-
-        <h3>12. Governing law and jurisdiction</h3>
-        <p>
-          These Terms, and any dispute or claim arising out of or in connection with them, are governed by the laws of England and Wales.
-          The courts of England and Wales shall have exclusive jurisdiction, except that consumers resident elsewhere in the UK may bring claims
-          in their local courts.
-        </p>
-
-        <h3>13. Contact</h3>
-        <p>
-          If you have any questions about these Terms, please contact us at info@forwardmymail.co.uk.
-        </p>
-
-        <div class="policy-note">
-          These Terms are provided as a template and may need to be tailored to your specific service agreements and regulatory requirements.
-          Independent legal advice is recommended before relying on them.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Cookie Policy -->
-  <div id="modal-cookies" class="policy-modal" aria-hidden="true">
-    <div class="policy-backdrop"></div>
-    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="cookies-title">
-      <div class="policy-header">
-        <h2 id="cookies-title">Cookie Policy</h2>
-        <button class="policy-close" type="button" aria-label="Close cookie policy">&times;</button>
-      </div>
-      <div class="policy-body">
-        <p>
-          This Cookie Policy explains how Forwardmymail Ltd (“Forwardmymail”, “we”, “us”, “our”) uses cookies and similar technologies on this
-          website and in our online customer portal.
-        </p>
-
-        <h3>1. What are cookies?</h3>
-        <p>
-          Cookies are small text files that are stored on your device when you visit a website. They help the site to recognise your device and
-          remember certain information about your visit, such as preferences and settings.
-        </p>
-
-        <h3>2. Types of cookies we use</h3>
-        <p>We may use the following categories of cookies:</p>
-        <ul>
-          <li>
-            <strong>Strictly necessary cookies</strong> – required for the operation of the website and portal, such as cookies that allow you
-            to log in and manage your account.
-          </li>
-          <li>
-            <strong>Performance and analytics cookies</strong> – used to collect anonymous information about how visitors use our site, such as
-            which pages are most popular and any error messages. This helps us improve the site.
-          </li>
-          <li>
-            <strong>Functional cookies</strong> – used to remember your choices and preferences (for example, language settings).
-          </li>
-          <li>
-            <strong>Marketing cookies</strong> – if used, these help us measure the effectiveness of our advertising and may be set by third-party
-            providers such as analytics or advertising partners.
-          </li>
-        </ul>
-
-        <h3>3. Examples of cookies</h3>
-        <p>Examples of the types of cookies that may be set include:</p>
-        <ul>
-          <li><strong>Session cookies</strong> – temporary cookies that are deleted when you close your browser and are used to maintain your session.</li>
-          <li><strong>Persistent cookies</strong> – remain on your device for a set period or until you delete them and help remember your settings.</li>
-          <li><strong>Third-party cookies</strong> – set by external providers such as analytics services. We do not control these cookies directly.</li>
-        </ul>
-
-        <h3>4. Cookie consent and control</h3>
-        <p>
-          When you first visit our site, you may be presented with a cookie banner or pop-up explaining the types of cookies we use.
-          Where required by law, we will only use non-essential cookies (such as analytics or marketing cookies) with your consent.
-        </p>
-        <p>You can manage your cookie preferences in several ways:</p>
-        <ul>
-          <li>Adjusting your choices in any on-site cookie banner or settings panel (where available).</li>
-          <li>Changing your browser settings to block or delete cookies, or to alert you before cookies are set.</li>
-          <li>Opting out of certain third-party cookies directly with the relevant provider (for example, analytics or advertising networks).</li>
-        </ul>
-        <p>
-          Please note that disabling some cookies may affect the functionality of the site or portal and your ability to use certain features.
-        </p>
-
-        <h3>5. Other tracking technologies</h3>
-        <p>
-          We may use similar technologies such as pixels or local storage to support site functionality and analytics. These operate in a
-          similar way to cookies and are treated in the same way for the purposes of this policy.
-        </p>
-
-        <h3>6. Updates to this Cookie Policy</h3>
-        <p>
-          We may update this Cookie Policy from time to time to reflect changes in technology or legal requirements. Any updates will be posted
-          on this page with a revised “last updated” date.
-        </p>
-
-        <h3>7. Contact</h3>
-        <p>
-          If you have any questions about our use of cookies, please contact us at info@forwardmymail.co.uk.
-        </p>
-
-        <div class="policy-note">
-          This Cookie Policy is a general template and should be aligned with the exact cookies and tools actually used on your site,
-          including any analytics, advertising or third-party plugins.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Acceptable Use Policy -->
-  <div id="modal-acceptable" class="policy-modal" aria-hidden="true">
-    <div class="policy-backdrop"></div>
-    <div class="policy-dialog" role="dialog" aria-modal="true" aria-labelledby="acceptable-title">
-      <div class="policy-header">
-        <h2 id="acceptable-title">Acceptable Use Policy</h2>
-        <button class="policy-close" type="button" aria-label="Close acceptable use policy">&times;</button>
-      </div>
-      <div class="policy-body">
-        <p>
-          This Acceptable Use Policy (“Policy”) sets out the rules that apply to your use of the Forwardmymail website, customer portal and
-          mail handling services (together, the “Services”). It is designed to protect both you and us, and to ensure that our Services are
-          used lawfully and responsibly.
-        </p>
-
-        <h3>1. Prohibited uses</h3>
-        <p>You must not use the Services:</p>
-        <ul>
-          <li>For any unlawful purpose or in connection with any illegal activity.</li>
-          <li>To promote or facilitate fraud, money laundering, tax evasion or other financial crime.</li>
-          <li>To receive, store or forward items that are illegal, dangerous or prohibited by postal or courier regulations.</li>
-          <li>To impersonate any person or entity or misrepresent your affiliation with any person or entity.</li>
-          <li>To send unsolicited bulk communications (spam) or conduct phishing, scams or deceptive practices.</li>
-          <li>To upload or transmit any content that is defamatory, obscene, threatening, discriminatory or otherwise objectionable.</li>
-        </ul>
-
-        <h3>2. Security and system integrity</h3>
-        <p>You agree that you will not:</p>
-        <ul>
-          <li>Attempt to gain unauthorised access to our systems, networks or the accounts of other users.</li>
-          <li>Probe, scan or test the vulnerability of any system or network without our prior written consent.</li>
-          <li>Interfere with or disrupt the operation of the Services, including by introducing malware or conducting denial-of-service attacks.</li>
-          <li>Use automated tools (such as bots or scrapers) to access or collect data from the Services without permission.</li>
-        </ul>
-
-        <h3>3. Use of addresses and mail forwarding</h3>
-        <p>When using any Forwardmymail address or mail forwarding service you must:</p>
-        <ul>
-          <li>Provide accurate and complete information about your identity, business and intended use of the address.</li>
-          <li>Ensure that your use of the address complies with all applicable laws and regulatory requirements.</li>
-          <li>Not use the address for activities that could damage our reputation or cause regulatory or legal issues.</li>
-          <li>Promptly update us if your contact details, ownership or business activities change.</li>
-        </ul>
-
-        <h3>4. Content you provide</h3>
-        <p>
-          You are responsible for all information, documents and content that you provide to us or upload to the portal. You must ensure that
-          you have the necessary rights to use and share such content and that it does not infringe any third-party rights, including
-          intellectual property and privacy rights.
-        </p>
-
-        <h3>5. Monitoring and enforcement</h3>
-        <p>
-          We reserve the right, but are not obliged, to monitor use of the Services and to investigate any suspected breach of this Policy.
-          Where we reasonably believe that a breach has occurred, we may:
-        </p>
-        <ul>
-          <li>Issue a warning and request that the breach is remedied.</li>
-          <li>Temporarily or permanently suspend access to the Services or your account.</li>
-          <li>Refuse to receive, store or forward specific items of mail.</li>
-          <li>Report the matter to relevant authorities, regulators or law-enforcement agencies.</li>
-          <li>Take legal action to recover any losses or costs incurred.</li>
-        </ul>
-
-        <h3>6. Reporting concerns</h3>
-        <p>
-          If you become aware of any misuse of the Services or any activity that may breach this Policy, please contact us immediately at
-          info@forwardmymail.co.uk.
-        </p>
-
-        <h3>7. Changes to this Policy</h3>
-        <p>
-          We may update this Acceptable Use Policy from time to time. Any changes will be posted on our website with an updated “last updated”
-          date and will apply from the date of publication.
-        </p>
-
-        <div class="policy-note">
-          This Acceptable Use Policy is a general template and may need to be adapted to reflect your specific risk profile, regulatory regime
-          and service terms. You should take legal advice where necessary.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
+</ul></div>
+<div>
+<div class="footer-heading">Legal</div>
+<ul class="footer-links">
+<li><button data-policy-modal="modal-privacy" type="button">Privacy Policy</button></li>
+<li><button data-policy-modal="modal-terms" type="button">Terms &amp; Conditions</button></li>
+<li><button data-policy-modal="modal-cookies" type="button">Cookie Policy</button></li>
+<li><button data-policy-modal="modal-acceptable" type="button">Acceptable Use</button></li>
+</ul>
+</div>
+</div>
+<div class="footer-bottom">
+<span>© 2025 Forwardmymail Ltd. All rights reserved. Registered in England &amp; Wales.</span>
+<span>Supervised for UK AML compliance. We do not support illegal activities.</span>
+</div>
+</div>
+</footer>
+</div>
+<!-- POLICY MODALS -->
+<!-- Privacy Policy -->
+<div aria-hidden="true" class="policy-modal" id="modal-privacy">
+<div class="policy-backdrop"></div>
+<div aria-labelledby="privacy-title" aria-modal="true" class="policy-dialog" role="dialog">
+<div class="policy-header">Privacy Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-body">
+<p><small>Last updated: 2025-12-19</small></p>
+<p>This Privacy Notice explains how Forward My Mail Ltd (“FMM”, “we”, “us”) collects and uses your personal data when you visit our website, contact us, or use our mail handling and virtual address services. We act as a “controller” for this data.</p>
+<h3>1. Who we are</h3>
+<p>Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL (Company No. 16912540). Contact: <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a>.</p>
+<h3>2. What data we collect</h3>
+<ul>
+<li><strong>Identity &amp; KYC</strong> — name, date of birth, nationality, identification numbers, copies of ID and proof of address (for KYC/AML checks).</li>
+<li><strong>Contact</strong> — email, phone, correspondence address and emergency contact.</li>
+<li><strong>Account</strong> — login credentials, profile/plan details, instructions, support history.</li>
+<li><strong>Mail-handling</strong> — sender/addressee details, item metadata and digital scans of mail opened on your instructions.</li>
+<li><strong>Transaction</strong> — invoices, payments, chargeback details.</li>
+<li><strong>Technical</strong> — IP address, device/browser info, cookies/analytics data.</li>
+<li><strong>Marketing preferences</strong>.</li>
+</ul>
+<h3>3. How and why we use your data</h3>
+<ul>
+<li><strong>Provide services</strong> — receive/open/scan/forward mail; operate registered office/director address and company formation (contract performance).</li>
+<li><strong>Identity verification &amp; compliance</strong> — KYC/AML, sanctions/PEP screening, fraud prevention (legal obligations and legitimate interests).</li>
+<li><strong>Customer support &amp; operations</strong> — communications, troubleshooting, training (legitimate interests).</li>
+<li><strong>Payments</strong> — billing, fraud/chargeback handling (contract, legitimate interests).</li>
+<li><strong>Legal</strong> — respond to lawful requests from authorities and courts (legal obligations).</li>
+<li><strong>Marketing</strong> — with your consent; you can opt out anytime.</li>
+</ul>
+<h3>4. Sharing</h3>
+<p>We share data with identity verification providers, payment processors, couriers/carriers, IT/cloud suppliers, professional advisers and authorities where lawful. We do not sell personal data.</p>
+<h3>5. International transfers</h3>
+<p>Where data is transferred outside the UK/EEA, we use appropriate safeguards (e.g., UK IDTA/EU SCCs) where required.</p>
+<h3>6. Retention</h3>
+<ul>
+<li>KYC/AML records: kept at least 5 years and no longer than 10 years unless required longer by law.</li>
+<li>Scans of mail: retained ~90 days unless you ask us to keep them longer or we must keep them for legal/compliance reasons.</li>
+<li>Operational forwarding logs: kept at least 12 months.</li>
+</ul>
+<h3>7. Your rights</h3>
+<p>You have rights to access, rectify, erase, restrict, object, portability, and to withdraw consent. You can complain to the ICO. Contact: <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a>.</p>
+<h3>8. Cookies</h3>
+<p>See our Cookies Policy for details of cookies and how to change your preferences.</p>
+<h3>9. Security</h3>
+<p>We use appropriate technical and organisational measures to protect data and require our providers to do the same.</p>
+</div>
+</div>
+</div>
+<!-- Terms & Conditions -->
+<div aria-hidden="true" class="policy-modal" id="modal-terms">
+<div class="policy-backdrop"></div>
+<div aria-labelledby="terms-title" aria-modal="true" class="policy-dialog" role="dialog">
+<div class="policy-header">Service Terms &amp; Conditions<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-body"><div class="terms-toc"><div class="terms-toc__title">Jump to a section:</div><ul class="terms-toc__list"><li><a class="terms-toc__link" href="#tsec-1-forward-my-mail-ltd-terms-conditions-uk-full-consolidated-version">Forward My Mail Ltd — Terms &amp; Conditions (UK) — Full Consolidated Version</a></li><li><a class="terms-toc__link" href="#tsec-2-contents">Contents</a></li><li><a class="terms-toc__link" href="#tsec-3-10-1-business-customers-you-shall-indemnify-and-keep-indemnified-forward-my-mail-ltd-and-its-director-s-officers-employees-and-agents-from-and-against-all-losses-liabilities-damages-claims-demands-actions-fines-penalties-and-costs-and-expenses-including-reasonable-legal-and-other-professional-costs-and-expenses-arising-out-of-or-in-connection-with-a-your-breach-of-these-terms-or-of-law-b-prohibited-or-restricted-items-c-inaccurate-customs-declarations-or-misstatements-d-breach-of-issuer-or-bank-rules-including-use-of-a-mail-forwarding-address-contrary-to-issuer-policy-e-misuse-of-our-address-including-at-companies-house-dvla-or-for-mlr-registrations-f-third-party-claims-relating-to-goods-content-or-instructions-you-send-or-ask-us-to-handle-g-sanctions-violations-or-h-fraud-or-wilful-misconduct-by-you-or-persons-you-authorise">10.1 Business Customers. You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with: (a) your breach of these Terms or of law; (b) Prohibited or Restricted Items; (c) inaccurate customs declarations or misstatements; (d) breach of issuer or bank rules (including use of a mail‑forwarding address contrary to issuer policy); (e) misuse of our address (including at Companies House, DVLA or for MLR registrations); (f) third‑party claims relating to goods, content or instructions you send or ask us to handle; (g) sanctions violations; or (h) fraud or wilful misconduct by you or persons you authorise.</a></li><li><a class="terms-toc__link" href="#tsec-4-10-2-consumers-if-you-are-a-consumer-this-indemnity-applies-only-to-the-extent-that-a-loss-is-caused-by-your-breach-misuse-or-unlawful-conduct-it-does-not-apply-to-losses-caused-by-our-own-negligence-or-failure-to-perform-with-reasonable-care-and-skill-and-does-not-reduce-your-statutory-rights-under-the-consumer-rights-act-2015">10.2 Consumers. If you are a Consumer, this indemnity applies only to the extent that a loss is caused by your breach, misuse or unlawful conduct. It does not apply to losses caused by our own negligence or failure to perform with reasonable care and skill and does not reduce your statutory rights under the Consumer Rights Act 2015.</a></li><li><a class="terms-toc__link" href="#tsec-5-10-3-legal-fees-and-costs-the-indemnity-in-this-clause-includes-the-reasonable-and-properly-incurred-legal-and-other-professional-costs-and-expenses-of-investigating-defending-and-or-settling-any-third-party-or-regulatory-claim-allegation-or-enquiry-arising-from-the-matters-described-in-clauses-10-1-10-2-whether-such-claim-is-made-against-us-alone-or-against-us-together-with-you">10.3 Legal fees and costs. The indemnity in this Clause includes the reasonable and properly incurred legal and other professional costs and expenses of investigating, defending and/or settling any third‑party or regulatory claim, allegation or enquiry arising from the matters described in Clauses 10.1–10.2, whether such claim is made against us alone or against us together with you.</a></li><li><a class="terms-toc__link" href="#tsec-6-10-4-conduct-of-claims-we-will-give-you-reasonable-notice-of-any-claim-for-which-we-seek-indemnity-we-may-conduct-the-defence-or-settlement-of-the-claim-and-you-shall-provide-prompt-cooperation-information-and-assistance-including-documents-witness-statements-and-access-to-systems-as-reasonably-requested-you-must-not-admit-liability-settle-or-compromise-any-claim-that-could-reasonably-be-expected-to-give-rise-to-indemnity-without-our-prior-written-consent-where-a-claim-is-solely-and-directly-against-you-you-may-assume-conduct-provided-that-doing-so-does-not-prejudice-us">10.4 Conduct of claims. We will give you reasonable notice of any claim for which we seek indemnity. We may conduct the defence or settlement of the claim and you shall provide prompt cooperation, information and assistance (including documents, witness statements and access to systems) as reasonably requested. You must not admit liability, settle or compromise any claim that could reasonably be expected to give rise to indemnity without our prior written consent. Where a claim is solely and directly against you, you may assume conduct provided that doing so does not prejudice us.</a></li><li><a class="terms-toc__link" href="#tsec-7-10-5-limits-and-fairness-nothing-in-this-clause-requires-you-to-indemnify-us-for-fines-or-penalties-to-the-extent-caused-by-our-own-breach-of-law-negligence-or-wilful-misconduct-nor-for-indirect-or-consequential-losses-except-to-the-extent-payable-to-a-third-party-under-a-settlement-or-judgment-we-will-take-reasonable-steps-to-mitigate-any-indemnified-losses">10.5 Limits and fairness. Nothing in this Clause requires you to indemnify us for fines or penalties to the extent caused by our own breach of law, negligence or wilful misconduct, nor for indirect or consequential losses except to the extent payable to a third party under a settlement or judgment. We will take reasonable steps to mitigate any indemnified losses.</a></li><li><a class="terms-toc__link" href="#tsec-8-10-6-advance-on-costs-where-a-third-party-or-regulatory-claim-is-reasonably-expected-to-exceed-routine-small-claims-costs-we-may-request-a-reasonable-advance-retainer-in-respect-of-external-legal-or-expert-costs-for-the-next-phase-not-more-than-the-reasonably-anticipated-external-costs-for-the-next-60-days-we-will-keep-records-and-reconcile-any-advance-against-actual-costs">10.6 Advance on costs. Where a third‑party or regulatory claim is reasonably expected to exceed routine small‑claims costs, we may request a reasonable advance/retainer in respect of external legal or expert costs for the next phase (not more than the reasonably anticipated external costs for the next 60 days). We will keep records and reconcile any advance against actual costs.</a></li><li><a class="terms-toc__link" href="#tsec-9-10-7-proportionality-for-micro-claims-for-consumer-disputes-allocated-to-the-small-claims-track-nothing-in-this-clause-requires-the-consumer-to-pay-our-irrecoverable-legal-costs-beyond-what-the-court-would-ordinarily-award-unless-the-court-orders-otherwise-due-to-dishonesty-abuse-of-process-or-similar-exceptional-conduct">10.7 Proportionality for micro‑claims. For consumer disputes allocated to the small‑claims track, nothing in this Clause requires the Consumer to pay our irrecoverable legal costs beyond what the court would ordinarily award, unless the court orders otherwise due to dishonesty, abuse of process or similar exceptional conduct.</a></li><li><a class="terms-toc__link" href="#tsec-10-key-facts-summary-for-convenience-only">Key Facts (Summary) — For Convenience Only</a></li><li><a class="terms-toc__link" href="#tsec-11-1-1-parties-fmm-we-us-means-forward-my-mail-ltd-8a-bore-street-lichfield-staffordshire-ws13-6ll-united-kingdom-company-no-16912540-you-means-the-customer-named-in-the-order-or-account-consumer-means-an-individual-acting-wholly-or-mainly-outside-of-trade-or-profession-business-customer-means-everyone-else">1.1 Parties. "FMM", "we", "us" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). "You" means the customer named in the order or account. "Consumer" means an individual acting wholly or mainly outside of trade or profession; "Business Customer" means everyone else.</a></li><li><a class="terms-toc__link" href="#tsec-12-1-2-interpretation-headings-are-for-convenience-only-references-to-laws-include-amendments-priority-is-given-to-mandatory-law-then-these-terms-then-any-schedule-policy">1.2 Interpretation. Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy.</a></li><li><a class="terms-toc__link" href="#tsec-13-1-3-entire-agreement-these-terms-including-schedules-form-the-entire-agreement-replacing-prior-statements-unless-expressly-agreed-in-writing">1.3 Entire agreement. These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing.</a></li><li><a class="terms-toc__link" href="#tsec-14-2-1-address-use-and-agency-you-may-use-an-fmm-provided-address-for-receiving-mail-and-packages-you-appoint-fmm-as-your-agent-to-receive-mail-on-your-behalf-and-authorise-us-to-open-and-scan-mail-for-processing-and-forwarding-except-where-prohibited-by-law-or-issuer-rules">2.1 Address use and agency. You may use an FMM‑provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding, except where prohibited by law or issuer rules.</a></li><li><a class="terms-toc__link" href="#tsec-15-2-2-registered-office-service-address-where-purchased-we-may-provide-a-registered-office-address-and-or-director-s-service-address-use-is-limited-to-official-purposes-not-for-trading-premises-returns-dvla-licensing-electoral-registration-or-money-laundering-regulations-registrations-we-may-report-misuse-and-or-require-removal-from-public-records">2.2 Registered office / service address. Where purchased, we may provide a registered office address and/or director’s service address. Use is limited to official purposes; not for trading premises, returns, DVLA/licensing, electoral registration, or Money Laundering Regulations registrations. We may report misuse and/or require removal from public records.</a></li><li><a class="terms-toc__link" href="#tsec-16-2-3-company-formation-where-you-instruct-us-to-incorporate-a-company-you-are-responsible-for-accuracy-of-information-and-regulatory-compliance-we-are-not-a-law-or-tax-firm-immediate-performance-is-requested-when-filings-begin-see-15-3">2.3 Company formation. Where you instruct us to incorporate a company, you are responsible for accuracy of information and regulatory compliance. We are not a law or tax firm. Immediate performance is requested when filings begin (see 15.3).</a></li><li><a class="terms-toc__link" href="#tsec-17-2-4-no-warehousing-we-do-not-provide-warehousing-or-long-term-storage-see-holding-windows-and-storage-fees-in-schedule-c">2.4 No warehousing. We do not provide warehousing or long‑term storage; see holding windows and storage fees in Schedule C.</a></li><li><a class="terms-toc__link" href="#tsec-18-2-5-subcontracting-we-may-use-subcontractors-and-carriers-we-remain-responsible-for-our-own-obligations">2.5 Subcontracting. We may use subcontractors and Carriers; we remain responsible for our own obligations.</a></li><li><a class="terms-toc__link" href="#tsec-19-2-6-not-a-residential-redirection-service-if-you-have-changed-residential-address-you-must-arrange-a-royal-mail-redirection-we-do-not-provide-a-statutory-residential-redirection-service">2.6 Not a residential redirection service. If you have changed residential address, you must arrange a Royal Mail Redirection; we do not provide a statutory residential redirection service.</a></li><li><a class="terms-toc__link" href="#tsec-20-3-1-lawful-use-do-not-send-receive-or-request-handling-of-prohibited-items-or-illegal-content-provide-accurate-recipient-names-and-instructions">3.1 Lawful use. Do not send, receive or request handling of Prohibited Items or illegal content. Provide accurate recipient names and instructions.</a></li><li><a class="terms-toc__link" href="#tsec-21-3-2-duties-taxes-you-are-responsible-for-customs-declarations-duties-and-taxes">3.2 Duties/taxes. You are responsible for customs declarations, duties and taxes.</a></li><li><a class="terms-toc__link" href="#tsec-22-3-3-packaging-disclosure-provide-sufficient-packaging-and-information-for-handling-and-customs">3.3 Packaging &amp; disclosure. Provide sufficient packaging and information for handling and customs.</a></li><li><a class="terms-toc__link" href="#tsec-23-3-4-cooperation-verification-provide-identity-and-address-documents-when-requested-see-clause-6">3.4 Cooperation &amp; verification. Provide identity and address documents when requested; see Clause 6.</a></li><li><a class="terms-toc__link" href="#tsec-24-3-5-address-limits-do-not-display-our-address-as-a-trading-address-or-for-advertising-without-prior-written-consent">3.5 Address limits. Do not display our address as a trading address or for advertising without prior written consent.</a></li><li><a class="terms-toc__link" href="#tsec-25-6-1-verification-an-account-is-not-active-and-services-are-not-provided-until-a-payment-is-received-and-b-all-required-kyc-aml-checks-are-completed-for-every-relevant-person-name-we-may-use-certified-digital-identity-service-providers">6.1 Verification. An account is not active and services are not provided until (a) payment is received and (b) all required KYC/AML checks are completed for every relevant person/name. We may use certified digital identity service providers.</a></li><li><a class="terms-toc__link" href="#tsec-26-6-2-ongoing-monitoring-we-may-monitor-usage-suspend-or-terminate-accounts-and-report-suspicious-activity-to-authorities-without-notice-where-required-by-law">6.2 Ongoing monitoring. We may monitor usage, suspend or terminate accounts, and report suspicious activity to authorities without notice where required by law.</a></li><li><a class="terms-toc__link" href="#tsec-27-6-3-annual-refresh-retention-we-may-carry-out-an-annual-id-refresh-you-must-provide-updated-documents-to-keep-your-account-active-we-may-retain-identity-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-required-longer-by-law">6.3 Annual refresh &amp; retention. We may carry out an annual ID refresh; you must provide updated documents to keep your account active. We may retain identity/verification records for at least 5 years and no longer than 10 years unless required longer by law.</a></li><li><a class="terms-toc__link" href="#tsec-28-6-4-trusts-before-we-provide-any-service-to-a-trust-you-must-provide-proof-of-registration-with-the-hmrc-trust-registration-service-trs">6.4 Trusts. Before we provide any service to a trust, you must provide proof of registration with the HMRC Trust Registration Service (TRS).</a></li><li><a class="terms-toc__link" href="#tsec-29-7-1-title-and-risk-risk-in-items-passes-to-you-when-items-are-delivered-to-the-carrier-for-forwarding-to-your-chosen-destination-or-when-collected-by-you-your-agent-whichever-occurs-first">7.1 Title and risk. Risk in items passes to you when items are delivered to the Carrier for forwarding to your chosen destination, or when collected by you/your agent, whichever occurs first.</a></li><li><a class="terms-toc__link" href="#tsec-30-7-2-carrier-terms-times-carriage-is-subject-to-carrier-terms-including-routing-and-transit-times-which-we-do-not-control-delivery-dates-are-estimates">7.2 Carrier terms &amp; times. Carriage is subject to Carrier terms, including routing and transit times, which we do not control. Delivery dates are estimates.</a></li><li><a class="terms-toc__link" href="#tsec-31-7-3-customs-and-delays-you-are-responsible-for-customs-clearance-and-delays-arising-from-inspections-or-documentation">7.3 Customs and delays. You are responsible for customs clearance and delays arising from inspections or documentation.</a></li><li><a class="terms-toc__link" href="#tsec-32-7-4-sensitive-financial-items-forwarding-of-sensitive-items-e-g-bank-credit-debit-cards-pin-letters-cheque-books-security-tokens-or-card-readers-is-optional-and-provided-only-if-a-you-have-completed-the-client-authorisation-in-schedule-b-b-all-kyc-aml-checks-are-satisfied-c-we-are-satisfied-the-forwarding-is-lawful-and-permitted-by-the-issuer-and-d-the-destination-address-has-been-verified-opening-scanning-our-service-includes-opening-mail-and-scanning-contents-for-you-for-sensitive-items-we-will-follow-your-written-instructions-except-we-will-not-scan-where-doing-so-would-breach-law-or-issuer-rules-e-g-certain-pin-mailers-identifiable-pin-mailers-and-security-envelopes-will-not-be-opened-unless-you-give-us-explicit-written-instructions-and-issuer-rules-permit-we-may-refuse-or-suspend-forwarding-scanning-of-sensitive-items-where-risk-or-compliance-concerns-arise">7.4 Sensitive financial items. Forwarding of Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens or card readers) is optional and provided only if: (a) you have completed the Client Authorisation in Schedule B; (b) all KYC/AML checks are satisfied; (c) we are satisfied the forwarding is lawful and permitted by the issuer; and (d) the destination address has been verified. Opening &amp; scanning: our Service includes opening mail and scanning contents for you. For Sensitive Items we will follow your written instructions, except we will not scan where doing so would breach law or issuer rules (e.g., certain PIN mailers). Identifiable PIN mailers and security envelopes will not be opened unless you give us explicit written instructions and issuer rules permit. We may refuse or suspend forwarding/scanning of Sensitive Items where risk or compliance concerns arise.</a></li><li><a class="terms-toc__link" href="#tsec-33-7-5-default-shipping-method-safety-first-unless-you-instruct-otherwise-in-writing-we-will-use-a-tracked-and-or-signed-for-method-where-available-and-commercially-reasonable-having-regard-to-the-item-value-and-destination-if-you-opt-for-an-untracked-or-unsigned-service-you-acknowledge-increased-risk-and-agree-that-our-liability-remains-limited-under-clause-9">7.5 Default shipping method (safety first). Unless you instruct otherwise in writing, we will use a tracked and/or signed‑for method where available and commercially reasonable, having regard to the item value and destination. If you opt for an untracked or unsigned service, you acknowledge increased risk and agree that our liability remains limited under Clause 9.</a></li><li><a class="terms-toc__link" href="#tsec-34-7-6-large-parcels-and-limits-please-give-24-hours-notice-for-parcels-exceeding-1-000-mm-in-any-dimension-we-may-refuse-items-exceeding-2-m-in-any-dimension-or-25-kg-in-weight-we-may-charge-handling-and-storage-fees-for-large-or-bulky-items">7.6 Large parcels and limits. Please give 24 hours’ notice for parcels exceeding 1,000 mm in any dimension. We may refuse items exceeding 2 m in any dimension or 25 kg in weight. We may charge handling and storage fees for large or bulky items.</a></li><li><a class="terms-toc__link" href="#tsec-35-7-7-client-arranged-courier-where-you-pre-pay-postage-courier-directly-a-handling-fee-per-item-may-apply-see-schedule-c-fees">7.7 Client‑arranged courier. Where you pre‑pay postage/courier directly, a handling fee per item may apply; see Schedule C (Fees).</a></li><li><a class="terms-toc__link" href="#tsec-36-7-8-retrieval-of-archived-scans-retrieval-of-previously-scanned-and-archived-items-may-attract-a-retrieval-fee-see-schedule-c-fees">7.8 Retrieval of archived scans. Retrieval of previously scanned‑and‑archived items may attract a retrieval fee; see Schedule C (Fees).</a></li><li><a class="terms-toc__link" href="#tsec-37-8-1-fees-taxes-you-agree-to-pay-service-fees-shipping-charges-and-surcharges-as-published-or-quoted-all-fees-are-exclusive-of-vat-and-any-carrier-surcharges-unless-stated-otherwise-we-may-change-fees-on-notice-for-future-services">8.1 Fees &amp; taxes. You agree to pay Service fees, shipping charges and surcharges as published or quoted. All fees are exclusive of VAT and any carrier surcharges unless stated otherwise. We may change fees on notice for future services.</a></li><li><a class="terms-toc__link" href="#tsec-38-8-2-storage-and-non-compliance-for-inactive-or-non-compliant-accounts-id-missing-fails-or-unpaid-invoices-we-may-hold-mail-for-up-to-14-days-without-charge-to-allow-resolution-after-that-period-items-may-be-returned-to-sender-securely-destroyed-disposed-of-or-stored-for-a-fee-parcels-may-accrue-storage-charges-after-24-hours-disposal-return-fees-may-apply">8.2 Storage and non‑compliance. For inactive or non‑compliant accounts (ID missing/fails, or unpaid invoices), we may hold mail for up to 14 days without charge to allow resolution. After that period items may be returned to sender, securely destroyed, disposed of, or stored for a fee. Parcels may accrue storage charges after 24 hours. Disposal/return fees may apply.</a></li><li><a class="terms-toc__link" href="#tsec-39-8-3-lien-we-have-a-general-and-particular-lien-over-items-for-all-amounts-you-owe-if-unpaid-after-notice-we-may-sell-or-dispose-of-items-and-apply-proceeds-to-your-debt-accounting-to-you-for-any-balance">8.3 Lien. We have a general and particular lien over items for all amounts you owe. If unpaid after notice, we may sell or dispose of items and apply proceeds to your debt (accounting to you for any balance).</a></li><li><a class="terms-toc__link" href="#tsec-40-8-4-sale-disposal-procedure-torts-act-before-any-sale-or-disposal-of-uncollected-goods-we-will-give-you-a-written-notice-of-intention-to-sell-allowing-a-reasonable-collection-period-under-the-torts-interference-with-goods-act-1977-we-will-account-to-you-for-any-net-proceeds-after-deducting-sums-properly-due">8.4 Sale/disposal procedure (Torts Act). Before any sale or disposal of uncollected goods we will give you a written notice of intention to sell allowing a reasonable collection period, under the Torts (Interference with Goods) Act 1977. We will account to you for any net proceeds after deducting sums properly due.</a></li><li><a class="terms-toc__link" href="#tsec-41-8-5-insurance-goods-are-not-insured-while-on-our-premises-or-in-transit-unless-you-purchase-optional-cover-from-us-in-writing-before-dispatch-if-you-arrange-your-own-courier-our-insurance-does-not-apply-you-are-responsible-for-declaring-value-and-arranging-appropriate-cover">8.5 Insurance. Goods are not insured while on our premises or in transit unless you purchase optional cover from us in writing before dispatch. If you arrange your own courier, our insurance does not apply. You are responsible for declaring value and arranging appropriate cover.</a></li><li><a class="terms-toc__link" href="#tsec-42-9-0-consumer-carve-out-if-you-are-a-consumer-nothing-in-these-terms-limits-your-statutory-rights-including-our-obligation-to-provide-the-service-with-reasonable-care-and-skill-under-the-consumer-rights-act-2015-any-limits-exclusions-apply-only-to-the-extent-permitted-by-law">9.0 Consumer carve‑out. If you are a Consumer, nothing in these Terms limits your statutory rights, including our obligation to provide the Service with reasonable care and skill under the Consumer Rights Act 2015. Any limits/exclusions apply only to the extent permitted by law.</a></li><li><a class="terms-toc__link" href="#tsec-43-9-1-exclusion-of-certain-losses-to-the-maximum-extent-permitted-by-law-fmm-and-its-director-s-officers-employees-and-agents-are-not-liable-for-indirect-consequential-exemplary-or-punitive-damages-loss-of-profit-revenue-business-goodwill-or-anticipated-savings-or-losses-arising-from-delay-missed-delivery-windows-customs-seizures-or-carrier-acts-omissions-beyond-our-reasonable-control">9.1 Exclusion of certain losses. To the maximum extent permitted by law, FMM and its Director(s), officers, employees and agents are not liable for indirect, consequential, exemplary or punitive damages; loss of profit, revenue, business, goodwill or anticipated savings; or losses arising from delay, missed delivery windows, customs seizures, or Carrier acts/omissions beyond our reasonable control.</a></li><li><a class="terms-toc__link" href="#tsec-44-9-2-monetary-cap-fmm-s-aggregate-liability-for-all-claims-arising-out-of-or-relating-to-the-service-in-any-12-month-period-is-limited-to-the-greater-of-100-or-100-of-fees-paid-to-fmm-by-you-for-the-service-giving-rise-to-the-claim-different-mandatory-caps-may-apply-where-law-requires">9.2 Monetary cap. FMM’s aggregate liability for all claims arising out of or relating to the Service in any 12‑month period is limited to the greater of £100 or 100% of fees paid to FMM by you for the Service giving rise to the claim. Different mandatory caps may apply where law requires.</a></li><li><a class="terms-toc__link" href="#tsec-45-9-3-non-excludable-liabilities-nothing-excludes-liability-for-death-or-personal-injury-caused-by-negligence-fraud-or-any-liability-which-cannot-lawfully-be-excluded-or-limited">9.3 Non‑excludable liabilities. Nothing excludes liability for death or personal injury caused by negligence, fraud, or any liability which cannot lawfully be excluded or limited.</a></li><li><a class="terms-toc__link" href="#tsec-46-9-4-carriers-we-are-not-liable-for-carrier-terms-delays-or-acts-omissions-beyond-our-control-your-remedies-against-carriers-are-unaffected">9.4 Carriers. We are not liable for Carrier terms, delays or acts/omissions beyond our control; your remedies against Carriers are unaffected.</a></li><li><a class="terms-toc__link" href="#tsec-47-9-5-third-party-rights-director-protection-the-director-s-of-fmm-may-enforce-this-clause-9-under-the-contracts-rights-of-third-parties-act-1999">9.5 Third‑party rights (Director protection). The Director(s) of FMM may enforce this Clause 9 under the Contracts (Rights of Third Parties) Act 1999.</a></li><li><a class="terms-toc__link" href="#tsec-48-9-6-time-limits-business-customers-you-must-notify-us-of-loss-or-damage-in-writing-within-7-days-of-delivery-or-scheduled-delivery-and-bring-any-claim-within-6-months-thereafter-otherwise-the-claim-is-barred-except-where-mandatory-law-provides-longer-consumers-please-notify-issues-within-30-days-where-reasonably-possible-failure-to-do-so-does-not-affect-your-statutory-rights-or-ability-to-bring-a-claim-within-the-applicable-statutory-limitation-period">9.6 Time limits. Business Customers: you must notify us of loss or damage in writing within 7 days of delivery (or scheduled delivery) and bring any claim within 6 months thereafter; otherwise the claim is barred, except where mandatory law provides longer. Consumers: please notify issues within 30 days where reasonably possible; failure to do so does not affect your statutory rights or ability to bring a claim within the applicable statutory limitation period.</a></li><li><a class="terms-toc__link" href="#tsec-49-11-1-controller-fmm-is-a-controller-of-personal-data-you-provide-see-our-privacy-notice-for-details">11.1 Controller. FMM is a controller of personal data you provide. See our Privacy Notice for details.</a></li><li><a class="terms-toc__link" href="#tsec-50-11-2-checks-and-sharing-you-consent-to-our-use-of-third-party-verification-and-payment-providers-and-to-lawful-disclosures-to-carriers-customs-and-law-enforcement-where-required-for-formation-registered-office-we-may-share-details-with-companies-house-hmrc-and-banks-at-your-request">11.2 Checks and sharing. You consent to our use of third‑party verification and payment providers and to lawful disclosures to Carriers, customs and law enforcement where required. For formation/registered office, we may share details with Companies House, HMRC and banks at your request.</a></li><li><a class="terms-toc__link" href="#tsec-51-11-3-international-transfers-where-data-is-transferred-outside-the-uk-eea-we-will-use-appropriate-safeguards-as-required-by-law">11.3 International transfers. Where data is transferred outside the UK/EEA, we will use appropriate safeguards as required by law.</a></li><li><a class="terms-toc__link" href="#tsec-52-11-4-aml-kyc-records-we-may-retain-identity-and-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-a-longer-period-is-required-by-law-e-g-ongoing-investigations-or-legal-claims">11.4 AML/KYC records. We may retain identity and verification records for at least 5 years and no longer than 10 years unless a longer period is required by law (e.g., ongoing investigations or legal claims).</a></li><li><a class="terms-toc__link" href="#tsec-53-11-5-scan-retention-unless-you-ask-us-to-keep-items-longer-or-we-must-keep-them-for-legal-compliance-reasons-scanned-images-and-related-handling-logs-will-be-retained-for-90-days-and-then-deleted-archived-in-line-with-our-policies">11.5 Scan retention. Unless you ask us to keep items longer (or we must keep them for legal/compliance reasons), scanned images and related handling logs will be retained for 90 days and then deleted/archived in line with our policies.</a></li><li><a class="terms-toc__link" href="#tsec-54-13-1-debt-recovery-chargebacks-overdue-accounts-may-be-referred-to-debt-collection-you-are-liable-for-reasonable-recovery-costs-and-any-statutory-compensation-interest-where-applicable-if-you-initiate-a-payment-chargeback-we-may-apply-a-reasonable-administration-fee-plus-any-third-party-fees-and-suspend-services-pending-resolution-we-may-notify-companies-house-and-other-bodies-and-take-steps-to-remove-unauthorised-use-of-our-address-where-fees-remain-unpaid">13.1 Debt recovery &amp; chargebacks. Overdue accounts may be referred to debt collection. You are liable for reasonable recovery costs and any statutory compensation/interest where applicable. If you initiate a payment chargeback, we may apply a reasonable administration fee (plus any third‑party fees) and suspend services pending resolution. We may notify Companies House and other bodies and take steps to remove unauthorised use of our address where fees remain unpaid.</a></li><li><a class="terms-toc__link" href="#tsec-55-15-1-cra-2015-for-consumers-we-will-provide-services-with-reasonable-care-and-skill-nothing-in-these-terms-affects-statutory-rights">15.1 CRA 2015. For Consumers we will provide services with reasonable care and skill. Nothing in these Terms affects statutory rights.</a></li><li><a class="terms-toc__link" href="#tsec-56-15-2-ccr-2013-cooling-off-if-you-are-a-consumer-and-purchased-online-or-at-a-distance-you-may-have-a-14-day-cooling-off-period-if-you-request-immediate-performance-you-agree-we-may-start-before-the-end-of-that-period-you-pay-for-services-performed-and-once-fully-performed-you-lose-the-right-to-cancel">15.2 CCR 2013 (cooling‑off). If you are a Consumer and purchased online or at a distance, you may have a 14‑day cooling‑off period. If you request immediate performance, you agree we may start before the end of that period; you pay for services performed, and once fully performed you lose the right to cancel.</a></li><li><a class="terms-toc__link" href="#tsec-57-15-3-immediate-performance-acknowledgment-by-instructing-us-to-file-an-incorporation-or-activate-an-address-you-request-immediate-performance-and-acknowledge-the-effect-on-your-cancellation-rights">15.3 Immediate performance acknowledgment. By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights.</a></li><li><a class="terms-toc__link" href="#tsec-58-15-4-optional-director-identity-verification-service-if-you-purchase-a-companies-house-director-identity-verification-service-from-us-the-service-fee-is-for-processing-submission-and-is-non-refundable-once-submitted-whether-the-check-succeeds-or-fails-additional-verification-may-attract-supplementary-fees">15.4 Optional Director Identity Verification service. If you purchase a Companies House director identity verification service from us, the service fee is for processing/submission and is non‑refundable once submitted, whether the check succeeds or fails. Additional verification may attract supplementary fees.</a></li><li><a class="terms-toc__link" href="#tsec-59-18-1-force-majeure-we-are-not-liable-for-failure-or-delay-due-to-events-beyond-our-reasonable-control">18.1 Force majeure. We are not liable for failure or delay due to events beyond our reasonable control.</a></li><li><a class="terms-toc__link" href="#tsec-60-18-2-no-waiver-failure-to-enforce-is-not-a-waiver">18.2 No waiver. Failure to enforce is not a waiver.</a></li><li><a class="terms-toc__link" href="#tsec-61-18-3-severability-if-any-provision-is-unlawful-or-unenforceable-the-remainder-remains-in-effect">18.3 Severability. If any provision is unlawful or unenforceable, the remainder remains in effect.</a></li><li><a class="terms-toc__link" href="#tsec-62-18-4-assignment-you-may-not-assign-without-our-consent-we-may-assign-subject-to-law">18.4 Assignment. You may not assign without our consent; we may assign subject to law.</a></li><li><a class="terms-toc__link" href="#tsec-63-18-5-notices-we-may-notify-you-via-the-service-email-or-your-account-address-you-agree-that-all-notices-and-communications-under-these-terms-may-be-served-by-email-to-the-email-address-in-your-account-and-are-deemed-received-at-the-earlier-of-a-the-time-of-transmission-uk-time-if-sent-on-a-working-day-before-5pm-or-b-the-next-working-day-you-must-keep-your-contact-details-current-you-may-send-notices-to-us-by-email-to-info-forwardmymail-co-uk-or-by-post-to-our-registered-address-legal-notices-are-effective-only-when-actually-received-by-us-for-the-avoidance-of-doubt-this-email-service-clause-does-not-apply-to-the-formal-service-of-court-proceedings-which-must-comply-with-applicable-procedural-rules-e-g-the-civil-procedure-rules-or-any-separate-written-consent">18.5 Notices. We may notify you via the Service, email or your account address. You agree that all notices and communications under these Terms may be served by email to the email address in your account and are deemed received at the earlier of (a) the time of transmission (UK time) if sent on a Working Day before 5pm, or (b) the next Working Day. You must keep your contact details current. You may send notices to us by email to info@forwardmymail.co.uk or by post to our registered address; legal notices are effective only when actually received by us. For the avoidance of doubt, this email‑service clause does not apply to the formal service of court proceedings, which must comply with applicable procedural rules (e.g., the Civil Procedure Rules) or any separate written consent.</a></li><li><a class="terms-toc__link" href="#tsec-64-18-6-third-party-rights-except-as-stated-in-clause-9-5-no-third-party-has-rights-to-enforce-these-terms">18.6 Third‑party rights. Except as stated in Clause 9.5, no third party has rights to enforce these Terms.</a></li><li><a class="terms-toc__link" href="#tsec-65-schedule-b-client-authorisation-for-receipt-international-forwarding-of-sensitive-mail-v2">Schedule B — Client Authorisation for Receipt &amp; International Forwarding of Sensitive Mail — v2</a></li><li><a class="terms-toc__link" href="#tsec-66-schedule-e-customer-declarations-consents-signable">Schedule E — Customer Declarations &amp; Consents (Signable)</a></li></ul></div><p><small>Last updated: 2025-12-19</small></p>
+<details class="terms-section" id="tsec-1-forward-my-mail-ltd-terms-conditions-uk-full-consolidated-version"><summary>Forward My Mail Ltd — Terms &amp; Conditions (UK) — Full Consolidated Version</summary><p>Last updated: 2025-12-19</p><p>These Terms govern the provision of mail receiving, opening/scanning, storage and forwarding services, and (where purchased) company formation, registered office and director’s service address services, by Forward My Mail Ltd ("FMM").</p></details>
+<details class="terms-section" id="tsec-2-contents"><summary>Contents</summary><p>1. Parties, Definitions and Interpretation</p><p>2. Service Description</p><p>3. Your Obligations</p><p>4. Prohibited &amp; Restricted Items</p><p>5. Inspections and Security</p><p>6. KYC/AML, Sanctions &amp; Fraud Controls</p><p>7. Handling, Transit &amp; Delivery</p><p>8. Fees, Storage &amp; Lien</p><p>9. Liability, Limits and Exclusions (Protection of FMM and Director)</p><p>10. Your Indemnities</p></details>
+<details class="terms-section" id="tsec-3-10-1-business-customers-you-shall-indemnify-and-keep-indemnified-forward-my-mail-ltd-and-its-director-s-officers-employees-and-agents-from-and-against-all-losses-liabilities-damages-claims-demands-actions-fines-penalties-and-costs-and-expenses-including-reasonable-legal-and-other-professional-costs-and-expenses-arising-out-of-or-in-connection-with-a-your-breach-of-these-terms-or-of-law-b-prohibited-or-restricted-items-c-inaccurate-customs-declarations-or-misstatements-d-breach-of-issuer-or-bank-rules-including-use-of-a-mail-forwarding-address-contrary-to-issuer-policy-e-misuse-of-our-address-including-at-companies-house-dvla-or-for-mlr-registrations-f-third-party-claims-relating-to-goods-content-or-instructions-you-send-or-ask-us-to-handle-g-sanctions-violations-or-h-fraud-or-wilful-misconduct-by-you-or-persons-you-authorise"><summary>10.1 Business Customers. You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with: (a) your breach of these Terms or of law; (b) Prohibited or Restricted Items; (c) inaccurate customs declarations or misstatements; (d) breach of issuer or bank rules (including use of a mail‑forwarding address contrary to issuer policy); (e) misuse of our address (including at Companies House, DVLA or for MLR registrations); (f) third‑party claims relating to goods, content or instructions you send or ask us to handle; (g) sanctions violations; or (h) fraud or wilful misconduct by you or persons you authorise.</summary></details>
+<details class="terms-section" id="tsec-4-10-2-consumers-if-you-are-a-consumer-this-indemnity-applies-only-to-the-extent-that-a-loss-is-caused-by-your-breach-misuse-or-unlawful-conduct-it-does-not-apply-to-losses-caused-by-our-own-negligence-or-failure-to-perform-with-reasonable-care-and-skill-and-does-not-reduce-your-statutory-rights-under-the-consumer-rights-act-2015"><summary>10.2 Consumers. If you are a Consumer, this indemnity applies only to the extent that a loss is caused by your breach, misuse or unlawful conduct. It does not apply to losses caused by our own negligence or failure to perform with reasonable care and skill and does not reduce your statutory rights under the Consumer Rights Act 2015.</summary></details>
+<details class="terms-section" id="tsec-5-10-3-legal-fees-and-costs-the-indemnity-in-this-clause-includes-the-reasonable-and-properly-incurred-legal-and-other-professional-costs-and-expenses-of-investigating-defending-and-or-settling-any-third-party-or-regulatory-claim-allegation-or-enquiry-arising-from-the-matters-described-in-clauses-10-1-10-2-whether-such-claim-is-made-against-us-alone-or-against-us-together-with-you"><summary>10.3 Legal fees and costs. The indemnity in this Clause includes the reasonable and properly incurred legal and other professional costs and expenses of investigating, defending and/or settling any third‑party or regulatory claim, allegation or enquiry arising from the matters described in Clauses 10.1–10.2, whether such claim is made against us alone or against us together with you.</summary></details>
+<details class="terms-section" id="tsec-6-10-4-conduct-of-claims-we-will-give-you-reasonable-notice-of-any-claim-for-which-we-seek-indemnity-we-may-conduct-the-defence-or-settlement-of-the-claim-and-you-shall-provide-prompt-cooperation-information-and-assistance-including-documents-witness-statements-and-access-to-systems-as-reasonably-requested-you-must-not-admit-liability-settle-or-compromise-any-claim-that-could-reasonably-be-expected-to-give-rise-to-indemnity-without-our-prior-written-consent-where-a-claim-is-solely-and-directly-against-you-you-may-assume-conduct-provided-that-doing-so-does-not-prejudice-us"><summary>10.4 Conduct of claims. We will give you reasonable notice of any claim for which we seek indemnity. We may conduct the defence or settlement of the claim and you shall provide prompt cooperation, information and assistance (including documents, witness statements and access to systems) as reasonably requested. You must not admit liability, settle or compromise any claim that could reasonably be expected to give rise to indemnity without our prior written consent. Where a claim is solely and directly against you, you may assume conduct provided that doing so does not prejudice us.</summary></details>
+<details class="terms-section" id="tsec-7-10-5-limits-and-fairness-nothing-in-this-clause-requires-you-to-indemnify-us-for-fines-or-penalties-to-the-extent-caused-by-our-own-breach-of-law-negligence-or-wilful-misconduct-nor-for-indirect-or-consequential-losses-except-to-the-extent-payable-to-a-third-party-under-a-settlement-or-judgment-we-will-take-reasonable-steps-to-mitigate-any-indemnified-losses"><summary>10.5 Limits and fairness. Nothing in this Clause requires you to indemnify us for fines or penalties to the extent caused by our own breach of law, negligence or wilful misconduct, nor for indirect or consequential losses except to the extent payable to a third party under a settlement or judgment. We will take reasonable steps to mitigate any indemnified losses.</summary></details>
+<details class="terms-section" id="tsec-8-10-6-advance-on-costs-where-a-third-party-or-regulatory-claim-is-reasonably-expected-to-exceed-routine-small-claims-costs-we-may-request-a-reasonable-advance-retainer-in-respect-of-external-legal-or-expert-costs-for-the-next-phase-not-more-than-the-reasonably-anticipated-external-costs-for-the-next-60-days-we-will-keep-records-and-reconcile-any-advance-against-actual-costs"><summary>10.6 Advance on costs. Where a third‑party or regulatory claim is reasonably expected to exceed routine small‑claims costs, we may request a reasonable advance/retainer in respect of external legal or expert costs for the next phase (not more than the reasonably anticipated external costs for the next 60 days). We will keep records and reconcile any advance against actual costs.</summary></details>
+<details class="terms-section" id="tsec-9-10-7-proportionality-for-micro-claims-for-consumer-disputes-allocated-to-the-small-claims-track-nothing-in-this-clause-requires-the-consumer-to-pay-our-irrecoverable-legal-costs-beyond-what-the-court-would-ordinarily-award-unless-the-court-orders-otherwise-due-to-dishonesty-abuse-of-process-or-similar-exceptional-conduct"><summary>10.7 Proportionality for micro‑claims. For consumer disputes allocated to the small‑claims track, nothing in this Clause requires the Consumer to pay our irrecoverable legal costs beyond what the court would ordinarily award, unless the court orders otherwise due to dishonesty, abuse of process or similar exceptional conduct.</summary><p>11. Data Protection (UK GDPR)</p><p>12. Compliance &amp; Sanctions</p><p>13. Suspension &amp; Termination</p><p>14. Changes to the Service or Terms</p><p>15. Consumer &amp; Business Information</p><p>16. Complaints. We aim to resolve complaints internally. If we cannot resolve a Consumer complaint, we will provide details of an approved Alternative Dispute Resolution (ADR) provider competent to handle your case and say whether we will take part. We do not currently subscribe to any ADR scheme. At deadlock we will signpost you to a Chartered Trading Standards Institute (CTSI)‑approved ADR body (for example, RetailADR (CDRL) or CEDR) and state whether we agree to ADR for your case. If you purchased online, you may also use the EU Commission’s ODR platform to route a complaint. This Clause does not affect your right to bring court proceedings.</p><p>17. Governing Law &amp; Jurisdiction</p><p>18. General</p><p>19. Contact Details</p><p>20. Acknowledgement &amp; Acceptance</p><p>21. Schedule A — Company Formation, Registered Office &amp; Director’s Service Address</p><p>22. Schedule B — Client Authorisation: Receipt &amp; International Forwarding of Sensitive Mail</p><p>23. Schedule C — Service Rules &amp; Fees (Operational Policies)</p><p>24. Schedule D — Torts Act Notice of Intention to Sell (Template)</p><p>25. Schedule C‑1 — Fees Table (Fill‑in placeholders)</p></details>
+<details class="terms-section" id="tsec-10-key-facts-summary-for-convenience-only"><summary>Key Facts (Summary) — For Convenience Only</summary><p>• Agency &amp; opening/scanning: You appoint FMM as your agent to receive mail at our address and authorise opening/scanning for processing and forwarding, unless prohibited by law or issuer rules.</p><p>• Sensitive items: Bank cards/PIN mailers are forwarded only with signed authorisation &amp; KYC; tracked/signed‑for by default unless you opt out in writing.</p><p>• Risk &amp; insurance: Risk passes on handover to the Carrier; items are not insured unless you purchase cover in writing before dispatch.</p><p>• Fees &amp; VAT: Prices exclude VAT and any carrier surcharges; postage is additional. See price list (Schedule C).</p><p>• Storage &amp; disposal: Torts Act notice of intention to sell is issued before any sale/disposal of uncollected goods.</p><p>• Liability (B2B): Cap = greater of £100 or 100% of fees for the service at issue. Consumers’ CRA 2015 rights preserved.</p><p>• Changes: Objective reasons only; 30‑day notice &amp; right to cancel if materially detrimental.</p><p>• KYC/AML: Service activates after payment + checks; AML records kept 5–10 years.</p><p>• ADR signposting: if a consumer complaint reaches deadlock, we will signpost a CTSI‑approved ADR body (e.g., RetailADR or CEDR) and state whether we will participate.</p><p>• Notices by email: permitted for contract notices (not for formal service of court proceedings unless rules/consent allow).</p><p>• Complaints/ADR: If deadlock with a consumer, we signpost an approved ADR body and state whether we will participate.</p><p>1. Parties, Definitions and Interpretation</p></details>
+<details class="terms-section" id="tsec-11-1-1-parties-fmm-we-us-means-forward-my-mail-ltd-8a-bore-street-lichfield-staffordshire-ws13-6ll-united-kingdom-company-no-16912540-you-means-the-customer-named-in-the-order-or-account-consumer-means-an-individual-acting-wholly-or-mainly-outside-of-trade-or-profession-business-customer-means-everyone-else"><summary>1.1 Parties. "FMM", "we", "us" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). "You" means the customer named in the order or account. "Consumer" means an individual acting wholly or mainly outside of trade or profession; "Business Customer" means everyone else.</summary></details>
+<details class="terms-section" id="tsec-12-1-2-interpretation-headings-are-for-convenience-only-references-to-laws-include-amendments-priority-is-given-to-mandatory-law-then-these-terms-then-any-schedule-policy"><summary>1.2 Interpretation. Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy.</summary></details>
+<details class="terms-section" id="tsec-13-1-3-entire-agreement-these-terms-including-schedules-form-the-entire-agreement-replacing-prior-statements-unless-expressly-agreed-in-writing"><summary>1.3 Entire agreement. These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing.</summary><p>2. Service Description</p></details>
+<details class="terms-section" id="tsec-14-2-1-address-use-and-agency-you-may-use-an-fmm-provided-address-for-receiving-mail-and-packages-you-appoint-fmm-as-your-agent-to-receive-mail-on-your-behalf-and-authorise-us-to-open-and-scan-mail-for-processing-and-forwarding-except-where-prohibited-by-law-or-issuer-rules"><summary>2.1 Address use and agency. You may use an FMM‑provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding, except where prohibited by law or issuer rules.</summary></details>
+<details class="terms-section" id="tsec-15-2-2-registered-office-service-address-where-purchased-we-may-provide-a-registered-office-address-and-or-director-s-service-address-use-is-limited-to-official-purposes-not-for-trading-premises-returns-dvla-licensing-electoral-registration-or-money-laundering-regulations-registrations-we-may-report-misuse-and-or-require-removal-from-public-records"><summary>2.2 Registered office / service address. Where purchased, we may provide a registered office address and/or director’s service address. Use is limited to official purposes; not for trading premises, returns, DVLA/licensing, electoral registration, or Money Laundering Regulations registrations. We may report misuse and/or require removal from public records.</summary></details>
+<details class="terms-section" id="tsec-16-2-3-company-formation-where-you-instruct-us-to-incorporate-a-company-you-are-responsible-for-accuracy-of-information-and-regulatory-compliance-we-are-not-a-law-or-tax-firm-immediate-performance-is-requested-when-filings-begin-see-15-3"><summary>2.3 Company formation. Where you instruct us to incorporate a company, you are responsible for accuracy of information and regulatory compliance. We are not a law or tax firm. Immediate performance is requested when filings begin (see 15.3).</summary></details>
+<details class="terms-section" id="tsec-17-2-4-no-warehousing-we-do-not-provide-warehousing-or-long-term-storage-see-holding-windows-and-storage-fees-in-schedule-c"><summary>2.4 No warehousing. We do not provide warehousing or long‑term storage; see holding windows and storage fees in Schedule C.</summary></details>
+<details class="terms-section" id="tsec-18-2-5-subcontracting-we-may-use-subcontractors-and-carriers-we-remain-responsible-for-our-own-obligations"><summary>2.5 Subcontracting. We may use subcontractors and Carriers; we remain responsible for our own obligations.</summary></details>
+<details class="terms-section" id="tsec-19-2-6-not-a-residential-redirection-service-if-you-have-changed-residential-address-you-must-arrange-a-royal-mail-redirection-we-do-not-provide-a-statutory-residential-redirection-service"><summary>2.6 Not a residential redirection service. If you have changed residential address, you must arrange a Royal Mail Redirection; we do not provide a statutory residential redirection service.</summary><p>3. Your Obligations</p></details>
+<details class="terms-section" id="tsec-20-3-1-lawful-use-do-not-send-receive-or-request-handling-of-prohibited-items-or-illegal-content-provide-accurate-recipient-names-and-instructions"><summary>3.1 Lawful use. Do not send, receive or request handling of Prohibited Items or illegal content. Provide accurate recipient names and instructions.</summary></details>
+<details class="terms-section" id="tsec-21-3-2-duties-taxes-you-are-responsible-for-customs-declarations-duties-and-taxes"><summary>3.2 Duties/taxes. You are responsible for customs declarations, duties and taxes.</summary></details>
+<details class="terms-section" id="tsec-22-3-3-packaging-disclosure-provide-sufficient-packaging-and-information-for-handling-and-customs"><summary>3.3 Packaging &amp; disclosure. Provide sufficient packaging and information for handling and customs.</summary></details>
+<details class="terms-section" id="tsec-23-3-4-cooperation-verification-provide-identity-and-address-documents-when-requested-see-clause-6"><summary>3.4 Cooperation &amp; verification. Provide identity and address documents when requested; see Clause 6.</summary></details>
+<details class="terms-section" id="tsec-24-3-5-address-limits-do-not-display-our-address-as-a-trading-address-or-for-advertising-without-prior-written-consent"><summary>3.5 Address limits. Do not display our address as a trading address or for advertising without prior written consent.</summary><p>4. Prohibited &amp; Restricted Items</p><p>You must comply with Carrier and legal restrictions (dangerous goods, weapons, controlled drugs, cash, perishable or illegal items). We may refuse, hold, return or dispose of items that breach this clause and may notify authorities.</p><p>5. Inspections and Security</p><p>We may open items to identify the recipient, comply with law, meet Carrier/customs requirements, repack damaged parcels, or for safety/security. We take reasonable care during inspection.</p><p>6. KYC/AML, Sanctions &amp; Fraud Controls</p></details>
+<details class="terms-section" id="tsec-25-6-1-verification-an-account-is-not-active-and-services-are-not-provided-until-a-payment-is-received-and-b-all-required-kyc-aml-checks-are-completed-for-every-relevant-person-name-we-may-use-certified-digital-identity-service-providers"><summary>6.1 Verification. An account is not active and services are not provided until (a) payment is received and (b) all required KYC/AML checks are completed for every relevant person/name. We may use certified digital identity service providers.</summary></details>
+<details class="terms-section" id="tsec-26-6-2-ongoing-monitoring-we-may-monitor-usage-suspend-or-terminate-accounts-and-report-suspicious-activity-to-authorities-without-notice-where-required-by-law"><summary>6.2 Ongoing monitoring. We may monitor usage, suspend or terminate accounts, and report suspicious activity to authorities without notice where required by law.</summary></details>
+<details class="terms-section" id="tsec-27-6-3-annual-refresh-retention-we-may-carry-out-an-annual-id-refresh-you-must-provide-updated-documents-to-keep-your-account-active-we-may-retain-identity-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-required-longer-by-law"><summary>6.3 Annual refresh &amp; retention. We may carry out an annual ID refresh; you must provide updated documents to keep your account active. We may retain identity/verification records for at least 5 years and no longer than 10 years unless required longer by law.</summary></details>
+<details class="terms-section" id="tsec-28-6-4-trusts-before-we-provide-any-service-to-a-trust-you-must-provide-proof-of-registration-with-the-hmrc-trust-registration-service-trs"><summary>6.4 Trusts. Before we provide any service to a trust, you must provide proof of registration with the HMRC Trust Registration Service (TRS).</summary><p>7. Handling, Transit &amp; Delivery</p></details>
+<details class="terms-section" id="tsec-29-7-1-title-and-risk-risk-in-items-passes-to-you-when-items-are-delivered-to-the-carrier-for-forwarding-to-your-chosen-destination-or-when-collected-by-you-your-agent-whichever-occurs-first"><summary>7.1 Title and risk. Risk in items passes to you when items are delivered to the Carrier for forwarding to your chosen destination, or when collected by you/your agent, whichever occurs first.</summary></details>
+<details class="terms-section" id="tsec-30-7-2-carrier-terms-times-carriage-is-subject-to-carrier-terms-including-routing-and-transit-times-which-we-do-not-control-delivery-dates-are-estimates"><summary>7.2 Carrier terms &amp; times. Carriage is subject to Carrier terms, including routing and transit times, which we do not control. Delivery dates are estimates.</summary></details>
+<details class="terms-section" id="tsec-31-7-3-customs-and-delays-you-are-responsible-for-customs-clearance-and-delays-arising-from-inspections-or-documentation"><summary>7.3 Customs and delays. You are responsible for customs clearance and delays arising from inspections or documentation.</summary></details>
+<details class="terms-section" id="tsec-32-7-4-sensitive-financial-items-forwarding-of-sensitive-items-e-g-bank-credit-debit-cards-pin-letters-cheque-books-security-tokens-or-card-readers-is-optional-and-provided-only-if-a-you-have-completed-the-client-authorisation-in-schedule-b-b-all-kyc-aml-checks-are-satisfied-c-we-are-satisfied-the-forwarding-is-lawful-and-permitted-by-the-issuer-and-d-the-destination-address-has-been-verified-opening-scanning-our-service-includes-opening-mail-and-scanning-contents-for-you-for-sensitive-items-we-will-follow-your-written-instructions-except-we-will-not-scan-where-doing-so-would-breach-law-or-issuer-rules-e-g-certain-pin-mailers-identifiable-pin-mailers-and-security-envelopes-will-not-be-opened-unless-you-give-us-explicit-written-instructions-and-issuer-rules-permit-we-may-refuse-or-suspend-forwarding-scanning-of-sensitive-items-where-risk-or-compliance-concerns-arise"><summary>7.4 Sensitive financial items. Forwarding of Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens or card readers) is optional and provided only if: (a) you have completed the Client Authorisation in Schedule B; (b) all KYC/AML checks are satisfied; (c) we are satisfied the forwarding is lawful and permitted by the issuer; and (d) the destination address has been verified. Opening &amp; scanning: our Service includes opening mail and scanning contents for you. For Sensitive Items we will follow your written instructions, except we will not scan where doing so would breach law or issuer rules (e.g., certain PIN mailers). Identifiable PIN mailers and security envelopes will not be opened unless you give us explicit written instructions and issuer rules permit. We may refuse or suspend forwarding/scanning of Sensitive Items where risk or compliance concerns arise.</summary></details>
+<details class="terms-section" id="tsec-33-7-5-default-shipping-method-safety-first-unless-you-instruct-otherwise-in-writing-we-will-use-a-tracked-and-or-signed-for-method-where-available-and-commercially-reasonable-having-regard-to-the-item-value-and-destination-if-you-opt-for-an-untracked-or-unsigned-service-you-acknowledge-increased-risk-and-agree-that-our-liability-remains-limited-under-clause-9"><summary>7.5 Default shipping method (safety first). Unless you instruct otherwise in writing, we will use a tracked and/or signed‑for method where available and commercially reasonable, having regard to the item value and destination. If you opt for an untracked or unsigned service, you acknowledge increased risk and agree that our liability remains limited under Clause 9.</summary></details>
+<details class="terms-section" id="tsec-34-7-6-large-parcels-and-limits-please-give-24-hours-notice-for-parcels-exceeding-1-000-mm-in-any-dimension-we-may-refuse-items-exceeding-2-m-in-any-dimension-or-25-kg-in-weight-we-may-charge-handling-and-storage-fees-for-large-or-bulky-items"><summary>7.6 Large parcels and limits. Please give 24 hours’ notice for parcels exceeding 1,000 mm in any dimension. We may refuse items exceeding 2 m in any dimension or 25 kg in weight. We may charge handling and storage fees for large or bulky items.</summary></details>
+<details class="terms-section" id="tsec-35-7-7-client-arranged-courier-where-you-pre-pay-postage-courier-directly-a-handling-fee-per-item-may-apply-see-schedule-c-fees"><summary>7.7 Client‑arranged courier. Where you pre‑pay postage/courier directly, a handling fee per item may apply; see Schedule C (Fees).</summary></details>
+<details class="terms-section" id="tsec-36-7-8-retrieval-of-archived-scans-retrieval-of-previously-scanned-and-archived-items-may-attract-a-retrieval-fee-see-schedule-c-fees"><summary>7.8 Retrieval of archived scans. Retrieval of previously scanned‑and‑archived items may attract a retrieval fee; see Schedule C (Fees).</summary><p>8. Fees, Storage &amp; Lien</p></details>
+<details class="terms-section" id="tsec-37-8-1-fees-taxes-you-agree-to-pay-service-fees-shipping-charges-and-surcharges-as-published-or-quoted-all-fees-are-exclusive-of-vat-and-any-carrier-surcharges-unless-stated-otherwise-we-may-change-fees-on-notice-for-future-services"><summary>8.1 Fees &amp; taxes. You agree to pay Service fees, shipping charges and surcharges as published or quoted. All fees are exclusive of VAT and any carrier surcharges unless stated otherwise. We may change fees on notice for future services.</summary></details>
+<details class="terms-section" id="tsec-38-8-2-storage-and-non-compliance-for-inactive-or-non-compliant-accounts-id-missing-fails-or-unpaid-invoices-we-may-hold-mail-for-up-to-14-days-without-charge-to-allow-resolution-after-that-period-items-may-be-returned-to-sender-securely-destroyed-disposed-of-or-stored-for-a-fee-parcels-may-accrue-storage-charges-after-24-hours-disposal-return-fees-may-apply"><summary>8.2 Storage and non‑compliance. For inactive or non‑compliant accounts (ID missing/fails, or unpaid invoices), we may hold mail for up to 14 days without charge to allow resolution. After that period items may be returned to sender, securely destroyed, disposed of, or stored for a fee. Parcels may accrue storage charges after 24 hours. Disposal/return fees may apply.</summary></details>
+<details class="terms-section" id="tsec-39-8-3-lien-we-have-a-general-and-particular-lien-over-items-for-all-amounts-you-owe-if-unpaid-after-notice-we-may-sell-or-dispose-of-items-and-apply-proceeds-to-your-debt-accounting-to-you-for-any-balance"><summary>8.3 Lien. We have a general and particular lien over items for all amounts you owe. If unpaid after notice, we may sell or dispose of items and apply proceeds to your debt (accounting to you for any balance).</summary></details>
+<details class="terms-section" id="tsec-40-8-4-sale-disposal-procedure-torts-act-before-any-sale-or-disposal-of-uncollected-goods-we-will-give-you-a-written-notice-of-intention-to-sell-allowing-a-reasonable-collection-period-under-the-torts-interference-with-goods-act-1977-we-will-account-to-you-for-any-net-proceeds-after-deducting-sums-properly-due"><summary>8.4 Sale/disposal procedure (Torts Act). Before any sale or disposal of uncollected goods we will give you a written notice of intention to sell allowing a reasonable collection period, under the Torts (Interference with Goods) Act 1977. We will account to you for any net proceeds after deducting sums properly due.</summary></details>
+<details class="terms-section" id="tsec-41-8-5-insurance-goods-are-not-insured-while-on-our-premises-or-in-transit-unless-you-purchase-optional-cover-from-us-in-writing-before-dispatch-if-you-arrange-your-own-courier-our-insurance-does-not-apply-you-are-responsible-for-declaring-value-and-arranging-appropriate-cover"><summary>8.5 Insurance. Goods are not insured while on our premises or in transit unless you purchase optional cover from us in writing before dispatch. If you arrange your own courier, our insurance does not apply. You are responsible for declaring value and arranging appropriate cover.</summary><p>9. Liability, Limits and Exclusions (Protection of FMM and Director)</p></details>
+<details class="terms-section" id="tsec-42-9-0-consumer-carve-out-if-you-are-a-consumer-nothing-in-these-terms-limits-your-statutory-rights-including-our-obligation-to-provide-the-service-with-reasonable-care-and-skill-under-the-consumer-rights-act-2015-any-limits-exclusions-apply-only-to-the-extent-permitted-by-law"><summary>9.0 Consumer carve‑out. If you are a Consumer, nothing in these Terms limits your statutory rights, including our obligation to provide the Service with reasonable care and skill under the Consumer Rights Act 2015. Any limits/exclusions apply only to the extent permitted by law.</summary></details>
+<details class="terms-section" id="tsec-43-9-1-exclusion-of-certain-losses-to-the-maximum-extent-permitted-by-law-fmm-and-its-director-s-officers-employees-and-agents-are-not-liable-for-indirect-consequential-exemplary-or-punitive-damages-loss-of-profit-revenue-business-goodwill-or-anticipated-savings-or-losses-arising-from-delay-missed-delivery-windows-customs-seizures-or-carrier-acts-omissions-beyond-our-reasonable-control"><summary>9.1 Exclusion of certain losses. To the maximum extent permitted by law, FMM and its Director(s), officers, employees and agents are not liable for indirect, consequential, exemplary or punitive damages; loss of profit, revenue, business, goodwill or anticipated savings; or losses arising from delay, missed delivery windows, customs seizures, or Carrier acts/omissions beyond our reasonable control.</summary></details>
+<details class="terms-section" id="tsec-44-9-2-monetary-cap-fmm-s-aggregate-liability-for-all-claims-arising-out-of-or-relating-to-the-service-in-any-12-month-period-is-limited-to-the-greater-of-100-or-100-of-fees-paid-to-fmm-by-you-for-the-service-giving-rise-to-the-claim-different-mandatory-caps-may-apply-where-law-requires"><summary>9.2 Monetary cap. FMM’s aggregate liability for all claims arising out of or relating to the Service in any 12‑month period is limited to the greater of £100 or 100% of fees paid to FMM by you for the Service giving rise to the claim. Different mandatory caps may apply where law requires.</summary></details>
+<details class="terms-section" id="tsec-45-9-3-non-excludable-liabilities-nothing-excludes-liability-for-death-or-personal-injury-caused-by-negligence-fraud-or-any-liability-which-cannot-lawfully-be-excluded-or-limited"><summary>9.3 Non‑excludable liabilities. Nothing excludes liability for death or personal injury caused by negligence, fraud, or any liability which cannot lawfully be excluded or limited.</summary></details>
+<details class="terms-section" id="tsec-46-9-4-carriers-we-are-not-liable-for-carrier-terms-delays-or-acts-omissions-beyond-our-control-your-remedies-against-carriers-are-unaffected"><summary>9.4 Carriers. We are not liable for Carrier terms, delays or acts/omissions beyond our control; your remedies against Carriers are unaffected.</summary></details>
+<details class="terms-section" id="tsec-47-9-5-third-party-rights-director-protection-the-director-s-of-fmm-may-enforce-this-clause-9-under-the-contracts-rights-of-third-parties-act-1999"><summary>9.5 Third‑party rights (Director protection). The Director(s) of FMM may enforce this Clause 9 under the Contracts (Rights of Third Parties) Act 1999.</summary></details>
+<details class="terms-section" id="tsec-48-9-6-time-limits-business-customers-you-must-notify-us-of-loss-or-damage-in-writing-within-7-days-of-delivery-or-scheduled-delivery-and-bring-any-claim-within-6-months-thereafter-otherwise-the-claim-is-barred-except-where-mandatory-law-provides-longer-consumers-please-notify-issues-within-30-days-where-reasonably-possible-failure-to-do-so-does-not-affect-your-statutory-rights-or-ability-to-bring-a-claim-within-the-applicable-statutory-limitation-period"><summary>9.6 Time limits. Business Customers: you must notify us of loss or damage in writing within 7 days of delivery (or scheduled delivery) and bring any claim within 6 months thereafter; otherwise the claim is barred, except where mandatory law provides longer. Consumers: please notify issues within 30 days where reasonably possible; failure to do so does not affect your statutory rights or ability to bring a claim within the applicable statutory limitation period.</summary><p>10. Your Indemnities</p><p>You indemnify us from losses, claims and costs arising from your breach of these Terms, unlawful items, customs misstatements, Prohibited Items, or issuer‑rule breaches. For Consumers this indemnity applies only to losses caused by your fault or unlawful use.</p><p>11. Data Protection (UK GDPR)</p></details>
+<details class="terms-section" id="tsec-49-11-1-controller-fmm-is-a-controller-of-personal-data-you-provide-see-our-privacy-notice-for-details"><summary>11.1 Controller. FMM is a controller of personal data you provide. See our Privacy Notice for details.</summary></details>
+<details class="terms-section" id="tsec-50-11-2-checks-and-sharing-you-consent-to-our-use-of-third-party-verification-and-payment-providers-and-to-lawful-disclosures-to-carriers-customs-and-law-enforcement-where-required-for-formation-registered-office-we-may-share-details-with-companies-house-hmrc-and-banks-at-your-request"><summary>11.2 Checks and sharing. You consent to our use of third‑party verification and payment providers and to lawful disclosures to Carriers, customs and law enforcement where required. For formation/registered office, we may share details with Companies House, HMRC and banks at your request.</summary></details>
+<details class="terms-section" id="tsec-51-11-3-international-transfers-where-data-is-transferred-outside-the-uk-eea-we-will-use-appropriate-safeguards-as-required-by-law"><summary>11.3 International transfers. Where data is transferred outside the UK/EEA, we will use appropriate safeguards as required by law.</summary></details>
+<details class="terms-section" id="tsec-52-11-4-aml-kyc-records-we-may-retain-identity-and-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-a-longer-period-is-required-by-law-e-g-ongoing-investigations-or-legal-claims"><summary>11.4 AML/KYC records. We may retain identity and verification records for at least 5 years and no longer than 10 years unless a longer period is required by law (e.g., ongoing investigations or legal claims).</summary></details>
+<details class="terms-section" id="tsec-53-11-5-scan-retention-unless-you-ask-us-to-keep-items-longer-or-we-must-keep-them-for-legal-compliance-reasons-scanned-images-and-related-handling-logs-will-be-retained-for-90-days-and-then-deleted-archived-in-line-with-our-policies"><summary>11.5 Scan retention. Unless you ask us to keep items longer (or we must keep them for legal/compliance reasons), scanned images and related handling logs will be retained for 90 days and then deleted/archived in line with our policies.</summary><p>12. Compliance &amp; Sanctions</p><p>You warrant that you and your recipients are not subject to sanctions that would prohibit the Service. We may suspend where required to comply with law.</p><p>13. Suspension &amp; Termination</p><p>We may suspend or terminate the Service immediately if you breach these Terms; we suspect unlawful activity; verification requests are not satisfied; or any amount is overdue. You may terminate on notice for convenience, subject to payment of accrued charges. Clauses intended to survive termination do so.</p></details>
+<details class="terms-section" id="tsec-54-13-1-debt-recovery-chargebacks-overdue-accounts-may-be-referred-to-debt-collection-you-are-liable-for-reasonable-recovery-costs-and-any-statutory-compensation-interest-where-applicable-if-you-initiate-a-payment-chargeback-we-may-apply-a-reasonable-administration-fee-plus-any-third-party-fees-and-suspend-services-pending-resolution-we-may-notify-companies-house-and-other-bodies-and-take-steps-to-remove-unauthorised-use-of-our-address-where-fees-remain-unpaid"><summary>13.1 Debt recovery &amp; chargebacks. Overdue accounts may be referred to debt collection. You are liable for reasonable recovery costs and any statutory compensation/interest where applicable. If you initiate a payment chargeback, we may apply a reasonable administration fee (plus any third‑party fees) and suspend services pending resolution. We may notify Companies House and other bodies and take steps to remove unauthorised use of our address where fees remain unpaid.</summary><p>14. Changes to the Service or Terms</p><p>We may update the Service or these Terms from time to time for objective reasons, including legal or regulatory compliance, security, changes to service functionality, or changes in third‑party costs (e.g., Carriers). Material changes will be notified via the website, in‑app, or email and will take effect prospectively. If a change is likely to cause material detriment to you, we will give at least 30 days’ notice and you may cancel before it takes effect. Continued use after changes take effect constitutes acceptance (this does not reduce consumer statutory rights).</p><p>15. Consumer &amp; Business Information</p></details>
+<details class="terms-section" id="tsec-55-15-1-cra-2015-for-consumers-we-will-provide-services-with-reasonable-care-and-skill-nothing-in-these-terms-affects-statutory-rights"><summary>15.1 CRA 2015. For Consumers we will provide services with reasonable care and skill. Nothing in these Terms affects statutory rights.</summary></details>
+<details class="terms-section" id="tsec-56-15-2-ccr-2013-cooling-off-if-you-are-a-consumer-and-purchased-online-or-at-a-distance-you-may-have-a-14-day-cooling-off-period-if-you-request-immediate-performance-you-agree-we-may-start-before-the-end-of-that-period-you-pay-for-services-performed-and-once-fully-performed-you-lose-the-right-to-cancel"><summary>15.2 CCR 2013 (cooling‑off). If you are a Consumer and purchased online or at a distance, you may have a 14‑day cooling‑off period. If you request immediate performance, you agree we may start before the end of that period; you pay for services performed, and once fully performed you lose the right to cancel.</summary></details>
+<details class="terms-section" id="tsec-57-15-3-immediate-performance-acknowledgment-by-instructing-us-to-file-an-incorporation-or-activate-an-address-you-request-immediate-performance-and-acknowledge-the-effect-on-your-cancellation-rights"><summary>15.3 Immediate performance acknowledgment. By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights.</summary></details>
+<details class="terms-section" id="tsec-58-15-4-optional-director-identity-verification-service-if-you-purchase-a-companies-house-director-identity-verification-service-from-us-the-service-fee-is-for-processing-submission-and-is-non-refundable-once-submitted-whether-the-check-succeeds-or-fails-additional-verification-may-attract-supplementary-fees"><summary>15.4 Optional Director Identity Verification service. If you purchase a Companies House director identity verification service from us, the service fee is for processing/submission and is non‑refundable once submitted, whether the check succeeds or fails. Additional verification may attract supplementary fees.</summary><p>16. Complaints</p><p>We aim to resolve complaints internally. If we cannot resolve a Consumer complaint, we will provide details of an approved Alternative Dispute Resolution (ADR) provider competent to handle your case and say whether we will take part; you may also use the ODR platform for online purchases.</p><p>17. Governing Law &amp; Jurisdiction</p><p>These Terms and any dispute are governed by the law of England and Wales. Courts of England and Wales have jurisdiction. Consumers may benefit from mandatory protections of their local law.</p><p>18. General</p></details>
+<details class="terms-section" id="tsec-59-18-1-force-majeure-we-are-not-liable-for-failure-or-delay-due-to-events-beyond-our-reasonable-control"><summary>18.1 Force majeure. We are not liable for failure or delay due to events beyond our reasonable control.</summary></details>
+<details class="terms-section" id="tsec-60-18-2-no-waiver-failure-to-enforce-is-not-a-waiver"><summary>18.2 No waiver. Failure to enforce is not a waiver.</summary></details>
+<details class="terms-section" id="tsec-61-18-3-severability-if-any-provision-is-unlawful-or-unenforceable-the-remainder-remains-in-effect"><summary>18.3 Severability. If any provision is unlawful or unenforceable, the remainder remains in effect.</summary></details>
+<details class="terms-section" id="tsec-62-18-4-assignment-you-may-not-assign-without-our-consent-we-may-assign-subject-to-law"><summary>18.4 Assignment. You may not assign without our consent; we may assign subject to law.</summary></details>
+<details class="terms-section" id="tsec-63-18-5-notices-we-may-notify-you-via-the-service-email-or-your-account-address-you-agree-that-all-notices-and-communications-under-these-terms-may-be-served-by-email-to-the-email-address-in-your-account-and-are-deemed-received-at-the-earlier-of-a-the-time-of-transmission-uk-time-if-sent-on-a-working-day-before-5pm-or-b-the-next-working-day-you-must-keep-your-contact-details-current-you-may-send-notices-to-us-by-email-to-info-forwardmymail-co-uk-or-by-post-to-our-registered-address-legal-notices-are-effective-only-when-actually-received-by-us-for-the-avoidance-of-doubt-this-email-service-clause-does-not-apply-to-the-formal-service-of-court-proceedings-which-must-comply-with-applicable-procedural-rules-e-g-the-civil-procedure-rules-or-any-separate-written-consent"><summary>18.5 Notices. We may notify you via the Service, email or your account address. You agree that all notices and communications under these Terms may be served by email to the email address in your account and are deemed received at the earlier of (a) the time of transmission (UK time) if sent on a Working Day before 5pm, or (b) the next Working Day. You must keep your contact details current. You may send notices to us by email to info@forwardmymail.co.uk or by post to our registered address; legal notices are effective only when actually received by us. For the avoidance of doubt, this email‑service clause does not apply to the formal service of court proceedings, which must comply with applicable procedural rules (e.g., the Civil Procedure Rules) or any separate written consent.</summary></details>
+<details class="terms-section" id="tsec-64-18-6-third-party-rights-except-as-stated-in-clause-9-5-no-third-party-has-rights-to-enforce-these-terms"><summary>18.6 Third‑party rights. Except as stated in Clause 9.5, no third party has rights to enforce these Terms.</summary><p>19. Contact Details</p><p>Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom. Company No. 16912540. Email: info@forwardmymail.co.uk</p><p>20. Acknowledgement &amp; Acceptance</p><p>By creating an account, purchasing a plan, or instructing us to receive, open/scan, store or forward items, you accept these Terms.</p><p>21. Schedule A — Company Formation, Registered Office &amp; Director’s Service Address</p><p>A1. Scope. Applies where you purchase formation, registered office or director’s service address services.</p><p>A2. No legal/tax advice. Information is general only; obtain your own advice.</p><p>A3. KYC/AML. We require identity and address verification for all beneficial owners (PSCs), directors and authorised users. We may refuse service or filings until verification is completed to our satisfaction.</p><p>A4. Filings and accuracy. You are responsible for incorporation data, consents and post‑incorporation compliance (PSC registers, statutory books, confirmation statements, HMRC registrations). We are not responsible for rejected/delayed filings caused by your incorrect or incomplete information.</p><p>A5. Registered office mail. Official mail (Companies House, HMRC, courts/regulators) is included as stated in your plan and will be scanned and/or forwarded in accordance with your instructions and applicable fees. Non‑official or marketing mail may be refused or charged additionally.</p><p>A6. Address display &amp; misuse. The registered office or director address may not be used as a trading address or for public advertising without our prior written consent. You must not use our address for DVLA driving licence/vehicle registration, electoral registration, or MLR registrations. We may require removal of the address from websites or materials if misused.</p><p>A7. Unauthorised use &amp; Companies House filings. If our address is used at Companies House without an active, paid service (per entity/name), you authorise us to file forms (including RP07 or equivalents) to remove or change the address. Fees apply per company and per officer/PSC using our address.</p><p>A8. Termination. On termination of address services you must promptly update Companies House and all records. We will refuse new mail from the termination date. Items received after termination will be handled as follows: (a) Letters received within 14 calendar days after termination: one courtesy email notification; we will hold for up to 14 days, then Return to Sender where practicable; if no sender/return address is available, we will securely destroy after a further 14 days. (b) Parcels received within 14 calendar days after termination: we will hold for up to 7 days; if uncollected/unspecified, we may issue a Torts Act s.12 notice allowing at least 14 days to collect or arrange forwarding on payment of all sums due; failing that, we may sell or dispose and account for any net proceeds. (c) Any post received more than 14 days after termination will be refused or returned to sender on receipt, without notice.</p><p>A9. Immediate performance. By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights (see Clause 15.3).</p><p>A10. Bank introductions. Where we provide bank or service introductions, these are without warranty; eligibility and onboarding decisions rest with the third party.</p><p>22. Schedule B — Client Authorisation: Receipt &amp; International Forwarding of Sensitive Mail</p><p>B1. Purpose. This authorisation confirms that the undersigned client authorises FMM to receive, open, scan, securely store and forward Sensitive Items on their behalf.</p><p>B2. Sensitive Items. “Sensitive Items” include: bank/credit/debit cards, PIN letters, cheque books, replacement security devices (e.g., card readers, tokens), and similar financial instruments. We may update this list from time to time.</p><p>B3. Preconditions. Sensitive Items will only be forwarded if: (a) the client has passed KYC/AML checks; (b) the issuer permits delivery to a mail‑forwarding address; (c) the Authorised Forwarding Address has been verified; and (d) the client has signed this Schedule.</p><p>B4. Method, opening &amp; security. FMM will use tracked and/or signed‑for services by default (unless you instruct otherwise in writing) and will record forwarding details internally. Our standard service includes opening mail and scanning contents; for Sensitive Items we will only scan with your explicit instruction and only where lawful and permitted by the issuer. We will not activate or test any card or device.</p><p>B5. Risk allocation. Once a Sensitive Item is handed to the Carrier for forwarding, risk passes to the client (see Clause 7.1). To the maximum extent permitted by law, FMM is not liable for delays, loss or misuse of Sensitive Items after dispatch, save where caused by FMM’s negligence. The liability limits in Clause 9 apply. The client indemnifies FMM for losses arising from issuer‑rule breach or misuse after dispatch.</p><p>B6. Refusal &amp; compliance. FMM may refuse, suspend or cancel forwarding of any Sensitive Item if compliance or security concerns arise, or if issuer, Carrier or legal restrictions apply.</p><p>B7. Client authorisation form. See separate PDF/DOCX form provided.</p><p>23. Schedule C — Service Rules &amp; Fees (Operational Policies)</p><p>C1. Status and updates. This Schedule sets out operational rules and fees for our services. It is incorporated by reference into the Terms. We may update this Schedule with prospective effect by notice on our website/in‑app/email.</p><p>C2. ID &amp; activation. Proof of identity and address is required for all relevant persons. Accounts remain inactive until payment is received and KYC/AML checks are completed. Annual ID refresh may be required.</p><p>C3. Mail handling windows. Letters held without charge for 14 days; parcels may accrue storage after 24 hours. After holding windows expire, items may be returned/destroyed/disposed of or stored for a fee. Disposal/return fees may apply.</p><p>C4. Opening &amp; inspection. We may open items to identify the recipient, comply with law, meet Carrier/customs requirements, repack damaged parcels, or for safety/security.</p><p>C5. Address restrictions. Do not use our address for DVLA driving licence/vehicle registration, electoral registration, or MLR registrations.</p><p>C6. Prohibited/restricted goods. You must comply with Carrier and law on dangerous goods (e.g., certain lithium batteries, aerosols, perfumes, controlled drugs). We may refuse or surrender items to authorities.</p><p>C7. Large parcels. Notify us 24 hours in advance for parcels over 1,000 mm in any dimension. We may refuse items over 2 m or 25 kg.</p><p>C8. Forwarding methods. Default to tracked/signed‑for unless you opt out in writing. If you arrange your own courier, a handling fee per item may apply (see Fees).</p><p>C9. Insurance. Goods are not insured on premises or in transit unless optional cover is purchased from us before dispatch. If you arrange your own courier, our insurance does not apply.</p><p>C10. Registered Office/Director’s Address. Official mail is included as stated in your plan. Non‑official mail requires an active Business Mailing Address plan. Unauthorised use at Companies House may be corrected by us via filings (including RP07). Fees apply per entity/name.</p><p>C11. Unclaimed/unknown mail. Items for unknown recipients may be held for up to 14 days then returned/destroyed/disposed of.</p><p>C16. No ongoing agency. After termination we do not act as agent to notify correspondents or authorities of your new address; you are responsible for updating records.</p><p>C15. Items received &gt;14 days post‑termination. Any postal items received more than 14 calendar days after termination will be refused on delivery or returned to sender on receipt, without notice.</p><p>C14. Post‑termination parcels. Parcels received within 14 calendar days after termination will be held for up to 7 days. If not collected or instructed for forwarding with payment of all sums due, we may issue a Torts (Interference with Goods) Act 1977, s.12 notice allowing at least 14 days to collect or arrange forwarding, after which we may sell or dispose and account for any net proceeds after deducting sums properly due.</p><p>C13. Post‑termination letters. Letters received within 14 calendar days after termination will be held for up to 14 days following a single courtesy email to the account contact. Thereafter, letters will be returned to sender where practicable or securely destroyed after a further 14 days if no sender/return address is available.</p><p>C12A. Operational logs. We maintain internal handling and forwarding logs (including tracking references where available). Unless required longer by law or for ongoing disputes, we retain such logs for at least 12 months.</p><p>C12. Fees. See Schedule C‑1 for the current fee table; postage is additional.</p><p>24. Schedule D — Torts (Interference with Goods) Act 1977 — Notice of Intention to Sell (Template)</p><p>To: [Customer Name] — [Email] and [Postal Address]</p><p>From: Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom</p><p>Date: 2025-12-19</p><p>Subject: Notice of Intention to Sell Uncollected Goods — Torts (Interference with Goods) Act 1977, s.12</p><p>We write to give you notice that we hold the following goods/items belonging to you: [describe items]. The following sums are now due and payable in respect of services, storage and/or other charges: [£amount].</p><p>Unless you (a) pay the sums due and (b) collect or arrange forwarding of the above items by [deadline date, e.g., 14 days from the date of this notice], we may sell or otherwise dispose of the goods under section 12 of the Torts (Interference with Goods) Act 1977. We will apply the proceeds of sale to the sums due (including our reasonable costs of sale/disposal) and will account to you for any balance. If the goods have no saleable value, we may dispose of them appropriately.</p><p>Please contact us at info@forwardmymail.co.uk to make arrangements. This notice is given without prejudice to our lien and other rights.</p><p>25. Schedule C‑1 — Fees Table (placeholders to fill)</p><p>Complete the placeholders below, or instruct us to populate from your latest price list.</p></details>
+<details class="terms-section" id="tsec-65-schedule-b-client-authorisation-for-receipt-international-forwarding-of-sensitive-mail-v2"><summary>Schedule B — Client Authorisation for Receipt &amp; International Forwarding of Sensitive Mail — v2</summary><p>This Authorisation supplements the Terms &amp; Conditions and sets specific consent and risk allocation for Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens/card readers).</p><p>B‑Authorisation Statements (tick/initial each):</p><p>• I authorise Forward My Mail Ltd ("FMM") to receive, open (where lawful/permitted) and securely store mail addressed to my company or to me as director/individual.</p><p>• I authorise FMM to forward Sensitive Items internationally to the address below using tracked and/or signed‑for methods by default, unless I opt out in writing.</p><p>• I confirm that the destination address is under my control and suitable for receiving such items.</p><p>• I acknowledge that my bank or issuer may prohibit delivery to mail‑forwarding addresses and that I remain responsible for ensuring any issuer rules are met.</p><p>• I understand FMM will not activate or test any card/device and treats identifiable PIN mailers as do‑not‑open by default unless I give explicit written instructions and issuer rules permit.</p><p>• I understand risk passes when FMM hands items to the Carrier or when collected, and items are not insured unless I purchase optional cover in writing before dispatch.</p><p>[  ]  I release FMM from liability for delay/loss/misuse after dispatch except where caused by FMM’s negligence (subject to the liability limits in the Terms).</p><p>Authorised International Forwarding Address:</p><p>Address Line 1: ________________________________________________________________________</p><p>Address Line 2: ________________________________________________________________________</p><p>City/Region: __________________________  Postcode/ZIP: ______________  Country: ____________</p><p>KYC/AML Confirmation:</p><p>I confirm that I/the company have completed KYC/AML checks with FMM and will supply any updates on request.</p><p>[X]  Explicit instruction: I instruct FMM to open identifiable PIN mailers/security envelopes where issuer rules permit, solely to scan for my review and/or forward as I direct.</p></details>
+<details class="terms-section" id="tsec-66-schedule-e-customer-declarations-consents-signable"><summary>Schedule E — Customer Declarations &amp; Consents (Signable)</summary><p>These declarations supplement the Terms &amp; Conditions and are designed to avoid misunderstandings about how the service operates. Tick/initial each item and sign below.</p><p>• Electronic service of notices: I agree that FMM may serve notices and legal communications by email to my account email; I will keep this address current.</p><p>• Immediate performance (consumers only): If I am a consumer and I ask FMM to start work within 14 days (e.g., company filings/activation), I understand I’ll pay for services performed and may lose the right to cancel once fully performed.</p><p>• Authorised names list: I will keep FMM updated with all individuals/entities permitted to receive mail under my account (including directors/PSCs and trading names).</p><p>• Address‑use restrictions: I understand the FMM address must not be used for DVLA vehicle/licence records, electoral registration, or Money Laundering Regulations registrations.</p><p>• Issuer/bank rules: I understand some issuers prohibit delivery to mail‑forwarding addresses. I remain responsible for compliance with issuer rules.</p><p>• Torts Act notices: I consent to receive Torts (Interference with Goods) Act s.12 notices and lien notifications by email (and, where provided, by post).</p><p>• Sanctions/PEP: I confirm neither I nor my recipients are subject to sanctions that would prohibit the service; I will notify FMM if this changes.</p><p>• Trusts: Where a trust is involved, I will provide HMRC Trust Registration Service (TRS) evidence before service.</p><p>• Companies House misuse: I authorise FMM to file to correct unauthorised use of its address (e.g., RP07), and I will pay related fees as per the price list.</p><p>• Data accuracy &amp; KYC: I confirm information provided is true/accurate. I will promptly provide KYC updates on request.</p><p>• ADR signposting: If a consumer complaint reaches deadlock, I acknowledge FMM will signpost an approved ADR body and state whether it will participate.</p><p>Optional preferences:</p><p>• Default to tracked/signed‑for forwarding for all items (recommended).</p><p>• Permit opening of identifiable PIN mailers where issuer rules permit and I instruct in writing.</p><p>Customer Acceptance &amp; Signatures</p><p>By signing below, the Customer confirms that they have read and agree to the Forward My Mail Ltd Terms &amp; Conditions (including all Schedules), and appoints Forward My Mail Ltd as agent to receive, open/scan and forward mail in accordance with the Terms.</p><p>Customer Legal Name: ________________________________</p><p>If a company: Company Number: ________________________   Country of incorporation: ____________________</p><p>Registered/Correspondence Address: _____________________________________________________________</p><p>Contact Email (for notices): ____________________________   Contact Phone: _______________________</p><p>Date: _____________    Place: _____________________</p><p>Signature (Authorised Signatory/Director/Individual): ___________________________________________</p><p>Name (print): ______________________________________   Position/Title: __________________________</p><p>Annex — Deadlock ADR Signposting Notice (Template)</p><p>Use this text in an email/letter when a consumer complaint reaches deadlock:</p><p>“We’re sorry we’ve not been able to resolve your complaint. As required by the Alternative Dispute Resolution for Consumer Disputes (Competent Authorities and Information) Regulations 2015, we are signposting you to a Chartered Trading Standards Institute (CTSI)‑approved ADR provider. Examples include RetailADR (CDRL) and CEDR. You can find the current list of CTSI‑approved ADR bodies here: https://www.tradingstandards.uk/consumers/adr-approved-bodies. Forward My Mail Ltd does not currently subscribe to an ADR scheme; we will consider ADR on a case‑by‑case basis and confirm to you whether we agree to use ADR for your complaint. Whether or not ADR is used, you remain free to bring legal proceedings.”</p></details>
+</div>
+</div>
+</div>
+<!-- Cookie Policy -->
+<div aria-hidden="true" class="policy-modal" id="modal-cookies">
+<div class="policy-backdrop"></div>
+<div aria-labelledby="cookies-title" aria-modal="true" class="policy-dialog" role="dialog">
+<div class="policy-header">Cookies Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-body">
+<p><small>Last updated: 2025-12-19</small></p>
+<p>We use cookies and similar technologies to run the site, provide secure login/checkout, remember your preferences and understand how the site is used.</p>
+<h3>Types of cookies</h3>
+<ul>
+<li><strong>Strictly necessary</strong> — required for login, checkout and security.</li>
+<li><strong>Functional</strong> — remember preferences (e.g., language).</li>
+<li><strong>Analytics</strong> — aggregate usage stats (we do not use them to identify you).</li>
+<li><strong>Marketing</strong> — only if you consent.</li>
+</ul>
+<h3>Your choices</h3>
+<p>You can manage cookies via our consent banner and your browser settings. Blocking some cookies may affect site functionality.</p>
+</div>
+</div>
+</div>
+<!-- Acceptable Use Policy -->
+<div aria-hidden="true" class="policy-modal" id="modal-acceptable">
+<div class="policy-backdrop"></div>
+<div aria-labelledby="acceptable-title" aria-modal="true" class="policy-dialog" role="dialog">
+<div class="policy-header">Acceptable Use Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-body">
+<p><small>Last updated: 2025-12-19</small></p>
+<p>You agree not to use our address/services for unlawful purposes. Prohibited or restricted items include (non‑exhaustive):</p>
+<ul>
+<li>Illegal drugs and controlled substances; counterfeit goods; stolen property.</li>
+<li>Weapons, explosives, hazardous materials and dangerous goods prohibited by carriers.</li>
+<li>Cash and bearer instruments; high‑value items without disclosure/insurance.</li>
+<li>Items breaching sanctions or export controls.</li>
+<li>Fraudulent activity, identity theft, or misleading use of our address (including DVLA, electoral registration, MLR registrations).</li>
+</ul>
+<p>We may refuse, hold, return, surrender to authorities or dispose of items that breach these rules and suspend/terminate service. See the Service Terms for details.</p>
+</div>
+</div>
+</div>
+<script>
     // Modal logic – all on one page, no navigation / scroll-to-top issues
     document.addEventListener('DOMContentLoaded', function () {
       // Open modals
@@ -2114,5 +1797,40 @@
       });
     });
   </script>
-</body>
+<script>
+(function(){
+  document.addEventListener('click', function(e){
+    const btn = e.target.closest('[data-print-modal]');
+    if(!btn) return;
+    const modal = btn.closest('.policy-modal');
+    if(!modal) return;
+    const body = modal.querySelector('.policy-body');
+    if(!body) return;
+    const w = window.open('', '_blank');
+    const styles = '<style>body{font-family:system-ui,Arial,sans-serif;line-height:1.5;padding:24px} h1,h2,h3{margin:.5rem 0} details{border:1px solid #eee;border-radius:6px;padding:.5rem .75rem;margin:.5rem 0} details>summary{cursor:pointer;font-weight:600;margin:-.5rem -.75rem .5rem -.75rem;padding:.5rem .75rem} details[open]{background:#fafafa}</style>';
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Policy</title>'+styles+'</head><body>'+body.innerHTML+'</body></html>');
+    w.document.close();
+    w.focus();
+    w.print();
+  }, false);
+})();
+</script><script>
+(function(){
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('.terms-toc__link');
+    if(!a) return;
+    const hash = a.getAttribute('href');
+    if(!hash || !hash.startsWith('#')) return;
+    const target = document.querySelector(hash);
+    const container = a.closest('.policy-modal')?.querySelector('.policy-body');
+    if(target && target.tagName.toLowerCase()==='details'){
+      // open details and scroll into view within the modal
+      target.setAttribute('open','');
+      // smooth scroll
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+      e.preventDefault();
+    }
+  }, false);
+})();
+</script></body>
 </html>
