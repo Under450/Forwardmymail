@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <title>Forwardmymail – UK Virtual Address &amp; Mail Forwarding</title>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="Premium UK virtual business address, mail forw...scanning and registered office services." name="description"/>
+<meta content="Premium UK virtual business address, mail forwarding, digital scanning and registered office services." name="description"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -13,614 +13,1019 @@
     :root {
       --primary: #0b2a5b;
       --primary-dark: #071c3d;
-      --bg: #f6f8fc;
-      --text: #0f172a;
-      --muted: #475569;
-      --card: #ffffff;
-      --border: rgba(15, 23, 42, 0.08);
-      --shadow: 0 12px 28px rgba(2, 6, 23, 0.12);
-      --radius: 20px;
+      --accent: #0c60ff;
+      --accent-soft: #e6f0ff;
+      --bg: #f5f7fb;
+      --bg-soft: #f0f3f9;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --border-subtle: #e5e7eb;
+      --white: #ffffff;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.12);
+      --shadow-card: 0 16px 40px rgba(15, 23, 42, 0.10);
+      --max-width: 1120px;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
       color: var(--text);
-      background: linear-gradient(180deg, #ffffff 0%, var(--bg) 70%);
+      line-height: 1.6;
     }
-    a { color: inherit; text-decoration: none; }
-    .container { width: min(1160px, 92%); margin: 0 auto; }
-    .page { overflow-x: hidden; }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    .page {
+      min-height: 100vh;
+      background: radial-gradient(circle at top right, #dfe7ff 0, transparent 55%), var(--bg);
+    }
+
+    .container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
 
     /* NAVBAR */
     .navbar {
       position: sticky;
       top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,0.86);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid var(--border);
+      z-index: 40;
+      backdrop-filter: blur(12px);
+      background: rgba(245, 247, 251, 0.9);
+      border-bottom: 1px solid rgba(229, 231, 235, 0.4);
     }
+
     .navbar-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.9rem 0;
-      gap: 1rem;
+      padding: 0.5rem 1.5rem;
     }
+
     .brand {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      gap: 0.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.02em;
+      font-size: 1rem;
     }
+
     .brand-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 14px;
-      background: radial-gradient(circle at 30% 30%, #163b7a, var(--primary));
-      display: grid;
-      place-items: center;
-      box-shadow: 0 10px 22px rgba(11,42,91,0.24);
-      overflow: hidden;
-    }
-    .brand-icon img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      display: block;
-      filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
-    }
-    .nav-links {
+      height: 30px;
+      width: auto;
       display: flex;
-      gap: 1.2rem;
-      font-weight: 600;
-      color: var(--muted);
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .nav-links a:hover { color: var(--primary); }
-    .nav-actions {
-      display: flex;
-      gap: 0.75rem;
       align-items: center;
     }
+
+    .brand-icon img {
+      height: 60px;
+      width: auto;
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      padding: 0.8rem 1.1rem;
+      padding: 0.7rem 1.3rem;
       border-radius: 999px;
-      font-weight: 700;
+      font-size: 0.95rem;
+      font-weight: 600;
       border: 1px solid transparent;
-      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      cursor: pointer;
       white-space: nowrap;
     }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 10px 18px rgba(2,6,23,0.12); }
+
     .btn-primary {
-      background: linear-gradient(135deg, var(--primary) 0%, #1b4aa0 100%);
-      color: #fff;
+      background: var(--primary);
+      color: var(--white);
+      box-shadow: 0 14px 35px rgba(15, 23, 42, 0.25);
     }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
     .btn-outline {
-      border-color: rgba(11,42,91,0.22);
+      background: transparent;
+      border-color: rgba(148, 163, 184, 0.6);
       color: var(--primary);
-      background: rgba(255,255,255,0.85);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      background: rgba(15, 23, 42, 0.03);
     }
 
     /* HERO */
     .hero {
-      padding: 5rem 0 3.5rem;
-      position: relative;
+      padding: 3.5rem 0 3rem;
     }
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: -120px 0 auto 0;
-      height: 420px;
-      background:
-        radial-gradient(circle at 20% 30%, rgba(27,74,160,0.16), transparent 52%),
-        radial-gradient(circle at 80% 20%, rgba(11,42,91,0.18), transparent 55%);
-      pointer-events: none;
-    }
+
     .hero-inner {
-      position: relative;
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.1fr);
       gap: 3rem;
       align-items: center;
     }
+
     .pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.55rem;
-      padding: 0.4rem 0.8rem;
-      border-radius: 999px;
-      background: rgba(11,42,91,0.1);
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 0.9rem;
-      margin-bottom: 1.2rem;
-    }
-    .pill-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #1b4aa0;
-      box-shadow: 0 0 0 6px rgba(27,74,160,0.12);
-    }
-    .hero-title {
-      font-size: clamp(2.5rem, 4vw, 3.5rem);
-      line-height: 1.05;
-      margin: 0 0 1rem;
-      letter-spacing: -0.04em;
-    }
-    .hero-subtitle {
-      margin: 0 0 1.6rem;
-      color: var(--muted);
-      font-size: 1.05rem;
-      line-height: 1.6;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 0.9rem;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-    .hero-meta {
-      display: flex;
-      gap: 1.6rem;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    .hero-meta span {
-      display: inline-flex;
-      align-items: center;
       gap: 0.5rem;
-    }
-    .hero-card {
-      background: rgba(255,255,255,0.92);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .hero-image-placeholder {
-      height: 320px;
-      position: relative;
-      background: linear-gradient(135deg, rgba(11,42,91,0.12), rgba(27,74,160,0.14));
-      display: grid;
-      place-items: center;
-    }
-    .hero-image-placeholder img {
-      width: 78%;
-      max-width: 260px;
-      object-fit: contain;
-      opacity: 0.92;
-      filter: drop-shadow(0 18px 26px rgba(0,0,0,0.18));
-    }
-    .hero-image-overlay {
-      position: absolute;
-      inset: auto 18px 18px 18px;
-      background: rgba(11,42,91,0.9);
-      color: #fff;
-      border-radius: 16px;
-      padding: 1rem 1.2rem;
-      backdrop-filter: blur(8px);
-      box-shadow: 0 14px 22px rgba(2,6,23,0.18);
-    }
-    .hero-image-overlay-title {
-      font-weight: 800;
-      margin-bottom: 0.25rem;
-    }
-    .hero-image-overlay-text {
-      font-size: 0.9rem;
-      opacity: 0.86;
-      line-height: 1.4;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      background: var(--accent-soft);
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 1rem;
     }
 
-    /* SECTION BASE */
-    section { padding: 4.2rem 0; }
+    .pill-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .hero-title {
+      font-size: clamp(2.2rem, 3.2vw + 1.2rem, 3.3rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin: 0 0 1rem;
+      color: var(--primary);
+    }
+
+    .hero-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 34rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .hero-meta strong {
+      color: var(--primary);
+    }
+
+    .hero-card {
+      background: var(--white);
+      border-radius: 28px;
+      padding: 1.2rem 1.2rem 1.4rem;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-image-placeholder {
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      height: 260px;
+      background: #020617;
+    }
+
+    .hero-image-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-image-overlay {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.1rem 1.3rem;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.92), rgba(15, 23, 42, 0.0));
+      color: #e5edff;
+    }
+
+    .hero-image-overlay-title {
+      font-weight: 600;
+      font-size: 0.98rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .hero-image-overlay-text {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    section {
+      padding: 3.5rem 0;
+    }
+
     .section-header {
       text-align: center;
-      max-width: 700px;
-      margin: 0 auto 2.3rem;
+      margin-bottom: 2.2rem;
     }
+
     .section-kicker {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.35rem 0.85rem;
-      border-radius: 999px;
-      background: rgba(27,74,160,0.12);
-      color: #1b4aa0;
-      font-weight: 800;
       font-size: 0.9rem;
-      margin-bottom: 0.85rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
     }
+
     .section-title {
-      margin: 0 0 0.8rem;
-      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      font-size: 1.8rem;
+      margin: 0 0 0.4rem;
+      color: var(--primary);
       letter-spacing: -0.03em;
     }
+
     .section-subtitle {
       margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
+      font-size: 0.98rem;
+      color: var(--text-muted);
+      max-width: 40rem;
+      margin-inline: auto;
     }
 
     /* HOW IT WORKS */
     .steps {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.2rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.5rem;
     }
+
     .step-card {
-      background: rgba(255,255,255,0.94);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 1.5rem 1.3rem;
-      box-shadow: 0 12px 18px rgba(2,6,23,0.06);
-      position: relative;
-      overflow: hidden;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.35rem 1.2rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, color 0.2s ease;
     }
-    .step-icon {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
-      background: rgba(11,42,91,0.1);
-      display: grid;
-      place-items: center;
+
+    .step-card:hover {
+      background: var(--primary);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.25);
+      transform: translateY(-4px);
+    }
+
+    .step-card:hover .step-title,
+    .step-card:hover .step-text {
+      color: #e5edff;
+    }
+
+    .step-card:hover .step-icon {
+      background: var(--white);
       color: var(--primary);
-      font-weight: 900;
-      margin-bottom: 1rem;
     }
+
+    .step-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 0.9rem;
+      font-size: 0.9rem;
+    }
+
     .step-title {
-      font-weight: 800;
-      margin-bottom: 0.35rem;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+      font-size: 0.98rem;
+      color: var(--primary);
     }
+
     .step-text {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
     }
 
     /* SERVICES */
     .services-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.4rem;
-    }
-    .service-card {
-      background: rgba(255,255,255,0.95);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1.7rem 1.5rem;
-      box-shadow: 0 12px 22px rgba(2,6,23,0.08);
-      display: flex;
-      flex-direction: column;
-      gap: 0.85rem;
-    }
-    .service-icon {
-      width: 54px;
-      height: 54px;
-      border-radius: 18px;
-      background: rgba(27,74,160,0.12);
-      display: grid;
-      place-items: center;
-      font-size: 1.5rem;
-    }
-    .service-title {
-      margin: 0;
-      font-size: 1.25rem;
-      letter-spacing: -0.02em;
-    }
-    .service-text {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 0.96rem;
-    }
-    .service-list {
-      margin: 0;
-      padding-left: 1.15rem;
-      color: var(--muted);
-      line-height: 1.55;
-      font-size: 0.92rem;
-    }
-    .services-footer-note {
-      text-align: center;
-      margin-top: 2.2rem;
-      font-weight: 650;
-      color: var(--muted);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
     }
 
-    /* FEATURE BAND */
-    .feature-band {
-      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
-      color: #fff;
-      border-radius: 0;
-      padding: 4.2rem 0;
+    .service-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.4rem 1.2rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
     }
+
+    .service-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      background: var(--bg-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.9rem;
+      font-size: 1rem;
+      color: var(--primary);
+    }
+
+    .service-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.45rem;
+      color: var(--primary);
+    }
+
+    .service-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.7rem;
+    }
+
+    .service-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .service-list li::before {
+      content: "•";
+      color: var(--accent);
+      margin-right: 0.3rem;
+    }
+
+    .services-footer-note {
+      margin-top: 1.3rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+    }
+
+    /* DARK BAND */
+    .feature-band {
+      background: var(--primary);
+      color: var(--white);
+      padding: 2.5rem 0;
+    }
+
     .feature-band-inner {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.8rem;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+      align-items: start;
     }
+
     .feature-item-title {
-      font-weight: 900;
-      margin-bottom: 0.4rem;
-      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
     }
+
     .feature-item-text {
-      margin: 0;
-      opacity: 0.86;
-      line-height: 1.6;
+      font-size: 0.9rem;
+      color: rgba(226, 232, 240, 0.9);
     }
 
     /* PRICING */
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.4rem;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 1.25rem;
       align-items: stretch;
     }
-    .price-card {
-      background: rgba(255,255,255,0.96);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 2rem 1.8rem;
+
+    .pricing-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 1.4rem 1.4rem 1.6rem;
       display: flex;
       flex-direction: column;
-      gap: 1.1rem;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
       position: relative;
+      overflow: hidden;
     }
-    .price-card.featured {
-      border-color: rgba(27,74,160,0.24);
-      box-shadow: 0 16px 34px rgba(11,42,91,0.18);
-      transform: translateY(-6px);
+
+    .pricing-card.highlight {
+      border-color: var(--accent);
+      box-shadow: 0 18px 42px rgba(37, 99, 235, 0.35);
+      transform: translateY(-4px);
+      padding-top: 2.7rem;
     }
+
     .badge {
       position: absolute;
-      top: 22px;
-      right: 22px;
-      background: rgba(27,74,160,0.14);
-      color: #1b4aa0;
-      padding: 0.35rem 0.75rem;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 0.85rem;
-    }
-    .price-title {
-      margin: 0;
-      font-size: 1.35rem;
-      font-weight: 900;
-      letter-spacing: -0.02em;
-    }
-    .price-amount {
-      font-size: 2.35rem;
-      font-weight: 900;
-      margin: 0;
-      letter-spacing: -0.04em;
-    }
-    .price-amount small {
-      font-size: 1rem;
+      top: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.7rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      background: linear-gradient(to right, var(--accent), #1d4ed8);
+      color: #e5edff;
+      padding: 0.35rem 0.6rem;
       font-weight: 700;
-      color: var(--muted);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.1);
+      z-index: 2;
     }
-    .price-desc {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .price-features {
-      margin: 0;
-      padding-left: 1.2rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-    .price-card .btn {
-      margin-top: auto;
-      width: 100%;
-    }
-    .pricing-footnote {
-      text-align: center;
-      margin-top: 2rem;
-      color: var(--muted);
+
+    .pricing-name {
       font-size: 0.95rem;
-      line-height: 1.6;
-    }
-
-    /* ABOUT + FAQ */
-    .split {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      align-items: start;
-    }
-    .panel {
-      background: rgba(255,255,255,0.95);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: 0 12px 24px rgba(2,6,23,0.08);
-      padding: 2rem;
-    }
-    .panel h3 { margin: 0 0 0.8rem; font-size: 1.35rem; letter-spacing: -0.02em; }
-    .panel p { margin: 0 0 1rem; color: var(--muted); line-height: 1.7; }
-    .panel ul { margin: 0; padding-left: 1.2rem; color: var(--muted); line-height: 1.6; }
-    .faq details {
-      border-bottom: 1px solid rgba(15,23,42,0.12);
-      padding: 0.9rem 0;
-    }
-    .faq summary {
-      cursor: pointer;
-      font-weight: 800;
-      color: var(--text);
-      list-style: none;
-    }
-    .faq summary::-webkit-details-marker { display: none; }
-    .faq p { margin: 0.6rem 0 0; color: var(--muted); line-height: 1.65; }
-
-    /* CONTACT */
-    .contact-card {
-      background: rgba(255,255,255,0.96);
-      border-radius: var(--radius);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 2.2rem;
-      text-align: center;
-    }
-    .contact-card h3 { margin: 0 0 0.8rem; font-size: 1.7rem; letter-spacing: -0.03em; }
-    .contact-card p { margin: 0 0 1.4rem; color: var(--muted); line-height: 1.6; }
-    .contact-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.2rem;
-      margin-top: 1.4rem;
-    }
-    .contact-item {
-      border: 1px solid rgba(15,23,42,0.08);
-      border-radius: 18px;
-      padding: 1.2rem;
-      background: rgba(246,248,252,0.5);
-    }
-    .contact-item strong { display: block; margin-bottom: 0.25rem; }
-    .contact-item span, .contact-item a { color: var(--muted); font-weight: 600; }
-
-    /* FOOTER */
-    footer {
-      padding: 3rem 0;
-      border-top: 1px solid var(--border);
-      background: rgba(255,255,255,0.9);
-    }
-    .footer-top {
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1fr 1fr;
-      gap: 1.4rem;
-      margin-bottom: 2rem;
-    }
-    .footer-title { font-weight: 900; margin-bottom: 0.8rem; }
-    .footer-links {
-      display: grid;
-      gap: 0.55rem;
-      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--text-muted);
       font-weight: 600;
     }
-    .footer-links button {
-      border: none;
-      background: none;
-      padding: 0;
+
+    .pricing-price {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin: 0.5rem 0;
+      color: var(--primary);
+    }
+
+    .pricing-price span {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .pricing-description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.9rem;
+    }
+
+    .pricing-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0 0 1.2rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .pricing-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .pricing-list li::before {
+      content: "✓";
+      color: #22c55e;
+      font-weight: 700;
+      margin-top: 0.1rem;
+    }
+
+    .pricing-card .btn-primary {
+      width: 100%;
+      margin-top: auto;
+    }
+
+    .pricing-extra {
+      margin-top: 2rem;
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07);
+      font-size: 0.9rem;
+      overflow: hidden;
+    }
+
+    .pricing-extra-header {
+      background: var(--primary);
+      color: #e5edff;
+      padding: 0.6rem 1.1rem;
+      font-weight: 600;
+      font-size: 0.92rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .pricing-extra-body {
+      padding: 1.1rem 1.1rem 1.3rem;
+    }
+
+    .pricing-extra-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1.4fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .pricing-extra-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--primary);
+    }
+
+    .pricing-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .pricing-table th,
+    .pricing-table td {
+      padding: 0.35rem 0.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .pricing-table th {
       text-align: left;
-      font: inherit;
-      color: inherit;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.82rem;
+    }
+
+    .pricing-compliance {
+      margin-top: 1rem;
+      padding-top: 0.9rem;
+      border-top: 1px dashed var(--border-subtle);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* ABOUT */
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .about-image-placeholder {
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+    }
+
+    .about-image-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .about-kicker {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .about-title {
+      font-size: 1.7rem;
+      margin: 0 0 0.4rem;
+      color: var(--primary);
+      letter-spacing: -0.03em;
+    }
+
+    .about-text {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .about-metrics {
+      display: flex;
+      gap: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .metric {
+      min-width: 120px;
+    }
+
+    .metric-number {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .metric-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* FAQ */
+    .faq-grid {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    details {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 0.9rem 1rem;
+      border: 1px solid var(--border-subtle);
+      margin-bottom: 0.7rem;
+      font-size: 0.92rem;
+    }
+
+    summary {
+      cursor: pointer;
+      list-style: none;
+      font-weight: 600;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::after {
+      content: "+";
+      margin-left: auto;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    details[open] summary::after {
+      content: "−";
+    }
+
+    details[open] {
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    details p {
+      margin-top: 0.6rem;
+      color: var(--text-muted);
+    }
+
+    /* CONTACT */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .contact-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(12, 96, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 0.9rem;
+    }
+
+    .contact-label {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.9rem;
+    }
+
+    .contact-form {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem 1.4rem 1.6rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.85rem;
+    }
+
+    label {
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    input,
+    textarea {
+      border-radius: 10px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.55rem 0.7rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      resize: vertical;
+      min-height: 42px;
+    }
+
+    textarea {
+      min-height: 110px;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.15);
+    }
+
+    .contact-form .btn-primary {
+      margin-top: 0.5rem;
+      width: 100%;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: var(--primary-dark);
+      color: rgba(226, 232, 240, 0.9);
+      padding: 2.3rem 0 1.5rem;
+      margin-top: 3rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) repeat(3, minmax(0, 0.7fr));
+      gap: 2rem;
+      margin-bottom: 1.8rem;
+      font-size: 0.86rem;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .footer-brand-title {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-weight: 700;
+      color: #e5edff;
+    }
+
+    .footer-brand .brand-icon img {
+      height: 30px;
+    }
+
+    .footer-heading {
+      font-size: 0.8rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #c7d2fe;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .footer-links li {
+      margin-bottom: 0.35rem;
+    }
+
+    .footer-links a {
+      color: rgba(226, 232, 240, 0.85);
+      font-size: 0.86rem;
       cursor: pointer;
     }
-    .footer-links button:hover { color: var(--primary); }
+
+    .footer-links a:hover {
+      color: #e5edff;
+    }
+
+    .footer-links button {
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      font: inherit;
+      color: rgba(226,232,240,0.85);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .footer-links button:hover {
+      color: #e5edff;
+    }
+
     .footer-bottom {
+      border-top: 1px solid rgba(148, 163, 184, 0.4);
+      padding-top: 1rem;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
-      gap: 1rem;
-      color: var(--muted);
-      font-size: 0.92rem;
-      border-top: 1px solid rgba(15,23,42,0.08);
-      padding-top: 1.4rem;
+      gap: 0.7rem;
+      font-size: 0.78rem;
+      color: rgba(148, 163, 184, 0.9);
     }
 
-    /* MODALS (policies) */
+    /* POLICY MODALS */
     .policy-modal {
       position: fixed;
       inset: 0;
       display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1.5rem;
-      z-index: 1000;
+      z-index: 80;
     }
-    .policy-modal.active { display: flex; }
+
+    .policy-modal.active {
+      display: block;
+    }
+
     .policy-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(2, 6, 23, 0.72);
-      backdrop-filter: blur(2px);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
     }
+
     .policy-dialog {
-      position: relative;
-      width: min(900px, 96%);
-      max-height: 90vh;
-      background: #fff;
-      border-radius: 18px;
-      border: 1px solid rgba(15,23,42,0.12);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.28);
-      overflow: hidden;
+      position: absolute;
+      top: 6%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(900px, 94vw);
+      max-height: 88vh;
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.35);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
+
     .policy-header {
-      padding: 0.95rem 1.1rem;
-      border-bottom: 1px solid rgba(15,23,42,0.1);
-      background: #fff;
-      font-weight: 900;
+      padding: 1rem 1.4rem;
+      border-bottom: 1px solid var(--border-subtle);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: .75rem;
-    }
-    .policy-actions { display: inline-flex; gap: .5rem; align-items: center; }
-    .btn-print {
-      border: 1px solid rgba(15,23,42,0.18);
-      background: rgba(246,248,252,0.85);
-      padding: 0.45rem 0.75rem;
-      border-radius: 10px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .btn--close {
-      border: none;
-      background: none;
-      font-size: 1.5rem;
-      line-height: 1;
-      cursor: pointer;
-      color: #334155;
-      padding: 0.2rem 0.35rem;
-      border-radius: 10px;
-    }
-    .btn--close:hover { background: rgba(15,23,42,0.06); }
-    .policy-body {
-      padding: 1.1rem 1.2rem 1.3rem;
-      overflow: auto;
-      line-height: 1.65;
-      color: #0f172a;
-      font-size: 0.98rem;
-    }
-    .policy-body h3 { margin: 1.1rem 0 0.4rem; }
-    .policy-body p { margin: 0.6rem 0; }
-    .policy-body ul { margin: 0.4rem 0 0.8rem; padding-left: 1.3rem; }
-    .policy-note {
-      margin-top: 1rem;
-      padding: 0.9rem 1rem;
-      border-radius: 14px;
-      background: rgba(27,74,160,0.08);
-      color: #1b4aa0;
-      font-weight: 650;
+      background: linear-gradient(to right, var(--primary-dark), var(--primary));
+      color: #e5edff;
     }
 
-    /* Responsive */
-    @media (max-width: 980px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .steps { grid-template-columns: 1fr 1fr; }
-      .services-grid { grid-template-columns: 1fr 1fr; }
-      .pricing-grid { grid-template-columns: 1fr; }
-      .split { grid-template-columns: 1fr; }
-      .feature-band-inner { grid-template-columns: 1fr; }
-      .footer-top { grid-template-columns: 1fr 1fr; }
-      .contact-grid { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
+    .policy-header h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
+
+    .policy-close {
+      border: none;
+      background: rgba(15, 23, 42, 0.25);
+      color: #e5edff;
+      border-radius: 999px;
+      width: 30px;
+      height: 30px;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .policy-close:hover {
+      background: rgba(15, 23, 42, 0.5);
+    }
+
+    .policy-body {
+      padding: 1.2rem 1.4rem 1.5rem;
+      overflow-y: auto;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      background: #f5f7fb;
+    }
+
+    .policy-body h3 {
+      margin-top: 1.1rem;
+      margin-bottom: 0.25rem;
+      font-size: 0.95rem;
+      color: var(--primary);
+    }
+
+    .policy-body p {
+      margin: 0.25rem 0 0.55rem;
+    }
+
+    .policy-body ul {
+      margin: 0.25rem 0 0.6rem 1.2rem;
+      padding: 0;
+    }
+
+    .policy-body li {
+      margin-bottom: 0.25rem;
+    }
+
+    .policy-note {
+      margin-top: 0.9rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 10px;
+      background: var(--bg-soft);
+      border: 1px dashed var(--border-subtle);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 960px) {
+      .navbar-inner { gap: 0.8rem; }
+      .nav-links { display: none; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-card { max-width: 460px; margin-inline: auto; }
+      .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .pricing-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .feature-band-inner,
+      .about-grid,
+      .contact-grid,
+      .pricing-extra-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
     @media (max-width: 680px) {
       .hero { padding-top: 2.5rem; }
       .steps,
@@ -709,7 +1114,7 @@
 }
 /* Down arrow */
 .policy-body::-webkit-scrollbar-button:single-button:vertical:increment {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpolygon points='4,8 20,8 12,18' fill='%23222'/%3E%3C/svg%3E");
+  background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpolygon points='4,8 20,8 12,18' fill='%23222'/%3E%3C/svg%3E\");
 }
 
 /* Firefox: wider scrollbar (arrow size can't be styled reliably) */
@@ -823,23 +1228,23 @@
 </div>
 <div class="step-card">
 <div class="step-icon">2</div>
-<div class="step-title">Verify</div>
+<div class="step-title">Verify ID</div>
 <div class="step-text">
-                Complete KYC/AML verification so we can activate services in line with UK requirements.
+                Complete a quick online identity check (KYC) so we can meet UK AML regulations.
               </div>
 </div>
 <div class="step-card">
 <div class="step-icon">3</div>
-<div class="step-title">Receive Mail</div>
+<div class="step-title">We Receive Mail</div>
 <div class="step-text">
-                Start using your address. We receive, log, and securely store your mail on arrival.
+                Use your Forwardmymail address on Companies House, invoices, and websites. We accept mail on your behalf.
               </div>
 </div>
 <div class="step-card">
 <div class="step-icon">4</div>
-<div class="step-title">Scan &amp; Forward</div>
+<div class="step-title">You Manage Online</div>
 <div class="step-text">
-                We open, scan, and forward electronically and/or by post using your chosen service level.
+                Log in to your secure portal to read scans, download documents, or request forwarding instantly.
               </div>
 </div>
 </div>
@@ -849,18 +1254,18 @@
 <section id="services">
 <div class="container">
 <div class="section-header">
-<div class="section-kicker">Services</div>
-<h2 class="section-title">Everything you need for mail and address management</h2>
+<div class="section-kicker">Our Services</div>
+<h2 class="section-title">Everything You Need to Run a UK Business Remotely</h2>
 <p class="section-subtitle">
-              Flexible plans for individuals, sole traders, and UK limited companies — with secure handling at every step.
+              From basic mail forwarding to full corporate compliance, Forwardmymail provides the infrastructure for your success.
             </p>
 </div>
 <div class="services-grid">
 <article class="service-card">
-<div class="service-icon">📬</div>
+<div class="service-icon">📨</div>
 <h3 class="service-title">Mail Forwarding</h3>
 <p class="service-text">
-                We receive and forward your mail domestically or internationally using the carrier/service you specify.
+                Have letters and parcels sent to your UK address and forwarded to you anywhere in the world.
               </p>
 <ul class="service-list">
 <li>Daily or weekly forwarding options</li>
@@ -962,167 +1367,318 @@
 <div class="container">
 <div class="section-header">
 <div class="section-kicker">Pricing</div>
-<h2 class="section-title">Clear plans for every stage</h2>
+<h2 class="section-title">Simple, Transparent Pricing</h2>
 <p class="section-subtitle">
-              Choose the level of forwarding and scanning you need. Postage is charged at cost. VAT may apply.
+              All plans include access to your secure online portal. Prices shown exclude VAT.
             </p>
 </div>
 <div class="pricing-grid">
-<div class="price-card">
-<h3 class="price-title">Starter</h3>
-<p class="price-amount">£25 <small>/ month</small></p>
-<p class="price-desc">Best for individuals and sole traders needing a reliable UK mailing address.</p>
-<ul class="price-features">
-<li>UK address for mail receipt</li>
-<li>Weekly forwarding (basic)</li>
-<li>Mail logging</li>
-<li>Email support</li>
+<article class="pricing-card">
+<div class="pricing-name">Personal Mailbox</div>
+<p class="pricing-price">£99<span>/year</span></p>
+<p class="pricing-description">
+                Ideal for individuals needing a secure UK mailing address without business use.
+              </p>
+<ul class="pricing-list">
+<li>Premium UK mailing address</li>
+<li>Mail receipt &amp; sorting</li>
+<li>Scan or forward options</li>
+<li>Secure online portal access</li>
 </ul>
-<a class="btn btn-primary" href="#contact">Choose Starter</a>
-</div>
-<div class="price-card featured">
-<div class="badge">Most Popular</div>
-<h3 class="price-title">Business</h3>
-<p class="price-amount">£45 <small>/ month</small></p>
-<p class="price-desc">Designed for UK limited companies using Registered Office + scanning.</p>
-<ul class="price-features">
-<li>Registered Office + Director Service Address</li>
-<li>Mail opening + PDF scans</li>
-<li>Forwarding on request (any carrier)</li>
-<li>Priority support</li>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/personal-mailbox/subscription">Choose Plan</a>
+</article>
+<article class="pricing-card">
+<div class="pricing-name">Business Address</div>
+<p class="pricing-price">£149<span>/year</span></p>
+<p class="pricing-description">
+                Perfect for freelancers and small businesses that need a professional trading address.
+              </p>
+<ul class="pricing-list">
+<li>Use on website &amp; invoices</li>
+<li>Mail scanning &amp; forwarding</li>
+<li>Unlimited mail receipt</li>
+<li>Junk mail filtering</li>
+<li>Free initial setup</li>
 </ul>
-<a class="btn btn-primary" href="#contact">Choose Business</a>
-</div>
-<div class="price-card">
-<h3 class="price-title">Premium</h3>
-<p class="price-amount">£75 <small>/ month</small></p>
-<p class="price-desc">For higher volume mail and businesses needing faster handling.</p>
-<ul class="price-features">
-<li>Daily processing window</li>
-<li>Higher scan allowance</li>
-<li>Flexible forwarding rules</li>
-<li>Dedicated account support</li>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/business-address/subscription">Choose Plan</a>
+</article>
+<article class="pricing-card highlight">
+<span class="badge">Most popular</span>
+<div class="pricing-name">Registered Office</div>
+<p class="pricing-price">£189<span>/year</span></p>
+<p class="pricing-description">
+                A complete compliance package for UK limited companies, including director address protection.
+              </p>
+<ul class="pricing-list">
+<li>Everything in Business Address</li>
+<li>Registered office address</li>
+<li>Director service address</li>
+<li>Official government mail handling</li>
+<li>Compliance checks included</li>
 </ul>
-<a class="btn btn-primary" href="#contact">Choose Premium</a>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/registered-office/subscription">Choose Plan</a>
+</article>
+<article class="pricing-card">
+<div class="pricing-name">Full Virtual Office</div>
+<p class="pricing-price">£299<span>/year</span></p>
+<p class="pricing-description">
+                The ultimate professional image for your company with enhanced communication features.
+              </p>
+<ul class="pricing-list">
+<li>Everything in Registered Office</li>
+<li>UK local phone number</li>
+<li>Call answering service</li>
+<li>Parcel handling options</li>
+</ul>
+<a class="btn btn-primary" href="https://forwardmymail.getzendo.io/service/full-virtual-office/subscription">Choose Plan</a>
+</article>
+</div>
+<div class="pricing-extra">
+<div class="pricing-extra-header">Ultimate + Parcel Handling Package</div>
+<div class="pricing-extra-body">
+<p style="margin: 0.3rem 0 0.2rem; color: var(--text-muted);">
+                Usage rates apply beyond inclusive allowances and can be tailored to your volume. Example rates:
+              </p>
+<div class="pricing-extra-grid">
+<div>
+<div class="pricing-extra-title">Mail &amp; Scanning</div>
+<table class="pricing-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Example rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Letters</td>
+<td>£0.25–£0.75 per item + postage</td>
+</tr>
+<tr>
+<td>Additional scanning</td>
+<td>£0.40–£0.80 per page beyond allowance</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div>
+<div class="pricing-extra-title">Parcels &amp; Storage</div>
+<table class="pricing-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Example rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Standard parcels (up to ~5kg)</td>
+<td>£1.50–£3.00 per parcel + postage</td>
+</tr>
+<tr>
+<td>Oversize / heavy / courier</td>
+<td>Special handling fee per item</td>
+</tr>
+<tr>
+<td>Long-term storage</td>
+<td>First 5 days free, then daily rate</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
-<p class="pricing-footnote">
-          Need custom volumes, parcel storage, or international consolidation? Contact us for a tailored quote.
-        </p>
+<div class="pricing-compliance">
+<strong>UK Compliance Notice:</strong>
+                In line with UK Anti-Money Laundering (AML) regulations, we are required to verify the identity and address of all customers. This is a secure digital process completed after sign-up.
+              </div>
+</div>
+</div>
 </div>
 </section>
-<!-- ABOUT + FAQ -->
+<!-- ABOUT -->
 <section id="about">
 <div class="container">
+<div class="about-grid">
+<div class="about-image-placeholder">
+<img alt="Forwardmymail office and team" src="forwardmymail-officelogo2.png"/>
+</div>
+<div>
+<div class="about-kicker">Built for Modern Business</div>
+<h2 class="about-title">Created to bridge the gap between traditional mail and digital workflows.</h2>
+<p class="about-text">
+                Forwardmymail was founded to give remote directors, global entrepreneurs, and digital-first teams a stable UK base without the overhead of a traditional office. Whether you are an expat, a start-up, or an e-commerce seller, our service keeps your company compliant while protecting your privacy.
+              </p>
+<p class="about-text">
+                Our mission is simple: provide a prestigious address and seamless mail handling so you can focus on growing your business, wherever you are in the world.
+              </p>
+<div class="about-metrics">
+<div class="metric">
+<div class="metric-number">100+</div>
+<div class="metric-label">Happy clients</div>
+</div>
+<div class="metric">
+<div class="metric-number">000's</div>
+<div class="metric-label">Of items processed</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ -->
+<section id="faqs">
+<div class="container">
 <div class="section-header">
-<div class="section-kicker">About</div>
-<h2 class="section-title">Built for trust, privacy and compliance</h2>
+<div class="section-kicker">FAQs</div>
+<h2 class="section-title">Frequently Asked Questions</h2>
 <p class="section-subtitle">
-              We operate from Lichfield, Staffordshire and serve clients worldwide with robust KYC/AML processes and careful handling.
+              Answers to the most common questions about addresses, scanning, and compliance. Contact us if you need anything more specific.
             </p>
 </div>
-<div class="split">
-<div class="panel">
-<h3>Why Forward My Mail?</h3>
+<div class="faq-grid">
+<details>
+<summary>Can I use this address as my Registered Office?</summary>
 <p>
-              We help customers protect their home address while maintaining a compliant UK presence. Our service is designed for legitimate business use.
-            </p>
-<ul>
-<li>Secure receiving, logging and storage</li>
-<li>Opening and scanning with client authority</li>
-<li>Flexible forwarding options including signed-for</li>
-<li>Clear retention and disposal processes</li>
-</ul>
-</div>
-<div class="panel faq" id="faqs">
-<h3>FAQs</h3>
-<details>
-<summary>Do you open sealed mail?</summary>
-<p>Yes — our core service is opening and scanning mail, and forwarding it electronically and/or by post, in line with your signed authorisation and our Terms.</p>
+                Yes, if you choose a plan that includes Registered Office service. We will receive and process official mail from Companies House and HMRC on your behalf.
+              </p>
 </details>
 <details>
-<summary>Can you forward bank cards and PIN letters?</summary>
-<p>We can handle sensitive items only where you have provided specific written authorisation and you accept issuer restrictions. We recommend tracked/signed-for forwarding by default.</p>
+<summary>Do you open my mail by default?</summary>
+<p>
+                For scanning and digital mailroom services, we open mail in our secure facility to create PDF copies. If you only require forwarding, we can forward sealed items according to your preferences.
+              </p>
 </details>
 <details>
-<summary>Can I choose my courier/service?</summary>
-<p>Yes — we will use the forwarding service you instruct (signed-for, tracked, etc.). Where available, we recommend signed-for to reduce risk.</p>
+<summary>Can non-UK residents use this service?</summary>
+<p>
+                Yes. Many of our clients are based overseas but need a compliant UK address. Additional ID documentation may be required depending on your country of residence.
+              </p>
 </details>
 <details>
-<summary>Do you support company formation?</summary>
-<p>Yes — we can set up a UK limited company and provide Registered Office + director address services, then handle and forward your statutory mail.</p>
+<summary>What identification do you require?</summary>
+<p>
+                We will ask for standard KYC documentation such as a government-issued photo ID and proof of address. All documents are handled and stored securely.
+              </p>
 </details>
-</div>
+<details>
+<summary>How long does it take to set everything up?</summary>
+<p>
+                In most cases, your address is ready as soon as payment is complete and your ID has been verified. Many customers are fully set up within one working day.
+              </p>
+</details>
 </div>
 </div>
 </section>
 <!-- CONTACT -->
 <section id="contact">
 <div class="container">
-<div class="contact-card">
-<h3>Ready to get started?</h3>
-<p>
-            Email us and we’ll help you choose the right plan, complete checks, and activate your UK address.
-          </p>
-<a class="btn btn-primary" href="mailto:info@forwardmymail.co.uk">Email: info@forwardmymail.co.uk</a>
+<div class="section-header">
+<div class="section-kicker">Contact</div>
+<h2 class="section-title">Get in Touch</h2>
+<p class="section-subtitle">
+              Need help choosing a plan or have a compliance question? Send us a message and a member of the team will get back to you.
+            </p>
+</div>
 <div class="contact-grid">
+<div>
 <div class="contact-item">
-<strong>Address</strong>
-<span>Forward My Mail Ltd<br/>8a Bore Street, Lichfield, Staffordshire, WS13 6LL</span>
+<div class="contact-icon">✉</div>
+<div>
+<div class="contact-label">Email</div>
+<div>info@forwardmymail.co.uk</div>
+</div>
 </div>
 <div class="contact-item">
-<strong>Company No.</strong>
-<span>16912540</span>
+<div class="contact-icon">📞</div>
+<div>
+<div class="contact-label">Phone</div>
+<div>01543 406028</div>
+<div>Mon–Fri, 9am–5.00pm GMT</div>
+</div>
 </div>
 <div class="contact-item">
-<strong>Client portal</strong>
-<a href="https://forwardmymail.getzendo.io/login" rel="noopener" target="_blank">Login</a>
+<div class="contact-icon">📍</div>
+<div>
+<div class="contact-label">Office</div>
+<div>8a Bore Street</div>
+<div>Lichfield</div>
+<div>Staffordshire</div>
+<div>WS13 6LL</div>
 </div>
 </div>
+</div>
+<form class="contact-form">
+<div class="form-row">
+<div class="form-group">
+<label for="name">Name</label>
+<input id="name" placeholder="John Smith" type="text"/>
+</div>
+<div class="form-group">
+<label for="email">Email</label>
+<input id="email" placeholder="john@yourcompany.com" type="email"/>
+</div>
+</div>
+<div class="form-group">
+<label for="company">Company (optional)</label>
+<input id="company" placeholder="Your Business Ltd" type="text"/>
+</div>
+<div class="form-group">
+<label for="message">Message</label>
+<textarea id="message" placeholder="How can we help?"></textarea>
+</div>
+<button class="btn btn-primary" type="submit">Send Message</button>
+</form>
 </div>
 </div>
 </section>
 </main>
-<footer>
+<!-- FOOTER -->
+<footer class="footer">
 <div class="container">
 <div class="footer-top">
-<div>
-<div class="footer-title">Forward My Mail</div>
-<div class="footer-links">
-<span>Mail forwarding &amp; digital mailroom</span>
-<span>Registered Office &amp; Director Address</span>
-<span>Company formation support</span>
+<div class="footer-brand">
+<div class="footer-brand-title">
+<div class="brand-icon">
+<img alt="Forward My Mail logo" src="logo.png"/>
 </div>
 </div>
-<div>
-<div class="footer-title">Company</div>
-<div class="footer-links">
-<a href="#about">About</a>
-<a href="#services">Services</a>
-<a href="#pricing">Pricing</a>
-<a href="#contact">Contact</a>
-</div>
+<p style="margin: 0;">
+              Premium mail handling and virtual office services for businesses worldwide.
+            </p>
 </div>
 <div>
-<div class="footer-title">Legal</div>
-<div class="footer-links">
-<button data-policy-modal="modal-terms" type="button">Terms &amp; Conditions</button>
-<button data-policy-modal="modal-privacy" type="button">Privacy Policy</button>
-<button data-policy-modal="modal-cookies" type="button">Cookies Policy</button>
-<button data-policy-modal="modal-acceptable" type="button">Acceptable Use</button>
-</div>
+<div class="footer-heading">Services</div>
+<ul class="footer-links">
+<li><a href="#services">Mail Forwarding</a></li>
+<li><a href="#services">Digital Mailroom</a></li>
+<li><a href="#services">Registered Office</a></li>
+<li><a href="#services">Company Formation</a></li>
+</ul>
 </div>
 <div>
-<div class="footer-title">Support</div>
-<div class="footer-links">
-<a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a>
-<span>UK Support Hours</span>
-<span>Secure processing</span>
-</div>
+<div class="footer-heading">Company</div>
+<ul class="footer-links">
+<li><a href="#about">About Us</a></li>
+<li><a href="#pricing">Pricing</a></li>
+<li><a href="#contact">Contact</a></li>
+<li>
+<a href="https://forwardmymail.getzendo.io/login" rel="noopener" target="_blank">
+    Client Login
+  </a>
+</li>
+</ul></div>
+<div>
+<div class="footer-heading">Legal</div>
+<ul class="footer-links">
+<li><button data-policy-modal="modal-privacy" type="button">Privacy Policy</button></li>
+<li><button data-policy-modal="modal-terms" type="button">Terms &amp; Conditions</button></li>
+<li><button data-policy-modal="modal-cookies" type="button">Cookie Policy</button></li>
+<li><button data-policy-modal="modal-acceptable" type="button">Acceptable Use</button></li>
+</ul>
 </div>
 </div>
 <div class="footer-bottom">
-<span>© 2025 Forward My Mail Ltd. All rights reserved. Registered in England &amp; Wales.</span>
+<span>© 2025 Forwardmymail Ltd. All rights reserved. Registered in England &amp; Wales.</span>
 <span>Supervised for UK AML compliance. We do not support illegal activities.</span>
 </div>
 </div>
@@ -1133,7 +1689,7 @@
 <div aria-hidden="true" class="policy-modal" id="modal-privacy">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="privacy-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Privacy Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="true" type="button">×</button></div>
+<div class="policy-header">Privacy Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="True" type="button">×</button></div>
 <div class="policy-body">
 <p><small>Last updated: 2025-12-19</small></p>
 <p>This Privacy Notice explains how Forward My Mail Ltd (“FMM”, “we”, “us”) collects and uses your personal data when you visit our website, contact us, or use our mail handling and virtual address services. We act as a “controller” for this data.</p>
@@ -1145,25 +1701,31 @@
 <li><strong>Contact</strong> — email, phone, correspondence address and emergency contact.</li>
 <li><strong>Account</strong> — login credentials, profile/plan details, instructions, support history.</li>
 <li><strong>Mail-handling</strong> — sender/addressee details, item metadata and digital scans of mail opened on your instructions.</li>
-<li><strong>Transaction</strong> — plan, invoices, payment history.</li>
-<li><strong>Technical</strong> — IP address, browser/device info; cookies.</li>
+<li><strong>Transaction</strong> — invoices, payments, chargeback details.</li>
+<li><strong>Technical</strong> — IP address, device/browser info, cookies/analytics data.</li>
+<li><strong>Marketing preferences</strong>.</li>
 </ul>
-<h3>3. Why we use it</h3>
+<h3>3. How and why we use your data</h3>
 <ul>
-<li>To provide services (receive/open/scan/forward mail), manage your account and instructions.</li>
-<li>To perform KYC/AML checks where required.</li>
-<li>To handle billing, payments and records.</li>
-<li>To respond to support queries and manage complaints.</li>
-<li>To secure and improve our services.</li>
+<li><strong>Provide services</strong> — receive/open/scan/forward mail; operate registered office/director address and company formation (contract performance).</li>
+<li><strong>Identity verification &amp; compliance</strong> — KYC/AML, sanctions/PEP screening, fraud prevention (legal obligations and legitimate interests).</li>
+<li><strong>Customer support &amp; operations</strong> — communications, troubleshooting, training (legitimate interests).</li>
+<li><strong>Payments</strong> — billing, fraud/chargeback handling (contract, legitimate interests).</li>
+<li><strong>Legal</strong> — respond to lawful requests from authorities and courts (legal obligations).</li>
+<li><strong>Marketing</strong> — with your consent; you can opt out anytime.</li>
 </ul>
-<h3>4. Lawful bases</h3>
-<p>Contract performance, legal obligations (e.g. AML), legitimate interests (security, fraud prevention), and consent where required (marketing/cookies).</p>
-<h3>5. Sharing</h3>
-<p>We may share data with payment processors, verification providers, IT/cloud hosts, postal/courier services and professional advisers. We require appropriate contractual safeguards.</p>
+<h3>4. Sharing</h3>
+<p>We share data with identity verification providers, payment processors, couriers/carriers, IT/cloud suppliers, professional advisers and authorities where lawful. We do not sell personal data.</p>
+<h3>5. International transfers</h3>
+<p>Where data is transferred outside the UK/EEA, we use appropriate safeguards (e.g., UK IDTA/EU SCCs) where required.</p>
 <h3>6. Retention</h3>
-<p>We keep data only as long as needed for the service and legal/compliance reasons (including AML recordkeeping periods).</p>
+<ul>
+<li>KYC/AML records: kept at least 5 years and no longer than 10 years unless required longer by law.</li>
+<li>Scans of mail: retained ~90 days unless you ask us to keep them longer or we must keep them for legal/compliance reasons.</li>
+<li>Operational forwarding logs: kept at least 12 months.</li>
+</ul>
 <h3>7. Your rights</h3>
-<p>You may have rights to access, correct, erase, restrict, object, and data portability. You can complain to the ICO. Contact: <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a>.</p>
+<p>You have rights to access, rectify, erase, restrict, object, portability, and to withdraw consent. You can complain to the ICO. Contact: <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a>.</p>
 <h3>8. Cookies</h3>
 <p>See our Cookies Policy for details of cookies and how to change your preferences.</p>
 <h3>9. Security</h3>
@@ -1176,21 +1738,21 @@
 <div class="policy-backdrop"></div>
 <div aria-labelledby="terms-title" aria-modal="true" class="policy-dialog" role="dialog" style="position:relative">
 <div class="policy-header">Service Terms &amp; Conditions<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="true" type="button">×</button></div>
-<div class="policy-body"><div class="terms-keyfacts"><div class="terms-keyfacts__title">Key facts (summary)</div><ul class="terms-keyfacts__list"><li>You appoint FMM as your agent to receive mail and (where lawful/permitted) open/scan for processing/forwarding.</li><li>Sensitive items (cards/PIN/chequebooks/security devices) require signed authorisation; tracked/signed-for forwarding by default.</li><li>Risk passes on hand-over to the carrier; items are not insured unless you purchase cover in advance.</li><li>Fees exclude VAT and carrier surcharges; postage is additional.</li><li>Storage/disposal after notice: Torts Act s.12 procedure used for uncollected goods.</li><li>Liability (B2B) capped at the greater of £100 or 100% of fees for the service at issue; consumers’ CRA rights preserved.</li><li>KYC/AML required before activation; we may retain verification records 5–10 years.</li><li>If a consumer dispute reaches deadlock, we signpost a CTSI-approved ADR body and state whether we will participate.</li></ul></div><details class="terms-section"><summary>1.1 Parties</summary><p>"FMM", "we", "us" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). "You" means the customer named in the order or account. "Consumer" means an individual acting wholly or mainly outside of trade or profession; "Business Customer" means everyone else.</p></details><details class="terms-section"><summary>1.2 Interpretation</summary><p>Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy.</p></details><details class="terms-section"><summary>1.3 Entire agreement</summary><p>These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing.</p><p>2. Service Description</p></details><details class="terms-section"><summary>2.1 Address use and agency</summary><p>You may use an FMM-provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding (except where prohibited by law or issuer rules).</p></details><details class="terms-section"><summary>2.2 Mail handling</summary><p>We log incoming items, store them securely, and process them according to your instructions (scan/upload, forward by post/courier, or hold for collection where agreed).</p></details><details class="terms-section"><summary>2.3 Sensitive mail</summary><p>Items such as bank/credit cards, PIN letters, chequebooks and security devices are treated as Sensitive Mail. We may require a separate signed authorisation and may default to tracked/signed-for forwarding. You acknowledge issuer restrictions may apply.</p></details><details class="terms-section"><summary>3. Customer obligations</summary><p>You must provide accurate KYC information, maintain up-to-date contact details, and keep your Companies House/HMRC/issuer records updated. You must not use the service for unlawful purposes.</p></details><details class="terms-section"><summary>4. Fees, payment and VAT</summary><p>Fees are as set out on our website/order. Postage/courier charges and surcharges are additional. VAT applies where required. Non-payment may result in suspension and storage/return handling as described in these Terms.</p></details><details class="terms-section"><summary>5. Forwarding and risk</summary><p>We will forward items using the service you request. Where you do not specify, we may choose a reasonable method (and may recommend tracked/signed-for). Risk passes when the item is handed to the carrier; carrier terms apply.</p></details><details class="terms-section"><summary>6. Liability</summary><p>Nothing limits liability for death/personal injury caused by negligence, fraud or other liability that cannot be excluded by law. For Business Customers, liability is capped as stated. Consumers’ statutory rights are preserved.</p></details><details class="terms-section"><summary>7. Termination</summary><p>On termination of address services you must promptly update Companies House and all records. We may return or refuse further mail after the termination date and apply storage/return/disposal processes as set out in these Terms.</p></details><details class="terms-section"><summary>8. Complaints and ADR</summary><p>We aim to resolve complaints internally. If a consumer complaint reaches deadlock, we will signpost a CTSI-approved ADR body and state whether we will participate.</p></details><details class="terms-section"><summary>9. Notices</summary><p>We may send contractual notices by email to your nominated contact email. (This does not automatically constitute service of court proceedings unless permitted by applicable rules or consent.)</p></details><details class="terms-section"><summary>10. Governing law</summary><p>These Terms are governed by the laws of England and Wales.</p></details><details class="terms-section"><summary>Schedule A — Services</summary><p>Services may include mail receipt, logging, opening, scanning, secure portal upload, forwarding by post/courier, registered office, director service address, and related administration as ordered.</p></details><details class="terms-section"><summary>Schedule B — Sensitive Mail Authorisation (summary)</summary><p>Where you opt-in, you authorise receipt/opening/scanning/forwarding of sensitive items and instruct the forwarding address and method (tracked/signed-for recommended).</p></details><details class="terms-section"><summary>Schedule C — Fees and charges</summary><p>Fees are as per your plan and published price list, plus postage/courier costs at cost and any applicable surcharges.</p></details><details class="terms-section"><summary>Schedule D — Storage, uncollected goods and disposal</summary><p>If items remain uncollected/unpaid, we may store them for a reasonable period, issue notice, and then return, surrender to authorities where required, or dispose/sell under the Torts (Interference with Goods) Act 1977 s.12 procedure as applicable.</p></details><details class="terms-section"><summary>Customer Acceptance</summary><p>By using the services you confirm acceptance of these Terms and appoint Forward My Mail Ltd as agent to receive/open/scan and forward mail as instructed.</p></details></div>
+<div class="policy-body"><div class="terms-keyfacts"><div class="terms-keyfacts__title">Key facts (summary)</div><ul class="terms-keyfacts__list"><li>You appoint FMM as your agent to receive mail and (where lawful/permitted) open/scan for processing/forwarding.</li><li>Sensitive items (cards/PIN/chequebooks/security devices) require signed authorisation; tracked/signed‑for forwarding by default.</li><li>Risk passes on hand‑over to the carrier; items are not insured unless you purchase cover in advance.</li><li>Fees exclude VAT and carrier surcharges; postage is additional.</li><li>Storage/disposal after notice: Torts Act s.12 procedure used for uncollected goods.</li><li>Liability (B2B) capped at the greater of £100 or 100% of fees for the service at issue; consumers’ CRA rights preserved.</li><li>KYC/AML required before activation; we may retain verification records 5–10 years.</li><li>If a consumer dispute reaches deadlock, we signpost a CTSI‑approved ADR body and state whether we will participate.</li></ul></div><details class="terms-section"><summary>1.1 Parties</summary><p>"FMM", "we", "us" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). "You" means the customer named in the order or account. "Consumer" means an individual acting wholly or mainly outside of trade or profession; "Business Customer" means everyone else.</p></details><details class="terms-section"><summary>1.2 Interpretation</summary><p>Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy.</p></details><details class="terms-section"><summary>1.3 Entire agreement</summary><p>These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing.</p><p>2. Service Description</p></details><details class="terms-section"><summary>2.1 Address use and agency</summary><p>You may use an FMM‑provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding, except where prohibited by law or issuer rules.</p></details><details class="terms-section"><summary>2.2 Registered office / service address</summary><p>Where purchased, we may provide a registered office address and/or director’s service address. Use is limited to official purposes; not for trading premises, returns, DVLA/licensing, electoral registration, or Money Laundering Regulations registrations. We may report misuse and/or require removal from public records.</p></details><details class="terms-section"><summary>2.3 Company formation</summary><p>Where you instruct us to incorporate a company, you are responsible for accuracy of information and regulatory compliance. We are not a law or tax firm. Immediate performance is requested when filings begin (see 15.3).</p></details><details class="terms-section"><summary>2.4 No warehousing</summary><p>We do not provide warehousing or long‑term storage; see holding windows and storage fees in Schedule C.</p></details><details class="terms-section"><summary>2.5 Subcontracting</summary><p>We may use subcontractors and Carriers; we remain responsible for our own obligations.</p></details><details class="terms-section"><summary>2.6 Not a residential redirection service</summary><p>If you have changed residential address, you must arrange a Royal Mail Redirection; we do not provide a statutory residential redirection service.</p><p>3. Your Obligations</p></details><details class="terms-section"><summary>3.1 Lawful use</summary><p>Do not send, receive or request handling of Prohibited Items or illegal content. Provide accurate recipient names and instructions.</p></details><details class="terms-section"><summary>3.2 Duties/taxes</summary><p>You are responsible for customs declarations, duties and taxes.</p></details><details class="terms-section"><summary>3.3 Packaging &amp; disclosure</summary><p>Provide sufficient packaging and information for handling and customs.</p></details><details class="terms-section"><summary>3.4 Cooperation &amp; verification</summary><p>Provide identity and address documents when requested; see Clause 6.</p></details><details class="terms-section"><summary>3.5 Address limits</summary><p>Do not display our address as a trading address or for advertising without prior written consent.</p><p>4. Prohibited &amp; Restricted Items</p><p>You must comply with Carrier and legal restrictions (dangerous goods, weapons, controlled drugs, cash, perishable or illegal items). We may refuse, hold, return or dispose of items that breach this clause and may notify authorities.</p><p>5. Inspections and Security</p><p>We may open items to identify the recipient, comply with law, meet Carrier/customs requirements, repack damaged parcels, or for safety/security. We take reasonable care during inspection.</p><p>6. KYC/AML, Sanctions &amp; Fraud Controls</p></details><details class="terms-section"><summary>6.1 Verification</summary><p>An account is not active and services are not provided until (a) payment is received and (b) all required KYC/AML checks are completed for every relevant person/name. We may use certified digital identity service providers.</p></details><details class="terms-section"><summary>6.2 Ongoing monitoring</summary><p>We may monitor usage, suspend or terminate accounts, and report suspicious activity to authorities without notice where required by law.</p></details><details class="terms-section"><summary>6.3 Annual refresh &amp; retention</summary><p>We may carry out an annual ID refresh; you must provide updated documents to keep your account active. We may retain identity/verification records for at least 5 years and no longer than 10 years unless required longer by law.</p></details><details class="terms-section"><summary>6.4 Trusts</summary><p>Before we provide any service to a trust, you must provide proof of registration with the HMRC Trust Registration Service (TRS).</p><p>7. Handling, Transit &amp; Delivery</p></details><details class="terms-section"><summary>7.1 Title and risk</summary><p>Risk in items passes to you when items are delivered to the Carrier for forwarding to your chosen destination, or when collected by you/your agent, whichever occurs first.</p></details><details class="terms-section"><summary>7.2 Carrier terms &amp; times</summary><p>Carriage is subject to Carrier terms, including routing and transit times, which we do not control. Delivery dates are estimates.</p></details><details class="terms-section"><summary>7.3 Customs and delays</summary><p>You are responsible for customs clearance and delays arising from inspections or documentation.</p></details><details class="terms-section"><summary>7.4 Sensitive financial items</summary><p>Forwarding of Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens or card readers) is optional and provided only if: (a) you have completed the Client Authorisation in Schedule B; (b) all KYC/AML checks are satisfied; (c) we are satisfied the forwarding is lawful and permitted by the issuer; and (d) the destination address has been verified. Opening &amp; scanning: our Service includes opening mail and scanning contents for you. For Sensitive Items we will follow your written instructions, except we will not scan where doing so would breach law or issuer rules (e.g., certain PIN mailers). Identifiable PIN mailers and security envelopes will not be opened unless you give us explicit written instructions and issuer rules permit. We may refuse or suspend forwarding/scanning of Sensitive Items where risk or compliance concerns arise.</p></details><details class="terms-section"><summary>7.5 Default shipping method (safety first)</summary><p>Unless you instruct otherwise in writing, we will use a tracked and/or signed‑for method where available and commercially reasonable, having regard to the item value and destination. If you opt for an untracked or unsigned service, you acknowledge increased risk and agree that our liability remains limited under Clause 9.</p></details><details class="terms-section"><summary>7.6 Large parcels and limits</summary><p>Please give 24 hours’ notice for parcels exceeding 1,000 mm in any dimension. We may refuse items exceeding 2 m in any dimension or 25 kg in weight. We may charge handling and storage fees for large or bulky items.</p></details><details class="terms-section"><summary>7.7 Client‑arranged courier</summary><p>Where you pre‑pay postage/courier directly, a handling fee per item may apply; see Schedule C (Fees).</p></details><details class="terms-section"><summary>7.8 Retrieval of archived scans</summary><p>Retrieval of previously scanned‑and‑archived items may attract a retrieval fee; see Schedule C (Fees).</p><p>8. Fees, Storage &amp; Lien</p></details><details class="terms-section"><summary>8.1 Fees &amp; taxes</summary><p>You agree to pay Service fees, shipping charges and surcharges as published or quoted. All fees are exclusive of VAT and any carrier surcharges unless stated otherwise. We may change fees on notice for future services.</p></details><details class="terms-section"><summary>8.2 Storage and non‑compliance</summary><p>For inactive or non‑compliant accounts (ID missing/fails, or unpaid invoices), we may hold mail for up to 14 days without charge to allow resolution. After that period items may be returned to sender, securely destroyed, disposed of, or stored for a fee. Parcels may accrue storage charges after 24 hours. Disposal/return fees may apply.</p></details><details class="terms-section"><summary>8.3 Lien</summary><p>We have a general and particular lien over items for all amounts you owe. If unpaid after notice, we may sell or dispose of items and apply proceeds to your debt (accounting to you for any balance).</p></details><details class="terms-section"><summary>8.4 Sale/disposal procedure (Torts Act)</summary><p>Before any sale or disposal of uncollected goods we will give you a written notice of intention to sell allowing a reasonable collection period, under the Torts (Interference with Goods) Act 1977. We will account to you for any net proceeds after deducting sums properly due.</p></details><details class="terms-section"><summary>8.5 Insurance</summary><p>Goods are not insured while on our premises or in transit unless you purchase optional cover from us in writing before dispatch. If you arrange your own courier, our insurance does not apply. You are responsible for declaring value and arranging appropriate cover.</p><p>9. Liability, Limits and Exclusions (Protection of FMM and Director)</p></details><details class="terms-section"><summary>9.0 Consumer carve‑out</summary><p>If you are a Consumer, nothing in these Terms limits your statutory rights, including our obligation to provide the Service with reasonable care and skill under the Consumer Rights Act 2015. Any limits/exclusions apply only to the extent permitted by law.</p></details><details class="terms-section"><summary>9.1 Exclusion of certain losses</summary><p>To the maximum extent permitted by law, FMM and its Director(s), officers, employees and agents are not liable for indirect, consequential, exemplary or punitive damages; loss of profit, revenue, business, goodwill or anticipated savings; or losses arising from delay, missed delivery windows, customs seizures, or Carrier acts/omissions beyond our reasonable control.</p></details><details class="terms-section"><summary>9.2 Monetary cap</summary><p>FMM’s aggregate liability for all claims arising out of or relating to the Service in any 12‑month period is limited to the greater of £100 or 100% of fees paid to FMM by you for the Service giving rise to the claim. Different mandatory caps may apply where law requires.</p></details><details class="terms-section"><summary>9.3 Non‑excludable liabilities</summary><p>Nothing excludes liability for death or personal injury caused by negligence, fraud, or any liability which cannot lawfully be excluded or limited.</p></details><details class="terms-section"><summary>9.4 Carriers</summary><p>We are not liable for Carrier terms, delays or acts/omissions beyond our control; your remedies against Carriers are unaffected.</p></details><details class="terms-section"><summary>9.5 Third‑party rights (Director protection)</summary><p>The Director(s) of FMM may enforce this Clause 9 under the Contracts (Rights of Third Parties) Act 1999.</p></details><details class="terms-section"><summary>9.6 Time limits</summary><p>Business Customers: you must notify us of loss or damage in writing within 7 days of delivery (or scheduled delivery) and bring any claim within 6 months thereafter; otherwise the claim is barred, except where mandatory law provides longer. Consumers: please notify issues within 30 days where reasonably possible; failure to do so does not affect your statutory rights or ability to bring a claim within the applicable statutory limitation period.</p><p>10. Your Indemnities</p><p>You indemnify us from losses, claims and costs arising from your breach of these Terms, unlawful items, customs misstatements, Prohibited Items, or issuer‑rule breaches. For Consumers this indemnity applies only to losses caused by your fault or unlawful use.</p><p>11. Data Protection (UK GDPR)</p></details><details class="terms-section"><summary>10.1 Business Customers</summary><p>You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with: (a) your breach of these Terms or of law; (b) Prohibited or Restricted Items; (c) inaccurate customs declarations or misstatements; (d) breach of issuer or bank rules (including use of a mail‑forwarding address contrary to issuer policy); (e) misuse of our address (including at Companies House, DVLA or for MLR registrations); (f) third‑party claims relating to goods, content or instructions you send or ask us to handle; (g) sanctions violations; or (h) fraud or wilful misconduct by you or persons you authorise.</p></details><details class="terms-section"><summary>10.2 Consumers</summary><p>If you are a Consumer, this indemnity applies only to the extent that a loss is caused by your breach, misuse or unlawful conduct. It does not apply to losses caused by our own negligence or failure to perform with reasonable care and skill and does not reduce your statutory rights under the Consumer Rights Act 2015.</p></details><details class="terms-section"><summary>10.3 Legal fees and costs</summary><p>The indemnity in this Clause includes the reasonable and properly incurred legal and other professional costs and expenses of investigating, defending and/or settling any third‑party or regulatory claim, allegation or enquiry arising from the matters described in Clauses 10.1–10.2, whether such claim is made against us alone or against us together with you.</p></details><details class="terms-section"><summary>10.4 Conduct of claims</summary><p>We will give you reasonable notice of any claim for which we seek indemnity. We may conduct the defence or settlement of the claim and you shall provide prompt cooperation, information and assistance (including documents, witness statements and access to systems) as reasonably requested. You must not admit liability, settle or compromise any claim that could reasonably be expected to give rise to indemnity without our prior written consent. Where a claim is solely and directly against you, you may assume conduct provided that doing so does not prejudice us.</p></details><details class="terms-section"><summary>10.5 Limits and fairness</summary><p>Nothing in this Clause requires you to indemnify us for fines or penalties to the extent caused by our own breach of law, negligence or wilful misconduct, nor for indirect or consequential losses except to the extent payable to a third party under a settlement or judgment. We will take reasonable steps to mitigate any indemnified losses.</p></details><details class="terms-section"><summary>10.6 Advance on costs</summary><p>Where a third‑party or regulatory claim is reasonably expected to exceed routine small‑claims costs, we may request a reasonable advance/retainer in respect of external legal or expert costs for the next phase (not more than the reasonably anticipated external costs for the next 60 days). We will keep records and reconcile any advance against actual costs.</p></details><details class="terms-section"><summary>10.7 Proportionality for micro‑claims</summary><p>For consumer disputes allocated to the small‑claims track, nothing in this Clause requires the Consumer to pay our irrecoverable legal costs beyond what the court would ordinarily award, unless the court orders otherwise due to dishonesty, abuse of process or similar exceptional conduct.</p><p>11. Data Protection (UK GDPR)</p><p>12. Compliance &amp; Sanctions</p><p>13. Suspension &amp; Termination</p><p>14. Changes to the Service or Terms</p><p>15. Consumer &amp; Business Information</p><p>16. Complaints. We aim to resolve complaints internally. If we cannot resolve a Consumer complaint, we will provide details of an approved Alternative Dispute Resolution (ADR) provider competent to handle your case and say whether we will take part. We do not currently subscribe to any ADR scheme. At deadlock we will signpost you to a Chartered Trading Standards Institute (CTSI)‑approved ADR body (for example, RetailADR (CDRL) or CEDR) and state whether we agree to ADR for your case. If you purchased online, you may also use the EU Commission’s ODR platform to route a complaint. This Clause does not affect your right to bring court proceedings.</p><p>17. Governing Law &amp; Jurisdiction</p><p>18. General</p><p>19. Contact Details</p><p>20. Acknowledgement &amp; Acceptance</p><p>21. Schedule A — Company Formation, Registered Office &amp; Director’s Service Address</p><p>22. Schedule B — Client Authorisation: Receipt &amp; International Forwarding of Sensitive Mail</p><p>23. Schedule C — Service Rules &amp; Fees (Operational Policies)</p><p>24. Schedule D — Torts Act Notice of Intention to Sell (Template)</p><p>25. Schedule C‑1 — Fees Table (Fill‑in placeholders)</p><p>Key Facts (Summary) — For Convenience Only</p><p>• Agency &amp; opening/scanning: You appoint FMM as your agent to receive mail at our address and authorise opening/scanning for processing and forwarding, unless prohibited by law or issuer rules.</p><p>• Sensitive items: Bank cards/PIN mailers are forwarded only with signed authorisation &amp; KYC; tracked/signed‑for by default unless you opt out in writing.</p><p>• Risk &amp; insurance: Risk passes on handover to the Carrier; items are not insured unless you purchase cover in writing before dispatch.</p><p>• Fees &amp; VAT: Prices exclude VAT and any carrier surcharges; postage is additional. See price list (Schedule C).</p><p>• Storage &amp; disposal: Torts Act notice of intention to sell is issued before any sale/disposal of uncollected goods.</p><p>• Liability (B2B): Cap = greater of £100 or 100% of fees for the service at issue. Consumers’ CRA 2015 rights preserved.</p><p>• Changes: Objective reasons only; 30‑day notice &amp; right to cancel if materially detrimental.</p><p>• KYC/AML: Service activates after payment + checks; AML records kept 5–10 years.</p><p>• ADR signposting: if a consumer complaint reaches deadlock, we will signpost a CTSI‑approved ADR body (e.g., RetailADR or CEDR) and state whether we will participate.</p><p>• Notices by email: permitted for contract notices (not for formal service of court proceedings unless rules/consent allow).</p><p>• Complaints/ADR: If deadlock with a consumer, we signpost an approved ADR body and state whether we will participate.</p><p>1. Parties, Definitions and Interpretation</p></details><details class="terms-section"><summary>11.1 Controller</summary><p>FMM is a controller of personal data you provide. See our Privacy Notice for details.</p></details><details class="terms-section"><summary>11.2 Checks and sharing</summary><p>You consent to our use of third‑party verification and payment providers and to lawful disclosures to Carriers, customs and law enforcement where required. For formation/registered office, we may share details with Companies House, HMRC and banks at your request.</p></details><details class="terms-section"><summary>11.3 International transfers</summary><p>Where data is transferred outside the UK/EEA, we will use appropriate safeguards as required by law.</p></details><details class="terms-section"><summary>11.4 AML/KYC records</summary><p>We may retain identity and verification records for at least 5 years and no longer than 10 years unless a longer period is required by law (e.g., ongoing investigations or legal claims).</p></details><details class="terms-section"><summary>11.5 Scan retention</summary><p>Unless you ask us to keep items longer (or we must keep them for legal/compliance reasons), scanned images and related handling logs will be retained for 90 days and then deleted/archived in line with our policies.</p><p>12. Compliance &amp; Sanctions</p><p>You warrant that you and your recipients are not subject to sanctions that would prohibit the Service. We may suspend where required to comply with law.</p><p>13. Suspension &amp; Termination</p><p>We may suspend or terminate the Service immediately if you breach these Terms; we suspect unlawful activity; verification requests are not satisfied; or any amount is overdue. You may terminate on notice for convenience, subject to payment of accrued charges. Clauses intended to survive termination do so.</p></details><details class="terms-section"><summary>13.1 Debt recovery &amp; chargebacks</summary><p>Overdue accounts may be referred to debt collection. You are liable for reasonable recovery costs and any statutory compensation/interest where applicable. If you initiate a payment chargeback, we may apply a reasonable administration fee (plus any third‑party fees) and suspend services pending resolution. We may notify Companies House and other bodies and take steps to remove unauthorised use of our address where fees remain unpaid.</p><p>14. Changes to the Service or Terms</p><p>We may update the Service or these Terms from time to time for objective reasons, including legal or regulatory compliance, security, changes to service functionality, or changes in third‑party costs (e.g., Carriers). Material changes will be notified via the website, in‑app, or email and will take effect prospectively. If a change is likely to cause material detriment to you, we will give at least 30 days’ notice and you may cancel before it takes effect. Continued use after changes take effect constitutes acceptance (this does not reduce consumer statutory rights).</p><p>15. Consumer &amp; Business Information</p></details><details class="terms-section"><summary>15.1 CRA 2015</summary><p>For Consumers we will provide services with reasonable care and skill. Nothing in these Terms affects statutory rights.</p></details><details class="terms-section"><summary>15.2 CCR 2013 (cooling‑off)</summary><p>If you are a Consumer and purchased online or at a distance, you may have a 14‑day cooling‑off period. If you request immediate performance, you agree we may start before the end of that period; you pay for services performed, and once fully performed you lose the right to cancel.</p></details><details class="terms-section"><summary>15.3 Immediate performance acknowledgment</summary><p>By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights.</p></details><details class="terms-section"><summary>15.4 Optional Director Identity Verification service</summary><p>If you purchase a Companies House director identity verification service from us, the service fee is for processing/submission and is non‑refundable once submitted, whether the check succeeds or fails. Additional verification may attract supplementary fees.</p><p>16. Complaints</p><p>We aim to resolve complaints internally. If we cannot resolve a Consumer complaint, we will provide details of an approved Alternative Dispute Resolution (ADR) provider competent to handle your case and say whether we will take part; you may also use the ODR platform for online purchases.</p><p>17. Governing Law &amp; Jurisdiction</p><p>These Terms and any dispute are governed by the law of England and Wales. Courts of England and Wales have jurisdiction. Consumers may benefit from mandatory protections of their local law.</p><p>18. General</p></details><details class="terms-section"><summary>18.1 Force majeure</summary><p>We are not liable for failure or delay due to events beyond our reasonable control.</p></details><details class="terms-section"><summary>18.2 No waiver</summary><p>Failure to enforce is not a waiver.</p></details><details class="terms-section"><summary>18.3 Severability</summary><p>If any provision is unlawful or unenforceable, the remainder remains in effect.</p></details><details class="terms-section"><summary>18.4 Assignment</summary><p>You may not assign without our consent; we may assign subject to law.</p></details><details class="terms-section"><summary>18.5 Notices</summary><p>We may notify you via the Service, email or your account address. You agree that all notices and communications under these Terms may be served by email to the email address in your account and are deemed received at the earlier of (a) the time of transmission (UK time) if sent on a Working Day before 5pm, or (b) the next Working Day. You must keep your contact details current. You may send notices to us by email to info@forwardmymail.co.uk or by post to our registered address; legal notices are effective only when actually received by us. For the avoidance of doubt, this email‑service clause does not apply to the formal service of court proceedings, which must comply with applicable procedural rules (e.g., the Civil Procedure Rules) or any separate written consent.</p></details><details class="terms-section"><summary>18.6 Third‑party rights</summary><p>Except as stated in Clause 9.5, no third party has rights to enforce these Terms.</p><p>19. Contact Details</p><p>Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom. Company No. 16912540. Email: info@forwardmymail.co.uk</p><p>20. Acknowledgement &amp; Acceptance</p><p>By creating an account, purchasing a plan, or instructing us to receive, open/scan, store or forward items, you accept these Terms.</p><p>21. Schedule A — Company Formation, Registered Office &amp; Director’s Service Address</p></details><details class="terms-section"><summary>A1. Scope</summary><p>Applies where you purchase formation, registered office or director’s service address services.</p></details><details class="terms-section"><summary>A2. No legal/tax advice</summary><p>Information is general only; obtain your own advice.</p></details><details class="terms-section"><summary>A3. KYC/AML</summary><p>We require identity and address verification for all beneficial owners (PSCs), directors and authorised users. We may refuse service or filings until verification is completed to our satisfaction.</p></details><details class="terms-section"><summary>A4. Filings and accuracy</summary><p>You are responsible for incorporation data, consents and post‑incorporation compliance (PSC registers, statutory books, confirmation statements, HMRC registrations). We are not responsible for rejected/delayed filings caused by your incorrect or incomplete information.</p></details><details class="terms-section"><summary>A5. Registered office mail</summary><p>Official mail (Companies House, HMRC, courts/regulators) is included as stated in your plan and will be scanned and/or forwarded in accordance with your instructions and applicable fees. Non‑official or marketing mail may be refused or charged additionally.</p></details><details class="terms-section"><summary>A6. Address display &amp; misuse</summary><p>The registered office or director address may not be used as a trading address or for public advertising without our prior written consent. You must not use our address for DVLA driving licence/vehicle registration, electoral registration, or MLR registrations. We may require removal of the address from websites or materials if misused.</p></details><details class="terms-section"><summary>A7. Unauthorised use &amp; Companies House filings</summary><p>If our address is used at Companies House without an active, paid service (per entity/name), you authorise us to file forms (including RP07 or equivalents) to remove or change the address. Fees apply per company and per officer/PSC using our address.</p></details><details class="terms-section"><summary>A8. Termination</summary><p>On termination of address services you must promptly update Companies House and all records. We will refuse new mail from the termination date. Items received after termination will be handled as follows: (a) Letters received within 14 calendar days after termination: one courtesy email notification; we will hold for up to 14 days, then Return to Sender where practicable; if no sender/return address is available, we will securely destroy after a further 14 days. (b) Parcels received within 14 calendar days after termination: we will hold for up to 7 days; if uncollected/unspecified, we may issue a Torts Act s.12 notice allowing at least 14 days to collect or arrange forwarding on payment of all sums due; failing that, we may sell or dispose and account for any net proceeds. (c) Any post received more than 14 days after termination will be refused or returned to sender on receipt, without notice.</p></details><details class="terms-section"><summary>A9. Immediate performance</summary><p>By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights (see Clause 15.3).</p></details><details class="terms-section"><summary>A10. Bank introductions</summary><p>Where we provide bank or service introductions, these are without warranty; eligibility and onboarding decisions rest with the third party.</p><p>22. Schedule B — Client Authorisation: Receipt &amp; International Forwarding of Sensitive Mail</p></details><details class="terms-section"><summary>B1. Purpose</summary><p>This authorisation confirms that the undersigned client authorises FMM to receive, open, scan, securely store and forward Sensitive Items on their behalf.</p></details><details class="terms-section"><summary>B2. Sensitive Items</summary><p>“Sensitive Items” include: bank/credit/debit cards, PIN letters, cheque books, replacement security devices (e.g., card readers, tokens), and similar financial instruments. We may update this list from time to time.</p></details><details class="terms-section"><summary>B3. Preconditions</summary><p>Sensitive Items will only be forwarded if: (a) the client has passed KYC/AML checks; (b) the issuer permits delivery to a mail‑forwarding address; (c) the Authorised Forwarding Address has been verified; and (d) the client has signed this Schedule.</p></details><details class="terms-section"><summary>B4. Method, opening &amp; security</summary><p>FMM will use tracked and/or signed‑for services by default (unless you instruct otherwise in writing) and will record forwarding details internally. Our standard service includes opening mail and scanning contents; for Sensitive Items we will only scan with your explicit instruction and only where lawful and permitted by the issuer. We will not activate or test any card or device.</p></details><details class="terms-section"><summary>B5. Risk allocation</summary><p>Once a Sensitive Item is handed to the Carrier for forwarding, risk passes to the client (see Clause 7.1). To the maximum extent permitted by law, FMM is not liable for delays, loss or misuse of Sensitive Items after dispatch, save where caused by FMM’s negligence. The liability limits in Clause 9 apply. The client indemnifies FMM for losses arising from issuer‑rule breach or misuse after dispatch.</p></details><details class="terms-section"><summary>B6. Refusal &amp; compliance</summary><p>FMM may refuse, suspend or cancel forwarding of any Sensitive Item if compliance or security concerns arise, or if issuer, Carrier or legal restrictions apply.</p></details><details class="terms-section"><summary>B7. Client authorisation form</summary><p>See separate PDF/DOCX form provided.</p><p>23. Schedule C — Service Rules &amp; Fees (Operational Policies)</p></details><details class="terms-section"><summary>C1. Status and updates</summary><p>This Schedule sets out operational rules and fees for our services. It is incorporated by reference into the Terms. We may update this Schedule with prospective effect by notice on our website/in‑app/email.</p></details><details class="terms-section"><summary>C2. ID &amp; activation</summary><p>Proof of identity and address is required for all relevant persons. Accounts remain inactive until payment is received and KYC/AML checks are completed. Annual ID refresh may be required.</p></details><details class="terms-section"><summary>C3. Mail handling windows</summary><p>Letters held without charge for 14 days; parcels may accrue storage after 24 hours. After holding windows expire, items may be returned/destroyed/disposed of or stored for a fee. Disposal/return fees may apply.</p></details><details class="terms-section"><summary>C4. Opening &amp; inspection</summary><p>We may open items to identify the recipient, comply with law, meet Carrier/customs requirements, repack damaged parcels, or for safety/security.</p></details><details class="terms-section"><summary>C5. Address restrictions</summary><p>Do not use our address for DVLA driving licence/vehicle registration, electoral registration, or MLR registrations.</p></details><details class="terms-section"><summary>C6. Prohibited/restricted goods</summary><p>You must comply with Carrier and law on dangerous goods (e.g., certain lithium batteries, aerosols, perfumes, controlled drugs). We may refuse or surrender items to authorities.</p></details><details class="terms-section"><summary>C7. Large parcels</summary><p>Notify us 24 hours in advance for parcels over 1,000 mm in any dimension. We may refuse items over 2 m or 25 kg.</p></details><details class="terms-section"><summary>C8. Forwarding methods</summary><p>Default to tracked/signed‑for unless you opt out in writing. If you arrange your own courier, a handling fee per item may apply (see Fees).</p></details><details class="terms-section"><summary>C9. Insurance</summary><p>Goods are not insured on premises or in transit unless optional cover is purchased from us before dispatch. If you arrange your own courier, our insurance does not apply.</p></details><details class="terms-section"><summary>C10. Registered Office/Director’s Address</summary><p>Official mail is included as stated in your plan. Non‑official mail requires an active Business Mailing Address plan. Unauthorised use at Companies House may be corrected by us via filings (including RP07). Fees apply per entity/name.</p></details><details class="terms-section"><summary>C11. Unclaimed/unknown mail</summary><p>Items for unknown recipients may be held for up to 14 days then returned/destroyed/disposed of.</p></details><details class="terms-section"><summary>C12. Fees</summary><p>See Schedule C‑1 for the current fee table; postage is additional.</p><p>24. Schedule D — Torts (Interference with Goods) Act 1977 — Notice of Intention to Sell (Template)</p><p>To: [Customer Name] — [Email] and [Postal Address]</p><p>From: Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom</p><p>Date: 2025-12-19</p><p>Subject: Notice of Intention to Sell Uncollected Goods — Torts (Interference with Goods) Act 1977, s.12</p><p>We write to give you notice that we hold the following goods/items belonging to you: [describe items]. The following sums are now due and payable in respect of services, storage and/or other charges: [£amount].</p><p>Unless you (a) pay the sums due and (b) collect or arrange forwarding of the above items by [deadline date, e.g., 14 days from the date of this notice], we may sell or otherwise dispose of the goods under section 12 of the Torts (Interference with Goods) Act 1977. We will apply the proceeds of sale to the sums due (including our reasonable costs of sale/disposal) and will account to you for any balance. If the goods have no saleable value, we may dispose of them appropriately.</p><p>Please contact us at info@forwardmymail.co.uk to make arrangements. This notice is given without prejudice to our lien and other rights.</p><p>25. Schedule C‑1 — Fees Table (placeholders to fill)</p><p>Complete the placeholders below, or instruct us to populate from your latest price list.</p></details><details class="terms-section"><summary>C13. Post‑termination letters</summary><p>Letters received within 14 calendar days after termination will be held for up to 14 days following a single courtesy email to the account contact. Thereafter, letters will be returned to sender where practicable or securely destroyed after a further 14 days if no sender/return address is available.</p><p>C12A. Operational logs. We maintain internal handling and forwarding logs (including tracking references where available). Unless required longer by law or for ongoing disputes, we retain such logs for at least 12 months.</p></details><details class="terms-section"><summary>C14. Post‑termination parcels</summary><p>Parcels received within 14 calendar days after termination will be held for up to 7 days. If not collected or instructed for forwarding with payment of all sums due, we may issue a Torts (Interference with Goods) Act 1977, s.12 notice allowing at least 14 days to collect or arrange forwarding, after which we may sell or dispose and account for any net proceeds after deducting sums properly due.</p></details><details class="terms-section"><summary>C15. Items received &gt;14 days post‑termination</summary><p>Any postal items received more than 14 calendar days after termination will be refused on delivery or returned to sender on receipt, without notice.</p></details><details class="terms-section"><summary>C16. No ongoing agency</summary><p>After termination we do not act as agent to notify correspondents or authorities of your new address; you are responsible for updating records.</p></details><details class="terms-section"><summary>Schedule B — Client Authorisation for Receipt &amp; International Forwarding of Sensitive Mail — v2</summary><p>This Authorisation supplements the Terms &amp; Conditions and sets specific consent and risk allocation for Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens/card readers).</p><p>B‑Authorisation Statements (tick/initial each):</p><p>• I authorise Forward My Mail Ltd ("FMM") to receive, open (where lawful/permitted) and securely store mail addressed to my company or to me as director/individual.</p><p>• I authorise FMM to forward Sensitive Items internationally to the address below using tracked and/or signed‑for methods by default, unless I opt out in writing.</p><p>• I confirm that the destination address is under my control and suitable for receiving such items.</p><p>• I acknowledge that my bank or issuer may prohibit delivery to mail‑forwarding addresses and that I remain responsible for ensuring any issuer rules are met.</p><p>• I understand FMM will not activate or test any card/device and treats identifiable PIN mailers as do‑not‑open by default unless I give explicit written instructions and issuer rules permit.</p><p>• I understand risk passes when FMM hands items to the Carrier or when collected, and items are not insured unless I purchase optional cover in writing before dispatch.</p><p>[  ]  I release FMM from liability for delay/loss/misuse after dispatch except where caused by FMM’s negligence (subject to the liability limits in the Terms).</p><p>Authorised International Forwarding Address:</p><p>Address Line 1: ________________________________________________________________________</p><p>Address Line 2: ________________________________________________________________________</p><p>City/Region: __________________________  Postcode/ZIP: ______________  Country: ____________</p><p>KYC/AML Confirmation:</p><p>I confirm that I/the company have completed KYC/AML checks with FMM and will supply any updates on request.</p><p>[X]  Explicit instruction: I instruct FMM to open identifiable PIN mailers/security envelopes where issuer rules permit, solely to scan for my review and/or forward as I direct.</p></details><details class="terms-section"><summary>Schedule E — Customer Declarations &amp; Consents (Signable)</summary><p>These declarations supplement the Terms &amp; Conditions and are designed to avoid misunderstandings about how the service operates. Tick/initial each item and sign below.</p><p>• Electronic service of notices: I agree that FMM may serve notices and legal communications by email to my account email; I will keep this address current.</p><p>• Immediate performance (consumers only): If I am a consumer and I ask FMM to start work within 14 days (e.g., company filings/activation), I understand I’ll pay for services performed and may lose the right to cancel once fully performed.</p><p>• Authorised names list: I will keep FMM updated with all individuals/entities permitted to receive mail under my account (including directors/PSCs and trading names).</p><p>• Address‑use restrictions: I understand the FMM address must not be used for DVLA vehicle/licence records, electoral registration, or Money Laundering Regulations registrations.</p><p>• Issuer/bank rules: I understand some issuers prohibit delivery to mail‑forwarding addresses. I remain responsible for compliance with issuer rules.</p><p>• Torts Act notices: I consent to receive Torts (Interference with Goods) Act s.12 notices and lien notifications by email (and, where provided, by post).</p><p>• Sanctions/PEP: I confirm neither I nor my recipients are subject to sanctions that would prohibit the service; I will notify FMM if this changes.</p><p>• Trusts: Where a trust is involved, I will provide HMRC Trust Registration Service (TRS) evidence before service.</p><p>• Companies House misuse: I authorise FMM to file to correct unauthorised use of its address (e.g., RP07), and I will pay related fees as per the price list.</p><p>• Data accuracy &amp; KYC: I confirm information provided is true/accurate. I will promptly provide KYC updates on request.</p><p>• ADR signposting: If a consumer complaint reaches deadlock, I acknowledge FMM will signpost an approved ADR body and state whether it will participate.</p><p>Optional preferences:</p><p>• Default to tracked/signed‑for forwarding for all items (recommended).</p><p>• Permit opening of identifiable PIN mailers where issuer rules permit and I instruct in writing.</p></details></div>
 </div>
 </div>
 <!-- Cookie Policy -->
 <div aria-hidden="true" class="policy-modal" id="modal-cookies">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="cookies-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Cookies Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="true" type="button">×</button></div>
+<div class="policy-header">Cookies Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="True" type="button">×</button></div>
 <div class="policy-body">
 <p><small>Last updated: 2025-12-19</small></p>
 <p>We use cookies and similar technologies to run the site, provide secure login/checkout, remember your preferences and understand how the site is used.</p>
 <h3>Types of cookies</h3>
 <ul>
 <li><strong>Strictly necessary</strong> — required for login, checkout and security.</li>
-<li><strong>Functional</strong> — remember preferences (e.g. language).</li>
+<li><strong>Functional</strong> — remember preferences (e.g., language).</li>
 <li><strong>Analytics</strong> — aggregate usage stats (we do not use them to identify you).</li>
 <li><strong>Marketing</strong> — only if you consent.</li>
 </ul>
@@ -1203,14 +1765,14 @@
 <div aria-hidden="true" class="policy-modal" id="modal-acceptable">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="acceptable-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Acceptable Use Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="true" type="button">×</button></div>
+<div class="policy-header">Acceptable Use Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span><button aria-label="Close" class="btn btn--close policy-close" data-close-modal="True" type="button">×</button></div>
 <div class="policy-body">
 <p><small>Last updated: 2025-12-19</small></p>
-<p>You agree not to use our address/services for unlawful purposes. Prohibited or restricted items include (non-exhaustive):</p>
+<p>You agree not to use our address/services for unlawful purposes. Prohibited or restricted items include (non‑exhaustive):</p>
 <ul>
 <li>Illegal drugs and controlled substances; counterfeit goods; stolen property.</li>
 <li>Weapons, explosives, hazardous materials and dangerous goods prohibited by carriers.</li>
-<li>Cash and bearer instruments; high-value items without disclosure/insurance.</li>
+<li>Cash and bearer instruments; high‑value items without disclosure/insurance.</li>
 <li>Items breaching sanctions or export controls.</li>
 <li>Fraudulent activity, identity theft, or misleading use of our address (including DVLA, electoral registration, MLR registrations).</li>
 </ul>
@@ -1274,17 +1836,43 @@
 })();
 </script><script>
 (function(){
-  // Keep the scrollbar buttons visible and ensure the modal is always scrollable (even collapsed)
-  const sync = () => {
-    const modal = document.getElementById('modal-terms');
-    if(!modal) return;
-    const body = modal.querySelector('.policy-body');
-    if(!body) return;
-    // force scroll container sizing
-    body.style.height = '70vh';
-    body.style.overflowY = 'scroll';
-    body.style.overflowX = 'hidden';
-  };
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('.terms-toc__link');
+    if(!a) return;
+    const hash = a.getAttribute('href');
+    if(!hash || !hash.startsWith('#')) return;
+    const target = document.querySelector(hash);
+    const container = a.closest('.policy-modal')?.querySelector('.policy-body');
+    if(target && target.tagName.toLowerCase()==='details'){
+      // open details and scroll into view within the modal
+      target.setAttribute('open','');
+      // smooth scroll
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+      e.preventDefault();
+    }
+  }, false);
+})();
+</script><script>
+(function(){
+  document.addEventListener('click', function(e){
+    const a = e.target.closest('.terms-toc__link');
+    if(!a) return;
+    const hash = a.getAttribute('href');
+    if(!hash || !hash.startsWith('#')) return;
+    const target = document.querySelector(hash);
+    if(target && target.tagName.toLowerCase()==='details'){
+      target.setAttribute('open','');
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+      e.preventDefault();
+    }
+  }, false);
+})();
+</script><script>
+(function(){
+  function anyOpen(){ return !!document.querySelector('.policy-modal.active,[aria-hidden="false"].policy-modal'); }
+  function sync(){
+    document.documentElement.style.overflow = anyOpen() ? 'hidden' : '';
+  }
   document.addEventListener('click', function(e){
     const opener = e.target.closest('[data-policy-modal]');
     if(opener) setTimeout(sync, 0);
