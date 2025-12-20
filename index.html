@@ -1318,23 +1318,6 @@ article.pricing-card ul.pricing-list{
   justify-content: center !important;
   gap: 18px !important;
 }
-
-/* ============================================================
-   HOW IT WORKS (STEPS GRAPHIC)
-   Image file: fmm_purchase_steps.png (same folder as index.html)
-============================================================ */
-.fmm-how-steps{
-  padding: 28px 0;
-  background: #fff;
-}
-.fmm-how-steps__img{
-  width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 18px;
-  box-shadow: var(--shadow);
-}
-
 </style>
 </head>
 <body>
@@ -1687,7 +1670,7 @@ article.pricing-card ul.pricing-list{
 <section class="fmm-how-steps" aria-label="How to purchase our services">
   <div class="container">
     <img
-      src="fmm_purchase_steps.png"
+      src="./fmm_purchase_steps.png"
       alt="Follow the steps to purchase our services: Step 1 Select your services, Step 2 Make payment, Step 3 Identity verification, Step 4 Enjoy your package."
       class="fmm-how-steps__img"
       loading="lazy"
@@ -2094,6 +2077,23 @@ article.pricing-card ul.pricing-list{
     if(!body) return;
     const w = window.open('', '_blank');
     const styles = '<style>body{font-family:system-ui,Arial,sans-serif;line-height:1.5;padding:24px} h1,h2,h3{margin:.5rem 0} details{border:1px solid #eee;border-radius:6px;padding:.5rem .75rem;margin:.5rem 0} details>summary{cursor:pointer;font-weight:600;margin:-.5rem -.75rem .5rem -.75rem;padding:.5rem .75rem} details[open]{background:#fafafa}
+/* Purchase steps banner (inserted between Pricing and About) */
+.purchase-steps{ padding: 34px 0 10px; }
+.purchase-steps-wrap{ max-width: 1120px; margin: 0 auto; }
+.purchase-steps-img{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 22px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.12);
+}
+@media (max-width: 640px){
+  .purchase-steps{ padding: 22px 0 8px; }
+  .purchase-steps-img{ border-radius: 16px; }
+}
+.fmm-how-steps { padding: 28px 0; }
+.fmm-how-steps__img { width: 100%; height: auto; display: block; }
+
 </style>';
     w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Policy</title>'+styles+'</head><body>'+body.innerHTML+'</body></html>');
     w.document.close();
