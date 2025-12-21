@@ -1327,6 +1327,46 @@ article.pricing-card ul.pricing-list{
   @keyframes waFabBounce { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-4px);} }
   @media (prefers-reduced-motion: reduce) { .wa-fab__btn { animation: none; } }
 </style>
+<style>
+/* Center print button & add close "X" in policy headers */
+.policy-header{
+  display:grid !important;
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items:center !important;
+  gap: 8px !important;
+}
+.policy-header h2, .policy-header .title {
+  margin:0;
+  justify-self:start;
+}
+.policy-actions{
+  justify-self:center !important;
+}
+.policy-close-x{
+  justify-self:end;
+  border:none;
+  background: rgba(15, 23, 42, 0.25);
+  color:#e5edff;
+  border-radius:999px;
+  width:32px;
+  height:32px;
+  font-size: 1.1rem;
+  line-height: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.policy-close-x:hover{ background: rgba(15,23,42,0.5); }
+</style>
+
+<style>
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid2 label{display:block}
+  .center-row{display:flex;justify-content:center;margin-top:10px}
+  .btn.btn-primary{background:#0a58ca;border:1px solid #0a58ca;color:#fff;padding:.55rem .9rem;border-radius:10px;cursor:pointer}
+</style>
+
 </head>
 <body>
 <div class="page">
@@ -1839,6 +1879,7 @@ article.pricing-card ul.pricing-list{
 <div>
 <div class="footer-heading">Services</div>
 <ul class="footer-links">
+<li><button type="button" data-policy-modal="modal-cancellation-form">Request Cancellation</button></li>
 <li><a href="#services">Mail Forwarding</a></li>
 <li><a href="#services">Digital Mailroom</a></li>
 <li><a href="#services">Registered Office</a></li>
@@ -1864,6 +1905,7 @@ article.pricing-card ul.pricing-list{
 <li><button data-policy-modal="modal-terms" type="button">Terms &amp; Conditions</button></li>
 <li><button data-policy-modal="modal-cookies" type="button">Cookie Policy</button></li>
 <li><button data-policy-modal="modal-acceptable" type="button">Acceptable Use</button></li>
+<li><button data-policy-modal="modal-cancellation" type="button">Cancellation &amp; Refunds</button></li>
 </ul>
 </div>
 </div>
@@ -1879,7 +1921,7 @@ article.pricing-card ul.pricing-list{
 <div aria-hidden="true" class="policy-modal" id="modal-privacy">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="privacy-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Privacy Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-header">Privacy Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span>
 <div class="policy-body">
 <p><small>Last updated: 2025-12-19</small></p>
 <p>This Privacy Notice explains how Forward My Mail Ltd (“FMM”, “we”, “us”) collects and uses your personal data when you visit our website, contact us, or use our mail handling and virtual address services. We act as a “controller” for this data.</p>
@@ -1927,8 +1969,8 @@ article.pricing-card ul.pricing-list{
 <div aria-hidden="true" class="policy-modal" id="modal-terms">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="terms-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Service Terms &amp; Conditions<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
-<div class="policy-body"><div class="terms-toc"><div class="terms-toc__title">Jump to a section:</div><ul class="terms-toc__list"><li><a class="terms-toc__link" href="#tsec-1-forward-my-mail-ltd-terms-conditions-uk-full-consolidated-version">Forward My Mail Ltd — Terms &amp; Conditions (UK) — Full Consolidated Version</a></li><li><a class="terms-toc__link" href="#tsec-2-contents">Contents</a></li><li><a class="terms-toc__link" href="#tsec-3-10-1-business-customers-you-shall-indemnify-and-keep-indemnified-forward-my-mail-ltd-and-its-director-s-officers-employees-and-agents-from-and-against-all-losses-liabilities-damages-claims-demands-actions-fines-penalties-and-costs-and-expenses-including-reasonable-legal-and-other-professional-costs-and-expenses-arising-out-of-or-in-connection-with-a-your-breach-of-these-terms-or-of-law-b-prohibited-or-restricted-items-c-inaccurate-customs-declarations-or-misstatements-d-breach-of-issuer-or-bank-rules-including-use-of-a-mail-forwarding-address-contrary-to-issuer-policy-e-misuse-of-our-address-including-at-companies-house-dvla-or-for-mlr-registrations-f-third-party-claims-relating-to-goods-content-or-instructions-you-send-or-ask-us-to-handle-g-sanctions-violations-or-h-fraud-or-wilful-misconduct-by-you-or-persons-you-authorise">10.1 Business Customers. You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with: (a) your breach of these Terms or of law; (b) Prohibited or Restricted Items; (c) inaccurate customs declarations or misstatements; (d) breach of issuer or bank rules (including use of a mail‑forwarding address contrary to issuer policy); (e) misuse of our address (including at Companies House, DVLA or for MLR registrations); (f) third‑party claims relating to goods, content or instructions you send or ask us to handle; (g) sanctions violations; or (h) fraud or wilful misconduct by you or persons you authorise.</a></li><li><a class="terms-toc__link" href="#tsec-4-10-2-consumers-if-you-are-a-consumer-this-indemnity-applies-only-to-the-extent-that-a-loss-is-caused-by-your-breach-misuse-or-unlawful-conduct-it-does-not-apply-to-losses-caused-by-our-own-negligence-or-failure-to-perform-with-reasonable-care-and-skill-and-does-not-reduce-your-statutory-rights-under-the-consumer-rights-act-2015">10.2 Consumers. If you are a Consumer, this indemnity applies only to the extent that a loss is caused by your breach, misuse or unlawful conduct. It does not apply to losses caused by our own negligence or failure to perform with reasonable care and skill and does not reduce your statutory rights under the Consumer Rights Act 2015.</a></li><li><a class="terms-toc__link" href="#tsec-5-10-3-legal-fees-and-costs-the-indemnity-in-this-clause-includes-the-reasonable-and-properly-incurred-legal-and-other-professional-costs-and-expenses-of-investigating-defending-and-or-settling-any-third-party-or-regulatory-claim-allegation-or-enquiry-arising-from-the-matters-described-in-clauses-10-1-10-2-whether-such-claim-is-made-against-us-alone-or-against-us-together-with-you">10.3 Legal fees and costs. The indemnity in this Clause includes the reasonable and properly incurred legal and other professional costs and expenses of investigating, defending and/or settling any third‑party or regulatory claim, allegation or enquiry arising from the matters described in Clauses 10.1–10.2, whether such claim is made against us alone or against us together with you.</a></li><li><a class="terms-toc__link" href="#tsec-6-10-4-conduct-of-claims-we-will-give-you-reasonable-notice-of-any-claim-for-which-we-seek-indemnity-we-may-conduct-the-defence-or-settlement-of-the-claim-and-you-shall-provide-prompt-cooperation-information-and-assistance-including-documents-witness-statements-and-access-to-systems-as-reasonably-requested-you-must-not-admit-liability-settle-or-compromise-any-claim-that-could-reasonably-be-expected-to-give-rise-to-indemnity-without-our-prior-written-consent-where-a-claim-is-solely-and-directly-against-you-you-may-assume-conduct-provided-that-doing-so-does-not-prejudice-us">10.4 Conduct of claims. We will give you reasonable notice of any claim for which we seek indemnity. We may conduct the defence or settlement of the claim and you shall provide prompt cooperation, information and assistance (including documents, witness statements and access to systems) as reasonably requested. You must not admit liability, settle or compromise any claim that could reasonably be expected to give rise to indemnity without our prior written consent. Where a claim is solely and directly against you, you may assume conduct provided that doing so does not prejudice us.</a></li><li><a class="terms-toc__link" href="#tsec-7-10-5-limits-and-fairness-nothing-in-this-clause-requires-you-to-indemnify-us-for-fines-or-penalties-to-the-extent-caused-by-our-own-breach-of-law-negligence-or-wilful-misconduct-nor-for-indirect-or-consequential-losses-except-to-the-extent-payable-to-a-third-party-under-a-settlement-or-judgment-we-will-take-reasonable-steps-to-mitigate-any-indemnified-losses">10.5 Limits and fairness. Nothing in this Clause requires you to indemnify us for fines or penalties to the extent caused by our own breach of law, negligence or wilful misconduct, nor for indirect or consequential losses except to the extent payable to a third party under a settlement or judgment. We will take reasonable steps to mitigate any indemnified losses.</a></li><li><a class="terms-toc__link" href="#tsec-8-10-6-advance-on-costs-where-a-third-party-or-regulatory-claim-is-reasonably-expected-to-exceed-routine-small-claims-costs-we-may-request-a-reasonable-advance-retainer-in-respect-of-external-legal-or-expert-costs-for-the-next-phase-not-more-than-the-reasonably-anticipated-external-costs-for-the-next-60-days-we-will-keep-records-and-reconcile-any-advance-against-actual-costs">10.6 Advance on costs. Where a third‑party or regulatory claim is reasonably expected to exceed routine small‑claims costs, we may request a reasonable advance/retainer in respect of external legal or expert costs for the next phase (not more than the reasonably anticipated external costs for the next 60 days). We will keep records and reconcile any advance against actual costs.</a></li><li><a class="terms-toc__link" href="#tsec-9-10-7-proportionality-for-micro-claims-for-consumer-disputes-allocated-to-the-small-claims-track-nothing-in-this-clause-requires-the-consumer-to-pay-our-irrecoverable-legal-costs-beyond-what-the-court-would-ordinarily-award-unless-the-court-orders-otherwise-due-to-dishonesty-abuse-of-process-or-similar-exceptional-conduct">10.7 Proportionality for micro‑claims. For consumer disputes allocated to the small‑claims track, nothing in this Clause requires the Consumer to pay our irrecoverable legal costs beyond what the court would ordinarily award, unless the court orders otherwise due to dishonesty, abuse of process or similar exceptional conduct.</a></li><li><a class="terms-toc__link" href="#tsec-10-key-facts-summary-for-convenience-only">Key Facts (Summary) — For Convenience Only</a></li><li><a class="terms-toc__link" href="#tsec-11-1-1-parties-fmm-we-us-means-forward-my-mail-ltd-8a-bore-street-lichfield-staffordshire-ws13-6ll-united-kingdom-company-no-16912540-you-means-the-customer-named-in-the-order-or-account-consumer-means-an-individual-acting-wholly-or-mainly-outside-of-trade-or-profession-business-customer-means-everyone-else">1.1 Parties. "FMM", "we", "us" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). "You" means the customer named in the order or account. "Consumer" means an individual acting wholly or mainly outside of trade or profession; "Business Customer" means everyone else.</a></li><li><a class="terms-toc__link" href="#tsec-12-1-2-interpretation-headings-are-for-convenience-only-references-to-laws-include-amendments-priority-is-given-to-mandatory-law-then-these-terms-then-any-schedule-policy">1.2 Interpretation. Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy.</a></li><li><a class="terms-toc__link" href="#tsec-13-1-3-entire-agreement-these-terms-including-schedules-form-the-entire-agreement-replacing-prior-statements-unless-expressly-agreed-in-writing">1.3 Entire agreement. These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing.</a></li><li><a class="terms-toc__link" href="#tsec-14-2-1-address-use-and-agency-you-may-use-an-fmm-provided-address-for-receiving-mail-and-packages-you-appoint-fmm-as-your-agent-to-receive-mail-on-your-behalf-and-authorise-us-to-open-and-scan-mail-for-processing-and-forwarding-except-where-prohibited-by-law-or-issuer-rules">2.1 Address use and agency. You may use an FMM‑provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding, except where prohibited by law or issuer rules.</a></li><li><a class="terms-toc__link" href="#tsec-15-2-2-registered-office-service-address-where-purchased-we-may-provide-a-registered-office-address-and-or-director-s-service-address-use-is-limited-to-official-purposes-not-for-trading-premises-returns-dvla-licensing-electoral-registration-or-money-laundering-regulations-registrations-we-may-report-misuse-and-or-require-removal-from-public-records">2.2 Registered office / service address. Where purchased, we may provide a registered office address and/or director’s service address. Use is limited to official purposes; not for trading premises, returns, DVLA/licensing, electoral registration, or Money Laundering Regulations registrations. We may report misuse and/or require removal from public records.</a></li><li><a class="terms-toc__link" href="#tsec-16-2-3-company-formation-where-you-instruct-us-to-incorporate-a-company-you-are-responsible-for-accuracy-of-information-and-regulatory-compliance-we-are-not-a-law-or-tax-firm-immediate-performance-is-requested-when-filings-begin-see-15-3">2.3 Company formation. Where you instruct us to incorporate a company, you are responsible for accuracy of information and regulatory compliance. We are not a law or tax firm. Immediate performance is requested when filings begin (see 15.3).</a></li><li><a class="terms-toc__link" href="#tsec-17-2-4-no-warehousing-we-do-not-provide-warehousing-or-long-term-storage-see-holding-windows-and-storage-fees-in-schedule-c">2.4 No warehousing. We do not provide warehousing or long‑term storage; see holding windows and storage fees in Schedule C.</a></li><li><a class="terms-toc__link" href="#tsec-18-2-5-subcontracting-we-may-use-subcontractors-and-carriers-we-remain-responsible-for-our-own-obligations">2.5 Subcontracting. We may use subcontractors and Carriers; we remain responsible for our own obligations.</a></li><li><a class="terms-toc__link" href="#tsec-19-2-6-not-a-residential-redirection-service-if-you-have-changed-residential-address-you-must-arrange-a-royal-mail-redirection-we-do-not-provide-a-statutory-residential-redirection-service">2.6 Not a residential redirection service. If you have changed residential address, you must arrange a Royal Mail Redirection; we do not provide a statutory residential redirection service.</a></li><li><a class="terms-toc__link" href="#tsec-20-3-1-lawful-use-do-not-send-receive-or-request-handling-of-prohibited-items-or-illegal-content-provide-accurate-recipient-names-and-instructions">3.1 Lawful use. Do not send, receive or request handling of Prohibited Items or illegal content. Provide accurate recipient names and instructions.</a></li><li><a class="terms-toc__link" href="#tsec-21-3-2-duties-taxes-you-are-responsible-for-customs-declarations-duties-and-taxes">3.2 Duties/taxes. You are responsible for customs declarations, duties and taxes.</a></li><li><a class="terms-toc__link" href="#tsec-22-3-3-packaging-disclosure-provide-sufficient-packaging-and-information-for-handling-and-customs">3.3 Packaging &amp; disclosure. Provide sufficient packaging and information for handling and customs.</a></li><li><a class="terms-toc__link" href="#tsec-23-3-4-cooperation-verification-provide-identity-and-address-documents-when-requested-see-clause-6">3.4 Cooperation &amp; verification. Provide identity and address documents when requested; see Clause 6.</a></li><li><a class="terms-toc__link" href="#tsec-24-3-5-address-limits-do-not-display-our-address-as-a-trading-address-or-for-advertising-without-prior-written-consent">3.5 Address limits. Do not display our address as a trading address or for advertising without prior written consent.</a></li><li><a class="terms-toc__link" href="#tsec-25-6-1-verification-an-account-is-not-active-and-services-are-not-provided-until-a-payment-is-received-and-b-all-required-kyc-aml-checks-are-completed-for-every-relevant-person-name-we-may-use-certified-digital-identity-service-providers">6.1 Verification. An account is not active and services are not provided until (a) payment is received and (b) all required KYC/AML checks are completed for every relevant person/name. We may use certified digital identity service providers.</a></li><li><a class="terms-toc__link" href="#tsec-26-6-2-ongoing-monitoring-we-may-monitor-usage-suspend-or-terminate-accounts-and-report-suspicious-activity-to-authorities-without-notice-where-required-by-law">6.2 Ongoing monitoring. We may monitor usage, suspend or terminate accounts, and report suspicious activity to authorities without notice where required by law.</a></li><li><a class="terms-toc__link" href="#tsec-27-6-3-annual-refresh-retention-we-may-carry-out-an-annual-id-refresh-you-must-provide-updated-documents-to-keep-your-account-active-we-may-retain-identity-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-required-longer-by-law">6.3 Annual refresh &amp; retention. We may carry out an annual ID refresh; you must provide updated documents to keep your account active. We may retain identity/verification records for at least 5 years and no longer than 10 years unless required longer by law.</a></li><li><a class="terms-toc__link" href="#tsec-28-6-4-trusts-before-we-provide-any-service-to-a-trust-you-must-provide-proof-of-registration-with-the-hmrc-trust-registration-service-trs">6.4 Trusts. Before we provide any service to a trust, you must provide proof of registration with the HMRC Trust Registration Service (TRS).</a></li><li><a class="terms-toc__link" href="#tsec-29-7-1-title-and-risk-risk-in-items-passes-to-you-when-items-are-delivered-to-the-carrier-for-forwarding-to-your-chosen-destination-or-when-collected-by-you-your-agent-whichever-occurs-first">7.1 Title and risk. Risk in items passes to you when items are delivered to the Carrier for forwarding to your chosen destination, or when collected by you/your agent, whichever occurs first.</a></li><li><a class="terms-toc__link" href="#tsec-30-7-2-carrier-terms-times-carriage-is-subject-to-carrier-terms-including-routing-and-transit-times-which-we-do-not-control-delivery-dates-are-estimates">7.2 Carrier terms &amp; times. Carriage is subject to Carrier terms, including routing and transit times, which we do not control. Delivery dates are estimates.</a></li><li><a class="terms-toc__link" href="#tsec-31-7-3-customs-and-delays-you-are-responsible-for-customs-clearance-and-delays-arising-from-inspections-or-documentation">7.3 Customs and delays. You are responsible for customs clearance and delays arising from inspections or documentation.</a></li><li><a class="terms-toc__link" href="#tsec-32-7-4-sensitive-financial-items-forwarding-of-sensitive-items-e-g-bank-credit-debit-cards-pin-letters-cheque-books-security-tokens-or-card-readers-is-optional-and-provided-only-if-a-you-have-completed-the-client-authorisation-in-schedule-b-b-all-kyc-aml-checks-are-satisfied-c-we-are-satisfied-the-forwarding-is-lawful-and-permitted-by-the-issuer-and-d-the-destination-address-has-been-verified-opening-scanning-our-service-includes-opening-mail-and-scanning-contents-for-you-for-sensitive-items-we-will-follow-your-written-instructions-except-we-will-not-scan-where-doing-so-would-breach-law-or-issuer-rules-e-g-certain-pin-mailers-identifiable-pin-mailers-and-security-envelopes-will-not-be-opened-unless-you-give-us-explicit-written-instructions-and-issuer-rules-permit-we-may-refuse-or-suspend-forwarding-scanning-of-sensitive-items-where-risk-or-compliance-concerns-arise">7.4 Sensitive financial items. Forwarding of Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens or card readers) is optional and provided only if: (a) you have completed the Client Authorisation in Schedule B; (b) all KYC/AML checks are satisfied; (c) we are satisfied the forwarding is lawful and permitted by the issuer; and (d) the destination address has been verified. Opening &amp; scanning: our Service includes opening mail and scanning contents for you. For Sensitive Items we will follow your written instructions, except we will not scan where doing so would breach law or issuer rules (e.g., certain PIN mailers). Identifiable PIN mailers and security envelopes will not be opened unless you give us explicit written instructions and issuer rules permit. We may refuse or suspend forwarding/scanning of Sensitive Items where risk or compliance concerns arise.</a></li><li><a class="terms-toc__link" href="#tsec-33-7-5-default-shipping-method-safety-first-unless-you-instruct-otherwise-in-writing-we-will-use-a-tracked-and-or-signed-for-method-where-available-and-commercially-reasonable-having-regard-to-the-item-value-and-destination-if-you-opt-for-an-untracked-or-unsigned-service-you-acknowledge-increased-risk-and-agree-that-our-liability-remains-limited-under-clause-9">7.5 Default shipping method (safety first). Unless you instruct otherwise in writing, we will use a tracked and/or signed‑for method where available and commercially reasonable, having regard to the item value and destination. If you opt for an untracked or unsigned service, you acknowledge increased risk and agree that our liability remains limited under Clause 9.</a></li><li><a class="terms-toc__link" href="#tsec-34-7-6-large-parcels-and-limits-please-give-24-hours-notice-for-parcels-exceeding-1-000-mm-in-any-dimension-we-may-refuse-items-exceeding-2-m-in-any-dimension-or-25-kg-in-weight-we-may-charge-handling-and-storage-fees-for-large-or-bulky-items">7.6 Large parcels and limits. Please give 24 hours’ notice for parcels exceeding 1,000 mm in any dimension. We may refuse items exceeding 2 m in any dimension or 25 kg in weight. We may charge handling and storage fees for large or bulky items.</a></li><li><a class="terms-toc__link" href="#tsec-35-7-7-client-arranged-courier-where-you-pre-pay-postage-courier-directly-a-handling-fee-per-item-may-apply-see-schedule-c-fees">7.7 Client‑arranged courier. Where you pre‑pay postage/courier directly, a handling fee per item may apply; see Schedule C (Fees).</a></li><li><a class="terms-toc__link" href="#tsec-36-7-8-retrieval-of-archived-scans-retrieval-of-previously-scanned-and-archived-items-may-attract-a-retrieval-fee-see-schedule-c-fees">7.8 Retrieval of archived scans. Retrieval of previously scanned‑and‑archived items may attract a retrieval fee; see Schedule C (Fees).</a></li><li><a class="terms-toc__link" href="#tsec-37-8-1-fees-taxes-you-agree-to-pay-service-fees-shipping-charges-and-surcharges-as-published-or-quoted-all-fees-are-exclusive-of-vat-and-any-carrier-surcharges-unless-stated-otherwise-we-may-change-fees-on-notice-for-future-services">8.1 Fees &amp; taxes. You agree to pay Service fees, shipping charges and surcharges as published or quoted. All fees are exclusive of VAT and any carrier surcharges unless stated otherwise. We may change fees on notice for future services.</a></li><li><a class="terms-toc__link" href="#tsec-38-8-2-storage-and-non-compliance-for-inactive-or-non-compliant-accounts-id-missing-fails-or-unpaid-invoices-we-may-hold-mail-for-up-to-14-days-without-charge-to-allow-resolution-after-that-period-items-may-be-returned-to-sender-securely-destroyed-disposed-of-or-stored-for-a-fee-parcels-may-accrue-storage-charges-after-24-hours-disposal-return-fees-may-apply">8.2 Storage and non‑compliance. For inactive or non‑compliant accounts (ID missing/fails, or unpaid invoices), we may hold mail for up to 14 days without charge to allow resolution. After that period items may be returned to sender, securely destroyed, disposed of, or stored for a fee. Parcels may accrue storage charges after 24 hours. Disposal/return fees may apply.</a></li><li><a class="terms-toc__link" href="#tsec-39-8-3-lien-we-have-a-general-and-particular-lien-over-items-for-all-amounts-you-owe-if-unpaid-after-notice-we-may-sell-or-dispose-of-items-and-apply-proceeds-to-your-debt-accounting-to-you-for-any-balance">8.3 Lien. We have a general and particular lien over items for all amounts you owe. If unpaid after notice, we may sell or dispose of items and apply proceeds to your debt (accounting to you for any balance).</a></li><li><a class="terms-toc__link" href="#tsec-40-8-4-sale-disposal-procedure-torts-act-before-any-sale-or-disposal-of-uncollected-goods-we-will-give-you-a-written-notice-of-intention-to-sell-allowing-a-reasonable-collection-period-under-the-torts-interference-with-goods-act-1977-we-will-account-to-you-for-any-net-proceeds-after-deducting-sums-properly-due">8.4 Sale/disposal procedure (Torts Act). Before any sale or disposal of uncollected goods we will give you a written notice of intention to sell allowing a reasonable collection period, under the Torts (Interference with Goods) Act 1977. We will account to you for any net proceeds after deducting sums properly due.</a></li><li><a class="terms-toc__link" href="#tsec-41-8-5-insurance-goods-are-not-insured-while-on-our-premises-or-in-transit-unless-you-purchase-optional-cover-from-us-in-writing-before-dispatch-if-you-arrange-your-own-courier-our-insurance-does-not-apply-you-are-responsible-for-declaring-value-and-arranging-appropriate-cover">8.5 Insurance. Goods are not insured while on our premises or in transit unless you purchase optional cover from us in writing before dispatch. If you arrange your own courier, our insurance does not apply. You are responsible for declaring value and arranging appropriate cover.</a></li><li><a class="terms-toc__link" href="#tsec-42-9-0-consumer-carve-out-if-you-are-a-consumer-nothing-in-these-terms-limits-your-statutory-rights-including-our-obligation-to-provide-the-service-with-reasonable-care-and-skill-under-the-consumer-rights-act-2015-any-limits-exclusions-apply-only-to-the-extent-permitted-by-law">9.0 Consumer carve‑out. If you are a Consumer, nothing in these Terms limits your statutory rights, including our obligation to provide the Service with reasonable care and skill under the Consumer Rights Act 2015. Any limits/exclusions apply only to the extent permitted by law.</a></li><li><a class="terms-toc__link" href="#tsec-43-9-1-exclusion-of-certain-losses-to-the-maximum-extent-permitted-by-law-fmm-and-its-director-s-officers-employees-and-agents-are-not-liable-for-indirect-consequential-exemplary-or-punitive-damages-loss-of-profit-revenue-business-goodwill-or-anticipated-savings-or-losses-arising-from-delay-missed-delivery-windows-customs-seizures-or-carrier-acts-omissions-beyond-our-reasonable-control">9.1 Exclusion of certain losses. To the maximum extent permitted by law, FMM and its Director(s), officers, employees and agents are not liable for indirect, consequential, exemplary or punitive damages; loss of profit, revenue, business, goodwill or anticipated savings; or losses arising from delay, missed delivery windows, customs seizures, or Carrier acts/omissions beyond our reasonable control.</a></li><li><a class="terms-toc__link" href="#tsec-44-9-2-monetary-cap-fmm-s-aggregate-liability-for-all-claims-arising-out-of-or-relating-to-the-service-in-any-12-month-period-is-limited-to-the-greater-of-100-or-100-of-fees-paid-to-fmm-by-you-for-the-service-giving-rise-to-the-claim-different-mandatory-caps-may-apply-where-law-requires">9.2 Monetary cap. FMM’s aggregate liability for all claims arising out of or relating to the Service in any 12‑month period is limited to the greater of £100 or 100% of fees paid to FMM by you for the Service giving rise to the claim. Different mandatory caps may apply where law requires.</a></li><li><a class="terms-toc__link" href="#tsec-45-9-3-non-excludable-liabilities-nothing-excludes-liability-for-death-or-personal-injury-caused-by-negligence-fraud-or-any-liability-which-cannot-lawfully-be-excluded-or-limited">9.3 Non‑excludable liabilities. Nothing excludes liability for death or personal injury caused by negligence, fraud, or any liability which cannot lawfully be excluded or limited.</a></li><li><a class="terms-toc__link" href="#tsec-46-9-4-carriers-we-are-not-liable-for-carrier-terms-delays-or-acts-omissions-beyond-our-control-your-remedies-against-carriers-are-unaffected">9.4 Carriers. We are not liable for Carrier terms, delays or acts/omissions beyond our control; your remedies against Carriers are unaffected.</a></li><li><a class="terms-toc__link" href="#tsec-47-9-5-third-party-rights-director-protection-the-director-s-of-fmm-may-enforce-this-clause-9-under-the-contracts-rights-of-third-parties-act-1999">9.5 Third‑party rights (Director protection). The Director(s) of FMM may enforce this Clause 9 under the Contracts (Rights of Third Parties) Act 1999.</a></li><li><a class="terms-toc__link" href="#tsec-48-9-6-time-limits-business-customers-you-must-notify-us-of-loss-or-damage-in-writing-within-7-days-of-delivery-or-scheduled-delivery-and-bring-any-claim-within-6-months-thereafter-otherwise-the-claim-is-barred-except-where-mandatory-law-provides-longer-consumers-please-notify-issues-within-30-days-where-reasonably-possible-failure-to-do-so-does-not-affect-your-statutory-rights-or-ability-to-bring-a-claim-within-the-applicable-statutory-limitation-period">9.6 Time limits. Business Customers: you must notify us of loss or damage in writing within 7 days of delivery (or scheduled delivery) and bring any claim within 6 months thereafter; otherwise the claim is barred, except where mandatory law provides longer. Consumers: please notify issues within 30 days where reasonably possible; failure to do so does not affect your statutory rights or ability to bring a claim within the applicable statutory limitation period.</a></li><li><a class="terms-toc__link" href="#tsec-49-11-1-controller-fmm-is-a-controller-of-personal-data-you-provide-see-our-privacy-notice-for-details">11.1 Controller. FMM is a controller of personal data you provide. See our Privacy Notice for details.</a></li><li><a class="terms-toc__link" href="#tsec-50-11-2-checks-and-sharing-you-consent-to-our-use-of-third-party-verification-and-payment-providers-and-to-lawful-disclosures-to-carriers-customs-and-law-enforcement-where-required-for-formation-registered-office-we-may-share-details-with-companies-house-hmrc-and-banks-at-your-request">11.2 Checks and sharing. You consent to our use of third‑party verification and payment providers and to lawful disclosures to Carriers, customs and law enforcement where required. For formation/registered office, we may share details with Companies House, HMRC and banks at your request.</a></li><li><a class="terms-toc__link" href="#tsec-51-11-3-international-transfers-where-data-is-transferred-outside-the-uk-eea-we-will-use-appropriate-safeguards-as-required-by-law">11.3 International transfers. Where data is transferred outside the UK/EEA, we will use appropriate safeguards as required by law.</a></li><li><a class="terms-toc__link" href="#tsec-52-11-4-aml-kyc-records-we-may-retain-identity-and-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-a-longer-period-is-required-by-law-e-g-ongoing-investigations-or-legal-claims">11.4 AML/KYC records. We may retain identity and verification records for at least 5 years and no longer than 10 years unless a longer period is required by law (e.g., ongoing investigations or legal claims).</a></li><li><a class="terms-toc__link" href="#tsec-53-11-5-scan-retention-unless-you-ask-us-to-keep-items-longer-or-we-must-keep-them-for-legal-compliance-reasons-scanned-images-and-related-handling-logs-will-be-retained-for-90-days-and-then-deleted-archived-in-line-with-our-policies">11.5 Scan retention. Unless you ask us to keep items longer (or we must keep them for legal/compliance reasons), scanned images and related handling logs will be retained for 90 days and then deleted/archived in line with our policies.</a></li><li><a class="terms-toc__link" href="#tsec-54-13-1-debt-recovery-chargebacks-overdue-accounts-may-be-referred-to-debt-collection-you-are-liable-for-reasonable-recovery-costs-and-any-statutory-compensation-interest-where-applicable-if-you-initiate-a-payment-chargeback-we-may-apply-a-reasonable-administration-fee-plus-any-third-party-fees-and-suspend-services-pending-resolution-we-may-notify-companies-house-and-other-bodies-and-take-steps-to-remove-unauthorised-use-of-our-address-where-fees-remain-unpaid">13.1 Debt recovery &amp; chargebacks. Overdue accounts may be referred to debt collection. You are liable for reasonable recovery costs and any statutory compensation/interest where applicable. If you initiate a payment chargeback, we may apply a reasonable administration fee (plus any third‑party fees) and suspend services pending resolution. We may notify Companies House and other bodies and take steps to remove unauthorised use of our address where fees remain unpaid.</a></li><li><a class="terms-toc__link" href="#tsec-55-15-1-cra-2015-for-consumers-we-will-provide-services-with-reasonable-care-and-skill-nothing-in-these-terms-affects-statutory-rights">15.1 CRA 2015. For Consumers we will provide services with reasonable care and skill. Nothing in these Terms affects statutory rights.</a></li><li><a class="terms-toc__link" href="#tsec-56-15-2-ccr-2013-cooling-off-if-you-are-a-consumer-and-purchased-online-or-at-a-distance-you-may-have-a-14-day-cooling-off-period-if-you-request-immediate-performance-you-agree-we-may-start-before-the-end-of-that-period-you-pay-for-services-performed-and-once-fully-performed-you-lose-the-right-to-cancel">15.2 CCR 2013 (cooling‑off). If you are a Consumer and purchased online or at a distance, you may have a 14‑day cooling‑off period. If you request immediate performance, you agree we may start before the end of that period; you pay for services performed, and once fully performed you lose the right to cancel.</a></li><li><a class="terms-toc__link" href="#tsec-57-15-3-immediate-performance-acknowledgment-by-instructing-us-to-file-an-incorporation-or-activate-an-address-you-request-immediate-performance-and-acknowledge-the-effect-on-your-cancellation-rights">15.3 Immediate performance acknowledgment. By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights.</a></li><li><a class="terms-toc__link" href="#tsec-58-15-4-optional-director-identity-verification-service-if-you-purchase-a-companies-house-director-identity-verification-service-from-us-the-service-fee-is-for-processing-submission-and-is-non-refundable-once-submitted-whether-the-check-succeeds-or-fails-additional-verification-may-attract-supplementary-fees">15.4 Optional Director Identity Verification service. If you purchase a Companies House director identity verification service from us, the service fee is for processing/submission and is non‑refundable once submitted, whether the check succeeds or fails. Additional verification may attract supplementary fees.</a></li><li><a class="terms-toc__link" href="#tsec-59-18-1-force-majeure-we-are-not-liable-for-failure-or-delay-due-to-events-beyond-our-reasonable-control">18.1 Force majeure. We are not liable for failure or delay due to events beyond our reasonable control.</a></li><li><a class="terms-toc__link" href="#tsec-60-18-2-no-waiver-failure-to-enforce-is-not-a-waiver">18.2 No waiver. Failure to enforce is not a waiver.</a></li><li><a class="terms-toc__link" href="#tsec-61-18-3-severability-if-any-provision-is-unlawful-or-unenforceable-the-remainder-remains-in-effect">18.3 Severability. If any provision is unlawful or unenforceable, the remainder remains in effect.</a></li><li><a class="terms-toc__link" href="#tsec-62-18-4-assignment-you-may-not-assign-without-our-consent-we-may-assign-subject-to-law">18.4 Assignment. You may not assign without our consent; we may assign subject to law.</a></li><li><a class="terms-toc__link" href="#tsec-63-18-5-notices-we-may-notify-you-via-the-service-email-or-your-account-address-you-agree-that-all-notices-and-communications-under-these-terms-may-be-served-by-email-to-the-email-address-in-your-account-and-are-deemed-received-at-the-earlier-of-a-the-time-of-transmission-uk-time-if-sent-on-a-working-day-before-5pm-or-b-the-next-working-day-you-must-keep-your-contact-details-current-you-may-send-notices-to-us-by-email-to-info-forwardmymail-co-uk-or-by-post-to-our-registered-address-legal-notices-are-effective-only-when-actually-received-by-us-for-the-avoidance-of-doubt-this-email-service-clause-does-not-apply-to-the-formal-service-of-court-proceedings-which-must-comply-with-applicable-procedural-rules-e-g-the-civil-procedure-rules-or-any-separate-written-consent">18.5 Notices. We may notify you via the Service, email or your account address. You agree that all notices and communications under these Terms may be served by email to the email address in your account and are deemed received at the earlier of (a) the time of transmission (UK time) if sent on a Working Day before 5pm, or (b) the next Working Day. You must keep your contact details current. You may send notices to us by email to info@forwardmymail.co.uk or by post to our registered address; legal notices are effective only when actually received by us. For the avoidance of doubt, this email‑service clause does not apply to the formal service of court proceedings, which must comply with applicable procedural rules (e.g., the Civil Procedure Rules) or any separate written consent.</a></li><li><a class="terms-toc__link" href="#tsec-64-18-6-third-party-rights-except-as-stated-in-clause-9-5-no-third-party-has-rights-to-enforce-these-terms">18.6 Third‑party rights. Except as stated in Clause 9.5, no third party has rights to enforce these Terms.</a></li><li><a class="terms-toc__link" href="#tsec-65-schedule-b-client-authorisation-for-receipt-international-forwarding-of-sensitive-mail-v2">Schedule B — Client Authorisation for Receipt &amp; International Forwarding of Sensitive Mail — v2</a></li><li><a class="terms-toc__link" href="#tsec-66-schedule-e-customer-declarations-consents-signable">Schedule E — Customer Declarations &amp; Consents (Signable)</a></li></ul></div><p><small>Last updated: 2025-12-19</small></p>
+<div class="policy-header">Service Terms &amp; Conditions<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span>
+<div class="policy-body"><ul class="terms-toc__list"><li><a class="terms-toc__link" href="#tsec-1-forward-my-mail-ltd-terms-conditions-uk-full-consolidated-version">Forward My Mail Ltd — Terms &amp; Conditions (UK) — Full Consolidated Version</a></li><li><a class="terms-toc__link" href="#tsec-2-contents">Contents</a></li><li><a class="terms-toc__link" href="#tsec-3-10-1-business-customers-you-shall-indemnify-and-keep-indemnified-forward-my-mail-ltd-and-its-director-s-officers-employees-and-agents-from-and-against-all-losses-liabilities-damages-claims-demands-actions-fines-penalties-and-costs-and-expenses-including-reasonable-legal-and-other-professional-costs-and-expenses-arising-out-of-or-in-connection-with-a-your-breach-of-these-terms-or-of-law-b-prohibited-or-restricted-items-c-inaccurate-customs-declarations-or-misstatements-d-breach-of-issuer-or-bank-rules-including-use-of-a-mail-forwarding-address-contrary-to-issuer-policy-e-misuse-of-our-address-including-at-companies-house-dvla-or-for-mlr-registrations-f-third-party-claims-relating-to-goods-content-or-instructions-you-send-or-ask-us-to-handle-g-sanctions-violations-or-h-fraud-or-wilful-misconduct-by-you-or-persons-you-authorise">10.1 Business Customers. You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with: (a) your breach of these Terms or of law; (b) Prohibited or Restricted Items; (c) inaccurate customs declarations or misstatements; (d) breach of issuer or bank rules (including use of a mail‑forwarding address contrary to issuer policy); (e) misuse of our address (including at Companies House, DVLA or for MLR registrations); (f) third‑party claims relating to goods, content or instructions you send or ask us to handle; (g) sanctions violations; or (h) fraud or wilful misconduct by you or persons you authorise.</a></li><li><a class="terms-toc__link" href="#tsec-4-10-2-consumers-if-you-are-a-consumer-this-indemnity-applies-only-to-the-extent-that-a-loss-is-caused-by-your-breach-misuse-or-unlawful-conduct-it-does-not-apply-to-losses-caused-by-our-own-negligence-or-failure-to-perform-with-reasonable-care-and-skill-and-does-not-reduce-your-statutory-rights-under-the-consumer-rights-act-2015">10.2 Consumers. If you are a Consumer, this indemnity applies only to the extent that a loss is caused by your breach, misuse or unlawful conduct. It does not apply to losses caused by our own negligence or failure to perform with reasonable care and skill and does not reduce your statutory rights under the Consumer Rights Act 2015.</a></li><li><a class="terms-toc__link" href="#tsec-5-10-3-legal-fees-and-costs-the-indemnity-in-this-clause-includes-the-reasonable-and-properly-incurred-legal-and-other-professional-costs-and-expenses-of-investigating-defending-and-or-settling-any-third-party-or-regulatory-claim-allegation-or-enquiry-arising-from-the-matters-described-in-clauses-10-1-10-2-whether-such-claim-is-made-against-us-alone-or-against-us-together-with-you">10.3 Legal fees and costs. The indemnity in this Clause includes the reasonable and properly incurred legal and other professional costs and expenses of investigating, defending and/or settling any third‑party or regulatory claim, allegation or enquiry arising from the matters described in Clauses 10.1–10.2, whether such claim is made against us alone or against us together with you.</a></li><li><a class="terms-toc__link" href="#tsec-6-10-4-conduct-of-claims-we-will-give-you-reasonable-notice-of-any-claim-for-which-we-seek-indemnity-we-may-conduct-the-defence-or-settlement-of-the-claim-and-you-shall-provide-prompt-cooperation-information-and-assistance-including-documents-witness-statements-and-access-to-systems-as-reasonably-requested-you-must-not-admit-liability-settle-or-compromise-any-claim-that-could-reasonably-be-expected-to-give-rise-to-indemnity-without-our-prior-written-consent-where-a-claim-is-solely-and-directly-against-you-you-may-assume-conduct-provided-that-doing-so-does-not-prejudice-us">10.4 Conduct of claims. We will give you reasonable notice of any claim for which we seek indemnity. We may conduct the defence or settlement of the claim and you shall provide prompt cooperation, information and assistance (including documents, witness statements and access to systems) as reasonably requested. You must not admit liability, settle or compromise any claim that could reasonably be expected to give rise to indemnity without our prior written consent. Where a claim is solely and directly against you, you may assume conduct provided that doing so does not prejudice us.</a></li><li><a class="terms-toc__link" href="#tsec-7-10-5-limits-and-fairness-nothing-in-this-clause-requires-you-to-indemnify-us-for-fines-or-penalties-to-the-extent-caused-by-our-own-breach-of-law-negligence-or-wilful-misconduct-nor-for-indirect-or-consequential-losses-except-to-the-extent-payable-to-a-third-party-under-a-settlement-or-judgment-we-will-take-reasonable-steps-to-mitigate-any-indemnified-losses">10.5 Limits and fairness. Nothing in this Clause requires you to indemnify us for fines or penalties to the extent caused by our own breach of law, negligence or wilful misconduct, nor for indirect or consequential losses except to the extent payable to a third party under a settlement or judgment. We will take reasonable steps to mitigate any indemnified losses.</a></li><li><a class="terms-toc__link" href="#tsec-8-10-6-advance-on-costs-where-a-third-party-or-regulatory-claim-is-reasonably-expected-to-exceed-routine-small-claims-costs-we-may-request-a-reasonable-advance-retainer-in-respect-of-external-legal-or-expert-costs-for-the-next-phase-not-more-than-the-reasonably-anticipated-external-costs-for-the-next-60-days-we-will-keep-records-and-reconcile-any-advance-against-actual-costs">10.6 Advance on costs. Where a third‑party or regulatory claim is reasonably expected to exceed routine small‑claims costs, we may request a reasonable advance/retainer in respect of external legal or expert costs for the next phase (not more than the reasonably anticipated external costs for the next 60 days). We will keep records and reconcile any advance against actual costs.</a></li><li><a class="terms-toc__link" href="#tsec-9-10-7-proportionality-for-micro-claims-for-consumer-disputes-allocated-to-the-small-claims-track-nothing-in-this-clause-requires-the-consumer-to-pay-our-irrecoverable-legal-costs-beyond-what-the-court-would-ordinarily-award-unless-the-court-orders-otherwise-due-to-dishonesty-abuse-of-process-or-similar-exceptional-conduct">10.7 Proportionality for micro‑claims. For consumer disputes allocated to the small‑claims track, nothing in this Clause requires the Consumer to pay our irrecoverable legal costs beyond what the court would ordinarily award, unless the court orders otherwise due to dishonesty, abuse of process or similar exceptional conduct.</a></li><li><a class="terms-toc__link" href="#tsec-10-key-facts-summary-for-convenience-only">Key Facts (Summary) — For Convenience Only</a></li><li><a class="terms-toc__link" href="#tsec-11-1-1-parties-fmm-we-us-means-forward-my-mail-ltd-8a-bore-street-lichfield-staffordshire-ws13-6ll-united-kingdom-company-no-16912540-you-means-the-customer-named-in-the-order-or-account-consumer-means-an-individual-acting-wholly-or-mainly-outside-of-trade-or-profession-business-customer-means-everyone-else">1.1 Parties. "FMM", "we", "us" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). "You" means the customer named in the order or account. "Consumer" means an individual acting wholly or mainly outside of trade or profession; "Business Customer" means everyone else.</a></li><li><a class="terms-toc__link" href="#tsec-12-1-2-interpretation-headings-are-for-convenience-only-references-to-laws-include-amendments-priority-is-given-to-mandatory-law-then-these-terms-then-any-schedule-policy">1.2 Interpretation. Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy.</a></li><li><a class="terms-toc__link" href="#tsec-13-1-3-entire-agreement-these-terms-including-schedules-form-the-entire-agreement-replacing-prior-statements-unless-expressly-agreed-in-writing">1.3 Entire agreement. These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing.</a></li><li><a class="terms-toc__link" href="#tsec-14-2-1-address-use-and-agency-you-may-use-an-fmm-provided-address-for-receiving-mail-and-packages-you-appoint-fmm-as-your-agent-to-receive-mail-on-your-behalf-and-authorise-us-to-open-and-scan-mail-for-processing-and-forwarding-except-where-prohibited-by-law-or-issuer-rules">2.1 Address use and agency. You may use an FMM‑provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding, except where prohibited by law or issuer rules.</a></li><li><a class="terms-toc__link" href="#tsec-15-2-2-registered-office-service-address-where-purchased-we-may-provide-a-registered-office-address-and-or-director-s-service-address-use-is-limited-to-official-purposes-not-for-trading-premises-returns-dvla-licensing-electoral-registration-or-money-laundering-regulations-registrations-we-may-report-misuse-and-or-require-removal-from-public-records">2.2 Registered office / service address. Where purchased, we may provide a registered office address and/or director’s service address. Use is limited to official purposes; not for trading premises, returns, DVLA/licensing, electoral registration, or Money Laundering Regulations registrations. We may report misuse and/or require removal from public records.</a></li><li><a class="terms-toc__link" href="#tsec-16-2-3-company-formation-where-you-instruct-us-to-incorporate-a-company-you-are-responsible-for-accuracy-of-information-and-regulatory-compliance-we-are-not-a-law-or-tax-firm-immediate-performance-is-requested-when-filings-begin-see-15-3">2.3 Company formation. Where you instruct us to incorporate a company, you are responsible for accuracy of information and regulatory compliance. We are not a law or tax firm. Immediate performance is requested when filings begin (see 15.3).</a></li><li><a class="terms-toc__link" href="#tsec-17-2-4-no-warehousing-we-do-not-provide-warehousing-or-long-term-storage-see-holding-windows-and-storage-fees-in-schedule-c">2.4 No warehousing. We do not provide warehousing or long‑term storage; see holding windows and storage fees in Schedule C.</a></li><li><a class="terms-toc__link" href="#tsec-18-2-5-subcontracting-we-may-use-subcontractors-and-carriers-we-remain-responsible-for-our-own-obligations">2.5 Subcontracting. We may use subcontractors and Carriers; we remain responsible for our own obligations.</a></li><li><a class="terms-toc__link" href="#tsec-19-2-6-not-a-residential-redirection-service-if-you-have-changed-residential-address-you-must-arrange-a-royal-mail-redirection-we-do-not-provide-a-statutory-residential-redirection-service">2.6 Not a residential redirection service. If you have changed residential address, you must arrange a Royal Mail Redirection; we do not provide a statutory residential redirection service.</a></li><li><a class="terms-toc__link" href="#tsec-20-3-1-lawful-use-do-not-send-receive-or-request-handling-of-prohibited-items-or-illegal-content-provide-accurate-recipient-names-and-instructions">3.1 Lawful use. Do not send, receive or request handling of Prohibited Items or illegal content. Provide accurate recipient names and instructions.</a></li><li><a class="terms-toc__link" href="#tsec-21-3-2-duties-taxes-you-are-responsible-for-customs-declarations-duties-and-taxes">3.2 Duties/taxes. You are responsible for customs declarations, duties and taxes.</a></li><li><a class="terms-toc__link" href="#tsec-22-3-3-packaging-disclosure-provide-sufficient-packaging-and-information-for-handling-and-customs">3.3 Packaging &amp; disclosure. Provide sufficient packaging and information for handling and customs.</a></li><li><a class="terms-toc__link" href="#tsec-23-3-4-cooperation-verification-provide-identity-and-address-documents-when-requested-see-clause-6">3.4 Cooperation &amp; verification. Provide identity and address documents when requested; see Clause 6.</a></li><li><a class="terms-toc__link" href="#tsec-24-3-5-address-limits-do-not-display-our-address-as-a-trading-address-or-for-advertising-without-prior-written-consent">3.5 Address limits. Do not display our address as a trading address or for advertising without prior written consent.</a></li><li><a class="terms-toc__link" href="#tsec-25-6-1-verification-an-account-is-not-active-and-services-are-not-provided-until-a-payment-is-received-and-b-all-required-kyc-aml-checks-are-completed-for-every-relevant-person-name-we-may-use-certified-digital-identity-service-providers">6.1 Verification. An account is not active and services are not provided until (a) payment is received and (b) all required KYC/AML checks are completed for every relevant person/name. We may use certified digital identity service providers.</a></li><li><a class="terms-toc__link" href="#tsec-26-6-2-ongoing-monitoring-we-may-monitor-usage-suspend-or-terminate-accounts-and-report-suspicious-activity-to-authorities-without-notice-where-required-by-law">6.2 Ongoing monitoring. We may monitor usage, suspend or terminate accounts, and report suspicious activity to authorities without notice where required by law.</a></li><li><a class="terms-toc__link" href="#tsec-27-6-3-annual-refresh-retention-we-may-carry-out-an-annual-id-refresh-you-must-provide-updated-documents-to-keep-your-account-active-we-may-retain-identity-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-required-longer-by-law">6.3 Annual refresh &amp; retention. We may carry out an annual ID refresh; you must provide updated documents to keep your account active. We may retain identity/verification records for at least 5 years and no longer than 10 years unless required longer by law.</a></li><li><a class="terms-toc__link" href="#tsec-28-6-4-trusts-before-we-provide-any-service-to-a-trust-you-must-provide-proof-of-registration-with-the-hmrc-trust-registration-service-trs">6.4 Trusts. Before we provide any service to a trust, you must provide proof of registration with the HMRC Trust Registration Service (TRS).</a></li><li><a class="terms-toc__link" href="#tsec-29-7-1-title-and-risk-risk-in-items-passes-to-you-when-items-are-delivered-to-the-carrier-for-forwarding-to-your-chosen-destination-or-when-collected-by-you-your-agent-whichever-occurs-first">7.1 Title and risk. Risk in items passes to you when items are delivered to the Carrier for forwarding to your chosen destination, or when collected by you/your agent, whichever occurs first.</a></li><li><a class="terms-toc__link" href="#tsec-30-7-2-carrier-terms-times-carriage-is-subject-to-carrier-terms-including-routing-and-transit-times-which-we-do-not-control-delivery-dates-are-estimates">7.2 Carrier terms &amp; times. Carriage is subject to Carrier terms, including routing and transit times, which we do not control. Delivery dates are estimates.</a></li><li><a class="terms-toc__link" href="#tsec-31-7-3-customs-and-delays-you-are-responsible-for-customs-clearance-and-delays-arising-from-inspections-or-documentation">7.3 Customs and delays. You are responsible for customs clearance and delays arising from inspections or documentation.</a></li><li><a class="terms-toc__link" href="#tsec-32-7-4-sensitive-financial-items-forwarding-of-sensitive-items-e-g-bank-credit-debit-cards-pin-letters-cheque-books-security-tokens-or-card-readers-is-optional-and-provided-only-if-a-you-have-completed-the-client-authorisation-in-schedule-b-b-all-kyc-aml-checks-are-satisfied-c-we-are-satisfied-the-forwarding-is-lawful-and-permitted-by-the-issuer-and-d-the-destination-address-has-been-verified-opening-scanning-our-service-includes-opening-mail-and-scanning-contents-for-you-for-sensitive-items-we-will-follow-your-written-instructions-except-we-will-not-scan-where-doing-so-would-breach-law-or-issuer-rules-e-g-certain-pin-mailers-identifiable-pin-mailers-and-security-envelopes-will-not-be-opened-unless-you-give-us-explicit-written-instructions-and-issuer-rules-permit-we-may-refuse-or-suspend-forwarding-scanning-of-sensitive-items-where-risk-or-compliance-concerns-arise">7.4 Sensitive financial items. Forwarding of Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens or card readers) is optional and provided only if: (a) you have completed the Client Authorisation in Schedule B; (b) all KYC/AML checks are satisfied; (c) we are satisfied the forwarding is lawful and permitted by the issuer; and (d) the destination address has been verified. Opening &amp; scanning: our Service includes opening mail and scanning contents for you. For Sensitive Items we will follow your written instructions, except we will not scan where doing so would breach law or issuer rules (e.g., certain PIN mailers). Identifiable PIN mailers and security envelopes will not be opened unless you give us explicit written instructions and issuer rules permit. We may refuse or suspend forwarding/scanning of Sensitive Items where risk or compliance concerns arise.</a></li><li><a class="terms-toc__link" href="#tsec-33-7-5-default-shipping-method-safety-first-unless-you-instruct-otherwise-in-writing-we-will-use-a-tracked-and-or-signed-for-method-where-available-and-commercially-reasonable-having-regard-to-the-item-value-and-destination-if-you-opt-for-an-untracked-or-unsigned-service-you-acknowledge-increased-risk-and-agree-that-our-liability-remains-limited-under-clause-9">7.5 Default shipping method (safety first). Unless you instruct otherwise in writing, we will use a tracked and/or signed‑for method where available and commercially reasonable, having regard to the item value and destination. If you opt for an untracked or unsigned service, you acknowledge increased risk and agree that our liability remains limited under Clause 9.</a></li><li><a class="terms-toc__link" href="#tsec-34-7-6-large-parcels-and-limits-please-give-24-hours-notice-for-parcels-exceeding-1-000-mm-in-any-dimension-we-may-refuse-items-exceeding-2-m-in-any-dimension-or-25-kg-in-weight-we-may-charge-handling-and-storage-fees-for-large-or-bulky-items">7.6 Large parcels and limits. Please give 24 hours’ notice for parcels exceeding 1,000 mm in any dimension. We may refuse items exceeding 2 m in any dimension or 25 kg in weight. We may charge handling and storage fees for large or bulky items.</a></li><li><a class="terms-toc__link" href="#tsec-35-7-7-client-arranged-courier-where-you-pre-pay-postage-courier-directly-a-handling-fee-per-item-may-apply-see-schedule-c-fees">7.7 Client‑arranged courier. Where you pre‑pay postage/courier directly, a handling fee per item may apply; see Schedule C (Fees).</a></li><li><a class="terms-toc__link" href="#tsec-36-7-8-retrieval-of-archived-scans-retrieval-of-previously-scanned-and-archived-items-may-attract-a-retrieval-fee-see-schedule-c-fees">7.8 Retrieval of archived scans. Retrieval of previously scanned‑and‑archived items may attract a retrieval fee; see Schedule C (Fees).</a></li><li><a class="terms-toc__link" href="#tsec-37-8-1-fees-taxes-you-agree-to-pay-service-fees-shipping-charges-and-surcharges-as-published-or-quoted-all-fees-are-exclusive-of-vat-and-any-carrier-surcharges-unless-stated-otherwise-we-may-change-fees-on-notice-for-future-services">8.1 Fees &amp; taxes. You agree to pay Service fees, shipping charges and surcharges as published or quoted. All fees are exclusive of VAT and any carrier surcharges unless stated otherwise. We may change fees on notice for future services.</a></li><li><a class="terms-toc__link" href="#tsec-38-8-2-storage-and-non-compliance-for-inactive-or-non-compliant-accounts-id-missing-fails-or-unpaid-invoices-we-may-hold-mail-for-up-to-14-days-without-charge-to-allow-resolution-after-that-period-items-may-be-returned-to-sender-securely-destroyed-disposed-of-or-stored-for-a-fee-parcels-may-accrue-storage-charges-after-24-hours-disposal-return-fees-may-apply">8.2 Storage and non‑compliance. For inactive or non‑compliant accounts (ID missing/fails, or unpaid invoices), we may hold mail for up to 14 days without charge to allow resolution. After that period items may be returned to sender, securely destroyed, disposed of, or stored for a fee. Parcels may accrue storage charges after 24 hours. Disposal/return fees may apply.</a></li><li><a class="terms-toc__link" href="#tsec-39-8-3-lien-we-have-a-general-and-particular-lien-over-items-for-all-amounts-you-owe-if-unpaid-after-notice-we-may-sell-or-dispose-of-items-and-apply-proceeds-to-your-debt-accounting-to-you-for-any-balance">8.3 Lien. We have a general and particular lien over items for all amounts you owe. If unpaid after notice, we may sell or dispose of items and apply proceeds to your debt (accounting to you for any balance).</a></li><li><a class="terms-toc__link" href="#tsec-40-8-4-sale-disposal-procedure-torts-act-before-any-sale-or-disposal-of-uncollected-goods-we-will-give-you-a-written-notice-of-intention-to-sell-allowing-a-reasonable-collection-period-under-the-torts-interference-with-goods-act-1977-we-will-account-to-you-for-any-net-proceeds-after-deducting-sums-properly-due">8.4 Sale/disposal procedure (Torts Act). Before any sale or disposal of uncollected goods we will give you a written notice of intention to sell allowing a reasonable collection period, under the Torts (Interference with Goods) Act 1977. We will account to you for any net proceeds after deducting sums properly due.</a></li><li><a class="terms-toc__link" href="#tsec-41-8-5-insurance-goods-are-not-insured-while-on-our-premises-or-in-transit-unless-you-purchase-optional-cover-from-us-in-writing-before-dispatch-if-you-arrange-your-own-courier-our-insurance-does-not-apply-you-are-responsible-for-declaring-value-and-arranging-appropriate-cover">8.5 Insurance. Goods are not insured while on our premises or in transit unless you purchase optional cover from us in writing before dispatch. If you arrange your own courier, our insurance does not apply. You are responsible for declaring value and arranging appropriate cover.</a></li><li><a class="terms-toc__link" href="#tsec-42-9-0-consumer-carve-out-if-you-are-a-consumer-nothing-in-these-terms-limits-your-statutory-rights-including-our-obligation-to-provide-the-service-with-reasonable-care-and-skill-under-the-consumer-rights-act-2015-any-limits-exclusions-apply-only-to-the-extent-permitted-by-law">9.0 Consumer carve‑out. If you are a Consumer, nothing in these Terms limits your statutory rights, including our obligation to provide the Service with reasonable care and skill under the Consumer Rights Act 2015. Any limits/exclusions apply only to the extent permitted by law.</a></li><li><a class="terms-toc__link" href="#tsec-43-9-1-exclusion-of-certain-losses-to-the-maximum-extent-permitted-by-law-fmm-and-its-director-s-officers-employees-and-agents-are-not-liable-for-indirect-consequential-exemplary-or-punitive-damages-loss-of-profit-revenue-business-goodwill-or-anticipated-savings-or-losses-arising-from-delay-missed-delivery-windows-customs-seizures-or-carrier-acts-omissions-beyond-our-reasonable-control">9.1 Exclusion of certain losses. To the maximum extent permitted by law, FMM and its Director(s), officers, employees and agents are not liable for indirect, consequential, exemplary or punitive damages; loss of profit, revenue, business, goodwill or anticipated savings; or losses arising from delay, missed delivery windows, customs seizures, or Carrier acts/omissions beyond our reasonable control.</a></li><li><a class="terms-toc__link" href="#tsec-44-9-2-monetary-cap-fmm-s-aggregate-liability-for-all-claims-arising-out-of-or-relating-to-the-service-in-any-12-month-period-is-limited-to-the-greater-of-100-or-100-of-fees-paid-to-fmm-by-you-for-the-service-giving-rise-to-the-claim-different-mandatory-caps-may-apply-where-law-requires">9.2 Monetary cap. FMM’s aggregate liability for all claims arising out of or relating to the Service in any 12‑month period is limited to the greater of £100 or 100% of fees paid to FMM by you for the Service giving rise to the claim. Different mandatory caps may apply where law requires.</a></li><li><a class="terms-toc__link" href="#tsec-45-9-3-non-excludable-liabilities-nothing-excludes-liability-for-death-or-personal-injury-caused-by-negligence-fraud-or-any-liability-which-cannot-lawfully-be-excluded-or-limited">9.3 Non‑excludable liabilities. Nothing excludes liability for death or personal injury caused by negligence, fraud, or any liability which cannot lawfully be excluded or limited.</a></li><li><a class="terms-toc__link" href="#tsec-46-9-4-carriers-we-are-not-liable-for-carrier-terms-delays-or-acts-omissions-beyond-our-control-your-remedies-against-carriers-are-unaffected">9.4 Carriers. We are not liable for Carrier terms, delays or acts/omissions beyond our control; your remedies against Carriers are unaffected.</a></li><li><a class="terms-toc__link" href="#tsec-47-9-5-third-party-rights-director-protection-the-director-s-of-fmm-may-enforce-this-clause-9-under-the-contracts-rights-of-third-parties-act-1999">9.5 Third‑party rights (Director protection). The Director(s) of FMM may enforce this Clause 9 under the Contracts (Rights of Third Parties) Act 1999.</a></li><li><a class="terms-toc__link" href="#tsec-48-9-6-time-limits-business-customers-you-must-notify-us-of-loss-or-damage-in-writing-within-7-days-of-delivery-or-scheduled-delivery-and-bring-any-claim-within-6-months-thereafter-otherwise-the-claim-is-barred-except-where-mandatory-law-provides-longer-consumers-please-notify-issues-within-30-days-where-reasonably-possible-failure-to-do-so-does-not-affect-your-statutory-rights-or-ability-to-bring-a-claim-within-the-applicable-statutory-limitation-period">9.6 Time limits. Business Customers: you must notify us of loss or damage in writing within 7 days of delivery (or scheduled delivery) and bring any claim within 6 months thereafter; otherwise the claim is barred, except where mandatory law provides longer. Consumers: please notify issues within 30 days where reasonably possible; failure to do so does not affect your statutory rights or ability to bring a claim within the applicable statutory limitation period.</a></li><li><a class="terms-toc__link" href="#tsec-49-11-1-controller-fmm-is-a-controller-of-personal-data-you-provide-see-our-privacy-notice-for-details">11.1 Controller. FMM is a controller of personal data you provide. See our Privacy Notice for details.</a></li><li><a class="terms-toc__link" href="#tsec-50-11-2-checks-and-sharing-you-consent-to-our-use-of-third-party-verification-and-payment-providers-and-to-lawful-disclosures-to-carriers-customs-and-law-enforcement-where-required-for-formation-registered-office-we-may-share-details-with-companies-house-hmrc-and-banks-at-your-request">11.2 Checks and sharing. You consent to our use of third‑party verification and payment providers and to lawful disclosures to Carriers, customs and law enforcement where required. For formation/registered office, we may share details with Companies House, HMRC and banks at your request.</a></li><li><a class="terms-toc__link" href="#tsec-51-11-3-international-transfers-where-data-is-transferred-outside-the-uk-eea-we-will-use-appropriate-safeguards-as-required-by-law">11.3 International transfers. Where data is transferred outside the UK/EEA, we will use appropriate safeguards as required by law.</a></li><li><a class="terms-toc__link" href="#tsec-52-11-4-aml-kyc-records-we-may-retain-identity-and-verification-records-for-at-least-5-years-and-no-longer-than-10-years-unless-a-longer-period-is-required-by-law-e-g-ongoing-investigations-or-legal-claims">11.4 AML/KYC records. We may retain identity and verification records for at least 5 years and no longer than 10 years unless a longer period is required by law (e.g., ongoing investigations or legal claims).</a></li><li><a class="terms-toc__link" href="#tsec-53-11-5-scan-retention-unless-you-ask-us-to-keep-items-longer-or-we-must-keep-them-for-legal-compliance-reasons-scanned-images-and-related-handling-logs-will-be-retained-for-90-days-and-then-deleted-archived-in-line-with-our-policies">11.5 Scan retention. Unless you ask us to keep items longer (or we must keep them for legal/compliance reasons), scanned images and related handling logs will be retained for 90 days and then deleted/archived in line with our policies.</a></li><li><a class="terms-toc__link" href="#tsec-54-13-1-debt-recovery-chargebacks-overdue-accounts-may-be-referred-to-debt-collection-you-are-liable-for-reasonable-recovery-costs-and-any-statutory-compensation-interest-where-applicable-if-you-initiate-a-payment-chargeback-we-may-apply-a-reasonable-administration-fee-plus-any-third-party-fees-and-suspend-services-pending-resolution-we-may-notify-companies-house-and-other-bodies-and-take-steps-to-remove-unauthorised-use-of-our-address-where-fees-remain-unpaid">13.1 Debt recovery &amp; chargebacks. Overdue accounts may be referred to debt collection. You are liable for reasonable recovery costs and any statutory compensation/interest where applicable. If you initiate a payment chargeback, we may apply a reasonable administration fee (plus any third‑party fees) and suspend services pending resolution. We may notify Companies House and other bodies and take steps to remove unauthorised use of our address where fees remain unpaid.</a></li><li><a class="terms-toc__link" href="#tsec-55-15-1-cra-2015-for-consumers-we-will-provide-services-with-reasonable-care-and-skill-nothing-in-these-terms-affects-statutory-rights">15.1 CRA 2015. For Consumers we will provide services with reasonable care and skill. Nothing in these Terms affects statutory rights.</a></li><li><a class="terms-toc__link" href="#tsec-56-15-2-ccr-2013-cooling-off-if-you-are-a-consumer-and-purchased-online-or-at-a-distance-you-may-have-a-14-day-cooling-off-period-if-you-request-immediate-performance-you-agree-we-may-start-before-the-end-of-that-period-you-pay-for-services-performed-and-once-fully-performed-you-lose-the-right-to-cancel">15.2 CCR 2013 (cooling‑off). If you are a Consumer and purchased online or at a distance, you may have a 14‑day cooling‑off period. If you request immediate performance, you agree we may start before the end of that period; you pay for services performed, and once fully performed you lose the right to cancel.</a></li><li><a class="terms-toc__link" href="#tsec-57-15-3-immediate-performance-acknowledgment-by-instructing-us-to-file-an-incorporation-or-activate-an-address-you-request-immediate-performance-and-acknowledge-the-effect-on-your-cancellation-rights">15.3 Immediate performance acknowledgment. By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights.</a></li><li><a class="terms-toc__link" href="#tsec-58-15-4-optional-director-identity-verification-service-if-you-purchase-a-companies-house-director-identity-verification-service-from-us-the-service-fee-is-for-processing-submission-and-is-non-refundable-once-submitted-whether-the-check-succeeds-or-fails-additional-verification-may-attract-supplementary-fees">15.4 Optional Director Identity Verification service. If you purchase a Companies House director identity verification service from us, the service fee is for processing/submission and is non‑refundable once submitted, whether the check succeeds or fails. Additional verification may attract supplementary fees.</a></li><li><a class="terms-toc__link" href="#tsec-59-18-1-force-majeure-we-are-not-liable-for-failure-or-delay-due-to-events-beyond-our-reasonable-control">18.1 Force majeure. We are not liable for failure or delay due to events beyond our reasonable control.</a></li><li><a class="terms-toc__link" href="#tsec-60-18-2-no-waiver-failure-to-enforce-is-not-a-waiver">18.2 No waiver. Failure to enforce is not a waiver.</a></li><li><a class="terms-toc__link" href="#tsec-61-18-3-severability-if-any-provision-is-unlawful-or-unenforceable-the-remainder-remains-in-effect">18.3 Severability. If any provision is unlawful or unenforceable, the remainder remains in effect.</a></li><li><a class="terms-toc__link" href="#tsec-62-18-4-assignment-you-may-not-assign-without-our-consent-we-may-assign-subject-to-law">18.4 Assignment. You may not assign without our consent; we may assign subject to law.</a></li><li><a class="terms-toc__link" href="#tsec-63-18-5-notices-we-may-notify-you-via-the-service-email-or-your-account-address-you-agree-that-all-notices-and-communications-under-these-terms-may-be-served-by-email-to-the-email-address-in-your-account-and-are-deemed-received-at-the-earlier-of-a-the-time-of-transmission-uk-time-if-sent-on-a-working-day-before-5pm-or-b-the-next-working-day-you-must-keep-your-contact-details-current-you-may-send-notices-to-us-by-email-to-info-forwardmymail-co-uk-or-by-post-to-our-registered-address-legal-notices-are-effective-only-when-actually-received-by-us-for-the-avoidance-of-doubt-this-email-service-clause-does-not-apply-to-the-formal-service-of-court-proceedings-which-must-comply-with-applicable-procedural-rules-e-g-the-civil-procedure-rules-or-any-separate-written-consent">18.5 Notices. We may notify you via the Service, email or your account address. You agree that all notices and communications under these Terms may be served by email to the email address in your account and are deemed received at the earlier of (a) the time of transmission (UK time) if sent on a Working Day before 5pm, or (b) the next Working Day. You must keep your contact details current. You may send notices to us by email to info@forwardmymail.co.uk or by post to our registered address; legal notices are effective only when actually received by us. For the avoidance of doubt, this email‑service clause does not apply to the formal service of court proceedings, which must comply with applicable procedural rules (e.g., the Civil Procedure Rules) or any separate written consent.</a></li><li><a class="terms-toc__link" href="#tsec-64-18-6-third-party-rights-except-as-stated-in-clause-9-5-no-third-party-has-rights-to-enforce-these-terms">18.6 Third‑party rights. Except as stated in Clause 9.5, no third party has rights to enforce these Terms.</a></li><li><a class="terms-toc__link" href="#tsec-65-schedule-b-client-authorisation-for-receipt-international-forwarding-of-sensitive-mail-v2">Schedule B — Client Authorisation for Receipt &amp; International Forwarding of Sensitive Mail — v2</a></li><li><a class="terms-toc__link" href="#tsec-66-schedule-e-customer-declarations-consents-signable">Schedule E — Customer Declarations &amp; Consents (Signable)</a></li></ul></div><p><small>Last updated: 2025-12-19</small></p>
 <details class="terms-section" id="tsec-1-forward-my-mail-ltd-terms-conditions-uk-full-consolidated-version"><summary>Forward My Mail Ltd — Terms &amp; Conditions (UK) — Full Consolidated Version</summary><p>Last updated: 2025-12-19</p><p>These Terms govern the provision of mail receiving, opening/scanning, storage and forwarding services, and (where purchased) company formation, registered office and director’s service address services, by Forward My Mail Ltd ("FMM").</p></details>
 <details class="terms-section" id="tsec-2-contents"><summary>Contents</summary><p>1. Parties, Definitions and Interpretation</p><p>2. Service Description</p><p>3. Your Obligations</p><p>4. Prohibited &amp; Restricted Items</p><p>5. Inspections and Security</p><p>6. KYC/AML, Sanctions &amp; Fraud Controls</p><p>7. Handling, Transit &amp; Delivery</p><p>8. Fees, Storage &amp; Lien</p><p>9. Liability, Limits and Exclusions (Protection of FMM and Director)</p><p>10. Your Indemnities</p></details>
 <details class="terms-section" id="tsec-3-10-1-business-customers-you-shall-indemnify-and-keep-indemnified-forward-my-mail-ltd-and-its-director-s-officers-employees-and-agents-from-and-against-all-losses-liabilities-damages-claims-demands-actions-fines-penalties-and-costs-and-expenses-including-reasonable-legal-and-other-professional-costs-and-expenses-arising-out-of-or-in-connection-with-a-your-breach-of-these-terms-or-of-law-b-prohibited-or-restricted-items-c-inaccurate-customs-declarations-or-misstatements-d-breach-of-issuer-or-bank-rules-including-use-of-a-mail-forwarding-address-contrary-to-issuer-policy-e-misuse-of-our-address-including-at-companies-house-dvla-or-for-mlr-registrations-f-third-party-claims-relating-to-goods-content-or-instructions-you-send-or-ask-us-to-handle-g-sanctions-violations-or-h-fraud-or-wilful-misconduct-by-you-or-persons-you-authorise"><summary>10.1 Business Customers. You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with: (a) your breach of these Terms or of law; (b) Prohibited or Restricted Items; (c) inaccurate customs declarations or misstatements; (d) breach of issuer or bank rules (including use of a mail‑forwarding address contrary to issuer policy); (e) misuse of our address (including at Companies House, DVLA or for MLR registrations); (f) third‑party claims relating to goods, content or instructions you send or ask us to handle; (g) sanctions violations; or (h) fraud or wilful misconduct by you or persons you authorise.</summary></details>
@@ -2002,7 +2044,7 @@ article.pricing-card ul.pricing-list{
 <div aria-hidden="true" class="policy-modal" id="modal-cookies">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="cookies-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Cookies Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-header">Cookies Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span>
 <div class="policy-body">
 <p><small>Last updated: 2025-12-19</small></p>
 <p>We use cookies and similar technologies to run the site, provide secure login/checkout, remember your preferences and understand how the site is used.</p>
@@ -2022,7 +2064,7 @@ article.pricing-card ul.pricing-list{
 <div aria-hidden="true" class="policy-modal" id="modal-acceptable">
 <div class="policy-backdrop"></div>
 <div aria-labelledby="acceptable-title" aria-modal="true" class="policy-dialog" role="dialog">
-<div class="policy-header">Acceptable Use Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span></div>
+<div class="policy-header">Acceptable Use Policy<span class="policy-actions"><button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button></span>
 <div class="policy-body">
 <p><small>Last updated: 2025-12-19</small></p>
 <p>You agree not to use our address/services for unlawful purposes. Prohibited or restricted items include (non‑exhaustive):</p>
@@ -2103,7 +2145,363 @@ article.pricing-card ul.pricing-list{
 .fmm-how-steps__img { width: 100%; height: auto; display: block; }
 
 </style>';
-    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Policy</title>'+styles+'</head><body>'+body.innerHTML+'</body></html>');
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Policy</title>'+styles+'<style>
+/* Center print button & add close "X" in policy headers */
+.policy-header{
+  display:grid !important;
+  grid-template-columns: 1fr auto 1fr !important;
+  align-items:center !important;
+  gap: 8px !important;
+}
+.policy-header h2, .policy-header .title {
+  margin:0;
+  justify-self:start;
+}
+.policy-actions{
+  justify-self:center !important;
+}
+.policy-close-x{
+  justify-self:end;
+  border:none;
+  background: rgba(15, 23, 42, 0.25);
+  color:#e5edff;
+  border-radius:999px;
+  width:32px;
+  height:32px;
+  font-size: 1.1rem;
+  line-height: 1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.policy-close-x:hover{ background: rgba(15,23,42,0.5); }
+</style>
+
+<style>
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid2 label{display:block}
+  .center-row{display:flex;justify-content:center;margin-top:10px}
+  .btn.btn-primary{background:#0a58ca;border:1px solid #0a58ca;color:#fff;padding:.55rem .9rem;border-radius:10px;cursor:pointer}
+</style>
+
+</head><body>'+body.innerHTML+'
+<!-- Cancellation & Refund Policy -->
+<div aria-hidden="true" class="policy-modal" id="modal-cancellation">
+  <div class="policy-backdrop"></div>
+  <div aria-labelledby="cxl-title" aria-modal="true" class="policy-dialog" role="dialog">
+    <div class="policy-header">
+      <h2 id="cxl-title">Cancellation &amp; Refund Policy (UK)</h2>
+      <span class="policy-actions">
+        <button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button>
+      </span>
+      <button class="policy-close-x" aria-label="Close">×</button>
+    
+    <div class="policy-body">
+      <p><small>Last updated: 21 December 2025</small></p>
+
+      <details open>
+        <summary>1) Scope</summary>
+        <p>This policy explains how cancellations, refunds and service credits work for our address and mail-handling services. It forms part of our Terms.</p>
+      </details>
+
+      <details>
+        <summary>2) Consumers (B2C) – 14-day cooling-off</summary>
+        <ul>
+          <li>If you buy online or by phone, you may cancel <strong>within 14 days</strong> of the contract date without giving a reason.</li>
+          <li>If you ask us to <strong>start the service during the 14-day period</strong>, you’ll pay a <strong>proportionate amount</strong> for the service delivered up to cancellation. Once the service is <strong>fully performed</strong>, the cancellation right ends.</li>
+          <li><strong>How to cancel:</strong> email <a href="mailto:info@forwardmymail.co.uk?subject=Cancellation%20request">info@forwardmymail.co.uk</a> with your name, address and order reference, or use our Cancellation Form.</li>
+          <li>We refund <strong>within 14 days</strong> of your cancellation (or of confirming any pro‑rata amount due) using the original payment method unless otherwise agreed.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>3) Businesses &amp; organisations (B2B)</summary>
+        <p>The statutory cooling-off rules do not apply to business customers. You may cancel on <strong>30 days’ written notice</strong> (email is fine). Fees already paid for a fixed term are <strong>non‑refundable</strong>, unless we agree otherwise in writing.</p>
+      </details>
+
+      <details>
+        <summary>4) When we may suspend or terminate</summary>
+        <p>We may suspend/terminate if (i) required ID/verification is not provided, (ii) invoices are overdue, or (iii) our address is misused / Terms are breached. If we end the contract for your breach, <strong>no refund</strong> of prepaid fees is due. We’ll act reasonably and notify you where practicable.</p>
+      </details>
+
+      <details>
+        <summary>5) Mail and address use after cancellation</summary>
+        <p>After cancellation you must remove our address from <strong>all</strong> records (e.g., Companies House / DVLA). Mail received after termination may be returned to sender or securely destroyed per our data‑protection procedures.</p>
+      </details>
+
+      <details>
+        <summary>6) Service credits</summary>
+        <p>Where appropriate we may offer a <strong>service credit</strong> instead of a cash refund. Credits expire <strong>12 months</strong> from issue. Credits are discretionary and do not affect your statutory rights.</p>
+      </details>
+
+      <details>
+        <summary>7) How to request a cancellation or refund</summary>
+        <p>Email: <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a> (or write to our postal address). Please include: name, company (if applicable), service reference, requested cancellation date, and reason (optional).</p>
+      </details>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // Open/close logic
+  document.addEventListener('click', function(e){
+    const openBtn = e.target.closest('[data-policy-modal]');
+    if(openBtn){
+      const id = openBtn.getAttribute('data-policy-modal');
+      const modal = document.getElementById(id);
+      if(modal){
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden','false');
+        // If opening Terms, convert sections to <details> if not already converted
+        if(id === 'modal-terms'){ convertTermsToDetails(); }
+      }
+    }
+    if(e.target.classList.contains('policy-backdrop') || e.target.classList.contains('policy-close-x')){
+      const modal = e.target.closest('.policy-modal') || document.querySelector('.policy-modal.active');
+      if(modal){
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden','true');
+      }
+    }
+    if(e.target.matches('[data-print-modal]')){
+      const dialog = e.target.closest('.policy-dialog');
+      if(!dialog){ return; }
+      // Print only the dialog content
+      const w = window.open('', '_blank');
+      const doc = w.document.open();
+      const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+        .map(el => el.outerHTML).join('\n');
+      doc.write(`<!doctype html><html><head><meta charset="utf-8">${styles}
+<style>
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid2 label{display:block}
+  .center-row{display:flex;justify-content:center;margin-top:10px}
+  .btn.btn-primary{background:#0a58ca;border:1px solid #0a58ca;color:#fff;padding:.55rem .9rem;border-radius:10px;cursor:pointer}
+</style>
+
+</head><body>${dialog.outerHTML}
+<!-- Cancellation Form Modal -->
+<div aria-hidden="true" class="policy-modal" id="modal-cancellation-form">
+  <div class="policy-backdrop"></div>
+  <div aria-labelledby="cxl-form-title" aria-modal="true" class="policy-dialog" role="dialog">
+    <div class="policy-header">
+      <h2 id="cxl-form-title">Request a Cancellation</h2>
+      <span class="policy-actions">
+        <button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button>
+      </span>
+      <button class="policy-close-x" aria-label="Close">×</button>
+    </div>
+    <div class="policy-body">
+      <form id="cxlForm" onsubmit="return false;">
+        <div class="grid2">
+          <label>Name <input type="text" id="cx_name" required></label>
+          <label>Company (optional) <input type="text" id="cx_company"></label>
+        </div>
+        <label>Service / reference <input type="text" id="cx_service" required></label>
+        <div class="grid2">
+          <label>Order date <input type="date" id="cx_order"></label>
+          <label>Requested cancellation date <input type="date" id="cx_cancel"></label>
+        </div>
+        <label>Reason (optional) <textarea id="cx_reason" rows="4"></textarea></label>
+        <div class="center-row">
+          <button type="button" class="btn btn-primary" data-send-cxl>Email this to info@forwardmymail.co.uk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // click: open modals (existing handler may already exist; this augments behaviors)
+  document.addEventListener('click', function(e){
+    const mbtn = e.target.closest('[data-policy-modal]');
+    if(mbtn){
+      const id = mbtn.getAttribute('data-policy-modal');
+      const modal = document.getElementById(id);
+      if(modal){
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+    // send cancellation email from the form
+    if(e.target && e.target.hasAttribute('data-send-cxl')){
+      const name = (document.getElementById('cx_name')||{}).value||'';
+      const company = (document.getElementById('cx_company')||{}).value||'';
+      const service = (document.getElementById('cx_service')||{}).value||'';
+      const order = (document.getElementById('cx_order')||{}).value||'';
+      const cancel = (document.getElementById('cx_cancel')||{}).value||'';
+      const reason = (document.getElementById('cx_reason')||{}).value||'';
+      const subject = encodeURIComponent('Cancellation request');
+      const body = encodeURIComponent(
+        'Name: ' + name + '\n' +
+        'Company: ' + company + '\n' +
+        'Service / reference: ' + service + '\n' +
+        'Order date: ' + order + '\n' +
+        'Requested cancellation date: ' + cancel + '\n' +
+        'Reason: ' + reason + '\n'
+      );
+      const href = 'mailto:info@forwardmymail.co.uk?subject=' + subject + '&body=' + body;
+      window.location.href = href;
+    }
+  }, false);
+
+  // Insert an extra "Request Cancellation" button inside the Terms modal
+  const terms = document.getElementById('modal-terms');
+  if(terms){
+    const body = terms.querySelector('.policy-body');
+    const header = terms.querySelector('.policy-header');
+    const btnHTML = '<div class="center-row" style="margin:10px 0 4px;"><button type="button" class="btn btn-primary" data-policy-modal="modal-cancellation-form">Request Cancellation</button></div>';
+    if(header && !header.dataset.cxlBtnAdded){
+      header.insertAdjacentHTML('afterend', btnHTML);
+      header.dataset.cxlBtnAdded = '1';
+    }
+    if(body && !body.dataset.cxlBtnAdded){
+      body.insertAdjacentHTML('beforeend', '<hr style="margin-top:16px;border:none;border-top:1px solid #e5e7eb;">' + btnHTML);
+      body.dataset.cxlBtnAdded = '1';
+    }
+  }
+})();
+</script>
+
+</body></html>`);
+      doc.close();
+      w.focus();
+      w.print();
+    }
+  }, false);
+
+  // Convert Terms <h3> sections into numbered <details>
+  function convertTermsToDetails(){
+    const body = document.querySelector('#modal-terms .policy-body');
+    if(!body){ return; }
+    // Avoid double-conversion
+    if(body.querySelector('details')){ return; }
+
+    const nodes = Array.from(body.children);
+    let sections = [];
+    let current = null;
+
+    nodes.forEach(node => {
+      if(node.tagName && node.tagName.toLowerCase() === 'h3'){
+        if(current){ sections.push(current); }
+        current = { title: node.textContent.trim(), content: [] };
+      } else {
+        if(current){ current.content.push(node.outerHTML if node.outerHTML else node.textContent); }
+      }
+    });
+    if(current){ sections.push(current); }
+
+    // Rebuild body with <details> in numeric order
+    if(sections.length){
+      body.innerHTML = '';
+      sections.forEach((sec, i) => {
+        const num = i+1;
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = num + ') ' + sec.title;
+        details.appendChild(summary);
+        const div = document.createElement('div');
+        div.innerHTML = sec.content.join('');
+        details.appendChild(div);
+        body.appendChild(details);
+      });
+    }
+  }
+})();
+</script>
+
+
+<!-- Cancellation Form Modal -->
+<div aria-hidden="true" class="policy-modal" id="modal-cancellation-form">
+  <div class="policy-backdrop"></div>
+  <div aria-labelledby="cxl-form-title" aria-modal="true" class="policy-dialog" role="dialog">
+    <div class="policy-header">
+      <h2 id="cxl-form-title">Request a Cancellation</h2>
+      <span class="policy-actions">
+        <button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button>
+      </span>
+      <button class="policy-close-x" aria-label="Close">×</button>
+    </div>
+    <div class="policy-body">
+      <form id="cxlForm" onsubmit="return false;">
+        <div class="grid2">
+          <label>Name <input type="text" id="cx_name" required></label>
+          <label>Company (optional) <input type="text" id="cx_company"></label>
+        </div>
+        <label>Service / reference <input type="text" id="cx_service" required></label>
+        <div class="grid2">
+          <label>Order date <input type="date" id="cx_order"></label>
+          <label>Requested cancellation date <input type="date" id="cx_cancel"></label>
+        </div>
+        <label>Reason (optional) <textarea id="cx_reason" rows="4"></textarea></label>
+        <div class="center-row">
+          <button type="button" class="btn btn-primary" data-send-cxl>Email this to info@forwardmymail.co.uk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // click: open modals (existing handler may already exist; this augments behaviors)
+  document.addEventListener('click', function(e){
+    const mbtn = e.target.closest('[data-policy-modal]');
+    if(mbtn){
+      const id = mbtn.getAttribute('data-policy-modal');
+      const modal = document.getElementById(id);
+      if(modal){
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+    // send cancellation email from the form
+    if(e.target && e.target.hasAttribute('data-send-cxl')){
+      const name = (document.getElementById('cx_name')||{}).value||'';
+      const company = (document.getElementById('cx_company')||{}).value||'';
+      const service = (document.getElementById('cx_service')||{}).value||'';
+      const order = (document.getElementById('cx_order')||{}).value||'';
+      const cancel = (document.getElementById('cx_cancel')||{}).value||'';
+      const reason = (document.getElementById('cx_reason')||{}).value||'';
+      const subject = encodeURIComponent('Cancellation request');
+      const body = encodeURIComponent(
+        'Name: ' + name + '\n' +
+        'Company: ' + company + '\n' +
+        'Service / reference: ' + service + '\n' +
+        'Order date: ' + order + '\n' +
+        'Requested cancellation date: ' + cancel + '\n' +
+        'Reason: ' + reason + '\n'
+      );
+      const href = 'mailto:info@forwardmymail.co.uk?subject=' + subject + '&body=' + body;
+      window.location.href = href;
+    }
+  }, false);
+
+  // Insert an extra "Request Cancellation" button inside the Terms modal
+  const terms = document.getElementById('modal-terms');
+  if(terms){
+    const body = terms.querySelector('.policy-body');
+    const header = terms.querySelector('.policy-header');
+    const btnHTML = '<div class="center-row" style="margin:10px 0 4px;"><button type="button" class="btn btn-primary" data-policy-modal="modal-cancellation-form">Request Cancellation</button></div>';
+    if(header && !header.dataset.cxlBtnAdded){
+      header.insertAdjacentHTML('afterend', btnHTML);
+      header.dataset.cxlBtnAdded = '1';
+    }
+    if(body && !body.dataset.cxlBtnAdded){
+      body.insertAdjacentHTML('beforeend', '<hr style="margin-top:16px;border:none;border-top:1px solid #e5e7eb;">' + btnHTML);
+      body.dataset.cxlBtnAdded = '1';
+    }
+  }
+})();
+</script>
+
+</body></html>');
     w.document.close();
     w.focus();
     w.print();
@@ -2127,7 +2525,7 @@ article.pricing-card ul.pricing-list{
     }
   }, false);
 })();
-</script><div aria-hidden="true" class="policy-modal" id="modal-addon-gate"><div class="policy-backdrop"></div><div aria-labelledby="addon-title" aria-modal="true" class="policy-dialog" role="dialog"><div class="policy-header"><span id="addon-title">Add-on purchase</span><button aria-label="Close" class="policy-close" type="button">×</button></div><div class="policy-body"><p>This add-on can only be purchased with an active Forward My Mail plan.</p><p>If you’re new, please choose a plan above first. If you’re already a customer, you can continue to purchase the add-on.</p><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;"><button class="btn btn-outline" id="addon-choose-plan" type="button">Choose a plan</button><a class="btn btn-primary" href="#" id="addon-continue">I’m already a customer</a><button class="btn btn-outline" id="addon-cancel" type="button">Cancel</button></div></div></div></div><script id="addon-gate-script">
+</script><div aria-hidden="true" class="policy-modal" id="modal-addon-gate"><div class="policy-backdrop"></div><div aria-labelledby="addon-title" aria-modal="true" class="policy-dialog" role="dialog"><div class="policy-header"><span id="addon-title">Add-on purchase</span><button aria-label="Close" class="policy-close" type="button">×</button><div class="policy-body"><p>This add-on can only be purchased with an active Forward My Mail plan.</p><p>If you’re new, please choose a plan above first. If you’re already a customer, you can continue to purchase the add-on.</p><div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;"><button class="btn btn-outline" id="addon-choose-plan" type="button">Choose a plan</button><a class="btn btn-primary" href="#" id="addon-continue">I’m already a customer</a><button class="btn btn-outline" id="addon-cancel" type="button">Cancel</button></div></div></div></div><script id="addon-gate-script">
 document.addEventListener('DOMContentLoaded', function () {
   var addonBtn = document.getElementById('btn-parcel-addon');
   var modal = document.getElementById('modal-addon-gate');
@@ -2176,5 +2574,321 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 <!-- WhatsApp floating button -->
 <a class="wa-fab__btn" href="https://wa.me/+441543406028?text=Hi%20there%2C%20I%27d%20like%20to%20learn%20more." target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22white%22%20d%3D%22M19.11%2017.21c-.28-.14-1.64-.8-1.9-.9-.26-.1-.45-.14-.64.14-.19.28-.73.9-.9%201.08-.17.19-.33.21-.61.07-.28-.14-1.17-.43-2.22-1.38-.82-.73-1.38-1.64-1.54-1.91-.16-.28-.02-.43.12-.57.12-.12.28-.33.42-.5.14-.17.19-.28.28-.47.09-.19.05-.36-.02-.5-.07-.14-.64-1.54-.88-2.11-.23-.56-.47-.48-.64-.48h-.55c-.19%200-.5.07-.76.36-.26.28-.99.97-.99%202.36%200%201.39%201.02%202.74%201.16%202.93.14.19%202.01%203.06%204.88%204.29.68.29%201.21.46%201.63.59.68.21%201.31.18%201.81.11.55-.08%201.64-.67%201.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.26-.19-.54-.33zM16%203.2c-7.06%200-12.8%205.74-12.8%2012.8%200%202.26.6%204.37%201.64%206.2L3.2%2028.8l6.75-1.77c1.76.96%203.77%201.5%205.94%201.5%207.06%200%2012.8-5.74%2012.8-12.8S23.06%203.2%2016%203.2zm0%2022.94c-1.98%200-3.82-.59-5.36-1.61l-.38-.24-4.01%201.05%201.07-3.9-.25-.4a10.6%2010.6%200%200%201-1.66-5.75c0-5.88%204.78-10.66%2010.66-10.66%205.88%200%2010.66%204.78%2010.66%2010.66%200%205.88-4.78%2010.66-10.66%2010.66z%22/%3E%3C/svg%3E" alt=""/></a>
+
+<!-- Cancellation & Refund Policy -->
+<div aria-hidden="true" class="policy-modal" id="modal-cancellation">
+  <div class="policy-backdrop"></div>
+  <div aria-labelledby="cxl-title" aria-modal="true" class="policy-dialog" role="dialog">
+    <div class="policy-header">
+      <h2 id="cxl-title">Cancellation &amp; Refund Policy (UK)</h2>
+      <span class="policy-actions">
+        <button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button>
+      </span>
+      <button class="policy-close-x" aria-label="Close">×</button>
+    
+    <div class="policy-body">
+      <p><small>Last updated: [fill date]</small></p>
+
+      <details open>
+        <summary>1) Scope</summary>
+        <p>This policy explains how cancellations, refunds and service credits work for our address and mail-handling services. It forms part of our Terms.</p>
+      </details>
+
+      <details>
+        <summary>2) Consumers (B2C) – 14-day cooling-off</summary>
+        <ul>
+          <li>If you buy online or by phone, you may cancel <strong>within 14 days</strong> of the contract date without giving a reason.</li>
+          <li>If you ask us to <strong>start the service during the 14-day period</strong>, you’ll pay a <strong>proportionate amount</strong> for the service delivered up to cancellation. Once the service is <strong>fully performed</strong>, the cancellation right ends.</li>
+          <li><strong>How to cancel:</strong> email <a href="mailto:info@forwardmymail.co.uk?subject=Cancellation%20request">info@forwardmymail.co.uk</a> with your name, address and order reference, or use our Cancellation Form.</li>
+          <li>We refund <strong>within 14 days</strong> of your cancellation (or of confirming any pro‑rata amount due) using the original payment method unless otherwise agreed.</li>
+        </ul>
+      </details>
+
+      <details>
+        <summary>3) Businesses &amp; organisations (B2B)</summary>
+        <p>The statutory cooling-off rules do not apply to business customers. You may cancel on <strong>30 days’ written notice</strong> (email is fine). Fees already paid for a fixed term are <strong>non‑refundable</strong>, unless we agree otherwise in writing.</p>
+      </details>
+
+      <details>
+        <summary>4) When we may suspend or terminate</summary>
+        <p>We may suspend/terminate if (i) required ID/verification is not provided, (ii) invoices are overdue, or (iii) our address is misused / Terms are breached. If we end the contract for your breach, <strong>no refund</strong> of prepaid fees is due. We’ll act reasonably and notify you where practicable.</p>
+      </details>
+
+      <details>
+        <summary>5) Mail and address use after cancellation</summary>
+        <p>After cancellation you must remove our address from <strong>all</strong> records (e.g., Companies House / DVLA). Mail received after termination may be returned to sender or securely destroyed per our data‑protection procedures.</p>
+      </details>
+
+      <details>
+        <summary>6) Service credits</summary>
+        <p>Where appropriate we may offer a <strong>service credit</strong> instead of a cash refund. Credits expire <strong>12 months</strong> from issue. Credits are discretionary and do not affect your statutory rights.</p>
+      </details>
+
+      <details>
+        <summary>7) How to request a cancellation or refund</summary>
+        <p>Email: <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a> (or write to our postal address). Please include: name, company (if applicable), service reference, requested cancellation date, and reason (optional).</p>
+      </details>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // Open/close logic
+  document.addEventListener('click', function(e){
+    const openBtn = e.target.closest('[data-policy-modal]');
+    if(openBtn){
+      const id = openBtn.getAttribute('data-policy-modal');
+      const modal = document.getElementById(id);
+      if(modal){
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden','false');
+        // If opening Terms, convert sections to <details> if not already converted
+        if(id === 'modal-terms'){ convertTermsToDetails(); }
+      }
+    }
+    if(e.target.classList.contains('policy-backdrop') || e.target.classList.contains('policy-close-x')){
+      const modal = e.target.closest('.policy-modal') || document.querySelector('.policy-modal.active');
+      if(modal){
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden','true');
+      }
+    }
+    if(e.target.matches('[data-print-modal]')){
+      const dialog = e.target.closest('.policy-dialog');
+      if(!dialog){ return; }
+      // Print only the dialog content
+      const w = window.open('', '_blank');
+      const doc = w.document.open();
+      const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+        .map(el => el.outerHTML).join('\n');
+      doc.write(`<!doctype html><html><head><meta charset="utf-8">${styles}
+<style>
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid2 label{display:block}
+  .center-row{display:flex;justify-content:center;margin-top:10px}
+  .btn.btn-primary{background:#0a58ca;border:1px solid #0a58ca;color:#fff;padding:.55rem .9rem;border-radius:10px;cursor:pointer}
+</style>
+
+</head><body>${dialog.outerHTML}
+<!-- Cancellation Form Modal -->
+<div aria-hidden="true" class="policy-modal" id="modal-cancellation-form">
+  <div class="policy-backdrop"></div>
+  <div aria-labelledby="cxl-form-title" aria-modal="true" class="policy-dialog" role="dialog">
+    <div class="policy-header">
+      <h2 id="cxl-form-title">Request a Cancellation</h2>
+      <span class="policy-actions">
+        <button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button>
+      </span>
+      <button class="policy-close-x" aria-label="Close">×</button>
+    </div>
+    <div class="policy-body">
+      <form id="cxlForm" onsubmit="return false;">
+        <div class="grid2">
+          <label>Name <input type="text" id="cx_name" required></label>
+          <label>Company (optional) <input type="text" id="cx_company"></label>
+        </div>
+        <label>Service / reference <input type="text" id="cx_service" required></label>
+        <div class="grid2">
+          <label>Order date <input type="date" id="cx_order"></label>
+          <label>Requested cancellation date <input type="date" id="cx_cancel"></label>
+        </div>
+        <label>Reason (optional) <textarea id="cx_reason" rows="4"></textarea></label>
+        <div class="center-row">
+          <button type="button" class="btn btn-primary" data-send-cxl>Email this to info@forwardmymail.co.uk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // click: open modals (existing handler may already exist; this augments behaviors)
+  document.addEventListener('click', function(e){
+    const mbtn = e.target.closest('[data-policy-modal]');
+    if(mbtn){
+      const id = mbtn.getAttribute('data-policy-modal');
+      const modal = document.getElementById(id);
+      if(modal){
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+    // send cancellation email from the form
+    if(e.target && e.target.hasAttribute('data-send-cxl')){
+      const name = (document.getElementById('cx_name')||{}).value||'';
+      const company = (document.getElementById('cx_company')||{}).value||'';
+      const service = (document.getElementById('cx_service')||{}).value||'';
+      const order = (document.getElementById('cx_order')||{}).value||'';
+      const cancel = (document.getElementById('cx_cancel')||{}).value||'';
+      const reason = (document.getElementById('cx_reason')||{}).value||'';
+      const subject = encodeURIComponent('Cancellation request');
+      const body = encodeURIComponent(
+        'Name: ' + name + '\n' +
+        'Company: ' + company + '\n' +
+        'Service / reference: ' + service + '\n' +
+        'Order date: ' + order + '\n' +
+        'Requested cancellation date: ' + cancel + '\n' +
+        'Reason: ' + reason + '\n'
+      );
+      const href = 'mailto:info@forwardmymail.co.uk?subject=' + subject + '&body=' + body;
+      window.location.href = href;
+    }
+  }, false);
+
+  // Insert an extra "Request Cancellation" button inside the Terms modal
+  const terms = document.getElementById('modal-terms');
+  if(terms){
+    const body = terms.querySelector('.policy-body');
+    const header = terms.querySelector('.policy-header');
+    const btnHTML = '<div class="center-row" style="margin:10px 0 4px;"><button type="button" class="btn btn-primary" data-policy-modal="modal-cancellation-form">Request Cancellation</button></div>';
+    if(header && !header.dataset.cxlBtnAdded){
+      header.insertAdjacentHTML('afterend', btnHTML);
+      header.dataset.cxlBtnAdded = '1';
+    }
+    if(body && !body.dataset.cxlBtnAdded){
+      body.insertAdjacentHTML('beforeend', '<hr style="margin-top:16px;border:none;border-top:1px solid #e5e7eb;">' + btnHTML);
+      body.dataset.cxlBtnAdded = '1';
+    }
+  }
+})();
+</script>
+
+</body></html>`);
+      doc.close();
+      w.focus();
+      w.print();
+    }
+  }, false);
+
+  // Convert Terms <h3> sections into numbered <details>
+  function convertTermsToDetails(){
+    const body = document.querySelector('#modal-terms .policy-body');
+    if(!body){ return; }
+    // Avoid double-conversion
+    if(body.querySelector('details')){ return; }
+
+    const nodes = Array.from(body.children);
+    let sections = [];
+    let current = null;
+
+    nodes.forEach(node => {
+      if(node.tagName && node.tagName.toLowerCase() === 'h3'){
+        if(current){ sections.push(current); }
+        current = { title: node.textContent.trim(), content: [] };
+      } else {
+        if(current){ current.content.push(node.outerHTML if node.outerHTML else node.textContent); }
+      }
+    });
+    if(current){ sections.push(current); }
+
+    // Rebuild body with <details> in numeric order
+    if(sections.length){
+      body.innerHTML = '';
+      sections.forEach((sec, i) => {
+        const num = i+1;
+        const details = document.createElement('details');
+        const summary = document.createElement('summary');
+        summary.textContent = num + ') ' + sec.title;
+        details.appendChild(summary);
+        const div = document.createElement('div');
+        div.innerHTML = sec.content.join('');
+        details.appendChild(div);
+        body.appendChild(details);
+      });
+    }
+  }
+})();
+</script>
+
+
+<!-- Cancellation Form Modal -->
+<div aria-hidden="true" class="policy-modal" id="modal-cancellation-form">
+  <div class="policy-backdrop"></div>
+  <div aria-labelledby="cxl-form-title" aria-modal="true" class="policy-dialog" role="dialog">
+    <div class="policy-header">
+      <h2 id="cxl-form-title">Request a Cancellation</h2>
+      <span class="policy-actions">
+        <button aria-label="Print / Save PDF" class="btn btn-print" data-print-modal="true" type="button">Print / Save PDF</button>
+      </span>
+      <button class="policy-close-x" aria-label="Close">×</button>
+    </div>
+    <div class="policy-body">
+      <form id="cxlForm" onsubmit="return false;">
+        <div class="grid2">
+          <label>Name <input type="text" id="cx_name" required></label>
+          <label>Company (optional) <input type="text" id="cx_company"></label>
+        </div>
+        <label>Service / reference <input type="text" id="cx_service" required></label>
+        <div class="grid2">
+          <label>Order date <input type="date" id="cx_order"></label>
+          <label>Requested cancellation date <input type="date" id="cx_cancel"></label>
+        </div>
+        <label>Reason (optional) <textarea id="cx_reason" rows="4"></textarea></label>
+        <div class="center-row">
+          <button type="button" class="btn btn-primary" data-send-cxl>Email this to info@forwardmymail.co.uk</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  // click: open modals (existing handler may already exist; this augments behaviors)
+  document.addEventListener('click', function(e){
+    const mbtn = e.target.closest('[data-policy-modal]');
+    if(mbtn){
+      const id = mbtn.getAttribute('data-policy-modal');
+      const modal = document.getElementById(id);
+      if(modal){
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+    // send cancellation email from the form
+    if(e.target && e.target.hasAttribute('data-send-cxl')){
+      const name = (document.getElementById('cx_name')||{}).value||'';
+      const company = (document.getElementById('cx_company')||{}).value||'';
+      const service = (document.getElementById('cx_service')||{}).value||'';
+      const order = (document.getElementById('cx_order')||{}).value||'';
+      const cancel = (document.getElementById('cx_cancel')||{}).value||'';
+      const reason = (document.getElementById('cx_reason')||{}).value||'';
+      const subject = encodeURIComponent('Cancellation request');
+      const body = encodeURIComponent(
+        'Name: ' + name + '\n' +
+        'Company: ' + company + '\n' +
+        'Service / reference: ' + service + '\n' +
+        'Order date: ' + order + '\n' +
+        'Requested cancellation date: ' + cancel + '\n' +
+        'Reason: ' + reason + '\n'
+      );
+      const href = 'mailto:info@forwardmymail.co.uk?subject=' + subject + '&body=' + body;
+      window.location.href = href;
+    }
+  }, false);
+
+  // Insert an extra "Request Cancellation" button inside the Terms modal
+  const terms = document.getElementById('modal-terms');
+  if(terms){
+    const body = terms.querySelector('.policy-body');
+    const header = terms.querySelector('.policy-header');
+    const btnHTML = '<div class="center-row" style="margin:10px 0 4px;"><button type="button" class="btn btn-primary" data-policy-modal="modal-cancellation-form">Request Cancellation</button></div>';
+    if(header && !header.dataset.cxlBtnAdded){
+      header.insertAdjacentHTML('afterend', btnHTML);
+      header.dataset.cxlBtnAdded = '1';
+    }
+    if(body && !body.dataset.cxlBtnAdded){
+      body.insertAdjacentHTML('beforeend', '<hr style="margin-top:16px;border:none;border-top:1px solid #e5e7eb;">' + btnHTML);
+      body.dataset.cxlBtnAdded = '1';
+    }
+  }
+})();
+</script>
+
 </body>
 </html>
