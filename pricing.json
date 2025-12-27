@@ -1,15 +1,60 @@
 {
   "last_updated": "2025-12-27",
   "currency": "GBP",
+
   "personal_mailbox": {
     "name": "Personal Mailbox",
     "billing": "annual",
     "price": 99.00
   },
-  "concierge": {
-    "lite": { "name": "Concierge Lite", "billing": "monthly", "price": 29.99, "minutes_included": 50, "overage_per_min": 0.50 },
-    "smart": { "name": "Concierge Smart", "billing": "monthly", "price": 55.00, "minutes_included": 150, "overage_per_min": 0.45 },
-    "pro":   { "name": "Concierge Pro",   "billing": "monthly", "price": 88.99, "minutes_included": 300, "overage_per_min": 0.40 }
+
+  "business": {
+    "business_address": {
+      "name": "Business Address",
+      "billing": "annual",
+      "price": 149.00
+    },
+    "registered_office": {
+      "name": "Registered Office",
+      "billing": "annual",
+      "price": 189.00
+    },
+    "full_virtual_office": {
+      "name": "Full Virtual Office",
+      "billing": "annual",
+      "price": 299.00
+    },
+    "registered_office_plus_formation": {
+      "name": "Registered Office + Company Formation",
+      "billing": "annual + one-off",
+      "price": null,
+      "notes": "Do NOT quote this price. Direct callers to the website/Zendo for the latest formation fee."
+    }
   },
-  "notes": "All figures exclude VAT unless otherwise stated. Pricing and features may change; website is the master record."
+
+  "concierge": {
+    "lite": {
+      "name": "Concierge Lite",
+      "billing": "monthly",
+      "price": 29.99,
+      "minutes_included": 50,
+      "overage_per_min": 0.50
+    },
+    "smart": {
+      "name": "Concierge Smart",
+      "billing": "monthly",
+      "price": 55.00,
+      "minutes_included": 150,
+      "overage_per_min": 0.45
+    },
+    "pro": {
+      "name": "Concierge Pro",
+      "billing": "monthly",
+      "price": 88.99,
+      "minutes_included": 300,
+      "overage_per_min": 0.40
+    }
+  },
+
+  "notes": "All figures exclude VAT unless otherwise stated. Pricing/features may change; the website is the master record. If any field is missing or null, the agent must not guess and should direct the caller to the Pricing page or offer transfer."
 }
