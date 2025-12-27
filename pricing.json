@@ -1,0 +1,15 @@
+{
+  "last_updated": "2025-12-27",
+  "currency": "GBP",
+  "personal_mailbox": {
+    "name": "Personal Mailbox",
+    "billing": "annual",
+    "price": 99.00
+  },
+  "concierge": {
+    "lite": { "name": "Concierge Lite", "billing": "monthly", "price": 29.99, "minutes_included": 50, "overage_per_min": 0.50 },
+    "smart": { "name": "Concierge Smart", "billing": "monthly", "price": 55.00, "minutes_included": 150, "overage_per_min": 0.45 },
+    "pro":   { "name": "Concierge Pro",   "billing": "monthly", "price": 88.99, "minutes_included": 300, "overage_per_min": 0.40 }
+  },
+  "notes": "All figures exclude VAT unless otherwise stated. Pricing and features may change; website is the master record."
+}
