@@ -379,9 +379,16 @@
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        await loadCustomers();
-        loginSection.classList.remove('active');
-        portalSection.classList.add('active');
+        // Wait for ID token to be ready
+        try {
+          await user.getIdToken(true);
+          await loadCustomers();
+          loginSection.classList.remove('active');
+          portalSection.classList.add('active');
+        } catch (error) {
+          console.error('Error getting auth token:', error);
+          showError('Authentication error. Please try logging in again.');
+        }
       } else {
         loginSection.classList.add('active');
         portalSection.classList.remove('active');
