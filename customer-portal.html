@@ -443,10 +443,22 @@
       document.getElementById('password').value = '';
     });
 
-    // Force logout on page load so users must login each time
-    signOut(auth).catch(() => {
-      // Ignore errors if not logged in
-    });
+    // Check for success/cancelled payment
+    const urlParams = new URLSearchParams(window.location.search);
+    const isPaymentReturn = urlParams.get('success') || urlParams.get('cancelled');
+    
+    if (urlParams.get('success')) {
+      showSuccess('Payment successful! Your credits have been added.');
+    } else if (urlParams.get('cancelled')) {
+      showError('Payment cancelled.');
+    }
+
+    // Force logout on page load ONLY if not returning from payment
+    if (!isPaymentReturn) {
+      signOut(auth).catch(() => {
+        // Ignore errors if not logged in
+      });
+    }
 
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
