@@ -395,6 +395,12 @@
       showError('Payment cancelled.');
     }
 
+    // Force clear login fields on page load (prevent autofill)
+    window.addEventListener('load', () => {
+      document.getElementById('email').value = '';
+      document.getElementById('password').value = '';
+    });
+
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
