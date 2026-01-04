@@ -455,7 +455,10 @@
         // Wait for ID token to be ready
         try {
           await user.getIdToken(true);
+          
+          // ALWAYS load customers when authenticated
           await loadCustomers();
+          
           loginSection.classList.remove('active');
           portalSection.classList.add('active');
         } catch (error) {
