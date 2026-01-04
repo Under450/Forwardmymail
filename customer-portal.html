@@ -526,14 +526,39 @@
           const item = doc.data();
           const date = item.processedAt?.toDate().toLocaleDateString() || 'Unknown';
           const status = item.status || 'scanned';
+          const files = item.files || [];
+          
+          // Build file links HTML
+          let filesHtml = '';
+          if (files.length > 0) {
+            filesHtml = '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">';
+            files.forEach((file, index) => {
+              const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
+              filesHtml += `
+                <div style="margin-top: 5px;">
+                  <a href="${file.url}" target="_blank" download="${file.name}" 
+                     style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                    ${fileIcon} ${file.name}
+                    <span style="color: #999; font-size: 12px;">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                  </a>
+                </div>
+              `;
+            });
+            filesHtml += '</div>';
+          }
           
           html += `
             <div class="mail-item">
               <div class="mail-item-info">
                 <div><strong>${item.pages || 1} page(s)</strong></div>
                 <div class="mail-item-date">${date}</div>
+                ${item.notes ? `<div style="color: #666; font-size: 14px; margin-top: 5px;">${item.notes}</div>` : ''}
+                ${filesHtml}
               </div>
-              <span class="mail-item-status status-${status}">${status}</span>
+              <div style="text-align: right;">
+                <span class="mail-item-status status-${status}">${status}</span>
+                <div style="margin-top: 5px; font-weight: bold; color: #1e3c72;">£${item.cost?.toFixed(2) || '0.00'}</div>
+              </div>
             </div>
           `;
         });
