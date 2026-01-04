@@ -280,15 +280,15 @@
         <h2 style="margin-bottom: 20px;">Staff Login</h2>
         <div id="errorMessage" class="error-message"></div>
         
-        <form id="loginForm">
+        <form id="loginForm" autocomplete="off">
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" required placeholder="staff@forwardmymail.co.uk">
+            <input type="email" id="email" required placeholder="staff@forwardmymail.co.uk" autocomplete="off">
           </div>
           
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" required placeholder="Enter your password">
+            <input type="password" id="password" required placeholder="Enter your password" autocomplete="new-password">
           </div>
           
           <button type="submit" id="loginBtn">Login</button>
