@@ -443,15 +443,6 @@
       document.getElementById('password').value = '';
     });
 
-    // Check for success/cancelled payment
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.get('success')) {
-      showSuccess('Payment successful! Your credits have been added.');
-    } else if (urlParams.get('cancelled')) {
-      showError('Payment cancelled.');
-    }
-
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -480,12 +471,16 @@
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
+      console.log('Login attempt for:', email);
+
       try {
         loginBtn.disabled = true;
         loginBtn.textContent = 'Logging in...';
-        await signInWithEmailAndPassword(auth, email, password);
+        const result = await signInWithEmailAndPassword(auth, email, password);
+        console.log('Login successful:', result.user.email);
       } catch (error) {
-        showError('Invalid email or password');
+        console.error('Login error:', error);
+        showError('Invalid email or password: ' + error.message);
       } finally {
         loginBtn.disabled = false;
         loginBtn.textContent = 'Login';
