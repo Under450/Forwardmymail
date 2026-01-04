@@ -14,7 +14,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -32,10 +32,16 @@
     }
 
     .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: white;
       padding: 30px;
       text-align: center;
+    }
+
+    .header .logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 15px;
     }
 
     .header h1 {
@@ -77,13 +83,13 @@
 
     input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #1e3c72;
     }
 
     button {
       width: 100%;
       padding: 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: white;
       border: none;
       border-radius: 8px;
@@ -157,7 +163,7 @@
 
     .credit-balance {
       font-size: 32px;
-      color: #667eea;
+      color: #1e3c72;
     }
 
     .credit-packs {
@@ -178,7 +184,7 @@
     }
 
     .credit-pack:hover {
-      border-color: #667eea;
+      border-color: #1e3c72;
       transform: translateY(-4px);
       box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
     }
@@ -186,7 +192,7 @@
     .pack-amount {
       font-size: 24px;
       font-weight: bold;
-      color: #667eea;
+      color: #1e3c72;
       margin-bottom: 8px;
     }
 
@@ -264,7 +270,8 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>🏢 Forward My Mail</h1>
+      <img src="https://forwardmymail.co.uk/wp-content/uploads/2024/12/FMM-Logo-White-No-Background-e1734621812404.png" alt="Forward My Mail" class="logo">
+      <h1>Forward My Mail</h1>
       <p id="headerSubtitle">Customer Portal</p>
     </div>
 
@@ -286,12 +293,12 @@
           </div>
           
           <button type="submit" id="loginBtn">Login</button>
-          <button type="button" onclick="window.location.href='signup.html'" style="background: white; color: #667eea; border: 2px solid #667eea; margin-top: 10px;">Create Account</button>
+          <button type="button" onclick="window.location.href='signup.html'" style="background: white; color: #1e3c72; border: 2px solid #1e3c72; margin-top: 10px;">Create Account</button>
         </form>
         
         <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
           <p style="color: #666; margin-bottom: 10px;">
-            <a href="reset-password.html" style="color: #667eea; text-decoration: none; font-weight: 500;">Forgot password?</a>
+            <a href="reset-password.html" style="color: #1e3c72; text-decoration: none; font-weight: 500;">Forgot password?</a>
           </p>
         </div>
       </div>
