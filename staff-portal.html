@@ -449,11 +449,6 @@
       document.getElementById('password').value = '';
     });
 
-    // Force logout on page load so users must login each time
-    signOut(auth).catch(() => {
-      // Ignore errors if not logged in
-    });
-
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -707,6 +702,12 @@
           credits: newCredits
         });
 
+        // Update current customer object with new credits
+        currentCustomer.credits = newCredits;
+        
+        // Update the credit display immediately
+        displayCustomerInfo(currentCustomer);
+
         showSuccess(`Scan processed successfully! ${pages} page(s) - £${cost.toFixed(2)} deducted. ${uploadedFiles.length} file(s) uploaded. New balance: £${newCredits.toFixed(2)}`);
         
         // Reset form
@@ -752,13 +753,33 @@
         querySnapshot.forEach((doc) => {
           const item = doc.data();
           const date = item.processedAt?.toDate().toLocaleString() || 'Unknown';
+          const files = item.files || [];
+          
+          // Build files display
+          let filesHtml = '';
+          if (files.length > 0) {
+            filesHtml = '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">';
+            files.forEach((file) => {
+              const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
+              filesHtml += `
+                <div style="font-size: 13px; margin-top: 4px;">
+                  <a href="${file.url}" target="_blank" download="${file.name}" 
+                     style="color: #1e3c72; text-decoration: none;">
+                    ${fileIcon} ${file.name}
+                  </a>
+                </div>
+              `;
+            });
+            filesHtml += '</div>';
+          }
           
           html += `
             <div class="activity-item">
               <div class="activity-info">
-                <div><strong>${item.pages} page(s)</strong></div>
+                <div><strong>${item.pages} page(s)</strong> ${files.length > 0 ? `- ${files.length} file(s)` : ''}</div>
                 <div class="activity-date">${date}</div>
                 ${item.notes ? `<div style="color: #666; font-size: 14px; margin-top: 5px;">${item.notes}</div>` : ''}
+                ${filesHtml}
               </div>
               <div class="activity-cost">-£${item.cost.toFixed(2)}</div>
             </div>
