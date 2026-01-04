@@ -2160,22 +2160,50 @@ a.cf-cta:hover * { color: #ffffff !important; }
     });
   }
   // Print handler (scoped, does not override existing)
+  // Print handler (scoped, does not override existing)
   document.addEventListener('click', function(e){
     if(e.target && e.target.matches('[data-print-modal]')){
       const dialog = e.target.closest('.policy-dialog');
       if(!dialog) return;
-      const w = window.open('', '_blank');
-      const doc = w.document.open();
-      const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-        .map(el => el.outerHTML).join('\n');
-      doc.write(`<!doctype html><html><head><meta charset="utf-8">${styles}<style>
+      
+      let fallbackShown = false;
+      function showFallback(msg) {
+        if(fallbackShown) return;
+        fallbackShown = true;
+        alert(msg || 'Pop-up blocked. Please allow pop-ups or use Ctrl+P to print.');
+      }
+      
+      let w;
+      try {
+        w = window.open('', '_blank');
+      } catch(err) {
+        showFallback('Unable to open print window. Please check your browser settings.');
+        return;
+      }
+      
+      if(!w || w.closed || typeof w.closed === 'undefined') {
+        showFallback('Pop-up blocked. Please allow pop-ups for this site.');
+        return;
+      }
+      
+      try {
+        const doc = w.document.open();
+        const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+          .map(el => el.outerHTML).join('\n');
+        doc.write(`<!doctype html><html><head><meta charset="utf-8">${styles}<style>
 </style>
 <style>
 </style>
 <style>
 </style>
 </head><body>${dialog.outerHTML}</body></html>`);
-      doc.close(); w.focus(); w.print();
+        doc.close();
+        w.focus();
+        setTimeout(() => { try { w.print(); } catch(e) { showFallback('Unable to print. Use Ctrl+P in the new window.'); } }, 100);
+      } catch(err) {
+        try { w.close(); } catch(e) {}
+        showFallback('Error preparing print. Please try Ctrl+P.');
+      }
     }
   }, false);
   // Cancellation form mailto sender
