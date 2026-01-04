@@ -357,6 +357,21 @@
             <textarea id="notes" rows="3" placeholder="Add any notes about this scan..."></textarea>
           </div>
 
+          <div class="form-group">
+            <label for="scanFiles">Upload Scanned Documents</label>
+            <input type="file" id="scanFiles" multiple accept="image/*,.pdf" style="margin-bottom: 10px;">
+            <div style="font-size: 13px; color: #666; margin-top: 5px;">
+              Select one or more images (JPG, PNG) or PDF files
+            </div>
+            <div id="fileList" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+            <div id="uploadProgress" style="display: none; margin-top: 10px;">
+              <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
+                <div id="progressBar" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+              </div>
+              <div id="progressText" style="text-align: center; margin-top: 5px; font-size: 13px; color: #666;"></div>
+            </div>
+          </div>
+
           <div class="cost-display">
             <div style="color: #666; margin-bottom: 5px;">Estimated Cost</div>
             <div class="cost-amount">£<span id="costAmount">0.50</span></div>
@@ -385,6 +400,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, addDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
     // Firebase configuration
     const firebaseConfig = {
@@ -401,6 +417,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     // DOM Elements
     const loginSection = document.getElementById('loginSection');
@@ -417,6 +434,11 @@
     const pagesInput = document.getElementById('pages');
     const costAmount = document.getElementById('costAmount');
     const processScanBtn = document.getElementById('processScanBtn');
+    const scanFilesInput = document.getElementById('scanFiles');
+    const fileListDiv = document.getElementById('fileList');
+    const uploadProgressDiv = document.getElementById('uploadProgress');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
 
     let currentCustomer = null;
     let unsubscribeCustomer = null;
@@ -586,6 +608,58 @@
       costAmount.textContent = cost.toFixed(2);
     });
 
+    // File list display
+    scanFilesInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      if (files.length === 0) {
+        fileListDiv.innerHTML = '';
+        return;
+      }
+      
+      const fileNames = files.map((f, i) => `${i + 1}. ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('<br>');
+      fileListDiv.innerHTML = `<strong>${files.length} file(s) selected:</strong><br>${fileNames}`;
+    });
+
+    // Upload files to Storage
+    async function uploadScanFiles(customerId, files) {
+      const uploadedFiles = [];
+      const timestamp = Date.now();
+      
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const fileName = `${timestamp}_${i + 1}_${file.name}`;
+        const storageRef = ref(storage, `mail-scans/${customerId}/${fileName}`);
+        
+        // Update progress
+        progressText.textContent = `Uploading ${i + 1} of ${files.length}: ${file.name}`;
+        
+        const uploadTask = uploadBytesResumable(storageRef, file);
+        
+        await new Promise((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              const overallProgress = ((i / files.length) + (progress / 100 / files.length)) * 100;
+              progressBar.style.width = overallProgress + '%';
+            },
+            (error) => reject(error),
+            async () => {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              uploadedFiles.push({
+                name: file.name,
+                url: downloadURL,
+                size: file.size,
+                type: file.type
+              });
+              resolve();
+            }
+          );
+        });
+      }
+      
+      return uploadedFiles;
+    }
+
     // Process scan handler
     processScanBtn.addEventListener('click', async () => {
       if (!currentCustomer) {
@@ -596,6 +670,7 @@
       const pages = parseInt(pagesInput.value) || 1;
       const notes = document.getElementById('notes').value;
       const cost = 0.50 + ((pages - 1) * 0.25);
+      const files = Array.from(scanFilesInput.files);
 
       if (currentCustomer.credits < cost) {
         showError(`Insufficient credits. Need £${cost.toFixed(2)}, but customer only has £${currentCustomer.credits.toFixed(2)}`);
@@ -606,12 +681,21 @@
         processScanBtn.disabled = true;
         processScanBtn.textContent = 'Processing...';
 
-        // Create mail item record
+        // Upload files if any are selected
+        let uploadedFiles = [];
+        if (files.length > 0) {
+          uploadProgressDiv.style.display = 'block';
+          uploadedFiles = await uploadScanFiles(currentCustomer.id, files);
+          uploadProgressDiv.style.display = 'none';
+        }
+
+        // Create mail item record with file URLs
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages: pages,
           cost: cost,
           notes: notes,
+          files: uploadedFiles, // Store uploaded file info
           processedAt: serverTimestamp(),
           processedBy: auth.currentUser.email,
           status: 'scanned'
@@ -623,19 +707,23 @@
           credits: newCredits
         });
 
-        showSuccess(`Scan processed successfully! ${pages} page(s) - £${cost.toFixed(2)} deducted. New balance: £${newCredits.toFixed(2)}`);
+        showSuccess(`Scan processed successfully! ${pages} page(s) - £${cost.toFixed(2)} deducted. ${uploadedFiles.length} file(s) uploaded. New balance: £${newCredits.toFixed(2)}`);
         
         // Reset form
         pagesInput.value = 1;
         document.getElementById('notes').value = '';
+        scanFilesInput.value = '';
+        fileListDiv.innerHTML = '';
         costAmount.textContent = '0.50';
+        progressBar.style.width = '0%';
 
         // Reload activity
         await loadRecentActivity(currentCustomer.id);
 
       } catch (error) {
         console.error('Error processing scan:', error);
-        showError('Error processing scan. Please try again.');
+        showError('Error processing scan: ' + error.message);
+        uploadProgressDiv.style.display = 'none';
       } finally {
         processScanBtn.disabled = false;
         processScanBtn.textContent = 'Process Scan';
