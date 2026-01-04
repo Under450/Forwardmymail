@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Forward My Mail</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 500px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 40px;
+    }
+
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .error-message, .success-message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .error-message {
+      background-color: #fee;
+      color: #c33;
+      border: 1px solid #fcc;
+    }
+
+    .success-message {
+      background-color: #efe;
+      color: #3c3;
+      border: 1px solid #cfc;
+    }
+
+    .error-message.show, .success-message.show {
+      display: block;
+    }
+
+    .links {
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .links a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    .logo {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+
+    .requirement {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+
+    .terms-container {
+      margin: 25px 0;
+    }
+
+    .terms-box {
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      height: 200px;
+      overflow-y: scroll;
+      background: #fafafa;
+      margin-bottom: 15px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .terms-box h3 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .terms-box p {
+      margin-bottom: 10px;
+      color: #666;
+    }
+
+    .terms-box::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .terms-box::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .terms-box::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 4px;
+    }
+
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .checkbox-container input[type="checkbox"]:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .checkbox-container label {
+      margin: 0;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .scroll-notice {
+      font-size: 13px;
+      color: #ff9800;
+      font-weight: 500;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .scroll-notice.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">📬</div>
+      <h1>Create Your Account</h1>
+      <p>Join Forward My Mail today</p>
+    </div>
+    <div class="content">
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
+
+      <form id="signupForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" required placeholder="Craig Jeavons">
+        </div>
+
+        <div class="form-group">
+          <label for="company">Company (Optional)</label>
+          <input type="text" id="company" placeholder="Your Company Ltd">
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" required placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" required placeholder="At least 6 characters">
+          <div class="requirement">Minimum 6 characters</div>
+        </div>
+
+        <div class="form-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" required placeholder="Re-enter your password">
+        </div>
+
+        <!-- Terms & Conditions -->
+        <div class="terms-container">
+          <div class="scroll-notice" id="scrollNotice">
+            ⬇️ Please scroll to the bottom to read all terms
+          </div>
+          <div class="terms-box" id="termsBox">
+            <h3>Terms and Conditions</h3>
+            <p><strong>Last Updated: January 2026</strong></p>
+            
+            <h4>1. Service Description</h4>
+            <p>Forward My Mail provides virtual mailbox and mail forwarding services. We scan and digitize your postal mail, making it available through our online portal.</p>
+            
+            <h4>2. Credit System</h4>
+            <p>Our service operates on a credit-based system. Credits are purchased in advance and used to pay for mail scanning services. First page costs £0.50, additional pages cost £0.25 each.</p>
+            
+            <h4>3. Privacy & Data Protection</h4>
+            <p>We handle your mail with strict confidentiality. All scanned documents are stored securely and are only accessible by you. We comply with UK GDPR regulations.</p>
+            
+            <h4>4. Mail Handling</h4>
+            <p>We will scan mail items as requested. Physical mail can be forwarded, shredded, or stored according to your instructions. Mail storage beyond 30 days may incur additional fees.</p>
+            
+            <h4>5. Payment Terms</h4>
+            <p>Credits are non-refundable once purchased. All payments are processed securely through Stripe. You are responsible for maintaining sufficient credits to process your mail.</p>
+            
+            <h4>6. Account Termination</h4>
+            <p>Either party may terminate this agreement with 30 days notice. Upon termination, remaining credits will expire and cannot be refunded.</p>
+            
+            <h4>7. Limitation of Liability</h4>
+            <p>Forward My Mail is not liable for any loss or damage arising from use of our services, except as required by law. Our liability is limited to the amount paid for services.</p>
+            
+            <h4>8. Changes to Terms</h4>
+            <p>We reserve the right to modify these terms at any time. Continued use of the service after changes constitutes acceptance of new terms.</p>
+            
+            <p><strong>By creating an account, you agree to these terms and conditions.</strong></p>
+          </div>
+          
+          <div class="checkbox-container">
+            <input type="checkbox" id="termsCheckbox" disabled>
+            <label for="termsCheckbox">I have read and agree to the Terms and Conditions</label>
+          </div>
+        </div>
+
+        <button type="submit" id="signupBtn" disabled>Create Account</button>
+      </form>
+
+      <div class="links">
+        Already have an account? <a href="customer-portal.html">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+    import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDi5k6W0vT5s2NauNxv4TIX5FZNZRV_Fj8",
+      authDomain: "forward-my-mail.firebaseapp.com",
+      projectId: "forward-my-mail",
+      storageBucket: "forward-my-mail.firebasestorage.app",
+      messagingSenderId: "933044287958",
+      appId: "1:933044287958:web:fa3a707dbec62b24e74c77",
+      measurementId: "G-J8M65WQCGH"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const signupForm = document.getElementById('signupForm');
+    const signupBtn = document.getElementById('signupBtn');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+    const termsBox = document.getElementById('termsBox');
+    const termsCheckbox = document.getElementById('termsCheckbox');
+    const scrollNotice = document.getElementById('scrollNotice');
+
+    // Terms scroll detection
+    termsBox.addEventListener('scroll', () => {
+      const isScrolledToBottom = termsBox.scrollHeight - termsBox.scrollTop <= termsBox.clientHeight + 5;
+      
+      if (isScrolledToBottom) {
+        termsCheckbox.disabled = false;
+        scrollNotice.classList.remove('show');
+      }
+    });
+
+    // Show scroll notice on page load
+    scrollNotice.classList.add('show');
+
+    // Checkbox handler - enable submit button when checked
+    termsCheckbox.addEventListener('change', (e) => {
+      signupBtn.disabled = !e.target.checked;
+    });
+
+    // Signup handler
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value.trim();
+      const company = document.getElementById('company').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Validation
+      if (!name) {
+        showError('Please enter your full name');
+        return;
+      }
+
+      if (password.length < 6) {
+        showError('Password must be at least 6 characters');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        showError('Passwords do not match');
+        return;
+      }
+
+      if (!termsCheckbox.checked) {
+        showError('Please accept the Terms and Conditions');
+        return;
+      }
+
+      try {
+        signupBtn.disabled = true;
+        signupBtn.textContent = 'Creating account...';
+        hideMessages();
+
+        // Create user account
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        // Update profile with display name
+        await updateProfile(user, {
+          displayName: name
+        });
+
+        // Create customer document in Firestore
+        await setDoc(doc(db, 'customers', user.uid), {
+          name: name,
+          email: email,
+          company: company || '',
+          credits: 0,
+          created: serverTimestamp()
+        });
+
+        showSuccess('Account created successfully! Redirecting to customer portal...');
+        
+        // Redirect to customer portal after 2 seconds
+        setTimeout(() => {
+          window.location.href = 'customer-portal.html';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Signup error:', error);
+        
+        let errorMsg = 'Failed to create account. Please try again.';
+        
+        if (error.code === 'auth/email-already-in-use') {
+          errorMsg = 'This email is already registered. Please login instead.';
+        } else if (error.code === 'auth/invalid-email') {
+          errorMsg = 'Invalid email address.';
+        } else if (error.code === 'auth/weak-password') {
+          errorMsg = 'Password is too weak. Please use a stronger password.';
+        }
+        
+        showError(errorMsg);
+        signupBtn.disabled = false;
+        signupBtn.textContent = 'Create Account';
+      }
+    });
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+      successMessage.classList.remove('show');
+    }
+
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.classList.add('show');
+      errorMessage.classList.remove('show');
+    }
+
+    function hideMessages() {
+      errorMessage.classList.remove('show');
+      successMessage.classList.remove('show');
+    }
+  </script>
+</body>
+</html>
