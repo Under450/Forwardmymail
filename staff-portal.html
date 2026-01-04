@@ -413,6 +413,11 @@
       document.getElementById('password').value = '';
     });
 
+    // Force logout on page load so users must login each time
+    signOut(auth).catch(() => {
+      // Ignore errors if not logged in
+    });
+
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
