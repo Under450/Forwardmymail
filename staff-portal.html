@@ -77,12 +77,12 @@
     }
 
     button {
-      padding: 14px 28px;
+      padding: 12px 24px;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: transform 0.2s;
@@ -232,6 +232,34 @@
       color: #1e3c72;
     }
 
+    .low-credit-warning {
+      background: #fff3cd;
+      border-left: 4px solid #ff9800;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: #856404;
+    }
+
+    .critical-credit-warning {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: #721c24;
+    }
+
+    .credit-value.low-credit {
+      color: #ff9800 !important;
+    }
+
+    .credit-value.critical-credit {
+      color: #dc3545 !important;
+    }
+
     @media (max-width: 768px) {
       .customer-info {
         grid-template-columns: 1fr;
@@ -297,6 +325,9 @@
             </div>
           </div>
         </div>
+
+        <!-- Low Credit Warning -->
+        <div id="lowCreditWarning" style="display: none;"></div>
 
         <!-- Scan Processing Form -->
         <div class="scan-form" id="scanForm" style="display: none;">
@@ -489,12 +520,35 @@
       
       const credits = customer.credits || 0;
       const creditsElement = document.getElementById('customerCredits');
+      const warningElement = document.getElementById('lowCreditWarning');
       creditsElement.textContent = `£${credits.toFixed(2)}`;
       
-      if (credits < 5) {
+      // Remove all credit classes first
+      creditsElement.classList.remove('low-credit', 'critical-credit');
+      
+      // Show appropriate warning based on credit level
+      if (credits < 0.50) {
+        // CRITICAL - Can't process any scans
+        creditsElement.classList.add('critical-credit');
+        warningElement.className = 'critical-credit-warning';
+        warningElement.innerHTML = '⛔ <strong>CRITICAL:</strong> Customer has insufficient credits (£' + credits.toFixed(2) + '). Minimum £0.50 required to process scans. Customer must purchase credits before processing.';
+        warningElement.style.display = 'block';
+      } else if (credits < 2.00) {
+        // LOW - Can process 1-3 scans only
+        const scansRemaining = Math.floor((credits - 0.50) / 0.25) + 1;
         creditsElement.classList.add('low-credit');
+        warningElement.className = 'low-credit-warning';
+        warningElement.innerHTML = '⚠️ <strong>LOW CREDITS:</strong> Customer has £' + credits.toFixed(2) + ' remaining (approximately ' + scansRemaining + ' scan(s)). Advise customer to purchase more credits soon.';
+        warningElement.style.display = 'block';
+      } else if (credits < 5.00) {
+        // MODERATE - Show gentle warning
+        creditsElement.classList.add('low-credit');
+        warningElement.className = 'low-credit-warning';
+        warningElement.innerHTML = '💡 <strong>NOTICE:</strong> Customer credit balance is getting low (£' + credits.toFixed(2) + '). Consider notifying customer.';
+        warningElement.style.display = 'block';
       } else {
-        creditsElement.classList.remove('low-credit');
+        // SUFFICIENT - No warning
+        warningElement.style.display = 'none';
       }
 
       customerInfo.style.display = 'grid';
