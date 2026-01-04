@@ -169,9 +169,16 @@
 
     .credit-packs {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
       margin-top: 20px;
+      max-width: 100%;
+    }
+
+    @media (min-width: 768px) {
+      .credit-packs {
+        grid-template-columns: repeat(5, 1fr);
+      }
     }
 
     .credit-pack {
@@ -328,17 +335,45 @@
         </p>
 
         <div class="credit-packs">
+          <div class="credit-pack" data-amount="5">
+            <div class="pack-amount">£5</div>
+            <div class="pack-scans">~15 scans</div>
+          </div>
           <div class="credit-pack" data-amount="10">
             <div class="pack-amount">£10</div>
             <div class="pack-scans">~30 scans</div>
+          </div>
+          <div class="credit-pack" data-amount="15">
+            <div class="pack-amount">£15</div>
+            <div class="pack-scans">~45 scans</div>
           </div>
           <div class="credit-pack" data-amount="20">
             <div class="pack-amount">£20</div>
             <div class="pack-scans">~60 scans</div>
           </div>
+          <div class="credit-pack" data-amount="25">
+            <div class="pack-amount">£25</div>
+            <div class="pack-scans">~75 scans</div>
+          </div>
+          <div class="credit-pack" data-amount="30">
+            <div class="pack-amount">£30</div>
+            <div class="pack-scans">~90 scans</div>
+          </div>
+          <div class="credit-pack" data-amount="40">
+            <div class="pack-amount">£40</div>
+            <div class="pack-scans">~120 scans</div>
+          </div>
           <div class="credit-pack" data-amount="50">
             <div class="pack-amount">£50</div>
             <div class="pack-scans">~150 scans</div>
+          </div>
+          <div class="credit-pack" data-amount="75">
+            <div class="pack-amount">£75</div>
+            <div class="pack-scans">~225 scans</div>
+          </div>
+          <div class="credit-pack" data-amount="100">
+            <div class="pack-amount">£100</div>
+            <div class="pack-scans">~300 scans</div>
           </div>
         </div>
 
@@ -470,7 +505,7 @@
         
         if (customerDoc.exists()) {
           const data = customerDoc.data();
-          userName.textContent = data.name || 'Customer';
+          userName.textContent = data.name || currentUser.email || 'Customer';
           creditBalance.textContent = (data.credits || 0).toFixed(2);
 
           // Show low balance warning if credits < £5
@@ -497,10 +532,16 @@
 
           // Load mail items
           await loadMailItems();
+        } else {
+          // Customer document doesn't exist - show error
+          userName.textContent = currentUser.email || 'Customer';
+          creditBalance.textContent = '0.00';
+          showError('Your customer account is not set up yet. Please contact support at info@forwardmymail.co.uk');
+          console.error('Customer document not found for UID:', currentUser.uid);
         }
       } catch (error) {
         console.error('Error loading customer data:', error);
-        showError('Error loading your data');
+        showError('Error loading your data: ' + error.message);
       }
     }
 
