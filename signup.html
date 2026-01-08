@@ -327,7 +327,7 @@
 
     // Firebase configuration
     const firebaseConfig = {
-      apiKey: "AIzaSyDi5k6W0vT5s2NauNxv4TIX5FZNZRV_Fj8",
+      apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
       authDomain: "forward-my-mail.firebaseapp.com",
       projectId: "forward-my-mail",
       storageBucket: "forward-my-mail.firebasestorage.app",
@@ -425,15 +425,17 @@
         });
 
         // Generate mailbox ID using Cloud Function
-        const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
-        const functions = getFunctions(app);
-        const generateMailboxId = httpsCallable(functions, 'generateMailboxId');
-        
+        // Generate mailbox ID using Cloud Function
         try {
-          const result = await generateMailboxId();
+          const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
+          const functions = getFunctions(app);
+          const generateMailboxIdFunc = httpsCallable(functions, 'generateMailboxId');
+          const result = await generateMailboxIdFunc();
           console.log('Mailbox ID generated:', result.data.mailboxId);
         } catch (functionError) {
           console.error('Error generating mailbox ID:', functionError);
+          // Continue anyway - account still created, ID can be generated later
+        }
           // Continue anyway - ID can be generated later
         }
 
