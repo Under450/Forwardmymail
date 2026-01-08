@@ -425,20 +425,15 @@
         });
 
         // Generate mailbox ID using Cloud Function
-        // Generate mailbox ID using Cloud Function
         try {
-          const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
-          const functions = getFunctions(app);
-          const generateMailboxIdFunc = httpsCallable(functions, 'generateMailboxId');
+          const functionsModule = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
+          const functions = functionsModule.getFunctions(app);
+          const generateMailboxIdFunc = functionsModule.httpsCallable(functions, 'generateMailboxId');
           const result = await generateMailboxIdFunc();
           console.log('Mailbox ID generated:', result.data.mailboxId);
         } catch (functionError) {
           console.error('Error generating mailbox ID:', functionError);
-          // Continue anyway - account still created, ID can be generated later
         }
-          // Continue anyway - ID can be generated later
-        }
-
         showSuccess('Account created successfully! Redirecting to customer portal...');
         
         // Redirect to customer portal after 2 seconds
