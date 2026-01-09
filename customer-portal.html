@@ -501,10 +501,28 @@
       try {
         const customerDoc = await getDoc(doc(db, 'customers', currentUser.uid));
         
-        if (customerDoc.exists()) {
-          const data = customerDoc.data();
-          userName.textContent = data.name || currentUser.email || 'Customer';
-          creditBalance.textContent = (data.credits || 0).toFixed(2);
+if (customerDoc.exists()) {
+  const data = customerDoc.data();
+  
+  // Auto-generate mailbox ID if missing
+  if (!data.mailboxId) {
+    try {
+      const functionsModule = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
+      const functions = functionsModule.getFunctions(app);
+      const generateMailboxIdFunc = functionsModule.httpsCallable(functions, 'generateMailboxId');
+      const result = await generateMailboxIdFunc();
+      console.log('Mailbox ID generated on first login:', result.data.mailboxId);
+      
+      // Reload customer data to get the new mailbox ID
+      const updatedDoc = await getDoc(doc(db, 'customers', currentUser.uid));
+      data.mailboxId = updatedDoc.data().mailboxId;
+    } catch (error) {
+      console.error('Error generating mailbox ID:', error);
+    }
+  }
+  
+  userName.textContent = data.name || currentUser.email || 'Customer';
+  creditBalance.textContent = (data.credits || 0).toFixed(2);
 
           // Show low balance warning if credits < £5
           if ((data.credits || 0) < 5) {
