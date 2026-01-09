@@ -639,7 +639,7 @@ if (!data.mailboxId) {
           pack.style.pointerEvents = 'none';
 
           // Create checkout session via Cloud Function
-          const response = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/createCheckoutSession', {
+          const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
