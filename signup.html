@@ -474,14 +474,20 @@
         });
 
         await setDoc(doc(db, 'customers', user.uid), {
-          name: name,
-          email: email,
-          company: company || '',
-          credits: 0,
-          created: serverTimestamp(),
-          termsAccepted: true,
-          termsAcceptedAt: serverTimestamp()
-        });
+  name: name,
+  email: email,
+  company: company || '',
+  credits: 0,
+  created: serverTimestamp(),
+  termsAccepted: true,
+  termsAcceptedAt: serverTimestamp(),
+  termsAcceptance: {
+    version: '2025-12-19',
+    userAgent: navigator.userAgent,
+    timestamp: new Date().toISOString(),
+    ipAddress: 'pending' // Will be updated by Cloud Function
+  }
+});
 
         try {
           const functionsModule = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
