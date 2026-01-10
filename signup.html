@@ -490,13 +490,25 @@
 });
 
         try {
-          const functionsModule = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
-          const functions = functionsModule.getFunctions(app);
-          const generateMailboxIdFunc = functionsModule.httpsCallable(functions, 'generateMailboxId');
-          await generateMailboxIdFunc();
-        } catch (functionError) {
-          console.error('Error generating mailbox ID:', functionError);
-        }
+  const functionsModule = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
+  const functions = functionsModule.getFunctions(app);
+  
+  // Generate mailbox ID
+  const generateMailboxIdFunc = functionsModule.httpsCallable(functions, 'generateMailboxId');
+  const mailboxResult = await generateMailboxIdFunc();
+  
+  // Send welcome email
+  const sendWelcomeEmailFunc = functionsModule.httpsCallable(functions, 'sendWelcomeEmail');
+  await sendWelcomeEmailFunc({
+    email: email,
+    name: name,
+    mailboxId: mailboxResult.data.mailboxId
+  });
+  
+  console.log('Welcome email sent successfully');
+} catch (functionError) {
+  console.error('Error in post-signup functions:', functionError);
+}
 
         showSuccess('Account created successfully! Redirecting...');
         
