@@ -280,7 +280,7 @@
     <div class="header">
       <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail" class="logo">
       <h1>Forward My Mail</h1>
-      <p id="headerSubtitle">Customer Portal</p>
+      <p id="portalTitle">Customer Portal</p>
     </div>
 
     <div class="content">
@@ -525,7 +525,8 @@ if (!data.mailboxId) {
   }
 }  
   userName.textContent = data.name || currentUser.email || 'Customer';
-  creditBalance.textContent = (data.credits || 0).toFixed(2);
+  document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
+creditBalance.textContent = (data.credits || 0).toFixed(2);
 
           // Show low balance warning if credits < £5
           if ((data.credits || 0) < 5) {
