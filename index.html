@@ -1258,6 +1258,442 @@ article.pricing-card ul.pricing-list{
   justify-content: center !important;
   gap: 18px !important;
 }
+
+/* ========================================
+   AI CONCIERGE RECEPTIONIST CSS
+   ======================================== */
+
+.ai-concierge-section {
+  background: var(--bg);
+  padding: 3.5rem 0;
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.ai-hero {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.ai-hero-kicker {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 1.5rem;
+}
+
+.ai-hero-title {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #1a202c;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.ai-hero-title .ai-highlight {
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-hero-subtitle {
+  font-size: 1.25rem;
+  color: #4a5568;
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.ai-hero-cta {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 10px 30px rgba(255, 140, 66, 0.3);
+}
+
+.ai-hero-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(255, 140, 66, 0.4);
+}
+
+.ai-trust-badges {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin: 3rem 0;
+  flex-wrap: wrap;
+}
+
+.ai-trust-item {
+  text-align: center;
+}
+
+.ai-trust-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ai-trust-text {
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.ai-benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.ai-benefit-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ai-benefit-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.ai-benefit-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.ai-benefit-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+}
+
+.ai-benefit-description {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.ai-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.ai-pricing-card {
+  background: white;
+  border-radius: 25px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-pricing-card.ai-featured {
+  border: 3px solid #ff8c42;
+  transform: scale(1.05);
+}
+
+.ai-pricing-card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}
+
+.ai-pricing-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.ai-pricing-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.ai-pricing-price {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #ff8c42;
+  margin-bottom: 0.5rem;
+}
+
+.ai-pricing-period {
+  font-size: 1rem;
+  color: #718096;
+  margin-bottom: 2rem;
+}
+
+.ai-pricing-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+}
+
+.ai-pricing-features li {
+  padding: 0.75rem 0;
+  color: #4a5568;
+  font-size: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.ai-pricing-features li:before {
+  content: "✓";
+  color: #22c55e;
+  font-weight: 700;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.ai-pricing-cta {
+  display: block;
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  color: white;
+  text-align: center;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ai-pricing-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(255, 140, 66, 0.3);
+}
+
+.ai-how-it-works {
+  margin: 4rem 0;
+}
+
+.ai-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.ai-step {
+  text-align: center;
+  padding: 2rem;
+}
+
+.ai-step-number {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 auto 1.5rem;
+}
+
+.ai-step-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.75rem;
+}
+
+.ai-step-description {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+.ai-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.ai-testimonial {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.ai-testimonial-text {
+  font-size: 1.1rem;
+  color: #2d3748;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+}
+
+.ai-testimonial-author {
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 0.25rem;
+}
+
+.ai-testimonial-role {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.ai-faq-container {
+  max-width: 800px;
+  margin: 3rem auto;
+}
+
+.ai-faq-item {
+  background: white;
+  margin-bottom: 1rem;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.ai-faq-question {
+  padding: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a202c;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.3s ease;
+}
+
+.ai-faq-question:hover {
+  background-color: #f7fafc;
+}
+
+.ai-faq-answer {
+  padding: 0 1.5rem 1.5rem;
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.7;
+}
+
+.ai-section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.ai-section-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: #1a202c;
+  margin-bottom: 1rem;
+}
+
+.ai-section-title .ai-highlight {
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-section-subtitle {
+  font-size: 1.15rem;
+  color: #4a5568;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.ai-final-cta {
+  text-align: center;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  padding: 4rem 2rem;
+  border-radius: 25px;
+  margin: 4rem 0;
+}
+
+.ai-final-cta-title {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: white;
+  margin-bottom: 1rem;
+}
+
+.ai-final-cta-subtitle {
+  font-size: 1.25rem;
+  color: #cbd5e0;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.ai-final-cta-button {
+  display: inline-block;
+  background: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 100%);
+  color: white;
+  padding: 1.25rem 3rem;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 15px 35px rgba(255, 140, 66, 0.4);
+}
+
+.ai-final-cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 45px rgba(255, 140, 66, 0.5);
+}
+
+@media (max-width: 768px) {
+  .ai-trust-badges {
+    gap: 2rem;
+  }
+  
+  .ai-benefits-grid,
+  .ai-pricing-grid,
+  .ai-steps-grid,
+  .ai-testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .ai-pricing-card.ai-featured {
+    transform: scale(1);
+  }
+  
+  .ai-hero-title {
+    font-size: 2rem;
+  }
+  
+  .ai-hero-subtitle {
+    font-size: 1.1rem;
+  }
+}
 <style id="wa-fab-style">
   .wa-fab__btn { position: fixed; right: 18px; bottom: 18px; width: 56px; height: 56px; border-radius: 999px; background: #25D366; box-shadow: 0 10px 24px rgba(0,0,0,0.18); display: inline-flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; animation: waFabBounce 2.4s ease-in-out infinite; text-decoration: none; }
   .wa-fab__btn:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 14px 30px rgba(0,0,0,0.22); }
