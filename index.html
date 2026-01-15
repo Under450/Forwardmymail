@@ -1762,16 +1762,19 @@ a.cf-cta:hover * { color: #ffffff !important; }
   .ai-trust-badges{ gap: 1.5rem; margin: 2rem 0; }
 
   /* ⬇️ ADD THESE LINES FOR THE LOGO */
-  .ai-hero-logo{
-    display:block;
-    width:96px;
-    height:auto;
-    margin:0 auto 12px;
-    filter: drop-shadow(0 6px 18px rgba(0,0,0,.12));
-  }
-  @media (max-width:640px){
-    .ai-hero-logo{ width:72px; margin-bottom:10px; }
-  }
+ /* AI logo sizing */
+.ai-hero-logo{
+  display: block;
+  width: 196px;          /* <- bigger */
+  height: auto;
+  max-width: none !important;  /* ignore any global img max-width */
+  margin: 0 auto 12px;
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,.12));
+}
+@media (max-width:640px){
+  .ai-hero-logo{ width: 128px; }
+}
+
 </style>
 
 <style id="ai-steps-fix">
@@ -2173,8 +2176,6 @@ a.cf-cta:hover * { color: #ffffff !important; }
   class="ai-hero-logo"
   src="AI%20Consierge%20logo%201.png"
   alt="AI Concierge logo"
-  width="196"
-  height="196"
   loading="lazy"
 />
 
