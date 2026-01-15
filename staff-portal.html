@@ -196,7 +196,7 @@
       padding: 15px;
       border-radius: 8px;
       margin-top: 15px;
-      text-align: center;
+      text-align: center.
     }
 
     .cost-amount {
@@ -337,11 +337,21 @@
               <div class="info-label">Credit Balance</div>
               <div class="info-value credit-value" id="customerCredits">£0.00</div>
             </div>
+            <!-- NEW: free scans indicator -->
+            <div class="info-item">
+              <div class="info-label">Free scans left (this month)</div>
+              <div class="info-value" id="customerFreeScans">0</div>
+            </div>
           </div>
         </div>
 
         <!-- Low Credit Warning -->
         <div id="lowCreditWarning" style="display: none;"></div>
+
+        <!-- NEW: grant free scan action -->
+        <div id="freeScanActions" style="display:none; margin-bottom:20px;">
+          <button id="addFreeScanBtn" type="button">Add 1 Free Scan</button>
+        </div>
 
         <!-- Scan Processing Form -->
         <div class="scan-form" id="scanForm" style="display: none;">
@@ -399,7 +409,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, addDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, addDoc, onSnapshot, serverTimestamp, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
     // Firebase configuration
@@ -439,6 +449,9 @@
     const uploadProgressDiv = document.getElementById('uploadProgress');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
+    const addFreeScanBtn = document.getElementById('addFreeScanBtn');
+    const customerFreeScansEl = document.getElementById('customerFreeScans');
+    const freeScanActions = document.getElementById('freeScanActions');
 
     let currentCustomer = null;
     let unsubscribeCustomer = null;
@@ -452,13 +465,9 @@
     // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Wait for ID token to be ready
         try {
           await user.getIdToken(true);
-          
-          // ALWAYS load customers when authenticated
           await loadCustomers();
-          
           loginSection.classList.remove('active');
           portalSection.classList.add('active');
         } catch (error) {
@@ -503,13 +512,11 @@
     async function loadCustomers() {
       try {
         const querySnapshot = await getDocs(collection(db, 'customers'));
-        
         customerSelect.innerHTML = '<option value="">-- Select a customer --</option>';
-        
-        querySnapshot.forEach((doc) => {
-          const customer = doc.data();
+        querySnapshot.forEach((docSnap) => {
+          const customer = docSnap.data();
           const option = document.createElement('option');
-          option.value = doc.id;
+          option.value = docSnap.id;
           option.textContent = `${customer.name} - ${customer.company || 'No company'}`;
           customerSelect.appendChild(option);
         });
@@ -522,11 +529,11 @@
     // Customer select handler
     customerSelect.addEventListener('change', async (e) => {
       const customerId = e.target.value;
-      
       if (!customerId) {
         customerInfo.style.display = 'none';
         scanForm.style.display = 'none';
         recentActivity.style.display = 'none';
+        freeScanActions.style.display = 'none';
         currentCustomer = null;
         if (unsubscribeCustomer) unsubscribeCustomer();
         return;
@@ -534,7 +541,6 @@
 
       try {
         const customerDoc = await getDoc(doc(db, 'customers', customerId));
-        
         if (customerDoc.exists()) {
           currentCustomer = { id: customerId, ...customerDoc.data() };
           displayCustomerInfo(currentCustomer);
@@ -542,11 +548,11 @@
           recentActivity.style.display = 'block';
           await loadRecentActivity(customerId);
 
-          // Listen for real-time credit updates
+          // Real-time updates
           if (unsubscribeCustomer) unsubscribeCustomer();
-          unsubscribeCustomer = onSnapshot(doc(db, 'customers', customerId), (doc) => {
-            if (doc.exists()) {
-              currentCustomer = { id: customerId, ...doc.data() };
+          unsubscribeCustomer = onSnapshot(doc(db, 'customers', customerId), (snap) => {
+            if (snap.exists()) {
+              currentCustomer = { id: customerId, ...snap.data() };
               displayCustomerInfo(currentCustomer);
             }
           });
@@ -557,49 +563,73 @@
       }
     });
 
-    // Display customer info
+    // Display customer info (with free scans + warnings)
     function displayCustomerInfo(customer) {
       document.getElementById('customerName').textContent = customer.name || '-';
       document.getElementById('customerCompany').textContent = customer.company || '-';
       document.getElementById('customerEmail').textContent = customer.email || '-';
-      
-      const credits = customer.credits || 0;
+
+      const credits = Number(customer.credits || 0);
+      const freeScans = Number(customer.freeScansRemaining || 0);
+
       const creditsElement = document.getElementById('customerCredits');
       const warningElement = document.getElementById('lowCreditWarning');
+
       creditsElement.textContent = `£${credits.toFixed(2)}`;
-      
-      // Remove all credit classes first
+      if (customerFreeScansEl) customerFreeScansEl.textContent = String(freeScans);
+
+      // Reset classes
       creditsElement.classList.remove('low-credit', 'critical-credit');
-      
-      // Show appropriate warning based on credit level
-      if (credits < 0.50) {
-        // CRITICAL - Can't process any scans
+
+      // Warnings (considering free scans)
+      if (credits < 0.50 && freeScans <= 0) {
         creditsElement.classList.add('critical-credit');
         warningElement.className = 'critical-credit-warning';
-        warningElement.innerHTML = '⛔ <strong>CRITICAL:</strong> Customer has insufficient credits (£' + credits.toFixed(2) + '). Minimum £0.50 required to process scans. Customer must purchase credits before processing.';
+        warningElement.innerHTML = '⛔ <strong>CRITICAL:</strong> Insufficient credits (£' + credits.toFixed(2) + ') and no free scans.';
+        warningElement.style.display = 'block';
+      } else if (credits < 0.50 && freeScans > 0) {
+        creditsElement.classList.add('low-credit');
+        warningElement.className = 'low-credit-warning';
+        warningElement.innerHTML = '✅ <strong>Free scans available:</strong> ' + freeScans + ' left this month. Scans will use these before credits.';
         warningElement.style.display = 'block';
       } else if (credits < 2.00) {
-        // LOW - Can process 1-3 scans only
-        const scansRemaining = Math.floor((credits - 0.50) / 0.25) + 1;
+        const scansRemaining = Math.max(Math.floor((credits - 0.50) / 0.25) + 1, 0);
         creditsElement.classList.add('low-credit');
         warningElement.className = 'low-credit-warning';
-        warningElement.innerHTML = '⚠️ <strong>LOW CREDITS:</strong> Customer has £' + credits.toFixed(2) + ' remaining (approximately ' + scansRemaining + ' scan(s)). Advise customer to purchase more credits soon.';
+        warningElement.innerHTML = '⚠️ <strong>LOW CREDITS:</strong> £' + credits.toFixed(2) + ' (~' + scansRemaining + ' paid scan(s)). Free scans left: ' + freeScans + '.';
         warningElement.style.display = 'block';
       } else if (credits < 5.00) {
-        // MODERATE - Show gentle warning
         creditsElement.classList.add('low-credit');
         warningElement.className = 'low-credit-warning';
-        warningElement.innerHTML = '💡 <strong>NOTICE:</strong> Customer credit balance is getting low (£' + credits.toFixed(2) + '). Consider notifying customer.';
+        warningElement.innerHTML = '💡 <strong>NOTICE:</strong> Credits getting low (£' + credits.toFixed(2) + '). Free scans left: ' + freeScans + '.';
         warningElement.style.display = 'block';
       } else {
-        // SUFFICIENT - No warning
         warningElement.style.display = 'none';
       }
+
+      // Show free scan action once a customer is selected
+      if (freeScanActions) freeScanActions.style.display = 'block';
 
       customerInfo.style.display = 'grid';
     }
 
-    // Calculate cost
+    // Grant 1 free scan
+    addFreeScanBtn?.addEventListener('click', async () => {
+      if (!currentCustomer) return showError('Please select a customer first');
+      try {
+        addFreeScanBtn.disabled = true;
+        await updateDoc(doc(db, 'customers', currentCustomer.id), {
+          freeScansRemaining: increment(1)
+        });
+        showSuccess('Added 1 free scan');
+      } catch (e) {
+        showError('Failed to add free scan: ' + e.message);
+      } finally {
+        addFreeScanBtn.disabled = false;
+      }
+    });
+
+    // Calculate cost display
     pagesInput.addEventListener('input', () => {
       const pages = parseInt(pagesInput.value) || 1;
       const cost = 0.50 + ((pages - 1) * 0.25);
@@ -613,7 +643,6 @@
         fileListDiv.innerHTML = '';
         return;
       }
-      
       const fileNames = files.map((f, i) => `${i + 1}. ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('<br>');
       fileListDiv.innerHTML = `<strong>${files.length} file(s) selected:</strong><br>${fileNames}`;
     });
@@ -622,17 +651,12 @@
     async function uploadScanFiles(customerId, files) {
       const uploadedFiles = [];
       const timestamp = Date.now();
-      
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const fileName = `${timestamp}_${i + 1}_${file.name}`;
         const storageRef = ref(storage, `mail-scans/${customerId}/${fileName}`);
-        
-        // Update progress
         progressText.textContent = `Uploading ${i + 1} of ${files.length}: ${file.name}`;
-        
         const uploadTask = uploadBytesResumable(storageRef, file);
-        
         await new Promise((resolve, reject) => {
           uploadTask.on('state_changed',
             (snapshot) => {
@@ -654,11 +678,10 @@
           );
         });
       }
-      
       return uploadedFiles;
     }
 
-    // Process scan handler
+    // Process scan (use free scans first, else charge credits)
     processScanBtn.addEventListener('click', async () => {
       if (!currentCustomer) {
         showError('Please select a customer first');
@@ -667,11 +690,18 @@
 
       const pages = parseInt(pagesInput.value) || 1;
       const notes = document.getElementById('notes').value;
-      const cost = 0.50 + ((pages - 1) * 0.25);
+      const baseCost = 0.50 + ((pages - 1) * 0.25);
       const files = Array.from(scanFilesInput.files);
 
-      if (currentCustomer.credits < cost) {
-        showError(`Insufficient credits. Need £${cost.toFixed(2)}, but customer only has £${currentCustomer.credits.toFixed(2)}`);
+      const freeScans = Number(currentCustomer.freeScansRemaining || 0);
+      let usedFreeScan = false;
+      let effectiveCost = baseCost;
+
+      if (freeScans > 0) {
+        usedFreeScan = true;
+        effectiveCost = 0;
+      } else if ((currentCustomer.credits || 0) < baseCost) {
+        showError(`Insufficient credits. Need £${baseCost.toFixed(2)}, but customer only has £${(currentCustomer.credits || 0).toFixed(2)}`);
         return;
       }
 
@@ -679,7 +709,7 @@
         processScanBtn.disabled = true;
         processScanBtn.textContent = 'Processing...';
 
-        // Upload files if any are selected
+        // Upload files if any
         let uploadedFiles = [];
         if (files.length > 0) {
           uploadProgressDiv.style.display = 'block';
@@ -687,32 +717,38 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        // Create mail item record with file URLs
+        // Create mail item record
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
-          pages: pages,
-          cost: cost,
-          notes: notes,
-          files: uploadedFiles, // Store uploaded file info
+          pages,
+          cost: effectiveCost,
+          notes,
+          files: uploadedFiles,
           processedAt: serverTimestamp(),
           processedBy: auth.currentUser.email,
-          status: 'scanned'
+          status: 'scanned',
+          freeScanUsed: usedFreeScan
         });
 
-        // Deduct credits
-        const newCredits = currentCustomer.credits - cost;
-        await updateDoc(doc(db, 'customers', currentCustomer.id), {
-          credits: newCredits
-        });
+        // Update balances
+        if (usedFreeScan) {
+          await updateDoc(doc(db, 'customers', currentCustomer.id), {
+            freeScansRemaining: increment(-1)
+          });
+          currentCustomer.freeScansRemaining = Math.max(freeScans - 1, 0);
+        } else {
+          const newCredits = (currentCustomer.credits || 0) - baseCost;
+          await updateDoc(doc(db, 'customers', currentCustomer.id), { credits: newCredits });
+          currentCustomer.credits = newCredits;
+        }
 
-        // Update current customer object with new credits
-        currentCustomer.credits = newCredits;
-        
-        // Update the credit display immediately
+        // Refresh UI
         displayCustomerInfo(currentCustomer);
 
-        showSuccess(`Scan processed successfully! ${pages} page(s) - £${cost.toFixed(2)} deducted. ${uploadedFiles.length} file(s) uploaded. New balance: £${newCredits.toFixed(2)}`);
-        
+        showSuccess(
+          `Scan processed: ${pages} page(s) — ${usedFreeScan ? 'free scan used' : '£' + baseCost.toFixed(2) + ' deducted'}.`
+        );
+
         // Reset form
         pagesInput.value = 1;
         document.getElementById('notes').value = '';
@@ -721,9 +757,7 @@
         costAmount.textContent = '0.50';
         progressBar.style.width = '0%';
 
-        // Reload activity
         await loadRecentActivity(currentCustomer.id);
-
       } catch (error) {
         console.error('Error processing scan:', error);
         showError('Error processing scan: ' + error.message);
@@ -743,7 +777,6 @@
           orderBy('processedAt', 'desc'),
           limit(10)
         );
-
         const querySnapshot = await getDocs(q);
         const activityList = document.getElementById('activityList');
         
@@ -753,12 +786,13 @@
         }
 
         let html = '';
-        querySnapshot.forEach((doc) => {
-          const item = doc.data();
+        querySnapshot.forEach((d) => {
+          const item = d.data();
           const date = item.processedAt?.toDate().toLocaleString() || 'Unknown';
           const files = item.files || [];
-          
-          // Build files display
+          const costText = item.freeScanUsed ? '(free)' : `-£${(item.cost || 0).toFixed(2)}`;
+
+          // Files list
           let filesHtml = '';
           if (files.length > 0) {
             filesHtml = '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">';
@@ -766,8 +800,7 @@
               const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
               filesHtml += `
                 <div style="font-size: 13px; margin-top: 4px;">
-                  <a href="${file.url}" target="_blank" download="${file.name}" 
-                     style="color: #1e3c72; text-decoration: none;">
+                  <a href="${file.url}" target="_blank" download="${file.name}" style="color: #1e3c72; text-decoration: none;">
                     ${fileIcon} ${file.name}
                   </a>
                 </div>
@@ -784,7 +817,7 @@
                 ${item.notes ? `<div style="color: #666; font-size: 14px; margin-top: 5px;">${item.notes}</div>` : ''}
                 ${filesHtml}
               </div>
-              <div class="activity-cost">-£${item.cost.toFixed(2)}</div>
+              <div class="activity-cost">${costText}</div>
             </div>
           `;
         });
