@@ -1760,6 +1760,18 @@ a.cf-cta:hover * { color: #ffffff !important; }
   .ai-section-title{ font-size: clamp(1.4rem, 3vw, 1.8rem); }
   .ai-hero{ margin-bottom: 2rem; }
   .ai-trust-badges{ gap: 1.5rem; margin: 2rem 0; }
+
+  /* ⬇️ ADD THESE LINES FOR THE LOGO */
+  .ai-hero-logo{
+    display:block;
+    width:96px;
+    height:auto;
+    margin:0 auto 12px;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,.12));
+  }
+  @media (max-width:640px){
+    .ai-hero-logo{ width:72px; margin-bottom:10px; }
+  }
 </style>
 
 <style id="ai-steps-fix">
@@ -2159,7 +2171,7 @@ a.cf-cta:hover * { color: #ffffff !important; }
 <div class="ai-hero">
   <img
   class="ai-hero-logo"
-  src="AI Consierge logo 2.png"
+  src="AI%Consierge%logo%2.png"
   alt="AI Concierge logo"
   width="96"
   height="96"
