@@ -1748,14 +1748,44 @@ a.cf-cta:hover * { color: #ffffff !important; }
 </style>
 <style>
 </style>
-  a.cf-cta:hover * { color: #ffffff !important; }
+
+<!-- ⬇️ ADD THIS BLOCK AS THE LAST <style> IN <head> -->
+<style id="ai-compact-overrides">
+  .ai-concierge-section { font-size: 0.95rem; }
+
+  .ai-hero-title{ font-size: clamp(1.8rem, 3.2vw, 2.4rem); }
+  .ai-hero-subtitle{ font-size: 1rem; max-width: 620px; }
+  .ai-hero-cta{ padding: .7rem 1.5rem; font-size: .95rem; border-radius: 12px; box-shadow: none; }
+
+  .ai-benefit-card{ padding: 1.2rem; border-radius: 14px; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+  .ai-benefit-title{ font-size: 1.05rem; }
+  .ai-benefit-description{ font-size: .95rem; }
+
+  /* Smaller orange circles */
+  .ai-step-number{ width: 44px; height: 44px; font-size: 1.1rem; margin-bottom: 1rem; }
+
+  .ai-section-title{ font-size: clamp(1.6rem, 3.2vw, 2rem); }
+  .ai-section-subtitle{ font-size: 1rem; }
+
+  .ai-pricing-grid{ gap: 1rem; }
+  .ai-pricing-card{ padding: 1.25rem 1.25rem 1.5rem; border-radius: 16px; box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+  .ai-pricing-card.ai-featured{ border-width: 2px; transform: none; }
+  .ai-pricing-card:hover{ transform: translateY(-2px) scale(1.0); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+
+  .ai-pricing-name{ font-size: 1.1rem; }
+  .ai-pricing-price{ font-size: 2rem; margin-bottom: .25rem; }
+  .ai-pricing-period{ font-size: .95rem; }
+  .ai-pricing-features li{ padding: .5rem 0; font-size: .95rem; }
+  .ai-pricing-badge{ top: 12px; right: 12px; font-size: .65rem; padding: .25rem .6rem; }
+
+  .ai-pricing-cta{ padding: .6rem 1rem; font-size: .95rem; border-radius: 10px; box-shadow: none; }
+
+  .ai-final-cta{ padding: 2rem 1.25rem; border-radius: 18px; }
+  .ai-final-cta-title{ font-size: clamp(1.6rem, 3vw, 2rem); }
+  .ai-final-cta-subtitle{ font-size: 1rem; }
 </style>
-<style>
-</style>
-<style>
-</style>
-<style>
-</style>
+</head>
+
 
 <!-- INSERT THIS BLOCK ↓ JUST BEFORE </head> -->
 <style id="ai-steps-fix">
