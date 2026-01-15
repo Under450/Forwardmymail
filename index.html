@@ -1264,8 +1264,9 @@ article.pricing-card ul.pricing-list{
    ======================================== */
 
 .ai-concierge-section {
-  padding: 3.5rem 0;
+  padding: 2.5rem 0;            /* was 3.5rem */
   font-family: 'Outfit', 'Inter', sans-serif;
+  font-size: 0.9rem;            /* new: gently downscale everything */
 }
 
 .ai-concierge-section .container {
@@ -1292,7 +1293,7 @@ article.pricing-card ul.pricing-list{
 }
 
 .ai-hero-title {
-  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-size: clamp(1.8rem, 3.8vw, 2.4rem);
   font-weight: 800;
   color: #1a202c;
   margin-bottom: 1rem;
@@ -1307,7 +1308,7 @@ article.pricing-card ul.pricing-list{
 }
 
 .ai-hero-subtitle {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
   color: #4a5568;
   max-width: 700px;
   margin: 0 auto 2rem;
@@ -1364,8 +1365,8 @@ article.pricing-card ul.pricing-list{
 
 .ai-benefit-card {
   background: white;
-  padding: 2rem;
-  border-radius: 20px;
+  padding: 1rem;            /* was 2rem */
+  border-radius: 12px;      /* was 20px */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -1401,8 +1402,8 @@ article.pricing-card ul.pricing-list{
 }
 .ai-pricing-card {
   background: white;
-  border-radius: 25px;
-  padding: 2.5rem;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;   /* final padding */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
@@ -1410,8 +1411,8 @@ article.pricing-card ul.pricing-list{
 }
 
 .ai-pricing-card.ai-featured {
-  border: 3px solid #ff8c42;
-  transform: scale(1.05);
+  border: 2px solid #ff8c42;   /* thinner */
+  transform: none;              /* remove enlargement */
 }
 
 .ai-pricing-card:hover {
@@ -1440,7 +1441,7 @@ article.pricing-card ul.pricing-list{
 }
 
 .ai-pricing-price {
-  font-size: 3rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: #ff8c42;
   margin-bottom: 0.5rem;
