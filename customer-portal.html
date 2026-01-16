@@ -6,284 +6,65 @@
   <title>Customer Portal - Forward My Mail v2</title>
   <script src="https://js.stripe.com/v3/"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
-
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      max-width: 900px;
-      width: 100%;
-      overflow: hidden;
-    }
-
-    .header {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      padding: 30px;
-      text-align: center;
-    }
-
-    .header .logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 15px;
-      filter: brightness(0) invert(1);
-    }
-
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .content {
-      padding: 40px;
-    }
-
-    .login-section, .portal-section {
-      display: none;
-    }
-
-    .login-section.active, .portal-section.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 500;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: #1e3c72;
-    }
-
+    .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 900px; width: 100%; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px; text-align: center; }
+    .header .logo { width: 120px; height: auto; margin-bottom: 15px; filter: brightness(0) invert(1); }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .content { padding: 40px; }
+    .login-section, .portal-section { display: none; }
+    .login-section.active, .portal-section.active { display: block; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+    input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
+    input:focus { outline: none; border-color: #1e3c72; }
     button {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
+      width: 100%; padding: 12px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform 0.2s;
     }
-
-    button:hover {
-      transform: translateY(-2px);
-    }
-
-    button:active {
-      transform: translateY(0);
-    }
-
-    .error-message {
-      background: #fee;
-      color: #c33;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .error-message.show {
-      display: block;
-    }
-
-    .success-message {
-      background: #efe;
-      color: #3c3;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .success-message.show {
-      display: block;
-    }
-
-    .info-card {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #e0e0e0;
-    }
-
-    .info-row:last-child {
-      border-bottom: none;
-    }
-
-    .info-label {
-      color: #666;
-      font-weight: 500;
-    }
-
-    .info-value {
-      color: #333;
-      font-weight: 600;
-    }
-
-    .credit-balance {
-      font-size: 32px;
-      color: #1e3c72;
-    }
-
-    .credit-packs {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-      max-width: 100%;
-    }
-
-    @media (min-width: 768px) {
-      .credit-packs {
-        grid-template-columns: repeat(5, 1fr);
-      }
-    }
-
-    .credit-pack {
-      background: white;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .credit-pack:hover {
-      border-color: #1e3c72;
-      transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-    }
-
-    .pack-amount {
-      font-size: 24px;
-      font-weight: bold;
-      color: #1e3c72;
-      margin-bottom: 8px;
-    }
-
-    .pack-scans {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .logout-btn {
-      background: #dc3545;
-      margin-top: 20px;
-    }
-
-    .mail-items {
-      margin-top: 30px;
-    }
-
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    .error-message { background: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
+    .error-message.show { display: block; }
+    .success-message { background: #efe; color: #3c3; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
+    .success-message.show { display: block; }
+    .info-card { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e0e0e0; }
+    .info-row:last-child { border-bottom: none; }
+    .info-label { color: #666; font-weight: 500; }
+    .info-value { color: #333; font-weight: 600; }
+    .credit-balance { font-size: 32px; color: #1e3c72; }
+    .credit-packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; max-width: 100%; }
+    @media (min-width: 768px) { .credit-packs { grid-template-columns: repeat(5, 1fr); } }
+    .credit-pack { background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; }
+    .credit-pack:hover { border-color: #1e3c72; transform: translateY(-4px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2); }
+    .pack-amount { font-size: 24px; font-weight: bold; color: #1e3c72; margin-bottom: 8px; }
+    .pack-scans { color: #666; font-size: 14px; }
+    .logout-btn { background: #dc3545; margin-top: 20px; }
+    .mail-items { margin-top: 30px; }
     .mail-item {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px;
+      display: flex; justify-content: space-between; align-items: center;
     }
-
-    .mail-item-info {
-      flex: 1;
-    }
-
-    .mail-item-date {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .mail-item-status {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .status-scanned {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
+    .mail-item-info { flex: 1; }
+    .mail-item-date { color: #666; font-size: 14px; }
+    .mail-item-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-scanned { background: #d4edda; color: #155724; }
+    .status-pending { background: #fff3cd; color: #856404; }
     .low-balance-warning {
-      background: #fff3cd;
-      border-left: 4px solid #ffc107;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
+      background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none;
     }
-
     .low-balance-warning.show { display: block; }
-
-    /* NEW: red critical banner style */
     .critical-credit-warning {
-      background: #f8d7da;
-      border-left: 4px solid #dc3545;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      color: #721c24;
-      display: none;
+      background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #721c24; display: none;
     }
     .critical-credit-warning.show { display: block; }
-
-    @media (max-width: 768px) {
-      .credit-packs {
-        grid-template-columns: 1fr;
-      }
-    }
+    @media (max-width: 768px) { .credit-packs { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -305,16 +86,14 @@
             <label for="email">Email Address</label>
             <input type="email" id="email" required placeholder="your@email.com" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
           </div>
-          
           <div class="form-group">
             <label for="password">Password</label>
             <input type="password" id="password" required placeholder="Enter your password" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
           </div>
-          
           <button type="submit" id="loginBtn">Login</button>
           <button type="button" onclick="window.location.href='signup.html'" style="background: white; color: #1e3c72; border: 2px solid #1e3c72; margin-top: 10px;">Create Account</button>
         </form>
-        
+
         <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
           <p style="color: #666; margin-bottom: 10px;">
             <a href="reset-password.html" style="color: #1e3c72; text-decoration: none; font-weight: 500;">Forgot password?</a>
@@ -341,50 +120,24 @@
         </div>
 
         <h3 style="margin-bottom: 15px;">Purchase Credits</h3>
-        <p style="color: #666; margin-bottom: 20px;">
-          Add credits to your account for mail scanning services
-        </p>
+        <p style="color: #666; margin-bottom: 20px;">Add credits to your account for mail scanning services</p>
 
         <div class="credit-packs">
-          <div class="credit-pack" data-amount="10">
-            <div class="pack-amount">£10</div>
-          </div>
-          <div class="credit-pack" data-amount="20">
-            <div class="pack-amount">£20</div>
-          </div>
-          <div class="credit-pack" data-amount="25">
-            <div class="pack-amount">£25</div>
-          </div>
-          <div class="credit-pack" data-amount="30">
-            <div class="pack-amount">£30</div>
-          </div>
-          <div class="credit-pack" data-amount="50">
-            <div class="pack-amount">£50</div>
-          </div>
+          <div class="credit-pack" data-amount="10"><div class="pack-amount">£10</div></div>
+          <div class="credit-pack" data-amount="20"><div class="pack-amount">£20</div></div>
+          <div class="credit-pack" data-amount="25"><div class="pack-amount">£25</div></div>
+          <div class="credit-pack" data-amount="30"><div class="pack-amount">£30</div></div>
+          <div class="credit-pack" data-amount="50"><div class="pack-amount">£50</div></div>
         </div>
 
         <h3 style="margin-top: 30px; margin-bottom: 15px;">Mailbox Plans</h3>
-        <p style="color: #666; margin-bottom: 20px;">
-          Annual virtual mailbox subscriptions
-        </p>
+        <p style="color: #666; margin-bottom: 20px;">Annual virtual mailbox subscriptions</p>
 
         <div class="credit-packs">
-          <div class="credit-pack" data-amount="99">
-            <div class="pack-amount">£99/year</div>
-            <div class="pack-scans">Personal Mailbox</div>
-          </div>
-          <div class="credit-pack" data-amount="149">
-            <div class="pack-amount">£149/year</div>
-            <div class="pack-scans">Business Mailbox</div>
-          </div>
-          <div class="credit-pack" data-amount="199">
-            <div class="pack-amount">£199/year</div>
-            <div class="pack-scans">Premium Mailbox</div>
-          </div>
-          <div class="credit-pack" data-amount="299">
-            <div class="pack-amount">£299/year</div>
-            <div class="pack-scans">Full Virtual Office</div>
-          </div>
+          <div class="credit-pack" data-amount="99"><div class="pack-amount">£99/year</div><div class="pack-scans">Personal Mailbox</div></div>
+          <div class="credit-pack" data-amount="149"><div class="pack-amount">£149/year</div><div class="pack-scans">Business Mailbox</div></div>
+          <div class="credit-pack" data-amount="199"><div class="pack-amount">£199/year</div><div class="pack-scans">Premium Mailbox</div></div>
+          <div class="credit-pack" data-amount="299"><div class="pack-amount">£299/year</div><div class="pack-scans">Full Virtual Office</div></div>
         </div>
 
         <div class="mail-items">
@@ -405,7 +158,6 @@
     import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, query, collection, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'; 
     import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
 
-    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
       authDomain: "forward-my-mail.firebaseapp.com",
@@ -416,16 +168,12 @@
       measurementId: "G-J8M65WQCGH"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app); setPersistence(auth, browserSessionPersistence);
     const db = getFirestore(app);
     const functions = getFunctions(app);
-
-    // Initialize Stripe - LIVE MODE
     const stripe = Stripe('pk_live_51SjjoBPI7rl1q0GXBd6V8O5wp3ha0Kz7BtYGq1unqPQspEBE5Lbrgwxy8WIlgWjP7anr5sI7MbyCkajpscTsAEhh00I7bE4RsM');
 
-    // DOM Elements
     const loginSection = document.getElementById('loginSection');
     const portalSection = document.getElementById('portalSection');
     const loginForm = document.getElementById('loginForm');
@@ -442,7 +190,6 @@
     let currentUser = null;
     let unsubscribe = null;
 
-    // Check for success/cancelled payment
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('success')) {
       showSuccess('Payment successful! Your credits have been added.');
@@ -450,13 +197,11 @@
       showError('Payment cancelled.');
     }
 
-    // Force clear login fields on page load (prevent autofill)
     window.addEventListener('load', () => {
       document.getElementById('email').value = '';
       document.getElementById('password').value = '';
     });
 
-    // Auth state observer
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
@@ -477,7 +222,6 @@
       }
     });
 
-    // Login form handler
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
@@ -495,23 +239,57 @@
       }
     });
 
-    // Logout handler
     logoutBtn.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        showError('Error logging out');
-      }
+      try { await signOut(auth); }
+      catch (error) { showError('Error logging out'); }
     });
 
-    // Load customer data
     async function loadCustomerData() {
       try {
         const customerDoc = await getDoc(doc(db, 'customers', currentUser.uid));
         if (customerDoc.exists()) {
           const data = customerDoc.data();
 
-          // Auto-generate mailbox ID if missing
+          /* --- LAZY MONTHLY FREE-SCAN APPLY (runs once per month per user) --- */
+          try {
+            const tzNow = new Date(new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }));
+            const y = tzNow.getFullYear();
+            const m = String(tzNow.getMonth() + 1).padStart(2, '0');
+            const currentMonthKey = `${y}-${m}`;
+
+            const allowance = Number(data.monthlyFreeAllowance || 0);
+            const autoRenew = Boolean(data.autoRenewFreeScans);
+            const last = String(data.lastAppliedMonthKey || "");
+            const applyAt = data.applyAtMonthKey || null;
+            const mode = (data.resetMode || "reset").toLowerCase();
+
+            const shouldApplyThisMonth =
+              autoRenew &&
+              allowance > 0 &&
+              last !== currentMonthKey &&
+              (applyAt === null || applyAt === "" || applyAt === currentMonthKey);
+
+            if (shouldApplyThisMonth) {
+              const currentFree = Number(data.freeScansRemaining || 0);
+              const newFree = mode === "topup" ? currentFree + allowance : allowance;
+
+              await updateDoc(doc(db, 'customers', currentUser.uid), {
+                freeScansRemaining: newFree,
+                lastAppliedMonthKey: currentMonthKey,
+                applyAtMonthKey: null
+              });
+
+              // reflect in-memory immediately
+              data.freeScansRemaining = newFree;
+              data.lastAppliedMonthKey = currentMonthKey;
+              data.applyAtMonthKey = null;
+            }
+          } catch (e) {
+            console.error('Lazy monthly free-scan apply failed:', e);
+          }
+          /* --- END LAZY APPLY --- */
+
+          // ensure mailbox ID exists
           if (!data.mailboxId) {
             try {
               const randomNum = Math.floor(10000 + Math.random() * 90000);
@@ -530,12 +308,11 @@
           document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
           creditBalance.textContent = (data.credits || 0).toFixed(2);
 
-          // NEW: banner logic considers freeScansRemaining
+          // Banner logic includes free scans
           {
             const credits = Number(data.credits || 0);
             const free = Number(data.freeScansRemaining || 0);
 
-            // reset to default class hidden
             lowBalanceWarning.classList.remove('show');
             lowBalanceWarning.className = 'low-balance-warning';
 
@@ -551,7 +328,6 @@
             }
           }
 
-          // Listen for real-time credit/free-scan updates
           if (unsubscribe) unsubscribe();
           unsubscribe = onSnapshot(doc(db, 'customers', currentUser.uid), (docSnap) => {
             if (docSnap.exists()) {
@@ -561,7 +337,6 @@
               const credits = Number(d.credits || 0);
               const free = Number(d.freeScansRemaining || 0);
 
-              // reset then apply
               lowBalanceWarning.classList.remove('show');
               lowBalanceWarning.className = 'low-balance-warning';
 
@@ -578,7 +353,6 @@
             }
           });
 
-          // Load mail items
           await loadMailItems();
         } else {
           userName.textContent = currentUser.email || 'Customer';
@@ -591,7 +365,6 @@
       }
     }
 
-    // Load mail items
     async function loadMailItems() {
       try {
         const q = query(
@@ -602,7 +375,6 @@
         );
 
         const querySnapshot = await getDocs(q);
-        
         if (querySnapshot.empty) {
           mailItemsList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No recent mail items</p>';
           return;
@@ -655,7 +427,6 @@
       }
     }
 
-    // Credit pack purchase handlers
     document.querySelectorAll('.credit-pack').forEach(pack => {
       pack.addEventListener('click', async () => {
         const amount = parseInt(pack.dataset.amount);
@@ -690,7 +461,6 @@
       errorMessage.classList.add('show');
       setTimeout(() => errorMessage.classList.remove('show'), 5000);
     }
-
     function showSuccess(message) {
       successMessage.textContent = message;
       successMessage.classList.add('show');
