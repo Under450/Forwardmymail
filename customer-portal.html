@@ -247,7 +247,7 @@
       catch (error) { showError('Error logging out'); }
     });
 
-    // Load customer data (no monthly apply here—scheduled function will handle it)
+    // Load customer data (reads current freeScansRemaining; monthly resets are done by scheduled function)
     async function loadCustomerData() {
       try {
         const customerRef = doc(db, 'customers', currentUser.uid);
@@ -263,7 +263,7 @@
 
         const data = customerDoc.data();
 
-        // ensure mailboxId exists (optional nicety)
+        // ensure mailboxId exists (optional)
         if (!data.mailboxId) {
           try {
             const randomNum = Math.floor(10000 + Math.random() * 90000);
@@ -282,7 +282,7 @@
         document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
         creditBalance.textContent = (data.credits || 0).toFixed(2);
 
-        // Banner logic (includes freeScansRemaining set by monthly function)
+        // Banner logic (uses freeScansRemaining coming from monthly function)
         applyBanner(data.credits, data.freeScansRemaining);
 
         // Live updates
