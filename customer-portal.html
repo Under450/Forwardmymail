@@ -264,9 +264,20 @@
       display: none;
     }
 
-    .low-balance-warning.show {
-      display: block;
+    .low-balance-warning.show { display: block; }
+
+    /* NEW: red critical banner style */
+    .critical-credit-warning {
+      background: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-weight: 500;
+      color: #721c24;
+      display: none;
     }
+    .critical-credit-warning.show { display: block; }
 
     @media (max-width: 768px) {
       .credit-packs {
@@ -392,7 +403,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, browserSessionPersistence, setPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, query, collection, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js'; 
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+    import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
 
     // Firebase configuration
     const firebaseConfig = {
@@ -407,9 +418,10 @@ import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);setPersistence(auth, browserSessionPersistence);
+    const auth = getAuth(app); setPersistence(auth, browserSessionPersistence);
     const db = getFirestore(app);
-const functions = getFunctions(app);
+    const functions = getFunctions(app);
+
     // Initialize Stripe - LIVE MODE
     const stripe = Stripe('pk_live_51SjjoBPI7rl1q0GXBd6V8O5wp3ha0Kz7BtYGq1unqPQspEBE5Lbrgwxy8WIlgWjP7anr5sI7MbyCkajpscTsAEhh00I7bE4RsM');
 
@@ -448,7 +460,6 @@ const functions = getFunctions(app);
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
-        // Wait for ID token to be ready
         try {
           await user.getIdToken(true);
           await loadCustomerData();
@@ -472,15 +483,11 @@ const functions = getFunctions(app);
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
-      console.log('Login attempt for:', email);
-
       try {
         loginBtn.disabled = true;
         loginBtn.textContent = 'Logging in...';
-        const result = await signInWithEmailAndPassword(auth, email, password);
-        console.log('Login successful:', result.user.email);
+        await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
-        console.error('Login error:', error);
         showError('Invalid email or password: ' + error.message);
       } finally {
         loginBtn.disabled = false;
@@ -501,51 +508,72 @@ const functions = getFunctions(app);
     async function loadCustomerData() {
       try {
         const customerDoc = await getDoc(doc(db, 'customers', currentUser.uid));
-        
-if (customerDoc.exists()) {
-  const data = customerDoc.data();
-  
-// Auto-generate mailbox ID if missing
-if (!data.mailboxId) {
-  try {
-    // Generate random 5-digit number
-    const randomNum = Math.floor(10000 + Math.random() * 90000);
-    const mailboxId = `FMM-${randomNum}`;
-    
-    // Save to Firestore
-    await updateDoc(doc(db, 'customers', currentUser.uid), {
-      mailboxId: mailboxId,
-      mailboxIdGenerated: serverTimestamp()
-    });
-    
-    data.mailboxId = mailboxId;
-    console.log('Mailbox ID generated:', mailboxId);
-  } catch (error) {
-    console.error('Error generating mailbox ID:', error);
-  }
-}  
-  userName.textContent = data.name || currentUser.email || 'Customer';
-  document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
-creditBalance.textContent = (data.credits || 0).toFixed(2);
+        if (customerDoc.exists()) {
+          const data = customerDoc.data();
 
-          // Show low balance warning if credits < £5
-          if ((data.credits || 0) < 5) {
-            lowBalanceWarning.classList.add('show');
-          } else {
-            lowBalanceWarning.classList.remove('show');
+          // Auto-generate mailbox ID if missing
+          if (!data.mailboxId) {
+            try {
+              const randomNum = Math.floor(10000 + Math.random() * 90000);
+              const mailboxId = `FMM-${randomNum}`;
+              await updateDoc(doc(db, 'customers', currentUser.uid), {
+                mailboxId: mailboxId,
+                mailboxIdGenerated: serverTimestamp()
+              });
+              data.mailboxId = mailboxId;
+            } catch (error) {
+              console.error('Error generating mailbox ID:', error);
+            }
           }
 
-          // Listen for real-time credit updates
+          userName.textContent = data.name || currentUser.email || 'Customer';
+          document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
+          creditBalance.textContent = (data.credits || 0).toFixed(2);
+
+          // NEW: banner logic considers freeScansRemaining
+          {
+            const credits = Number(data.credits || 0);
+            const free = Number(data.freeScansRemaining || 0);
+
+            // reset to default class hidden
+            lowBalanceWarning.classList.remove('show');
+            lowBalanceWarning.className = 'low-balance-warning';
+
+            if (credits <= 0 && free <= 0) {
+              lowBalanceWarning.className = 'critical-credit-warning show';
+              lowBalanceWarning.innerHTML = '⛔ <strong>CRITICAL:</strong> You have no credits and no free scans. Please purchase credits.';
+            } else if (free > 0) {
+              lowBalanceWarning.className = 'low-balance-warning show';
+              lowBalanceWarning.innerHTML = `✅ <strong>Free scans available:</strong> ${free} left this month. Scans will use these before credits.`;
+            } else if (credits < 5) {
+              lowBalanceWarning.className = 'low-balance-warning show';
+              lowBalanceWarning.innerHTML = '⚠️ Low credit balance. Please purchase more credits to continue receiving mail scans.';
+            }
+          }
+
+          // Listen for real-time credit/free-scan updates
           if (unsubscribe) unsubscribe();
-          unsubscribe = onSnapshot(doc(db, 'customers', currentUser.uid), (doc) => {
-            if (doc.exists()) {
-              const data = doc.data();
-              creditBalance.textContent = (data.credits || 0).toFixed(2);
-              
-              if ((data.credits || 0) < 5) {
-                lowBalanceWarning.classList.add('show');
-              } else {
-                lowBalanceWarning.classList.remove('show');
+          unsubscribe = onSnapshot(doc(db, 'customers', currentUser.uid), (docSnap) => {
+            if (docSnap.exists()) {
+              const d = docSnap.data();
+              creditBalance.textContent = (d.credits || 0).toFixed(2);
+
+              const credits = Number(d.credits || 0);
+              const free = Number(d.freeScansRemaining || 0);
+
+              // reset then apply
+              lowBalanceWarning.classList.remove('show');
+              lowBalanceWarning.className = 'low-balance-warning';
+
+              if (credits <= 0 && free <= 0) {
+                lowBalanceWarning.className = 'critical-credit-warning show';
+                lowBalanceWarning.innerHTML = '⛔ <strong>CRITICAL:</strong> You have no credits and no free scans. Please purchase credits.';
+              } else if (free > 0) {
+                lowBalanceWarning.className = 'low-balance-warning show';
+                lowBalanceWarning.innerHTML = `✅ <strong>Free scans available:</strong> ${free} left this month. Scans will use these before credits.`;
+              } else if (credits < 5) {
+                lowBalanceWarning.className = 'low-balance-warning show';
+                lowBalanceWarning.innerHTML = '⚠️ Low credit balance. Please purchase more credits to continue receiving mail scans.';
               }
             }
           });
@@ -553,11 +581,9 @@ creditBalance.textContent = (data.credits || 0).toFixed(2);
           // Load mail items
           await loadMailItems();
         } else {
-          // Customer document doesn't exist - show error
           userName.textContent = currentUser.email || 'Customer';
           creditBalance.textContent = '0.00';
           showError('Your customer account is not set up yet. Please contact support at info@forwardmymail.co.uk');
-          console.error('Customer document not found for UID:', currentUser.uid);
         }
       } catch (error) {
         console.error('Error loading customer data:', error);
@@ -583,17 +609,16 @@ creditBalance.textContent = (data.credits || 0).toFixed(2);
         }
 
         let html = '';
-        querySnapshot.forEach((doc) => {
-          const item = doc.data();
+        querySnapshot.forEach((docSnap) => {
+          const item = docSnap.data();
           const date = item.processedAt?.toDate().toLocaleDateString() || 'Unknown';
           const status = item.status || 'scanned';
           const files = item.files || [];
           
-          // Build file links HTML
           let filesHtml = '';
           if (files.length > 0) {
             filesHtml = '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">';
-            files.forEach((file, index) => {
+            files.forEach((file) => {
               const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
               filesHtml += `
                 <div style="margin-top: 5px;">
@@ -631,20 +656,16 @@ creditBalance.textContent = (data.credits || 0).toFixed(2);
     }
 
     // Credit pack purchase handlers
-    creditPacks.forEach(pack => {
+    document.querySelectorAll('.credit-pack').forEach(pack => {
       pack.addEventListener('click', async () => {
         const amount = parseInt(pack.dataset.amount);
-        
         try {
           pack.style.opacity = '0.5';
           pack.style.pointerEvents = 'none';
 
-          // Create checkout session via Cloud Function
           const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               amount: amount,
               customerId: currentUser.uid,
@@ -653,17 +674,9 @@ creditBalance.textContent = (data.credits || 0).toFixed(2);
           });
 
           const session = await response.json();
-
-          // Redirect to Stripe Checkout
-          const result = await stripe.redirectToCheckout({
-            sessionId: session.id
-          });
-
-          if (result.error) {
-            showError(result.error.message);
-          }
+          const result = await stripe.redirectToCheckout({ sessionId: session.id });
+          if (result.error) showError(result.error.message);
         } catch (error) {
-          console.error('Error:', error);
           showError('Failed to initiate payment. Please try again.');
         } finally {
           pack.style.opacity = '1';
