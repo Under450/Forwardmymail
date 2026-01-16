@@ -1,283 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Staff Portal - Forward My Mail</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      min-height: 100vh;
-      padding: 20px;
+      min-height: 100vh; padding: 20px;
     }
+    .container { background: #fff; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 1200px; margin: 0 auto; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: #fff; padding: 30px; text-align: center; }
+    .header .logo { width: 120px; height: auto; margin-bottom: 15px; filter: brightness(0) invert(1); }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .content { padding: 40px; }
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      max-width: 1200px;
-      margin: 0 auto;
-      overflow: hidden;
-    }
+    .login-section, .portal-section { display: none; }
+    .login-section.active, .portal-section.active { display: block; }
 
-    .header {
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      padding: 30px;
-      text-align: center;
-    }
-
-    .header .logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 15px;
-      filter: brightness(0) invert(1);
-    }
-
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .content {
-      padding: 40px;
-    }
-
-    .login-section, .portal-section {
-      display: none;
-    }
-
-    .login-section.active, .portal-section.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      color: #333;
-      font-weight: 500;
-    }
-
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
     input, select, textarea {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s;
+      width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color .3s;
     }
-
-    input:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: #1e3c72;
-    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #1e3c72; }
 
     button {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
+      padding: 12px 24px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: transform .2s;
     }
+    button:hover { transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    button:disabled { opacity: .6; cursor: not-allowed; }
 
-    button:hover {
-      transform: translateY(-2px);
-    }
+    .error-message { background: #fee; color: #c33; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
+    .error-message.show { display: block; }
+    .success-message { background: #efe; color: #3c3; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
+    .success-message.show { display: block; }
 
-    button:active {
-      transform: translateY(0);
-    }
+    .info-card { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .customer-selector { margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px; }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .error-message {
-      background: #fee;
-      color: #c33;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .error-message.show {
-      display: block;
-    }
-
-    .success-message {
-      background: #efe;
-      color: #3c3;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .success-message.show {
-      display: block;
-    }
-
-    .info-card {
-      background: #f8f9fa;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .customer-selector {
-      margin-bottom: 30px;
-      padding: 20px;
-      background: #f8f9fa;
-      border-radius: 12px;
-    }
-
-    .customer-info {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-      padding: 20px;
-      background: white;
-      border-radius: 8px;
-    }
-
-    .info-item {
-      padding: 10px;
-    }
-
-    .info-label {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 5px;
-    }
-
-    .info-value {
-      color: #333;
-      font-size: 18px;
-      font-weight: 600;
-    }
-
-    .credit-value {
-      color: #1e3c72;
-      font-size: 24px;
-    }
-
-    .low-credit {
-      color: #dc3545;
-    }
-
-    .scan-form {
-      background: white;
-      border: 2px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 25px;
-      margin-bottom: 20px;
-    }
-
-    .cost-display {
-      background: #e7f3ff;
-      padding: 15px;
-      border-radius: 8px;
-      margin-top: 15px;
-      text-align: center.
-    }
-
-    .cost-amount {
-      font-size: 32px;
-      font-weight: bold;
-      color: #1e3c72;
-    }
-
-    .logout-btn {
-      background: #dc3545;
-      margin-top: 20px;
-    }
-
-    .recent-activity {
-      margin-top: 30px;
-    }
-
-    .activity-item {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .activity-info {
-      flex: 1;
-    }
-
-    .activity-date {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .activity-cost {
-      font-weight: bold;
-      color: #1e3c72;
-    }
+    .grid { display: grid; gap: 15px; }
+    .customer-info { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-top: 20px; padding: 20px; background: #fff; border-radius: 8px; }
+    .info-item { padding: 10px; }
+    .info-label { color: #666; font-size: 14px; margin-bottom: 5px; }
+    .info-value { color: #333; font-size: 18px; font-weight: 600; }
+    .credit-value { color: #1e3c72; font-size: 24px; }
+    .credit-value.low-credit { color: #ff9800 !important; }
+    .credit-value.critical-credit { color: #dc3545 !important; }
 
     .low-credit-warning {
-      background: #fff3cd;
-      border-left: 4px solid #ff9800;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      color: #856404;
+      background: #fff3cd; border-left: 4px solid #ff9800; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #856404;
     }
-
     .critical-credit-warning {
-      background: #f8d7da;
-      border-left: 4px solid #dc3545;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-weight: 500;
-      color: #721c24;
+      background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #721c24;
     }
 
-    .credit-value.low-credit {
-      color: #ff9800 !important;
-    }
+    .panel { background: #fff; border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .panel h3 { margin-bottom: 12px; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .row > * { flex: 1 1 200px; }
 
-    .credit-value.critical-credit {
-      color: #dc3545 !important;
-    }
+    .scan-form .cost-display { background: #e7f3ff; padding: 15px; border-radius: 8px; margin-top: 15px; text-align: center; }
+    .cost-amount { font-size: 32px; font-weight: bold; color: #1e3c72; }
 
-    @media (max-width: 768px) {
-      .customer-info {
-        grid-template-columns: 1fr;
-      }
-    }
+    .recent-activity { margin-top: 30px; }
+    .activity-item { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .activity-info { flex: 1; }
+    .activity-date { color: #666; font-size: 14px; }
+    .activity-cost { font-weight: bold; color: #1e3c72; }
+
+    @media (max-width: 768px) { .customer-info { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail" class="logo">
+      <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail" class="logo" />
       <h1>Forward My Mail</h1>
       <p id="headerSubtitle">Staff Portal</p>
     </div>
@@ -287,24 +89,20 @@
       <div id="loginSection" class="login-section active">
         <h2 style="margin-bottom: 20px;">Staff Login</h2>
         <div id="errorMessage" class="error-message"></div>
-        
         <form id="loginForm" autocomplete="off">
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" required placeholder="staff@forwardmymail.co.uk" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+            <input type="email" id="email" required placeholder="staff@forwardmymail.co.uk" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');" />
           </div>
-          
           <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" required placeholder="Enter your password" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');">
+            <input type="password" id="password" required placeholder="Enter your password" autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');" />
           </div>
-          
           <button type="submit" id="loginBtn">Login</button>
         </form>
-        
-        <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
-          <p style="color: #666;">
-            <a href="reset-password.html" style="color: #1e3c72; text-decoration: none; font-weight: 500;">Forgot password?</a>
+        <div style="text-align:center; margin-top:20px; padding-top:20px; border-top:1px solid #e0e0e0;">
+          <p style="color:#666;">
+            <a href="reset-password.html" style="color:#1e3c72; text-decoration:none; font-weight:500;">Forgot password?</a>
           </p>
         </div>
       </div>
@@ -314,13 +112,13 @@
         <div id="successMessage" class="success-message"></div>
 
         <!-- Customer Selector -->
-        <div class="customer-selector">
-          <h3 style="margin-bottom: 15px;">Select Customer</h3>
+        <div class="customer-selector panel">
+          <h3 style="margin-bottom:15px;">Select Customer</h3>
           <select id="customerSelect">
             <option value="">-- Select a customer --</option>
           </select>
 
-          <div id="customerInfo" class="customer-info" style="display: none;">
+          <div id="customerInfo" class="customer-info grid" style="display:none;">
             <div class="info-item">
               <div class="info-label">Customer Name</div>
               <div class="info-value" id="customerName">-</div>
@@ -337,29 +135,61 @@
               <div class="info-label">Credit Balance</div>
               <div class="info-value credit-value" id="customerCredits">£0.00</div>
             </div>
-            <!-- NEW: free scans indicator -->
             <div class="info-item">
               <div class="info-label">Free scans left (this month)</div>
               <div class="info-value" id="customerFreeScans">0</div>
             </div>
           </div>
+
+          <div id="lowCreditWarning" style="display:none;"></div>
         </div>
 
-        <!-- Low Credit Warning -->
-        <div id="lowCreditWarning" style="display: none;"></div>
+        <!-- Free Scans: Quick Action + Settings -->
+        <div class="panel" id="freeScansPanel" style="display:none;">
+          <h3>Free Scans</h3>
 
-        <!-- NEW: grant free scan action -->
-        <div id="freeScanActions" style="display:none; margin-bottom:20px;">
-          <button id="addFreeScanBtn" type="button">Add 1 Free Scan</button>
+          <!-- Quick action -->
+          <div class="row" style="align-items:end; margin-top:10px;">
+            <div>
+              <label>One-off grant</label>
+              <button id="addFreeScanBtn" type="button">Add 1 Free Scan</button>
+            </div>
+          </div>
+
+          <!-- Settings -->
+          <div class="info-card" style="margin-top:15px;">
+            <div class="row">
+              <div>
+                <label for="monthlyFreeAllowance">Monthly allowance (scans)</label>
+                <input type="number" id="monthlyFreeAllowance" min="0" value="0" />
+              </div>
+              <div>
+                <label for="resetMode">Renewal behavior</label>
+                <select id="resetMode">
+                  <option value="reset">Reset to allowance each month</option>
+                  <option value="topup">Top-up (add) allowance each month</option>
+                </select>
+              </div>
+              <div style="display:flex; align-items:center;">
+                <input type="checkbox" id="autoRenewFreeScans" style="width:20px; height:20px; margin-right:10px;"/>
+                <label for="autoRenewFreeScans" style="margin:0;">Auto-renew monthly</label>
+              </div>
+            </div>
+
+            <div class="row" style="margin-top:12px;">
+              <button id="saveFreeScanSettingsBtn" type="button">Save settings</button>
+              <button id="applyMonthlyNowBtn" type="button" style="background:#1f7a1f;">Apply allowance now</button>
+            </div>
+          </div>
         </div>
 
         <!-- Scan Processing Form -->
-        <div class="scan-form" id="scanForm" style="display: none;">
+        <div class="scan-form panel" id="scanForm" style="display:none;">
           <h3 style="margin-bottom: 20px;">Process Mail Scan</h3>
-          
+
           <div class="form-group">
             <label for="pages">Number of Pages</label>
-            <input type="number" id="pages" min="1" value="1" required>
+            <input type="number" id="pages" min="1" value="1" required />
           </div>
 
           <div class="form-group">
@@ -369,39 +199,35 @@
 
           <div class="form-group">
             <label for="scanFiles">Upload Scanned Documents</label>
-            <input type="file" id="scanFiles" multiple accept="image/*,.pdf" style="margin-bottom: 10px;">
-            <div style="font-size: 13px; color: #666; margin-top: 5px;">
-              Select one or more images (JPG, PNG) or PDF files
-            </div>
+            <input type="file" id="scanFiles" multiple accept="image/*,.pdf" style="margin-bottom:10px;" />
+            <div style="font-size: 13px; color: #666; margin-top: 5px;">Select one or more images (JPG, PNG) or PDF files</div>
             <div id="fileList" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
-            <div id="uploadProgress" style="display: none; margin-top: 10px;">
-              <div style="background: #e0e0e0; height: 20px; border-radius: 10px; overflow: hidden;">
-                <div id="progressBar" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); height: 100%; width: 0%; transition: width 0.3s;"></div>
+            <div id="uploadProgress" style="display:none; margin-top:10px;">
+              <div style="background:#e0e0e0; height:20px; border-radius:10px; overflow:hidden;">
+                <div id="progressBar" style="background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); height:100%; width:0%; transition:width .3s;"></div>
               </div>
-              <div id="progressText" style="text-align: center; margin-top: 5px; font-size: 13px; color: #666;"></div>
+              <div id="progressText" style="text-align:center; margin-top:5px; font-size:13px; color:#666;"></div>
             </div>
           </div>
 
           <div class="cost-display">
-            <div style="color: #666; margin-bottom: 5px;">Estimated Cost</div>
+            <div style="color:#666; margin-bottom:5px;">Estimated Cost</div>
             <div class="cost-amount">£<span id="costAmount">0.50</span></div>
-            <div style="color: #666; margin-top: 5px; font-size: 14px;">
-              First page: £0.50 | Additional: £0.25/page
-            </div>
+            <div style="color:#666; margin-top:5px; font-size:14px;">First page: £0.50 | Additional: £0.25/page</div>
           </div>
 
-          <button id="processScanBtn" style="width: 100%; margin-top: 20px;">Process Scan</button>
+          <button id="processScanBtn" style="width:100%; margin-top:20px;">Process Scan</button>
         </div>
 
         <!-- Recent Activity -->
-        <div class="recent-activity" id="recentActivity" style="display: none;">
+        <div class="recent-activity" id="recentActivity" style="display:none;">
           <h3 style="margin-bottom: 15px;">Recent Activity</h3>
           <div id="activityList">
-            <p style="color: #666; text-align: center; padding: 20px;">No recent activity</p>
+            <p style="color:#666; text-align:center; padding:20px;">No recent activity</p>
           </div>
         </div>
 
-        <button id="logoutBtn" class="logout-btn">Logout</button>
+        <button id="logoutBtn" class="logout-btn" style="margin-top:20px;">Logout</button>
       </div>
     </div>
   </div>
@@ -409,10 +235,13 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit, updateDoc, addDoc, onSnapshot, serverTimestamp, increment } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import {
+      getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit,
+      updateDoc, addDoc, onSnapshot, serverTimestamp, increment
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-    // Firebase configuration
+    // --- Firebase config ---
     const firebaseConfig = {
       apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
       authDomain: "forward-my-mail.firebaseapp.com",
@@ -423,13 +252,13 @@
       measurementId: "G-J8M65WQCGH"
     };
 
-    // Initialize Firebase
+    // --- Init ---
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // DOM Elements
+    // --- DOM refs ---
     const loginSection = document.getElementById('loginSection');
     const portalSection = document.getElementById('portalSection');
     const loginForm = document.getElementById('loginForm');
@@ -437,32 +266,47 @@
     const logoutBtn = document.getElementById('logoutBtn');
     const errorMessage = document.getElementById('errorMessage');
     const successMessage = document.getElementById('successMessage');
+
     const customerSelect = document.getElementById('customerSelect');
     const customerInfo = document.getElementById('customerInfo');
     const scanForm = document.getElementById('scanForm');
     const recentActivity = document.getElementById('recentActivity');
+
     const pagesInput = document.getElementById('pages');
     const costAmount = document.getElementById('costAmount');
     const processScanBtn = document.getElementById('processScanBtn');
+
     const scanFilesInput = document.getElementById('scanFiles');
     const fileListDiv = document.getElementById('fileList');
     const uploadProgressDiv = document.getElementById('uploadProgress');
     const progressBar = document.getElementById('progressBar');
     const progressText = document.getElementById('progressText');
+
     const addFreeScanBtn = document.getElementById('addFreeScanBtn');
     const customerFreeScansEl = document.getElementById('customerFreeScans');
-    const freeScanActions = document.getElementById('freeScanActions');
+    const freeScansPanel = document.getElementById('freeScansPanel');
+
+    // settings inputs
+    const monthlyFreeAllowanceInput = document.getElementById('monthlyFreeAllowance');
+    const autoRenewFreeScansInput = document.getElementById('autoRenewFreeScans');
+    const resetModeSelect = document.getElementById('resetMode');
+    const saveFreeScanSettingsBtn = document.getElementById('saveFreeScanSettingsBtn');
+    const applyMonthlyNowBtn = document.getElementById('applyMonthlyNowBtn');
+
+    const lowCreditWarning = document.getElementById('lowCreditWarning');
 
     let currentCustomer = null;
     let unsubscribeCustomer = null;
 
-    // Force clear login fields on page load (prevent autofill)
+    // prevent autofill
     window.addEventListener('load', () => {
-      document.getElementById('email').value = '';
-      document.getElementById('password').value = '';
+      const e = document.getElementById('email');
+      const p = document.getElementById('password');
+      if (e) e.value = '';
+      if (p) p.value = '';
     });
 
-    // Auth state observer
+    // --- Auth state ---
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
@@ -470,23 +314,23 @@
           await loadCustomers();
           loginSection.classList.remove('active');
           portalSection.classList.add('active');
-        } catch (error) {
-          console.error('Error getting auth token:', error);
+        } catch (err) {
+          console.error('Auth error:', err);
           showError('Authentication error. Please try logging in again.');
         }
       } else {
         loginSection.classList.add('active');
         portalSection.classList.remove('active');
         if (unsubscribeCustomer) unsubscribeCustomer();
+        currentCustomer = null;
       }
     });
 
-    // Login form handler
+    // --- Login ---
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-
       try {
         loginBtn.disabled = true;
         loginBtn.textContent = 'Logging in...';
@@ -499,123 +343,114 @@
       }
     });
 
-    // Logout handler
+    // --- Logout ---
     logoutBtn.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-      } catch (error) {
-        showError('Error logging out');
-      }
+      try { await signOut(auth); }
+      catch (error) { showError('Error logging out'); }
     });
 
-    // Load customers
+    // --- Load customers list ---
     async function loadCustomers() {
       try {
-        const querySnapshot = await getDocs(collection(db, 'customers'));
+        const qs = await getDocs(collection(db, 'customers'));
         customerSelect.innerHTML = '<option value="">-- Select a customer --</option>';
-        querySnapshot.forEach((docSnap) => {
-          const customer = docSnap.data();
-          const option = document.createElement('option');
-          option.value = docSnap.id;
-          option.textContent = `${customer.name} - ${customer.company || 'No company'}`;
-          customerSelect.appendChild(option);
+        qs.forEach((d) => {
+          const c = d.data();
+          const opt = document.createElement('option');
+          opt.value = d.id;
+          opt.textContent = `${c.name || 'Unnamed'} — ${c.company || 'No company'}`;
+          customerSelect.appendChild(opt);
         });
-      } catch (error) {
-        console.error('Error loading customers:', error);
+      } catch (e) {
+        console.error('loadCustomers error:', e);
         showError('Error loading customers');
       }
     }
 
-    // Customer select handler
+    // --- Customer change ---
     customerSelect.addEventListener('change', async (e) => {
-      const customerId = e.target.value;
-      if (!customerId) {
-        customerInfo.style.display = 'none';
-        scanForm.style.display = 'none';
-        recentActivity.style.display = 'none';
-        freeScanActions.style.display = 'none';
-        currentCustomer = null;
-        if (unsubscribeCustomer) unsubscribeCustomer();
+      const id = e.target.value;
+      if (!id) {
+        hideCustomerPanels();
         return;
       }
-
       try {
-        const customerDoc = await getDoc(doc(db, 'customers', customerId));
-        if (customerDoc.exists()) {
-          currentCustomer = { id: customerId, ...customerDoc.data() };
-          displayCustomerInfo(currentCustomer);
-          scanForm.style.display = 'block';
-          recentActivity.style.display = 'block';
-          await loadRecentActivity(customerId);
+        const snap = await getDoc(doc(db, 'customers', id));
+        if (!snap.exists()) { hideCustomerPanels(); return; }
+        currentCustomer = { id, ...snap.data() };
+        renderCustomer(currentCustomer);
+        scanForm.style.display = 'block';
+        recentActivity.style.display = 'block';
+        freeScansPanel.style.display = 'block';
+        await loadRecentActivity(id);
 
-          // Real-time updates
-          if (unsubscribeCustomer) unsubscribeCustomer();
-          unsubscribeCustomer = onSnapshot(doc(db, 'customers', customerId), (snap) => {
-            if (snap.exists()) {
-              currentCustomer = { id: customerId, ...snap.data() };
-              displayCustomerInfo(currentCustomer);
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Error loading customer:', error);
+        if (unsubscribeCustomer) unsubscribeCustomer();
+        unsubscribeCustomer = onSnapshot(doc(db, 'customers', id), (live) => {
+          if (!live.exists()) return;
+          currentCustomer = { id, ...live.data() };
+          renderCustomer(currentCustomer);
+        });
+      } catch (e2) {
+        console.error('load customer error:', e2);
         showError('Error loading customer details');
       }
     });
 
-    // Display customer info (with free scans + warnings)
-    function displayCustomerInfo(customer) {
-      document.getElementById('customerName').textContent = customer.name || '-';
-      document.getElementById('customerCompany').textContent = customer.company || '-';
-      document.getElementById('customerEmail').textContent = customer.email || '-';
+    function hideCustomerPanels() {
+      customerInfo.style.display = 'none';
+      scanForm.style.display = 'none';
+      recentActivity.style.display = 'none';
+      freeScansPanel.style.display = 'none';
+      lowCreditWarning.style.display = 'none';
+      currentCustomer = null;
+      if (unsubscribeCustomer) unsubscribeCustomer();
+    }
 
-      const credits = Number(customer.credits || 0);
-      const freeScans = Number(customer.freeScansRemaining || 0);
+    // --- Render customer info + warnings + settings prefill ---
+    function renderCustomer(cust) {
+      document.getElementById('customerName').textContent = cust.name || '-';
+      document.getElementById('customerCompany').textContent = cust.company || '-';
+      document.getElementById('customerEmail').textContent = cust.email || '-';
 
-      const creditsElement = document.getElementById('customerCredits');
-      const warningElement = document.getElementById('lowCreditWarning');
+      const credits = Number(cust.credits || 0);
+      const freeScans = Number(cust.freeScansRemaining || 0);
 
-      creditsElement.textContent = `£${credits.toFixed(2)}`;
+      const creditsEl = document.getElementById('customerCredits');
+      creditsEl.textContent = `£${credits.toFixed(2)}`;
+      creditsEl.classList.remove('low-credit', 'critical-credit');
+      if (credits < 0.50 && freeScans <= 0) creditsEl.classList.add('critical-credit');
+      else if (credits < 5.00) creditsEl.classList.add('low-credit');
+
       if (customerFreeScansEl) customerFreeScansEl.textContent = String(freeScans);
 
-      // Reset classes
-      creditsElement.classList.remove('low-credit', 'critical-credit');
-
-      // Warnings (considering free scans)
+      // warnings
       if (credits < 0.50 && freeScans <= 0) {
-        creditsElement.classList.add('critical-credit');
-        warningElement.className = 'critical-credit-warning';
-        warningElement.innerHTML = '⛔ <strong>CRITICAL:</strong> Insufficient credits (£' + credits.toFixed(2) + ') and no free scans.';
-        warningElement.style.display = 'block';
-      } else if (credits < 0.50 && freeScans > 0) {
-        creditsElement.classList.add('low-credit');
-        warningElement.className = 'low-credit-warning';
-        warningElement.innerHTML = '✅ <strong>Free scans available:</strong> ' + freeScans + ' left this month. Scans will use these before credits.';
-        warningElement.style.display = 'block';
-      } else if (credits < 2.00) {
-        const scansRemaining = Math.max(Math.floor((credits - 0.50) / 0.25) + 1, 0);
-        creditsElement.classList.add('low-credit');
-        warningElement.className = 'low-credit-warning';
-        warningElement.innerHTML = '⚠️ <strong>LOW CREDITS:</strong> £' + credits.toFixed(2) + ' (~' + scansRemaining + ' paid scan(s)). Free scans left: ' + freeScans + '.';
-        warningElement.style.display = 'block';
-      } else if (credits < 5.00) {
-        creditsElement.classList.add('low-credit');
-        warningElement.className = 'low-credit-warning';
-        warningElement.innerHTML = '💡 <strong>NOTICE:</strong> Credits getting low (£' + credits.toFixed(2) + '). Free scans left: ' + freeScans + '.';
-        warningElement.style.display = 'block';
+        lowCreditWarning.className = 'critical-credit-warning';
+        lowCreditWarning.innerHTML = '⛔ <strong>CRITICAL:</strong> Insufficient credits and no free scans.';
+        lowCreditWarning.style.display = 'block';
+      } else if (freeScans > 0) {
+        lowCreditWarning.className = 'low-credit-warning';
+        lowCreditWarning.innerHTML = `✅ <strong>Free scans available:</strong> ${freeScans} left this month.`;
+        lowCreditWarning.style.display = 'block';
+      } else if (credits < 5) {
+        lowCreditWarning.className = 'low-credit-warning';
+        lowCreditWarning.innerHTML = `⚠️ <strong>LOW CREDITS:</strong> £${credits.toFixed(2)} remaining.`;
+        lowCreditWarning.style.display = 'block';
       } else {
-        warningElement.style.display = 'none';
+        lowCreditWarning.style.display = 'none';
       }
 
-      // Show free scan action once a customer is selected
-      if (freeScanActions) freeScanActions.style.display = 'block';
+      // settings prefill (with sensible defaults)
+      monthlyFreeAllowanceInput.value = Number(cust.monthlyFreeAllowance ?? 0);
+      autoRenewFreeScansInput.checked = Boolean(cust.autoRenewFreeScans);
+      resetModeSelect.value = (cust.resetMode || 'reset').toLowerCase();
 
       customerInfo.style.display = 'grid';
     }
 
-    // Grant 1 free scan
+    // --- Quick: Add 1 free scan ---
     addFreeScanBtn?.addEventListener('click', async () => {
-      if (!currentCustomer) return showError('Please select a customer first');
+      if (!currentCustomer) return showError('Select a customer first');
       try {
         addFreeScanBtn.disabled = true;
         await updateDoc(doc(db, 'customers', currentCustomer.id), {
@@ -629,108 +464,162 @@
       }
     });
 
-    // Calculate cost display
+    // --- Save settings ---
+    saveFreeScanSettingsBtn.addEventListener('click', async () => {
+      if (!currentCustomer) return showError('Select a customer first');
+      const allowance = Math.max(Number(monthlyFreeAllowanceInput.value || 0), 0);
+      const autoRenew = Boolean(autoRenewFreeScansInput.checked);
+      const resetMode = resetModeSelect.value === 'topup' ? 'topup' : 'reset';
+
+      try {
+        saveFreeScanSettingsBtn.disabled = true;
+        await updateDoc(doc(db, 'customers', currentCustomer.id), {
+          monthlyFreeAllowance: allowance,
+          autoRenewFreeScans: autoRenew,
+          resetMode
+        });
+        showSuccess('Free scan settings saved');
+      } catch (e) {
+        showError('Failed to save settings: ' + e.message);
+      } finally {
+        saveFreeScanSettingsBtn.disabled = false;
+      }
+    });
+
+    // --- Apply allowance now (respect reset/topup) ---
+    applyMonthlyNowBtn.addEventListener('click', async () => {
+      if (!currentCustomer) return showError('Select a customer first');
+      const allowance = Math.max(Number(monthlyFreeAllowanceInput.value || 0), 0);
+      const resetMode = resetModeSelect.value === 'topup' ? 'topup' : 'reset';
+
+      if (allowance <= 0) return showError('Monthly allowance must be greater than 0 to apply');
+
+      try {
+        applyMonthlyNowBtn.disabled = true;
+
+        // get current month key (Europe/London)
+        const tzNow = new Date(new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }));
+        const y = tzNow.getFullYear();
+        const m = String(tzNow.getMonth() + 1).padStart(2, '0');
+        const currentMonthKey = `${y}-${m}`;
+
+        if (resetMode === 'topup') {
+          // add allowance to current free
+          await updateDoc(doc(db, 'customers', currentCustomer.id), {
+            freeScansRemaining: increment(allowance),
+            lastAppliedMonthKey: currentMonthKey,
+            applyAtMonthKey: null
+          });
+        } else {
+          // reset to allowance
+          await updateDoc(doc(db, 'customers', currentCustomer.id), {
+            freeScansRemaining: allowance,
+            lastAppliedMonthKey: currentMonthKey,
+            applyAtMonthKey: null
+          });
+        }
+
+        showSuccess('Monthly allowance applied');
+      } catch (e) {
+        showError('Failed to apply allowance: ' + e.message);
+      } finally {
+        applyMonthlyNowBtn.disabled = false;
+      }
+    });
+
+    // --- Cost estimate ---
     pagesInput.addEventListener('input', () => {
-      const pages = parseInt(pagesInput.value) || 1;
+      const pages = Math.max(parseInt(pagesInput.value) || 1, 1);
       const cost = 0.50 + ((pages - 1) * 0.25);
       costAmount.textContent = cost.toFixed(2);
     });
 
-    // File list display
+    // --- File list preview ---
     scanFilesInput.addEventListener('change', (e) => {
-      const files = Array.from(e.target.files);
-      if (files.length === 0) {
-        fileListDiv.innerHTML = '';
-        return;
-      }
-      const fileNames = files.map((f, i) => `${i + 1}. ${f.name} (${(f.size / 1024 / 1024).toFixed(2)} MB)`).join('<br>');
-      fileListDiv.innerHTML = `<strong>${files.length} file(s) selected:</strong><br>${fileNames}`;
+      const files = Array.from(e.target.files || []);
+      if (!files.length) { fileListDiv.innerHTML = ''; return; }
+      const rows = files.map((f, i) => `${i+1}. ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`);
+      fileListDiv.innerHTML = `<strong>${files.length} file(s) selected:</strong><br>${rows.join('<br>')}`;
     });
 
-    // Upload files to Storage
+    // --- Upload helper ---
     async function uploadScanFiles(customerId, files) {
-      const uploadedFiles = [];
-      const timestamp = Date.now();
+      const uploaded = [];
+      const ts = Date.now();
+
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        const fileName = `${timestamp}_${i + 1}_${file.name}`;
-        const storageRef = ref(storage, `mail-scans/${customerId}/${fileName}`);
-        progressText.textContent = `Uploading ${i + 1} of ${files.length}: ${file.name}`;
-        const uploadTask = uploadBytesResumable(storageRef, file);
+        const name = `${ts}_${i+1}_${file.name}`;
+        const storageRef = ref(storage, `mail-scans/${customerId}/${name}`);
+
+        progressText.textContent = `Uploading ${i+1} of ${files.length}: ${file.name}`;
+        const task = uploadBytesResumable(storageRef, file);
+
         await new Promise((resolve, reject) => {
-          uploadTask.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              const overallProgress = ((i / files.length) + (progress / 100 / files.length)) * 100;
-              progressBar.style.width = overallProgress + '%';
+          task.on('state_changed',
+            (snap) => {
+              const pct = (snap.bytesTransferred / snap.totalBytes) * 100;
+              const overall = ((i / files.length) + (pct / 100 / files.length)) * 100;
+              progressBar.style.width = overall + '%';
             },
-            (error) => reject(error),
+            (err) => reject(err),
             async () => {
-              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-              uploadedFiles.push({
-                name: file.name,
-                url: downloadURL,
-                size: file.size,
-                type: file.type
-              });
+              const url = await getDownloadURL(task.snapshot.ref);
+              uploaded.push({ name: file.name, url, size: file.size, type: file.type });
               resolve();
             }
           );
         });
       }
-      return uploadedFiles;
+      return uploaded;
     }
 
-    // Process scan (use free scans first, else charge credits)
+    // --- Process scan (use free scan first, else deduct credits) ---
     processScanBtn.addEventListener('click', async () => {
-      if (!currentCustomer) {
-        showError('Please select a customer first');
-        return;
-      }
+      if (!currentCustomer) return showError('Please select a customer first');
 
-      const pages = parseInt(pagesInput.value) || 1;
-      const notes = document.getElementById('notes').value;
+      const pages = Math.max(parseInt(pagesInput.value) || 1, 1);
+      const notes = document.getElementById('notes').value || '';
       const baseCost = 0.50 + ((pages - 1) * 0.25);
-      const files = Array.from(scanFilesInput.files);
+      const files = Array.from(scanFilesInput.files || []);
 
       const freeScans = Number(currentCustomer.freeScansRemaining || 0);
       let usedFreeScan = false;
-      let effectiveCost = baseCost;
+      let payable = baseCost;
 
       if (freeScans > 0) {
         usedFreeScan = true;
-        effectiveCost = 0;
+        payable = 0;
       } else if ((currentCustomer.credits || 0) < baseCost) {
-        showError(`Insufficient credits. Need £${baseCost.toFixed(2)}, but customer only has £${(currentCustomer.credits || 0).toFixed(2)}`);
-        return;
+        return showError(`Insufficient credits. Need £${baseCost.toFixed(2)}, but only £${(currentCustomer.credits || 0).toFixed(2)} available.`);
       }
 
       try {
         processScanBtn.disabled = true;
         processScanBtn.textContent = 'Processing...';
 
-        // Upload files if any
+        // upload files if any
         let uploadedFiles = [];
-        if (files.length > 0) {
+        if (files.length) {
           uploadProgressDiv.style.display = 'block';
           uploadedFiles = await uploadScanFiles(currentCustomer.id, files);
           uploadProgressDiv.style.display = 'none';
         }
 
-        // Create mail item record
+        // create mail item
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages,
-          cost: effectiveCost,
+          cost: payable,
           notes,
           files: uploadedFiles,
           processedAt: serverTimestamp(),
-          processedBy: auth.currentUser.email,
+          processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
           freeScanUsed: usedFreeScan
         });
 
-        // Update balances
+        // update balances
         if (usedFreeScan) {
           await updateDoc(doc(db, 'customers', currentCustomer.id), {
             freeScansRemaining: increment(-1)
@@ -742,14 +631,10 @@
           currentCustomer.credits = newCredits;
         }
 
-        // Refresh UI
-        displayCustomerInfo(currentCustomer);
+        renderCustomer(currentCustomer);
+        showSuccess(`Scan processed: ${pages} page(s) — ${usedFreeScan ? 'free scan used' : '£' + baseCost.toFixed(2) + ' deducted'}.`);
 
-        showSuccess(
-          `Scan processed: ${pages} page(s) — ${usedFreeScan ? 'free scan used' : '£' + baseCost.toFixed(2) + ' deducted'}.`
-        );
-
-        // Reset form
+        // reset form
         pagesInput.value = 1;
         document.getElementById('notes').value = '';
         scanFilesInput.value = '';
@@ -758,9 +643,9 @@
         progressBar.style.width = '0%';
 
         await loadRecentActivity(currentCustomer.id);
-      } catch (error) {
-        console.error('Error processing scan:', error);
-        showError('Error processing scan: ' + error.message);
+      } catch (e) {
+        console.error('process scan error:', e);
+        showError('Error processing scan: ' + e.message);
         uploadProgressDiv.style.display = 'none';
       } finally {
         processScanBtn.disabled = false;
@@ -768,74 +653,69 @@
       }
     });
 
-    // Load recent activity
+    // --- Recent activity ---
     async function loadRecentActivity(customerId) {
       try {
-        const q = query(
+        const qy = query(
           collection(db, 'mailItems'),
           where('customerId', '==', customerId),
           orderBy('processedAt', 'desc'),
           limit(10)
         );
-        const querySnapshot = await getDocs(q);
-        const activityList = document.getElementById('activityList');
-        
-        if (querySnapshot.empty) {
-          activityList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No recent activity</p>';
+        const qs = await getDocs(qy);
+        const list = document.getElementById('activityList');
+
+        if (qs.empty) {
+          list.innerHTML = '<p style="color:#666; text-align:center; padding:20px;">No recent activity</p>';
           return;
         }
 
         let html = '';
-        querySnapshot.forEach((d) => {
+        qs.forEach((d) => {
           const item = d.data();
           const date = item.processedAt?.toDate().toLocaleString() || 'Unknown';
           const files = item.files || [];
           const costText = item.freeScanUsed ? '(free)' : `-£${(item.cost || 0).toFixed(2)}`;
 
-          // Files list
           let filesHtml = '';
-          if (files.length > 0) {
-            filesHtml = '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e0e0;">';
-            files.forEach((file) => {
-              const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
+          if (files.length) {
+            filesHtml = '<div style="margin-top:8px; padding-top:8px; border-top:1px solid #e0e0e0;">';
+            files.forEach((f) => {
+              const icon = f.type?.includes('pdf') ? '📄' : '🖼️';
               filesHtml += `
-                <div style="font-size: 13px; margin-top: 4px;">
-                  <a href="${file.url}" target="_blank" download="${file.name}" style="color: #1e3c72; text-decoration: none;">
-                    ${fileIcon} ${file.name}
-                  </a>
-                </div>
-              `;
+                <div style="font-size:13px; margin-top:4px;">
+                  <a href="${f.url}" target="_blank" download="${f.name}" style="color:#1e3c72; text-decoration:none;">${icon} ${f.name}</a>
+                </div>`;
             });
             filesHtml += '</div>';
           }
-          
+
           html += `
             <div class="activity-item">
               <div class="activity-info">
-                <div><strong>${item.pages} page(s)</strong> ${files.length > 0 ? `- ${files.length} file(s)` : ''}</div>
+                <div><strong>${item.pages} page(s)</strong> ${files.length ? `- ${files.length} file(s)` : ''}</div>
                 <div class="activity-date">${date}</div>
-                ${item.notes ? `<div style="color: #666; font-size: 14px; margin-top: 5px;">${item.notes}</div>` : ''}
+                ${item.notes ? `<div style="color:#666; font-size:14px; margin-top:5px;">${item.notes}</div>` : ''}
                 ${filesHtml}
               </div>
               <div class="activity-cost">${costText}</div>
-            </div>
-          `;
+            </div>`;
         });
 
-        activityList.innerHTML = html;
-      } catch (error) {
-        console.error('Error loading activity:', error);
+        list.innerHTML = html;
+      } catch (e) {
+        console.error('loadRecentActivity error:', e);
       }
     }
 
-    function showError(message) {
-      errorMessage.textContent = message;
+    // --- Helpers ---
+    function showError(msg) {
+      errorMessage.textContent = msg;
       errorMessage.classList.add('show');
       setTimeout(() => errorMessage.classList.remove('show'), 5000);
     }
-
-    function showSuccess(message) {
-      successMessage.textContent = message;
+    function showSuccess(msg) {
+      successMessage.textContent = msg;
       successMessage.classList.add('show');
       setTimeout(() => successMessage.classList.remove('show'), 5000);
     }
