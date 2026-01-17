@@ -68,10 +68,11 @@
     .cost-amount { font-size: 32px; font-weight: bold; color: #1e3c72; }
 
     .recent-activity { margin-top: 30px; }
-    .activity-item { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .activity-item { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
     .activity-info { flex: 1; }
     .activity-date { color: #666; font-size: 14px; }
-    .activity-cost { font-weight: bold; color: #1e3c72; }
+    .activity-cost { font-weight: bold; color: #1e3c72; white-space: nowrap; }
+    .delete-btn { background: #e74c3c; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
 
     @media (max-width: 768px) { .customer-info { grid-template-columns: 1fr; } }
   </style>
@@ -237,9 +238,14 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import {
       getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit,
-      updateDoc, addDoc, onSnapshot, serverTimestamp, increment
+      updateDoc, addDoc, onSnapshot, serverTimestamp, increment,
+      // ADDED:
+      deleteDoc, Timestamp
     } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL,
+      // ADDED:
+      deleteObject
+    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
     // --- Firebase config ---
     const firebaseConfig = {
@@ -504,14 +510,12 @@
         const currentMonthKey = `${y}-${m}`;
 
         if (resetMode === 'topup') {
-          // add allowance to current free
           await updateDoc(doc(db, 'customers', currentCustomer.id), {
             freeScansRemaining: increment(allowance),
             lastAppliedMonthKey: currentMonthKey,
             applyAtMonthKey: null
           });
         } else {
-          // reset to allowance
           await updateDoc(doc(db, 'customers', currentCustomer.id), {
             freeScansRemaining: allowance,
             lastAppliedMonthKey: currentMonthKey,
@@ -606,7 +610,7 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        // create mail item
+        // create mail item (ADDED ttlAt for 30-day auto-delete)
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages,
@@ -616,7 +620,8 @@
           processedAt: serverTimestamp(),
           processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
-          freeScanUsed: usedFreeScan
+          freeScanUsed: usedFreeScan,
+          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)) // <-- ADDED
         });
 
         // update balances
@@ -690,6 +695,7 @@
             filesHtml += '</div>';
           }
 
+          // ADDED: delete button with doc id
           html += `
             <div class="activity-item">
               <div class="activity-info">
@@ -699,6 +705,7 @@
                 ${filesHtml}
               </div>
               <div class="activity-cost">${costText}</div>
+              <button class="delete-btn" type="button" data-id="${d.id}">✕ Delete</button>
             </div>`;
         });
 
@@ -707,6 +714,40 @@
         console.error('loadRecentActivity error:', e);
       }
     }
+
+    // ADDED: delegated delete handler (deletes files then doc)
+    document.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.delete-btn');
+      if (!btn) return;
+      const mailItemId = btn.getAttribute('data-id');
+      if (!mailItemId) return;
+
+      if (!confirm('Delete this scan? This will remove its files and record.')) return;
+
+      try {
+        const miRef = doc(db, 'mailItems', mailItemId);
+        const snap = await getDoc(miRef);
+        if (snap.exists()) {
+          const data = snap.data();
+          const files = Array.isArray(data.files) ? data.files : [];
+          await Promise.all(files.map(async (f) => {
+            try {
+              // ref can take a full gs:// or https URL
+              const fileRef = ref(storage, f.url);
+              await deleteObject(fileRef);
+            } catch (err) {
+              console.warn('File delete failed (continuing):', f.url, err);
+            }
+          }));
+        }
+        await deleteDoc(miRef);
+        showSuccess('Scan deleted');
+        if (currentCustomer?.id) await loadRecentActivity(currentCustomer.id);
+      } catch (err) {
+        console.error('delete scan error:', err);
+        showError('Failed to delete scan: ' + err.message);
+      }
+    });
 
     // --- Helpers ---
     function showError(msg) {
