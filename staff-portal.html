@@ -26,6 +26,8 @@
       width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color .3s;
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #1e3c72; }
+    /* Show greyed-out letter types clearly */
+    #letterType option[disabled] { color: #bbb; }
 
     button {
       padding: 12px 24px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
@@ -188,6 +190,19 @@
         <div class="scan-form panel" id="scanForm" style="display:none;">
           <h3 style="margin-bottom: 20px;">Process Mail Scan</h3>
 
+          <!-- ADDED: Type of letter -->
+          <div class="form-group">
+            <label for="letterType">Type of letter</label>
+            <select id="letterType">
+              <option value="personal">Personal</option>
+              <option value="company">Company</option>
+              <option value="hmrc">HMRC</option>
+              <option value="companies-house">Companies House</option>
+              <option value="override">Override (allow anyway)</option>
+            </select>
+            <div id="letterTypeHelp" style="font-size:13px;color:#666;margin-top:6px;"></div>
+          </div>
+
           <div class="form-group">
             <label for="pages">Number of Pages</label>
             <input type="number" id="pages" min="1" value="1" required />
@@ -239,13 +254,9 @@
     import {
       getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit,
       updateDoc, addDoc, onSnapshot, serverTimestamp, increment,
-      // ADDED:
       deleteDoc, Timestamp
     } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-    import { getStorage, ref, uploadBytesResumable, getDownloadURL,
-      // ADDED:
-      deleteObject
-    } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
     // --- Firebase config ---
     const firebaseConfig = {
@@ -300,6 +311,10 @@
     const applyMonthlyNowBtn = document.getElementById('applyMonthlyNowBtn');
 
     const lowCreditWarning = document.getElementById('lowCreditWarning');
+
+    // ADDED: Letter type DOM
+    const letterType = document.getElementById('letterType');
+    const letterTypeHelp = document.getElementById('letterTypeHelp');
 
     let currentCustomer = null;
     let unsubscribeCustomer = null;
@@ -371,6 +386,40 @@
         console.error('loadCustomers error:', e);
         showError('Error loading customers');
       }
+    }
+
+    // --- Allowed types by package + refresher (ADDED) ---
+    function allowedTypesForPackage(pkg) {
+      const p = (pkg || '').toUpperCase().trim();
+
+      // PERSONAL MAILBOX → personal + override
+      // BUSINESS ADDRESS → personal + company + override
+      // REGISTERED OFFICE / FULL VIRTUAL OFFICE → HMRC + Companies House + personal + override
+      if (p === 'BUSINESS ADDRESS') {
+        return ['personal', 'company', 'override'];
+      }
+      if (p === 'REGISTERED OFFICE' || p === 'FULL VIRTUAL OFFICE' || p === 'REGISTERED AND FULL VIRTUAL OFFICE') {
+        return ['hmrc', 'companies-house', 'personal', 'override'];
+      }
+      return ['personal', 'override']; // default PERSONAL MAILBOX
+    }
+
+    function refreshLetterTypeOptions(packageType) {
+      const allowed = new Set(allowedTypesForPackage(packageType));
+      Array.from(letterType.options).forEach(opt => {
+        opt.disabled = !allowed.has(opt.value);
+      });
+      const firstAllowed = Array.from(letterType.options).find(o => !o.disabled);
+      if (firstAllowed) letterType.value = firstAllowed.value;
+
+      const pkg = packageType || 'PERSONAL MAILBOX';
+      const unavailable = Array.from(letterType.options)
+        .filter(o => o.disabled)
+        .map(o => o.textContent)
+        .join(', ');
+      letterTypeHelp.textContent = unavailable
+        ? `Package: ${pkg}. Unavailable types (greyed out): ${unavailable}. Use “Override” only with approval.`
+        : `Package: ${pkg}.`;
     }
 
     // --- Customer change ---
@@ -450,6 +499,9 @@
       monthlyFreeAllowanceInput.value = Number(cust.monthlyFreeAllowance ?? 0);
       autoRenewFreeScansInput.checked = Boolean(cust.autoRenewFreeScans);
       resetModeSelect.value = (cust.resetMode || 'reset').toLowerCase();
+
+      // ADDED: refresh letter type options per package
+      refreshLetterTypeOptions(cust.packageType || 'PERSONAL MAILBOX');
 
       customerInfo.style.display = 'grid';
     }
@@ -587,6 +639,17 @@
       const baseCost = 0.50 + ((pages - 1) * 0.25);
       const files = Array.from(scanFilesInput.files || []);
 
+      // ADDED: Enforce letter type by package + override
+      const selectedType = letterType.value;
+      const selectedOpt = letterType.options[letterType.selectedIndex];
+      if (selectedOpt.disabled && selectedType !== 'override') {
+        return showError('This letter type is not included in the customer’s package. Use “Override” if approved.');
+      }
+      if (selectedType === 'override') {
+        const ok = confirm('You selected “Override”. Proceed with scanning this letter type even though it is not covered by the customer’s package?');
+        if (!ok) return;
+      }
+
       const freeScans = Number(currentCustomer.freeScansRemaining || 0);
       let usedFreeScan = false;
       let payable = baseCost;
@@ -610,7 +673,7 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        // create mail item (ADDED ttlAt for 30-day auto-delete)
+        // create mail item (ttlAt for 30-day auto-delete) + ADDED letterType
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages,
@@ -621,7 +684,8 @@
           processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
           freeScanUsed: usedFreeScan,
-          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)) // <-- ADDED
+          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+          letterType: selectedType
         });
 
         // update balances
@@ -695,11 +759,14 @@
             filesHtml += '</div>';
           }
 
-          // ADDED: delete button with doc id
+          // ADDED tag for letter type
           html += `
             <div class="activity-item">
               <div class="activity-info">
-                <div><strong>${item.pages} page(s)</strong> ${files.length ? `- ${files.length} file(s)` : ''}</div>
+                <div>
+                  <strong>${item.pages} page(s)</strong> ${files.length ? `- ${files.length} file(s)` : ''}
+                  ${item.letterType ? `<span style="margin-left:8px; font-size:12px; padding:2px 6px; border:1px solid #e0e0e0; border-radius:12px;">${item.letterType}</span>` : ''}
+                </div>
                 <div class="activity-date">${date}</div>
                 ${item.notes ? `<div style="color:#666; font-size:14px; margin-top:5px;">${item.notes}</div>` : ''}
                 ${filesHtml}
@@ -715,7 +782,7 @@
       }
     }
 
-    // ADDED: delegated delete handler (deletes files then doc)
+    // Delete button (deletes files then doc)
     document.addEventListener('click', async (e) => {
       const btn = e.target.closest('.delete-btn');
       if (!btn) return;
@@ -732,7 +799,6 @@
           const files = Array.isArray(data.files) ? data.files : [];
           await Promise.all(files.map(async (f) => {
             try {
-              // ref can take a full gs:// or https URL
               const fileRef = ref(storage, f.url);
               await deleteObject(fileRef);
             } catch (err) {
