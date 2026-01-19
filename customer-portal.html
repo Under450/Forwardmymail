@@ -159,34 +159,49 @@
           <div class="credit-pack" data-amount="50"><div class="pack-amount">£50</div></div>
         </div>
 
+        <!-- Mailbox Plans (UPDATED PRICES/LINKS + FULL VIRTUAL OFFICE) -->
         <h3 style="margin-top: 30px; margin-bottom: 15px;">Mailbox Plans</h3>
         <p style="color: #666; margin-bottom: 20px;">Annual virtual mailbox subscriptions</p>
 
-        <!-- UPDATED: ORIGINAL BOXES now link to your new Stripe Payment Links and show fixed prices -->
-        <div class="credit-packs">
-          <a class="credit-pack" href="https://buy.stripe.com/dRm4gB0nWcbv2Up4Ka4Ja0d" target="_blank" rel="noopener">
-            <div class="pack-amount">Personal Mailbox</div>
-            <div class="pack-scans">£125 / year</div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:15px;">
+          <!-- Personal Mailbox — £125 -->
+          <a href="https://buy.stripe.com/dRm4gB0nWcbv2Up4Ka4Ja0d"
+             target="_blank" rel="noopener"
+             style="display:block; text-decoration:none; background:#fff; border:2px solid #e0e0e0; border-radius:12px; padding:18px; text-align:center; transition:.2s;">
+            <div style="font-size:26px; font-weight:800; color:#1e3c72; margin-bottom:6px;">£125<span style="font-weight:600; font-size:16px;">/year</span></div>
+            <div style="color:#666; font-size:14px; line-height:1.2;">Personal<br/>Mailbox</div>
           </a>
 
-          <a class="credit-pack" href="https://buy.stripe.com/cNi28t1s0b7rcuZekK4Ja0e" target="_blank" rel="noopener">
-            <div class="pack-amount">Business Address</div>
-            <div class="pack-scans">£175 / year</div>
+          <!-- Business Mailbox — £175 -->
+          <a href="https://buy.stripe.com/cNi28t1s0b7rcuZekK4Ja0e"
+             target="_blank" rel="noopener"
+             style="display:block; text-decoration:none; background:#fff; border:2px solid #e0e0e0; border-radius:12px; padding:18px; text-align:center; transition:.2s;">
+            <div style="font-size:26px; font-weight:800; color:#1e3c72; margin-bottom:6px;">£175<span style="font-weight:600; font-size:16px;">/year</span></div>
+            <div style="color:#666; font-size:14px; line-height:1.2;">Business<br/>Mailbox</div>
           </a>
 
-          <a class="credit-pack" href="https://buy.stripe.com/28E8wRb2A1wR2Up90q4Ja0f" target="_blank" rel="noopener">
-            <div class="pack-amount">Registered Office</div>
-            <div class="pack-scans">£225 / year</div>
+          <!-- Premium Mailbox — £225 (Registered Office link) -->
+          <a href="https://buy.stripe.com/28E8wRb2A1wR2Up90q4Ja0f"
+             target="_blank" rel="noopener"
+             style="display:block; text-decoration:none; background:#fff; border:2px solid #e0e0e0; border-radius:12px; padding:18px; text-align:center; transition:.2s;">
+            <div style="font-size:26px; font-weight:800; color:#1e3c72; margin-bottom:6px;">£225<span style="font-weight:600; font-size:16px;">/year</span></div>
+            <div style="color:#666; font-size:14px; line-height:1.2;">Premium<br/>Mailbox</div>
           </a>
+
+          <!-- Full Virtual Office — £299 (no link provided) -->
+          <div style="background:#fff; border:2px solid #e0e0e0; border-radius:12px; padding:18px; text-align:center;">
+            <div style="font-size:26px; font-weight:800; color:#1e3c72; margin-bottom:6px;">£299<span style="font-weight:600; font-size:16px;">/year</span></div>
+            <div style="color:#666; font-size:14px; line-height:1.2;">Full Virtual<br/>Office</div>
+          </div>
         </div>
 
-        <!-- Plans & Upgrades (unchanged) -->
+        <!-- ===== Plans & Upgrades (Stripe Payment Links) ===== -->
         <section style="margin-top:24px;">
           <h3 style="margin:0 0 12px;">Plans & Upgrades (Stripe)</h3>
           <p style="color:#666; margin:0 0 14px;">Choose a plan or upgrade. Opens securely in Stripe.</p>
 
-          <!-- Upgrade actions (unchanged) -->
-          <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); margin-bottom:0;">
+          <!-- Upgrade actions -->
+          <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); margin-bottom:8px;">
             <a href="https://buy.stripe.com/aFa8wRgmUejDfHb5Oe4Ja0b"
                target="_blank" rel="noopener"
                style="display:inline-block; text-align:center; text-decoration:none; padding:12px; border-radius:8px; background:linear-gradient(135deg,#1e3c72 0%, #2a5298 100%); color:#fff; font-weight:600;">
@@ -198,8 +213,34 @@
               Upgrade: Business → Registered Office (£50)
             </a>
           </div>
+
+          <!-- Light grey note under upgrade buttons -->
+          <p style="color:#666; font-size:14px; margin:6px 0 16px;">
+            After payment, your plan/upgrade will be applied to your account. If it doesn’t show within a minute,
+            refresh this page. Please keep pop-ups enabled for Stripe.
+          </p>
+
+          <!-- (Optional) keep plan purchase links section if you want both areas -->
+          <h4 style="margin:12px 0 8px; font-size:1rem; color:#333;">Purchase / Renew a Plan</h4>
+          <div style="display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(220px,1fr));">
+            <a href="https://buy.stripe.com/dRm4gB0nWcbv2Up4Ka4Ja0d"
+               target="_blank" rel="noopener"
+               style="display:inline-block; text-align:center; text-decoration:none; padding:12px; border-radius:8px; background:linear-gradient(135deg,#1e3c72 0%, #2a5298 100%); color:#fff; font-weight:600;">
+              Personal Mailbox
+            </a>
+            <a href="https://buy.stripe.com/cNi28t1s0b7rcuZekK4Ja0e"
+               target="_blank" rel="noopener"
+               style="display:inline-block; text-align:center; text-decoration:none; padding:12px; border-radius:8px; background:white; color:#1e3c72; border:2px solid #1e3c72; font-weight:600;">
+              Business Mailbox
+            </a>
+            <a href="https://buy.stripe.com/28E8wRb2A1wR2Up90q4Ja0f"
+               target="_blank" rel="noopener"
+               style="display:inline-block; text-align:center; text-decoration:none; padding:12px; border-radius:8px; background:linear-gradient(135deg,#1e3c72 0%, #2a5298 100%); color:#fff; font-weight:600;">
+              Premium Mailbox
+            </a>
+          </div>
         </section>
-        <!-- /Plans & Upgrades -->
+        <!-- ===== /NEW ===== -->
 
         <div class="mail-items">
           <h3 style="margin-bottom: 15px;">Recent Mail Items</h3>
@@ -445,7 +486,8 @@
           const status = item.status || 'scanned';
           const files = item.files || [];
 
-        let filesHtml = '';
+          // Build file links
+          let filesHtml = '';
           if (files.length > 0) {
             filesHtml = '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">';
             files.forEach((file) => {
