@@ -76,6 +76,19 @@
     .activity-cost { font-weight: bold; color: #1e3c72; white-space: nowrap; }
     .delete-btn { background: #e74c3c; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
 
+    /* Small badge style for a clean package label */
+    .pkg-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid #e0e0e0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e3c72;
+      background: #f7f9ff;
+      white-space: nowrap;
+    }
+
     @media (max-width: 768px) { .customer-info { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -134,6 +147,13 @@
               <div class="info-label">Email</div>
               <div class="info-value" id="customerEmail">-</div>
             </div>
+
+            <!-- NEW: Package (shown where you circled) -->
+            <div class="info-item">
+              <div class="info-label">Package</div>
+              <div class="info-value"><span id="customerPackage" class="pkg-badge">-</span></div>
+            </div>
+
             <div class="info-item">
               <div class="info-label">Credit Balance</div>
               <div class="info-value credit-value" id="customerCredits">£0.00</div>
@@ -190,7 +210,7 @@
         <div class="scan-form panel" id="scanForm" style="display:none;">
           <h3 style="margin-bottom: 20px;">Process Mail Scan</h3>
 
-          <!-- ADDED: Type of letter -->
+          <!-- Type of letter -->
           <div class="form-group">
             <label for="letterType">Type of letter</label>
             <select id="letterType">
@@ -275,9 +295,6 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
-    // --- Retention config (easy to tweak) ---
-    const RETENTION_DAYS = 30;
-
     // --- DOM refs ---
     const loginSection = document.getElementById('loginSection');
     const portalSection = document.getElementById('portalSection');
@@ -315,9 +332,12 @@
 
     const lowCreditWarning = document.getElementById('lowCreditWarning');
 
-    // ADDED: Letter type DOM
+    // Letter type DOM
     const letterType = document.getElementById('letterType');
     const letterTypeHelp = document.getElementById('letterTypeHelp');
+
+    // NEW: Package display element
+    const customerPackageEl = document.getElementById('customerPackage');
 
     let currentCustomer = null;
     let unsubscribeCustomer = null;
@@ -391,7 +411,7 @@
       }
     }
 
-    // --- Allowed types by package + refresher (ADDED) ---
+    // --- Allowed types by package + refresher ---
     function allowedTypesForPackage(pkg) {
       const p = (pkg || '').toUpperCase().trim();
 
@@ -470,6 +490,10 @@
       document.getElementById('customerCompany').textContent = cust.company || '-';
       document.getElementById('customerEmail').textContent = cust.email || '-';
 
+      // NEW: Package label
+      const pkgLabel = (cust.packageType || 'Not set').toString();
+      customerPackageEl.textContent = pkgLabel;
+
       const credits = Number(cust.credits || 0);
       const freeScans = Number(cust.freeScansRemaining || 0);
 
@@ -503,7 +527,7 @@
       autoRenewFreeScansInput.checked = Boolean(cust.autoRenewFreeScans);
       resetModeSelect.value = (cust.resetMode || 'reset').toLowerCase();
 
-      // ADDED: refresh letter type options per package
+      // Update letter type options per package
       refreshLetterTypeOptions(cust.packageType || 'PERSONAL MAILBOX');
 
       customerInfo.style.display = 'grid';
@@ -642,7 +666,7 @@
       const baseCost = 0.50 + ((pages - 1) * 0.25);
       const files = Array.from(scanFilesInput.files || []);
 
-      // ADDED: Enforce letter type by package + override
+      // Enforce letter type by package + override
       const selectedType = letterType.value;
       const selectedOpt = letterType.options[letterType.selectedIndex];
       if (selectedOpt.disabled && selectedType !== 'override') {
@@ -676,7 +700,7 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        // create mail item (ttlAt for auto-delete) + ADDED letterType
+        // create mail item (ttlAt for 30-day auto-delete) + letterType
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages,
@@ -687,7 +711,7 @@
           processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
           freeScanUsed: usedFreeScan,
-          ttlAt: Timestamp.fromDate(new Date(Date.now() + RETENTION_DAYS * 24 * 60 * 60 * 1000)),
+          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)), // Firestore TTL field
           letterType: selectedType
         });
 
@@ -762,7 +786,7 @@
             filesHtml += '</div>';
           }
 
-          // ADDED tag for letter type
+          // tag for letter type
           html += `
             <div class="activity-item">
               <div class="activity-info">
