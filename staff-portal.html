@@ -275,6 +275,9 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
 
+    // --- Retention config (easy to tweak) ---
+    const RETENTION_DAYS = 30;
+
     // --- DOM refs ---
     const loginSection = document.getElementById('loginSection');
     const portalSection = document.getElementById('portalSection');
@@ -673,7 +676,7 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        // create mail item (ttlAt for 30-day auto-delete) + ADDED letterType
+        // create mail item (ttlAt for auto-delete) + ADDED letterType
         await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages,
@@ -684,7 +687,7 @@
           processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
           freeScanUsed: usedFreeScan,
-          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
+          ttlAt: Timestamp.fromDate(new Date(Date.now() + RETENTION_DAYS * 24 * 60 * 60 * 1000)),
           letterType: selectedType
         });
 
