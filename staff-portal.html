@@ -148,7 +148,13 @@
               <div class="info-value" id="customerEmail">-</div>
             </div>
 
-            <!-- NEW: Package (shown where you circled) -->
+            <!-- NEW: Mailbox ID -->
+            <div class="info-item">
+              <div class="info-label">Mailbox ID</div>
+              <div class="info-value" id="customerMailboxId">-</div>
+            </div>
+
+            <!-- Package badge -->
             <div class="info-item">
               <div class="info-label">Package</div>
               <div class="info-value"><span id="customerPackage" class="pkg-badge">-</span></div>
@@ -336,8 +342,9 @@
     const letterType = document.getElementById('letterType');
     const letterTypeHelp = document.getElementById('letterTypeHelp');
 
-    // NEW: Package display element
+    // Package + Mailbox elements
     const customerPackageEl = document.getElementById('customerPackage');
+    const customerMailboxIdEl = document.getElementById('customerMailboxId');
 
     let currentCustomer = null;
     let unsubscribeCustomer = null;
@@ -489,6 +496,9 @@
       document.getElementById('customerName').textContent = cust.name || '-';
       document.getElementById('customerCompany').textContent = cust.company || '-';
       document.getElementById('customerEmail').textContent = cust.email || '-';
+
+      // NEW: Mailbox ID
+      customerMailboxIdEl.textContent = cust.mailboxId || '-';
 
       // NEW: Package label
       const pkgLabel = (cust.packageType || 'Not set').toString();
