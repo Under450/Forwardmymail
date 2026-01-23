@@ -98,7 +98,7 @@
     .btn-file {
       display: inline-block;
       padding: 12px 20px;
-      background: #ff8a00;           /* orange */
+      background: #ff8a00;
       color: #fff;
       font-weight: 700;
       border-radius: 8px;
@@ -114,6 +114,11 @@
 
     /* hide the native input (we still use it for upload) */
     #scanFiles { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; clip-path: inset(50%); border: 0; padding: 0; margin: -1px; }
+
+    /* ID status badge colours */
+    .badge-pending { background:#fff3cd; color:#7a5c00; border-color:#ffec99; }
+    .badge-approved { background:#e6ffed; color:#116329; border-color:#b7f5c9; }
+    .badge-rejected { background:#fde8e8; color:#9b1c1c; border-color:#f5bdbd; }
 
     @media (max-width: 768px) { .customer-info { grid-template-columns: 1fr; } }
   </style>
@@ -197,19 +202,59 @@
           </div>
 
           <div id="lowCreditWarning" style="display:none;"></div>
+
+          <!-- ID STATUS BANNER + PANEL -->
+          <div id="idStatusBanner" class="critical-credit-warning" style="display:none; margin-top:12px;">
+            ⛔ <strong>ID CHECK REQUIRED:</strong> This account is blocked from scanning until ID is approved.
+          </div>
+
+          <div class="panel" id="idStatusPanel" style="display:none; margin-top:12px;">
+            <h3>ID Status</h3>
+            <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+              <div>
+                <div class="info-label">Current status</div>
+                <div class="info-value">
+                  <span id="idStatusBadge" class="pkg-badge">pending</span>
+                </div>
+              </div>
+              <div>
+                <div class="info-label">Checked by</div>
+                <div class="info-value" id="idCheckedBy">–</div>
+              </div>
+              <div>
+                <div class="info-label">Checked at</div>
+                <div class="info-value" id="idCheckedAt">–</div>
+              </div>
+            </div>
+
+            <div class="info-card" style="margin-top:12px;">
+              <div class="row">
+                <div style="display:flex;align-items:center;">
+                  <input type="checkbox" id="idApprovedCheckbox" style="width:20px;height:20px;margin-right:10px;">
+                  <label for="idApprovedCheckbox" style="margin:0;">ID verified (approved)</label>
+                </div>
+                <div>
+                  <label for="idNotes">Notes (optional)</label>
+                  <textarea id="idNotes" rows="2" placeholder="e.g. Passport checked, PoA received"></textarea>
+                </div>
+              </div>
+              <div class="row" style="margin-top:12px;">
+                <button id="saveIdStatusBtn" type="button">Save ID Status</button>
+                <button id="resetIdStatusBtn" type="button" style="background:#8a2e2e;">Set to Pending</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Free Scans: Quick Action + Settings -->
         <div class="panel" id="freeScansPanel" style="display:none;">
           <h3>Free Scans</h3>
-
           <div class="row" style="align-items:end; margin-top:10px;">
             <div>
               <label>One-off grant</label>
               <button id="addFreeScanBtn" type="button">Add 1 Free Scan</button>
             </div>
           </div>
-
           <div class="info-card" style="margin-top:15px;">
             <div class="row">
               <div>
@@ -228,7 +273,6 @@
                 <label for="autoRenewFreeScans" style="margin:0;">Auto-renew monthly</label>
               </div>
             </div>
-
             <div class="row" style="margin-top:12px;">
               <button id="saveFreeScanSettingsBtn" type="button">Save settings</button>
               <button id="applyMonthlyNowBtn" type="button" style="background:#1f7a1f;">Apply allowance now</button>
@@ -382,6 +426,17 @@
     const customerPackageEl = document.getElementById('customerPackage');
     const customerMailboxIdEl = document.getElementById('customerMailboxId');
 
+    // NEW: ID status elements
+    const idStatusPanel = document.getElementById('idStatusPanel');
+    const idStatusBanner = document.getElementById('idStatusBanner');
+    const idStatusBadge = document.getElementById('idStatusBadge');
+    const idCheckedBy = document.getElementById('idCheckedBy');
+    const idCheckedAt = document.getElementById('idCheckedAt');
+    const idApprovedCheckbox = document.getElementById('idApprovedCheckbox');
+    const idNotes = document.getElementById('idNotes');
+    const saveIdStatusBtn = document.getElementById('saveIdStatusBtn');
+    const resetIdStatusBtn = document.getElementById('resetIdStatusBtn');
+
     let currentCustomer = null;
     let unsubscribeCustomer = null;
 
@@ -508,6 +563,8 @@
       scanForm.style.display = 'none';
       recentActivity.style.display = 'none';
       freeScansPanel.style.display = 'none';
+      idStatusPanel.style.display = 'none';
+      idStatusBanner.style.display = 'none';
       lowCreditWarning.style.display = 'none';
       currentCustomer = null;
       if (unsubscribeCustomer) unsubscribeCustomer();
@@ -555,6 +612,32 @@
 
       refreshLetterTypeOptions(cust.packageType || 'PERSONAL MAILBOX');
 
+      // ---- ID Status handling ----
+      const status = (cust.idStatus || 'pending').toLowerCase();
+      const checkedByVal = cust.idCheckedBy || '–';
+      const checkedAtTs = cust.idCheckedAt;
+      const checkedAtTxt = checkedAtTs?.toDate?.() ? checkedAtTs.toDate().toLocaleString() : '–';
+
+      idStatusBadge.textContent = status;
+      idStatusBadge.classList.remove('badge-pending','badge-approved','badge-rejected');
+      if (status === 'approved') idStatusBadge.classList.add('badge-approved');
+      else if (status === 'rejected') idStatusBadge.classList.add('badge-rejected');
+      else idStatusBadge.classList.add('badge-pending');
+
+      idCheckedBy.textContent = checkedByVal;
+      idCheckedAt.textContent = checkedAtTxt;
+
+      idApprovedCheckbox.checked = (status === 'approved');
+      idNotes.value = cust.idNotes || '';
+
+      idStatusPanel.style.display = 'block';
+
+      const isApproved = (status === 'approved');
+      idStatusBanner.style.display = isApproved ? 'none' : 'block';
+      scanForm.style.pointerEvents = isApproved ? 'auto' : 'none';
+      scanForm.style.opacity = isApproved ? '1' : '0.5';
+      processScanBtn.disabled = !isApproved;
+
       customerInfo.style.display = 'grid';
     }
 
@@ -571,6 +654,42 @@
         showError('Failed to add free scan: ' + e.message);
       } finally {
         addFreeScanBtn.disabled = false;
+      }
+    });
+
+    // --- Save ID status ---
+    saveIdStatusBtn?.addEventListener('click', async () => {
+      if (!currentCustomer) return showError('Select a customer first');
+      try {
+        saveIdStatusBtn.disabled = true;
+        const newStatus = idApprovedCheckbox.checked ? 'approved' : 'pending';
+        await updateDoc(doc(db, 'customers', currentCustomer.id), {
+          idStatus: newStatus,
+          idNotes: (idNotes.value || '').trim(),
+          idCheckedBy: auth.currentUser?.email || 'staff',
+          idCheckedAt: serverTimestamp()
+        });
+        showSuccess(`ID status set to ${newStatus}.`);
+      } catch (e) {
+        showError('Failed to update ID status: ' + e.message);
+      } finally {
+        saveIdStatusBtn.disabled = false;
+      }
+    });
+
+    resetIdStatusBtn?.addEventListener('click', async () => {
+      if (!currentCustomer) return showError('Select a customer first');
+      try {
+        resetIdStatusBtn.disabled = true;
+        await updateDoc(doc(db, 'customers', currentCustomer.id), {
+          idStatus: 'pending',
+          idNotes: (idNotes.value || '').trim()
+        });
+        showSuccess('ID status reset to pending.');
+      } catch (e) {
+        showError('Failed to reset status: ' + e.message);
+      } finally {
+        resetIdStatusBtn.disabled = false;
       }
     });
 
@@ -640,7 +759,7 @@
       costAmount.textContent = cost.toFixed(2);
     });
 
-    // --- File list preview + status text (updated for custom button) ---
+    // --- File list preview + status text ---
     const fileStatus = document.getElementById('fileStatus');
     scanFilesInput.addEventListener('change', (e) => {
       const files = Array.from(e.target.files || []);
@@ -690,6 +809,11 @@
     processScanBtn.addEventListener('click', async () => {
       if (!currentCustomer) return showError('Please select a customer first');
 
+      // Block if ID not approved
+      if ((currentCustomer.idStatus || 'pending') !== 'approved') {
+        return showError('ID check not approved. You cannot process scans for this account yet.');
+      }
+
       const pages = Math.max(parseInt(pagesInput.value) || 1, 1);
       const notes = document.getElementById('notes').value || '';
       const baseCost = 0.50 + ((pages - 1) * 0.25);
@@ -727,7 +851,8 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        await addDoc(collection(db, 'mailItems')), {
+        // FIXED: correct addDoc call
+        await addDoc(collection(db, 'mailItems'), {
           customerId: currentCustomer.id,
           pages,
           cost: payable,
@@ -739,7 +864,7 @@
           freeScanUsed: usedFreeScan,
           ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
           letterType: selectedType
-        };
+        });
 
         if (usedFreeScan) {
           await updateDoc(doc(db, 'customers', currentCustomer.id), {
