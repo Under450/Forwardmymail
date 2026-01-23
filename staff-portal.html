@@ -26,7 +26,6 @@
       width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color .3s;
     }
     input:focus, select:focus, textarea:focus { outline: none; border-color: #1e3c72; }
-    /* Show greyed-out letter types clearly */
     #letterType option[disabled] { color: #bbb; }
 
     button {
@@ -76,7 +75,6 @@
     .activity-cost { font-weight: bold; color: #1e3c72; white-space: nowrap; }
     .delete-btn { background: #e74c3c; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; }
 
-    /* Small badge style for a clean package label */
     .pkg-badge {
       display: inline-block;
       padding: 4px 10px;
@@ -88,6 +86,34 @@
       background: #f7f9ff;
       white-space: nowrap;
     }
+
+    /* NEW: custom Choose Files button */
+    .file-picker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .btn-file {
+      display: inline-block;
+      padding: 12px 20px;
+      background: #ff8a00;           /* orange */
+      color: #fff;
+      font-weight: 700;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      border: 2px solid #ff8a00;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn-file:hover { transform: translateY(-1px); background: #ff7a00; border-color: #ff7a00; }
+    .btn-file:active { transform: translateY(0); }
+    .file-status { color: #666; font-size: 14px; }
+
+    /* hide the native input (we still use it for upload) */
+    #scanFiles { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; clip-path: inset(50%); border: 0; padding: 0; margin: -1px; }
 
     @media (max-width: 768px) { .customer-info { grid-template-columns: 1fr; } }
   </style>
@@ -148,13 +174,13 @@
               <div class="info-value" id="customerEmail">-</div>
             </div>
 
-            <!-- NEW: Mailbox ID -->
+            <!-- Mailbox ID -->
             <div class="info-item">
               <div class="info-label">Mailbox ID</div>
               <div class="info-value" id="customerMailboxId">-</div>
             </div>
 
-            <!-- Package badge -->
+            <!-- Package -->
             <div class="info-item">
               <div class="info-label">Package</div>
               <div class="info-value"><span id="customerPackage" class="pkg-badge">-</span></div>
@@ -177,7 +203,6 @@
         <div class="panel" id="freeScansPanel" style="display:none;">
           <h3>Free Scans</h3>
 
-          <!-- Quick action -->
           <div class="row" style="align-items:end; margin-top:10px;">
             <div>
               <label>One-off grant</label>
@@ -185,7 +210,6 @@
             </div>
           </div>
 
-          <!-- Settings -->
           <div class="info-card" style="margin-top:15px;">
             <div class="row">
               <div>
@@ -216,7 +240,6 @@
         <div class="scan-form panel" id="scanForm" style="display:none;">
           <h3 style="margin-bottom: 20px;">Process Mail Scan</h3>
 
-          <!-- Type of letter -->
           <div class="form-group">
             <label for="letterType">Type of letter</label>
             <select id="letterType">
@@ -239,11 +262,27 @@
             <textarea id="notes" rows="3" placeholder="Add any notes about this scan..."></textarea>
           </div>
 
+          <!-- Upload Scanned Documents (custom orange button centered) -->
           <div class="form-group">
-            <label for="scanFiles">Upload Scanned Documents</label>
-            <input type="file" id="scanFiles" multiple accept="image/*,.pdf" style="margin-bottom:10px;" />
-            <div style="font-size: 13px; color: #666; margin-top: 5px;">Select one or more images (JPG, PNG) or PDF files</div>
+            <label>Upload Scanned Documents</label>
+
+            <!-- Hidden real input -->
+            <input type="file" id="scanFiles" multiple accept="image/*,.pdf" />
+
+            <!-- Pretty, centered trigger + small status text -->
+            <div class="file-picker" aria-live="polite">
+              <label for="scanFiles" class="btn-file" role="button" tabindex="0">Choose Files</label>
+              <span id="fileStatus" class="file-status">No file chosen</span>
+            </div>
+
+            <div style="font-size: 13px; color: #666; margin-top: 8px;">
+              Select one or more images (JPG, PNG) or PDF files
+            </div>
+
+            <!-- Existing file list area (kept) -->
             <div id="fileList" style="margin-top: 10px; font-size: 14px; color: #666;"></div>
+
+            <!-- Existing progress UI (kept) -->
             <div id="uploadProgress" style="display:none; margin-top:10px;">
               <div style="background:#e0e0e0; height:20px; border-radius:10px; overflow:hidden;">
                 <div id="progressBar" style="background:linear-gradient(135deg,#1e3c72 0%,#2a5298 100%); height:100%; width:0%; transition:width .3s;"></div>
@@ -260,9 +299,7 @@
 
           <button id="processScanBtn" style="width:100%; margin-top:20px;">Process Scan</button>
         </div>
-        <button id="scanLocalBtn" type="button" style="width:100%; margin-top:10px;">
-  Scan (Local)
-</button>
+
         <!-- Recent Activity -->
         <div class="recent-activity" id="recentActivity" style="display:none;">
           <h3 style="margin-bottom: 15px;">Recent Activity</h3>
@@ -331,7 +368,6 @@
     const customerFreeScansEl = document.getElementById('customerFreeScans');
     const freeScansPanel = document.getElementById('freeScansPanel');
 
-    // settings inputs
     const monthlyFreeAllowanceInput = document.getElementById('monthlyFreeAllowance');
     const autoRenewFreeScansInput = document.getElementById('autoRenewFreeScans');
     const resetModeSelect = document.getElementById('resetMode');
@@ -340,11 +376,9 @@
 
     const lowCreditWarning = document.getElementById('lowCreditWarning');
 
-    // Letter type DOM
     const letterType = document.getElementById('letterType');
     const letterTypeHelp = document.getElementById('letterTypeHelp');
 
-    // Package + Mailbox elements
     const customerPackageEl = document.getElementById('customerPackage');
     const customerMailboxIdEl = document.getElementById('customerMailboxId');
 
@@ -423,13 +457,7 @@
     // --- Allowed types by package + refresher ---
     function allowedTypesForPackage(pkg) {
       const p = (pkg || '').toUpperCase().trim();
-
-      // PERSONAL MAILBOX → personal + override
-      // BUSINESS ADDRESS → personal + company + override
-      // REGISTERED OFFICE / FULL VIRTUAL OFFICE → HMRC + Companies House + personal + override
-      if (p === 'BUSINESS ADDRESS') {
-        return ['personal', 'company', 'override'];
-      }
+      if (p === 'BUSINESS ADDRESS') return ['personal', 'company', 'override'];
       if (p === 'REGISTERED OFFICE' || p === 'FULL VIRTUAL OFFICE' || p === 'REGISTERED AND FULL VIRTUAL OFFICE') {
         return ['hmrc', 'companies-house', 'personal', 'override'];
       }
@@ -438,17 +466,12 @@
 
     function refreshLetterTypeOptions(packageType) {
       const allowed = new Set(allowedTypesForPackage(packageType));
-      Array.from(letterType.options).forEach(opt => {
-        opt.disabled = !allowed.has(opt.value);
-      });
+      Array.from(letterType.options).forEach(opt => { opt.disabled = !allowed.has(opt.value); });
       const firstAllowed = Array.from(letterType.options).find(o => !o.disabled);
       if (firstAllowed) letterType.value = firstAllowed.value;
 
       const pkg = packageType || 'PERSONAL MAILBOX';
-      const unavailable = Array.from(letterType.options)
-        .filter(o => o.disabled)
-        .map(o => o.textContent)
-        .join(', ');
+      const unavailable = Array.from(letterType.options).filter(o => o.disabled).map(o => o.textContent).join(', ');
       letterTypeHelp.textContent = unavailable
         ? `Package: ${pkg}. Unavailable types (greyed out): ${unavailable}. Use “Override” only with approval.`
         : `Package: ${pkg}.`;
@@ -457,10 +480,7 @@
     // --- Customer change ---
     customerSelect.addEventListener('change', async (e) => {
       const id = e.target.value;
-      if (!id) {
-        hideCustomerPanels();
-        return;
-      }
+      if (!id) { hideCustomerPanels(); return; }
       try {
         const snap = await getDoc(doc(db, 'customers', id));
         if (!snap.exists()) { hideCustomerPanels(); return; }
@@ -499,12 +519,8 @@
       document.getElementById('customerCompany').textContent = cust.company || '-';
       document.getElementById('customerEmail').textContent = cust.email || '-';
 
-      // NEW: Mailbox ID
       customerMailboxIdEl.textContent = cust.mailboxId || '-';
-
-      // NEW: Package label
-      const pkgLabel = (cust.packageType || 'Not set').toString();
-      customerPackageEl.textContent = pkgLabel;
+      customerPackageEl.textContent = (cust.packageType || 'Not set').toString();
 
       const credits = Number(cust.credits || 0);
       const freeScans = Number(cust.freeScansRemaining || 0);
@@ -517,7 +533,6 @@
 
       if (customerFreeScansEl) customerFreeScansEl.textContent = String(freeScans);
 
-      // warnings
       if (credits < 0.50 && freeScans <= 0) {
         lowCreditWarning.className = 'critical-credit-warning';
         lowCreditWarning.innerHTML = '⛔ <strong>CRITICAL:</strong> Insufficient credits and no free scans.';
@@ -534,18 +549,16 @@
         lowCreditWarning.style.display = 'none';
       }
 
-      // settings prefill (with sensible defaults)
       monthlyFreeAllowanceInput.value = Number(cust.monthlyFreeAllowance ?? 0);
       autoRenewFreeScansInput.checked = Boolean(cust.autoRenewFreeScans);
       resetModeSelect.value = (cust.resetMode || 'reset').toLowerCase();
 
-      // Update letter type options per package
       refreshLetterTypeOptions(cust.packageType || 'PERSONAL MAILBOX');
 
       customerInfo.style.display = 'grid';
     }
 
-    // --- Quick: Add 1 free scan ---
+    // --- Free scans quick add ---
     addFreeScanBtn?.addEventListener('click', async () => {
       if (!currentCustomer) return showError('Select a customer first');
       try {
@@ -583,18 +596,16 @@
       }
     });
 
-    // --- Apply allowance now (respect reset/topup) ---
+    // --- Apply allowance now ---
     applyMonthlyNowBtn.addEventListener('click', async () => {
       if (!currentCustomer) return showError('Select a customer first');
       const allowance = Math.max(Number(monthlyFreeAllowanceInput.value || 0), 0);
       const resetMode = resetModeSelect.value === 'topup' ? 'topup' : 'reset';
-
       if (allowance <= 0) return showError('Monthly allowance must be greater than 0 to apply');
 
       try {
         applyMonthlyNowBtn.disabled = true;
 
-        // get current month key (Europe/London)
         const tzNow = new Date(new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }));
         const y = tzNow.getFullYear();
         const m = String(tzNow.getMonth() + 1).padStart(2, '0');
@@ -629,12 +640,18 @@
       costAmount.textContent = cost.toFixed(2);
     });
 
-    // --- File list preview ---
+    // --- File list preview + status text (updated for custom button) ---
+    const fileStatus = document.getElementById('fileStatus');
     scanFilesInput.addEventListener('change', (e) => {
       const files = Array.from(e.target.files || []);
-      if (!files.length) { fileListDiv.innerHTML = ''; return; }
+      if (!files.length) {
+        fileListDiv.innerHTML = '';
+        if (fileStatus) fileStatus.textContent = 'No file chosen';
+        return;
+      }
       const rows = files.map((f, i) => `${i+1}. ${f.name} (${(f.size/1024/1024).toFixed(2)} MB)`);
       fileListDiv.innerHTML = `<strong>${files.length} file(s) selected:</strong><br>${rows.join('<br>')}`;
+      if (fileStatus) fileStatus.textContent = files.length === 1 ? files[0].name : `${files.length} files selected`;
     });
 
     // --- Upload helper ---
@@ -678,7 +695,6 @@
       const baseCost = 0.50 + ((pages - 1) * 0.25);
       const files = Array.from(scanFilesInput.files || []);
 
-      // Enforce letter type by package + override
       const selectedType = letterType.value;
       const selectedOpt = letterType.options[letterType.selectedIndex];
       if (selectedOpt.disabled && selectedType !== 'override') {
@@ -704,7 +720,6 @@
         processScanBtn.disabled = true;
         processScanBtn.textContent = 'Processing...';
 
-        // upload files if any
         let uploadedFiles = [];
         if (files.length) {
           uploadProgressDiv.style.display = 'block';
@@ -712,8 +727,7 @@
           uploadProgressDiv.style.display = 'none';
         }
 
-        // create mail item (ttlAt for 30-day auto-delete) + letterType
-        await addDoc(collection(db, 'mailItems'), {
+        await addDoc(collection(db, 'mailItems')), {
           customerId: currentCustomer.id,
           pages,
           cost: payable,
@@ -723,11 +737,10 @@
           processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
           freeScanUsed: usedFreeScan,
-          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)), // Firestore TTL field
+          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)),
           letterType: selectedType
-        });
+        };
 
-        // update balances
         if (usedFreeScan) {
           await updateDoc(doc(db, 'customers', currentCustomer.id), {
             freeScansRemaining: increment(-1)
@@ -742,11 +755,11 @@
         renderCustomer(currentCustomer);
         showSuccess(`Scan processed: ${pages} page(s) — ${usedFreeScan ? 'free scan used' : '£' + baseCost.toFixed(2) + ' deducted'}.`);
 
-        // reset form
         pagesInput.value = 1;
         document.getElementById('notes').value = '';
         scanFilesInput.value = '';
         fileListDiv.innerHTML = '';
+        if (fileStatus) fileStatus.textContent = 'No file chosen';
         costAmount.textContent = '0.50';
         progressBar.style.width = '0%';
 
@@ -798,7 +811,6 @@
             filesHtml += '</div>';
           }
 
-          // tag for letter type
           html += `
             <div class="activity-item">
               <div class="activity-info">
@@ -821,13 +833,12 @@
       }
     }
 
-    // Delete button (deletes files then doc)
+    // Delete button
     document.addEventListener('click', async (e) => {
       const btn = e.target.closest('.delete-btn');
       if (!btn) return;
       const mailItemId = btn.getAttribute('data-id');
       if (!mailItemId) return;
-
       if (!confirm('Delete this scan? This will remove its files and record.')) return;
 
       try {
