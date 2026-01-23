@@ -2,10 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Customer Portal - Forward My Mail v2</title>
   <script src="https://js.stripe.com/v3/"></script>
   <style>
@@ -20,8 +17,10 @@
     .header .logo { width: 120px; height: auto; margin-bottom: 15px; filter: brightness(0) invert(1); }
     .header h1 { font-size: 28px; margin-bottom: 10px; }
     .content { padding: 40px; }
+
     .login-section, .portal-section { display: none; }
     .login-section.active, .portal-section.active { display: block; }
+
     .form-group { margin-bottom: 20px; }
     label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
     input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
@@ -36,77 +35,50 @@
     .error-message.show { display: block; }
     .success-message { background: #efe; color: #3c3; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none; }
     .success-message.show { display: block; }
+
     .info-card { background: #f8f9fa; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
     .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e0e0e0; }
     .info-row:last-child { border-bottom: none; }
     .info-label { color: #666; font-weight: 500; }
     .info-value { color: #333; font-weight: 600; }
     .credit-balance { font-size: 32px; color: #1e3c72; }
+
     .credit-packs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; max-width: 100%; }
     @media (min-width: 768px) { .credit-packs { grid-template-columns: repeat(5, 1fr); } }
     .credit-pack { background: white; border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s; }
     .credit-pack:hover { border-color: #1e3c72; transform: translateY(-4px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2); }
-    .pack-amount { font-size: 24px; font-weight: bold; color: #1e3c72; margin-bottom: 8px; }
-    .pack-scans { color: #666; font-size: 14px; }
-    .logout-btn { background: #dc3545; margin-top: 20px; }
+
     .mail-items { margin-top: 30px; }
-    .mail-item {
-      background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .mail-item { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
     .mail-item-info { flex: 1; }
     .mail-item-date { color: #666; font-size: 14px; }
     .mail-item-status { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .status-scanned { background: #d4edda; color: #155724; }
     .status-pending { background: #fff3cd; color: #856404; }
-    .low-balance-warning {
-      background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none;
-    }
+
+    .low-balance-warning { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; }
     .low-balance-warning.show { display: block; }
-    .critical-credit-warning {
-      background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #721c24; display: none;
-    }
+    .critical-credit-warning { background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #721c24; display: none; }
     .critical-credit-warning.show { display: block; }
+
     @media (max-width: 768px) { .credit-packs { grid-template-columns: 1fr; } }
 
-    /* ===== ID GATE (only overlays the portal area) ===== */
-    .portal-section { position: relative; }
+    /* ID Gate overlay */
     .id-gate {
-      position: absolute;
-      inset: 0;
-      display: none;                 /* JS toggles this */
-      background: rgba(255,255,255,0.84);
-      backdrop-filter: blur(2px);
-      pointer-events: all;
-      z-index: 20;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      padding-bottom: 26px;
+      position: absolute; inset: 0; background: rgba(255,255,255,0.9);
+      display: none; align-items: center; justify-content: center; pointer-events: none;
     }
+    .id-gate.show { display: flex; }
+    .id-gate__wrap { text-align:center; }
     .id-gate__badge {
-      background: #b22222;
-      color: #fff;
-      font-weight: 800;
-      letter-spacing: .5px;
-      padding: 12px 22px;
-      border-radius: 999px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.18);
-      margin-bottom: 10px;
+      display:inline-block; background:#dc3545; color:#fff; font-weight:800; letter-spacing:.5px;
+      padding:12px 22px; border-radius:999px; box-shadow:0 10px 30px rgba(220,53,69,.25);
     }
-    .id-gate__note {
-      color: #333;
-      background: rgba(255,255,255,.9);
-      border: 1px solid #e0e0e0;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 14px;
-    }
+    .id-gate__note { margin-top:10px; color:#444; font-size:13px; }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="container" style="position:relative;">
     <div class="header">
       <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail" class="logo" />
       <h1>Forward My Mail</h1>
@@ -122,36 +94,19 @@
         <form id="loginForm" autocomplete="off">
           <div class="form-group">
             <label for="email">Email Address</label>
-            <input
-              type="email"
-              id="email"
-              required
-              placeholder="your@email.com"
-              autocomplete="off"
-              readonly
-              onfocus="this.removeAttribute('readonly');"
-            />
+            <input type="email" id="email" required placeholder="your@email.com"
+                   autocomplete="off" readonly onfocus="this.removeAttribute('readonly');"/>
           </div>
 
           <div class="form-group">
             <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              required
-              placeholder="Enter your password"
-              autocomplete="new-password"
-              readonly
-              onfocus="this.removeAttribute('readonly');"
-            />
+            <input type="password" id="password" required placeholder="Enter your password"
+                   autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly');"/>
           </div>
 
           <button type="submit" id="loginBtn">Login</button>
-          <button
-            type="button"
-            onclick="window.location.href='signup.html'"
-            style="background: white; color: #1e3c72; border: 2px solid #1e3c72; margin-top: 10px;"
-          >
+          <button type="button" onclick="window.location.href='signup.html'"
+                  style="background: white; color: #1e3c72; border: 2px solid #1e3c72; margin-top: 10px;">
             Create Account
           </button>
         </form>
@@ -167,15 +122,14 @@
       <div id="portalSection" class="portal-section">
         <div id="successMessage" class="success-message"></div>
 
-        <!-- ID Gate (ONLY inside the portal) -->
-        <div id="idGate" class="id-gate" style="display:none;">
-          <div class="id-gate__badge">ID CHECK REQUIRED</div>
-          <div class="id-gate__note">
-            Please complete your identity verification. Scanning and purchases are disabled until approved.
+        <!-- ID Gate overlay (hidden unless gated) -->
+        <div id="idGate" class="id-gate" aria-hidden="true">
+          <div class="id-gate__wrap">
+            <div class="id-gate__badge">ID CHECK REQUIRED</div>
+            <div class="id-gate__note">Please complete your identity verification. Scanning and purchases are disabled until approved.</div>
           </div>
         </div>
 
-        <!-- Banner area -->
         <div id="lowBalanceWarning" class="low-balance-warning">
           ⚠️ Low credit balance! Please purchase more credits to continue receiving mail scans.
         </div>
@@ -202,7 +156,6 @@
           <div class="credit-pack" data-amount="50"><div class="pack-amount">£50</div></div>
         </div>
 
-        <!-- Mailbox Plans (top tiles kept) -->
         <h3 style="margin-top: 30px; margin-bottom: 15px;">Mailbox Plans</h3>
         <p style="color: #666; margin-bottom: 20px;">Annual virtual mailbox subscriptions</p>
 
@@ -232,7 +185,6 @@
           </a>
         </div>
 
-        <!-- Plans & Upgrades: keep upgrades + grey note only -->
         <section style="margin-top:24px;">
           <h3 style="margin:0 0 12px;">Plans & Upgrades (Stripe)</h3>
           <p style="color:#666; margin:0 0 14px;">Choose a plan or upgrade. Opens securely in Stripe.</p>
@@ -261,7 +213,7 @@
           </div>
         </div>
 
-        <button id="logoutBtn" class="logout-btn">Logout</button>
+        <button id="logoutBtn" class="logout-btn" style="background:#dc3545; margin-top:20px;">Logout</button>
       </div>
     </div>
   </div>
@@ -298,17 +250,52 @@
     const creditBalance = document.getElementById('creditBalance');
     const lowBalanceWarning = document.getElementById('lowBalanceWarning');
     const mailItemsList = document.getElementById('mailItemsList');
+    const idGateEl = document.getElementById('idGate');
 
-    // NEW: gate handle
-    const idGate = document.getElementById('idGate');
-    function showIdGate(on) {
-      if (!idGate) return;
-      idGate.style.display = on ? 'flex' : 'none';
-      // also toggle credit-pack interactivity
-      document.querySelectorAll('.credit-pack').forEach(pk => {
-        pk.style.pointerEvents = on ? 'none' : 'auto';
-        pk.style.opacity = on ? '.5' : '1';
-      });
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.classList.add('show');
+      setTimeout(() => errorMessage.classList.remove('show'), 5000);
+    }
+    function showSuccess(message) {
+      successMessage.textContent = message;
+      successMessage.classList.add('show');
+      setTimeout(() => successMessage.classList.remove('show'), 5000);
+    }
+
+    // ID Gate helpers
+    function showIdGate(isOn) {
+      if (!idGateEl) return;
+      idGateEl.classList.toggle('show', !!isOn);
+      idGateEl.setAttribute('aria-hidden', isOn ? 'false' : 'true');
+    }
+    function setIdGateMessage(d) {
+      const badge = idGateEl?.querySelector('.id-gate__badge');
+      const note  = idGateEl?.querySelector('.id-gate__note');
+      if (!badge || !note) return;
+      const status = (d.idStatus || 'pending').toUpperCase();
+      const due = d.idDueAt?.toDate?.() ? d.idDueAt.toDate().toLocaleDateString('en-GB') : null;
+
+      if (status === 'SUSPENDED') {
+        badge.textContent = 'ACCOUNT SUSPENDED';
+        note.textContent  = 'Please contact support to restore access.';
+      } else if (status === 'REJECTED') {
+        badge.textContent = 'ID CHECK REQUIRED';
+        note.textContent  = 'Your previous ID submission was not approved. Please resubmit. Access is restricted.';
+      } else {
+        badge.textContent = 'ID CHECK REQUIRED';
+        note.textContent  = due
+          ? `Please complete your ID check by ${due}. After this date, access will be restricted.`
+          : 'Please complete your identity verification. Access may be restricted until approved.';
+      }
+    }
+    function shouldGateByIdStatus(d) {
+      const status = (d.idStatus || '').toLowerCase();
+      if (status === 'approved') return false;
+      if (status === 'suspended') return true;
+      const dueAt = d.idDueAt?.toDate ? d.idDueAt.toDate() : null;
+      if (!dueAt) return false;
+      return new Date() > dueAt;
     }
 
     let currentUser = null;
@@ -337,10 +324,9 @@
         }
       } else {
         currentUser = null;
-        // hide gate on login screen
-        showIdGate(false);
         loginSection.classList.add('active');
         portalSection.classList.remove('active');
+        showIdGate(false);
         if (unsubscribe) unsubscribe();
       }
     });
@@ -365,7 +351,6 @@
     logoutBtn.addEventListener('click', async () => {
       try { await signOut(auth); }
       catch (error) { showError('Error logging out'); }
-      finally { showIdGate(false); } // ensure hidden once logged out
     });
 
     async function loadCustomerData() {
@@ -375,14 +360,12 @@
           userName.textContent = currentUser.email || 'Customer';
           creditBalance.textContent = '0.00';
           showError('Your customer account is not set up yet. Please contact support at info@forwardmymail.co.uk');
-          // unknown status → don’t block unnecessarily
-          showIdGate(false);
           return;
         }
 
         const data = snap.data();
 
-        // ensure mailboxId exists
+        // ensure mailboxId exists (legacy safeguard)
         if (!data.mailboxId) {
           try {
             const randomNum = Math.floor(10000 + Math.random() * 90000);
@@ -397,52 +380,13 @@
           }
         }
 
-        // Monthly free-scan lazy apply (unchanged)
-        try {
-          const tzNow = new Date(new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }));
-          const y = tzNow.getFullYear();
-          const m = String(tzNow.getMonth() + 1).padStart(2, '0');
-          const currentMonthKey = `${y}-${m}`;
-
-          const allowance = Number(data.monthlyFreeAllowance || 0);
-          const autoRenew = Boolean(data.autoRenewFreeScans);
-          const last = String(data.lastAppliedMonthKey || "");
-          const applyAt = data.applyAtMonthKey || null;
-          const mode = (data.resetMode || "reset").toLowerCase();
-
-          const shouldApplyThisMonth =
-            autoRenew &&
-            allowance > 0 &&
-            last !== currentMonthKey &&
-            (applyAt === null || applyAt === "" || applyAt === currentMonthKey);
-
-          if (shouldApplyThisMonth) {
-            const currentFree = Number(data.freeScansRemaining || 0);
-            const newFree = mode === "topup" ? currentFree + allowance : allowance;
-
-            await updateDoc(doc(db, 'customers', currentUser.uid), {
-              freeScansRemaining: newFree,
-              lastAppliedMonthKey: currentMonthKey,
-              applyAtMonthKey: null
-            });
-
-            data.freeScansRemaining = newFree;
-            data.lastAppliedMonthKey = currentMonthKey;
-            data.applyAtMonthKey = null;
-          }
-        } catch (e) {
-          console.error('Lazy apply failed:', e);
-        }
-
-        // ======= ID gate decision =======
-        const isVerified = Boolean(data.idVerified);
-        showIdGate(!isVerified);
-
         userName.textContent = data.name || currentUser.email || 'Customer';
         document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
         creditBalance.textContent = (data.credits || 0).toFixed(2);
 
         refreshBanner(data);
+        setIdGateMessage(data);
+        showIdGate(shouldGateByIdStatus(data));
 
         if (unsubscribe) unsubscribe();
         unsubscribe = onSnapshot(doc(db, 'customers', currentUser.uid), (docLive) => {
@@ -450,8 +394,8 @@
           const d = docLive.data();
           creditBalance.textContent = (d.credits || 0).toFixed(2);
           refreshBanner(d);
-          // keep gate live-updated
-          showIdGate(!Boolean(d.idVerified));
+          setIdGateMessage(d);
+          showIdGate(shouldGateByIdStatus(d));
         });
 
         await loadMailItems();
@@ -567,24 +511,11 @@
         } catch (error) {
           showError('Failed to initiate payment. Please try again.');
         } finally {
-          // If ID not verified, keep disabled via gate; otherwise restore
-          const gated = idGate && idGate.style.display !== 'none';
-          pack.style.opacity = gated ? '.5' : '1';
-          pack.style.pointerEvents = gated ? 'none' : 'auto';
+          pack.style.opacity = '1';
+          pack.style.pointerEvents = 'auto';
         }
       });
     });
-
-    function showError(message) {
-      errorMessage.textContent = message;
-      errorMessage.classList.add('show');
-      setTimeout(() => errorMessage.classList.remove('show'), 5000);
-    }
-    function showSuccess(message) {
-      successMessage.textContent = message;
-      successMessage.classList.add('show');
-      setTimeout(() => successMessage.classList.remove('show'), 5000);
-    }
   </script>
 </body>
 </html>
