@@ -22,6 +22,8 @@
     .content { padding: 40px; }
     .login-section, .portal-section { display: none; }
     .login-section.active, .portal-section.active { display: block; }
+    /* Make portal a positioned container so the overlay can cover it */
+    .portal-section { position: relative; }
     .form-group { margin-bottom: 20px; }
     label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
     input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
@@ -67,6 +69,36 @@
       background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #721c24; display: none;
     }
     .critical-credit-warning.show { display: block; }
+
+    /* ===== ID gate overlay ===== */
+    .id-gate {
+      position: absolute;
+      inset: 0;
+      background: rgba(245,245,245,0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      text-align: center;
+      padding: 20px;
+    }
+    .id-gate.show { display: flex; }
+    .id-gate .badge {
+      color: #fff;
+      background: #dc3545;
+      font-weight: 800;
+      font-size: 28px;
+      padding: 14px 22px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(220,53,69,.25);
+      display: inline-block;
+    }
+    .portal-locked *:not(.id-gate) {
+      pointer-events: none !important;
+      user-select: none !important;
+      filter: grayscale(0.4) opacity(0.6);
+    }
+
     @media (max-width: 768px) { .credit-packs { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -130,6 +162,16 @@
 
       <!-- Portal Section -->
       <div id="portalSection" class="portal-section">
+        <!-- ID Gate Overlay -->
+        <div id="idGate" class="id-gate">
+          <div>
+            <div class="badge">ID CHECK REQUIRED</div>
+            <p style="margin-top:12px; color:#444; font-weight:600;">
+              Please complete your identity verification. Scanning and purchases are disabled until approved.
+            </p>
+          </div>
+        </div>
+
         <div id="successMessage" class="success-message"></div>
 
         <!-- Banner area (will switch classes/content) -->
@@ -268,6 +310,19 @@
       document.getElementById('password').value = '';
     });
 
+    // === ID gate helper ===
+    function refreshIdGate(customerData) {
+      const gate = document.getElementById('idGate');
+      const approved = (customerData?.idStatus || '').toLowerCase() === 'approved';
+      if (!approved) {
+        gate.classList.add('show');
+        portalSection.classList.add('portal-locked');
+      } else {
+        gate.classList.remove('show');
+        portalSection.classList.remove('portal-locked');
+      }
+    }
+
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser = user;
@@ -377,6 +432,8 @@
         creditBalance.textContent = (data.credits || 0).toFixed(2);
 
         refreshBanner(data);
+        // UI lock based on ID status (immediately on load)
+        refreshIdGate(data);
 
         if (unsubscribe) unsubscribe();
         unsubscribe = onSnapshot(doc(db, 'customers', currentUser.uid), (docLive) => {
@@ -384,6 +441,8 @@
           const d = docLive.data();
           creditBalance.textContent = (d.credits || 0).toFixed(2);
           refreshBanner(d);
+          // UI lock reacts live to changes
+          refreshIdGate(d);
         });
 
         await loadMailItems();
