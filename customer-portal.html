@@ -22,8 +22,6 @@
     .content { padding: 40px; }
     .login-section, .portal-section { display: none; }
     .login-section.active, .portal-section.active { display: block; }
-    /* Make portal a positioned container so the overlay can cover it */
-    .portal-section { position: relative; }
     .form-group { margin-bottom: 20px; }
     label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
     input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
@@ -69,37 +67,42 @@
       background: #f8d7da; border-left: 4px solid #dc3545; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: 500; color: #721c24; display: none;
     }
     .critical-credit-warning.show { display: block; }
+    @media (max-width: 768px) { .credit-packs { grid-template-columns: 1fr; } }
 
-    /* ===== ID gate overlay ===== */
+    /* ===== ID GATE (only overlays the portal area) ===== */
+    .portal-section { position: relative; }
     .id-gate {
       position: absolute;
       inset: 0;
-      background: rgba(245,245,245,0.9);
-      display: none;
+      display: none;                 /* JS toggles this */
+      background: rgba(255,255,255,0.84);
+      backdrop-filter: blur(2px);
+      pointer-events: all;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
-      z-index: 50;
-      text-align: center;
-      padding: 20px;
+      justify-content: flex-end;
+      padding-bottom: 26px;
     }
-    .id-gate.show { display: flex; }
-    .id-gate .badge {
+    .id-gate__badge {
+      background: #b22222;
       color: #fff;
-      background: #dc3545;
       font-weight: 800;
-      font-size: 28px;
-      padding: 14px 22px;
-      border-radius: 10px;
-      box-shadow: 0 10px 30px rgba(220,53,69,.25);
-      display: inline-block;
+      letter-spacing: .5px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.18);
+      margin-bottom: 10px;
     }
-    .portal-locked *:not(.id-gate) {
-      pointer-events: none !important;
-      user-select: none !important;
-      filter: grayscale(0.4) opacity(0.6);
+    .id-gate__note {
+      color: #333;
+      background: rgba(255,255,255,.9);
+      border: 1px solid #e0e0e0;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
     }
-
-    @media (max-width: 768px) { .credit-packs { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -162,19 +165,17 @@
 
       <!-- Portal Section -->
       <div id="portalSection" class="portal-section">
-        <!-- ID Gate Overlay -->
-        <div id="idGate" class="id-gate">
-          <div>
-            <div class="badge">ID CHECK REQUIRED</div>
-            <p style="margin-top:12px; color:#444; font-weight:600;">
-              Please complete your identity verification. Scanning and purchases are disabled until approved.
-            </p>
+        <div id="successMessage" class="success-message"></div>
+
+        <!-- ID Gate (ONLY inside the portal) -->
+        <div id="idGate" class="id-gate" style="display:none;">
+          <div class="id-gate__badge">ID CHECK REQUIRED</div>
+          <div class="id-gate__note">
+            Please complete your identity verification. Scanning and purchases are disabled until approved.
           </div>
         </div>
 
-        <div id="successMessage" class="success-message"></div>
-
-        <!-- Banner area (will switch classes/content) -->
+        <!-- Banner area -->
         <div id="lowBalanceWarning" class="low-balance-warning">
           ⚠️ Low credit balance! Please purchase more credits to continue receiving mail scans.
         </div>
@@ -298,6 +299,18 @@
     const lowBalanceWarning = document.getElementById('lowBalanceWarning');
     const mailItemsList = document.getElementById('mailItemsList');
 
+    // NEW: gate handle
+    const idGate = document.getElementById('idGate');
+    function showIdGate(on) {
+      if (!idGate) return;
+      idGate.style.display = on ? 'flex' : 'none';
+      // also toggle credit-pack interactivity
+      document.querySelectorAll('.credit-pack').forEach(pk => {
+        pk.style.pointerEvents = on ? 'none' : 'auto';
+        pk.style.opacity = on ? '.5' : '1';
+      });
+    }
+
     let currentUser = null;
     let unsubscribe = null;
 
@@ -309,19 +322,6 @@
       document.getElementById('email').value = '';
       document.getElementById('password').value = '';
     });
-
-    // === ID gate helper ===
-    function refreshIdGate(customerData) {
-      const gate = document.getElementById('idGate');
-      const approved = (customerData?.idStatus || '').toLowerCase() === 'approved';
-      if (!approved) {
-        gate.classList.add('show');
-        portalSection.classList.add('portal-locked');
-      } else {
-        gate.classList.remove('show');
-        portalSection.classList.remove('portal-locked');
-      }
-    }
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -337,6 +337,8 @@
         }
       } else {
         currentUser = null;
+        // hide gate on login screen
+        showIdGate(false);
         loginSection.classList.add('active');
         portalSection.classList.remove('active');
         if (unsubscribe) unsubscribe();
@@ -363,6 +365,7 @@
     logoutBtn.addEventListener('click', async () => {
       try { await signOut(auth); }
       catch (error) { showError('Error logging out'); }
+      finally { showIdGate(false); } // ensure hidden once logged out
     });
 
     async function loadCustomerData() {
@@ -372,11 +375,14 @@
           userName.textContent = currentUser.email || 'Customer';
           creditBalance.textContent = '0.00';
           showError('Your customer account is not set up yet. Please contact support at info@forwardmymail.co.uk');
+          // unknown status → don’t block unnecessarily
+          showIdGate(false);
           return;
         }
 
         const data = snap.data();
 
+        // ensure mailboxId exists
         if (!data.mailboxId) {
           try {
             const randomNum = Math.floor(10000 + Math.random() * 90000);
@@ -391,6 +397,7 @@
           }
         }
 
+        // Monthly free-scan lazy apply (unchanged)
         try {
           const tzNow = new Date(new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }));
           const y = tzNow.getFullYear();
@@ -427,13 +434,15 @@
           console.error('Lazy apply failed:', e);
         }
 
+        // ======= ID gate decision =======
+        const isVerified = Boolean(data.idVerified);
+        showIdGate(!isVerified);
+
         userName.textContent = data.name || currentUser.email || 'Customer';
         document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
         creditBalance.textContent = (data.credits || 0).toFixed(2);
 
         refreshBanner(data);
-        // UI lock based on ID status (immediately on load)
-        refreshIdGate(data);
 
         if (unsubscribe) unsubscribe();
         unsubscribe = onSnapshot(doc(db, 'customers', currentUser.uid), (docLive) => {
@@ -441,8 +450,8 @@
           const d = docLive.data();
           creditBalance.textContent = (d.credits || 0).toFixed(2);
           refreshBanner(d);
-          // UI lock reacts live to changes
-          refreshIdGate(d);
+          // keep gate live-updated
+          showIdGate(!Boolean(d.idVerified));
         });
 
         await loadMailItems();
@@ -558,8 +567,10 @@
         } catch (error) {
           showError('Failed to initiate payment. Please try again.');
         } finally {
-          pack.style.opacity = '1';
-          pack.style.pointerEvents = 'auto';
+          // If ID not verified, keep disabled via gate; otherwise restore
+          const gated = idGate && idGate.style.display !== 'none';
+          pack.style.opacity = gated ? '.5' : '1';
+          pack.style.pointerEvents = gated ? 'none' : 'auto';
         }
       });
     });
