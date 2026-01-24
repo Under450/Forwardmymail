@@ -458,7 +458,7 @@
     // --- Gate UI controller ---
     function applyGateUI(data) {
       const status = (data.idStatus || 'not_started').toLowerCase(); // not_started | pending | verified | failed
-      const idGate = Boolean(data.idGate); // when true and not verified -> gate
+      const idGate = Boolean(data.idRequired || data.idGate); // when true and not verified -> gate
       const isVerified = status === 'verified';
       const shouldGate = idGate && !isVerified;
 
