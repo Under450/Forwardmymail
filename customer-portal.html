@@ -466,7 +466,7 @@ function applyGateUI(data) {
   
   const status = (data.idStatus || 'not_started').toLowerCase();
   const idGate = Boolean(data.idRequired || data.idGate);
-  const isVerified = status === 'verified';
+  const isVerified = status === 'verified' || status === 'approved';
   const shouldGate = idGate && !isVerified;
   
   console.log('Calculated shouldGate:', shouldGate);
