@@ -74,7 +74,7 @@
   pointer-events: none;       /* disable everything by default */
 }
 .gated > *:not(.allow-while-gated) {
-  filter: grayscale(60%) opacity(0.5);  /* only grey out gated sections */
+  filter: grayscale(100%) blur(3px) opacity(0.4);  /* more obvious greying/blur */
 }
 .allow-while-gated {
   pointer-events: auto !important;  /* re-enable allowed areas */
@@ -260,7 +260,7 @@
             </div>
           </div>
 
-          <button id="logoutBtn" class="logout-btn">Logout</button>
+         <button id="logoutBtn" class="logout-btn allow-while-gated">Logout</button>
         </div>
       </div>
     </div>
