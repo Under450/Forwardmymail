@@ -476,6 +476,7 @@ saveIdBtn.addEventListener('click', async ()=>{
     await updateDoc(doc(db,'customers', currentCustomer.id), {
       idStatus: idStatusSel.value,
       idGate: idRequiredSel.value === 'true',  // ← Should say idGate
+      idRequired: deleteField(), 
       idStatusUpdatedAt: serverTimestamp(),
       idUpdatedBy: auth.currentUser?.email || 'staff'
     });
