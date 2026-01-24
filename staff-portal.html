@@ -468,20 +468,34 @@
       idNote.textContent = lastUpd ? `Last updated: ${lastUpd.toLocaleString()}` : '';
     }
 
-   // Save ID settings
+  // Save ID settings
 saveIdBtn.addEventListener('click', async ()=>{
+  console.log('=== SAVE ID CLICKED ===');
   if (!currentCustomer?.id) return showError('Select a customer first');
+  
+  console.log('Customer ID:', currentCustomer.id);
+  console.log('idStatus value:', idStatusSel.value);
+  console.log('idRequired value:', idRequiredSel.value);
+  console.log('idGate will be:', idRequiredSel.value === 'true');
+  
   try{
     saveIdBtn.disabled = true;
+    
+    console.log('About to call updateDoc...');
     await updateDoc(doc(db,'customers', currentCustomer.id), {
       idStatus: idStatusSel.value,
-      idGate: idRequiredSel.value === 'true',  // ← Should say idGate
-      idRequired: deleteField(), 
+      idGate: idRequiredSel.value === 'true',
+      idRequired: deleteField(),
       idStatusUpdatedAt: serverTimestamp(),
       idUpdatedBy: auth.currentUser?.email || 'staff'
     });
+    
+    console.log('updateDoc completed successfully');
     showSuccess('ID settings saved');
-  }catch(e){ showError('Failed to save ID settings: ' + (e?.message||e)); }
+  }catch(e){ 
+    console.error('SAVE ERROR:', e);
+    showError('Failed to save ID settings: ' + (e?.message||e)); 
+  }
   finally{ saveIdBtn.disabled = false; }
 });
 
