@@ -459,10 +459,18 @@
 
     // --- Gate UI controller ---
 function applyGateUI(data) {
-  const status = (data.idStatus || 'not_started').toLowerCase(); // not_started | pending | verified | failed
-  const idGate = Boolean(data.idRequired || data.idGate); // CHECK BOTH FIELDS
+  console.log('=== DEBUG applyGateUI ===');
+  console.log('idRequired:', data.idRequired);
+  console.log('idGate:', data.idGate);
+  console.log('idStatus:', data.idStatus);
+  
+  const status = (data.idStatus || 'not_started').toLowerCase();
+  const idGate = Boolean(data.idRequired || data.idGate);
   const isVerified = status === 'verified';
   const shouldGate = idGate && !isVerified;
+  
+  console.log('Calculated shouldGate:', shouldGate);
+  console.log('======================');
 
   // Set banner text
   if (shouldGate) {
