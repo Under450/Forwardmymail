@@ -458,26 +458,26 @@
     }
 
     // --- Gate UI controller ---
-    function applyGateUI(data) {
-      const status = (data.idStatus || 'not_started').toLowerCase(); // not_started | pending | verified | failed
-      const idGate = Boolean(data.idRequired || data.idGate); // when true and not verified -> gate
-      const isVerified = status === 'verified';
-      const shouldGate = idGate && !isVerified;
+function applyGateUI(data) {
+  const status = (data.idStatus || 'not_started').toLowerCase(); // not_started | pending | verified | failed
+  const idGate = Boolean(data.idRequired || data.idGate); // CHECK BOTH FIELDS
+  const isVerified = status === 'verified';
+  const shouldGate = idGate && !isVerified;
 
-      // Set banner text
-      if (shouldGate) {
-        let msg = 'ID CHECK REQUIRED — Your account is temporarily limited until your ID is verified.';
-        if (status === 'pending') msg = 'ID CHECK PENDING — We are reviewing your documents.';
-        if (status === 'failed')  msg = 'ID CHECK FAILED — Please re-submit your ID documents.';
-        gateBanner.textContent = msg;
-        gateBanner.classList.add('show');
-        portalBody.classList.add('gated');
-      } else {
-        gateBanner.classList.remove('show');
-        gateBanner.textContent = '';
-        portalBody.classList.remove('gated');
-      }
-    }
+  // Set banner text
+  if (shouldGate) {
+    let msg = 'ID CHECK REQUIRED — Your account is temporarily limited until your ID is verified.';
+    if (status === 'pending') msg = 'ID CHECK PENDING — We are reviewing your documents.';
+    if (status === 'failed')  msg = 'ID CHECK FAILED — Please re-submit your ID documents.';
+    gateBanner.textContent = msg;
+    gateBanner.classList.add('show');
+    portalBody.classList.add('gated');
+  } else {
+    gateBanner.classList.remove('show');
+    gateBanner.textContent = '';
+    portalBody.classList.remove('gated');
+  }
+}
 
     // --- Banner renderer (considers free scans + credits) ---
     function refreshBanner(data) {
