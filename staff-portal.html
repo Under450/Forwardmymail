@@ -463,7 +463,7 @@
 
       // ID panel values
       idStatusSel.value = String(cust.idStatus || 'pending');
-      idRequiredSel.value = String(Boolean(cust.idRequired));
+      idRequiredSel.value = String(Boolean(cust.idGate));
       const lastUpd = tsToDate(cust.idStatusUpdatedAt);
       idNote.textContent = lastUpd ? `Last updated: ${lastUpd.toLocaleString()}` : '';
     }
@@ -475,7 +475,7 @@
         saveIdBtn.disabled = true;
         await updateDoc(doc(db,'customers', currentCustomer.id), {
           idStatus: idStatusSel.value,
-          idRequired: idRequiredSel.value === 'true',
+          idGate: idRequiredSel.value === 'true',
           idStatusUpdatedAt: serverTimestamp(),
           idUpdatedBy: auth.currentUser?.email || 'staff'
         });
