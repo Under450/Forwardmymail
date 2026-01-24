@@ -68,16 +68,18 @@
     }
     .critical-credit-warning.show { display: block; }
 
-    /* ===== Gating styles ===== */
-    .gated {
-      position: relative;
-      filter: grayscale(60%) opacity(0.5);
-      pointer-events: none;       /* disable everything by default */
-    }
-    .allow-while-gated {
-      pointer-events: auto !important;  /* re-enable allowed areas */
-      filter: none !important;
-    }
+   /* ===== Gating styles ===== */
+.gated {
+  position: relative;
+  pointer-events: none;       /* disable everything by default */
+}
+.gated > *:not(.allow-while-gated) {
+  filter: grayscale(60%) opacity(0.5);  /* only grey out gated sections */
+}
+.allow-while-gated {
+  pointer-events: auto !important;  /* re-enable allowed areas */
+  filter: none !important;
+}
     .gate-overlay {
       display: none;
       position: sticky;
@@ -167,7 +169,7 @@
         </div>
 
         <div id="portalBody">
-          <div class="info-card">
+          <div class="info-card allow-white-gated">
             <div class="info-row">
               <span class="info-label">Welcome</span>
               <span class="info-value" id="userName">Loading...</span>
