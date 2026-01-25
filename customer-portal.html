@@ -454,21 +454,34 @@
       }
     }
 
-    document.querySelectorAll('.credit-pack').forEach(pack => {
-      pack.addEventListener('click', async () => {
-        const amount = parseInt(pack.dataset.amount, 10) || parseFloat(pack.dataset.amount);
-        try {
-          pack.style.opacity = '0.5';
-          pack.style.pointerEvents = 'none';
-          const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount,
-              customerId: currentUser.uid,
-              customerEmail: currentUser.email
-            })
-          });
+    document.addEventListener('click', async (e) => {
+  const pack = e.target.closest('.credit-pack');
+  if (!pack || !pack.dataset.amount) return;
+  
+  const amount = parseFloat(pack.dataset.amount);
+  try {
+    pack.style.opacity = '0.5';
+    pack.style.pointerEvents = 'none';
+    const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount,
+        customerId: currentUser.uid,
+        customerEmail: currentUser.email
+      })
+    });
+    const session = await response.json();
+    const result = await stripe.redirectToCheckout({ sessionId: session.id });
+    if (result.error) showError(result.error.message);
+  } catch (error) {
+    showError('Failed to initiate payment. Please try again.');
+  } finally {
+    pack.style.opacity = '1';
+    pack.style.pointerEvents = 'auto';
+  }
+});
+        
           const session = await response.json();
           const result = await stripe.redirectToCheckout({ sessionId: session.id });
           if (result.error) showError(result.error.message);
