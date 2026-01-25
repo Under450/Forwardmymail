@@ -192,6 +192,10 @@
               <div class="credit-pack" data-amount="25"><div class="pack-amount">£25</div></div>
               <div class="credit-pack" data-amount="30"><div class="pack-amount">£30</div></div>
               <div class="credit-pack" data-amount="50"><div class="pack-amount">£50</div></div>
+            <div class="credit-pack" data-amount="0.30" id="testPack" style="display: none;">
+                <div class="pack-amount">TEST</div>
+                <div style="font-size: 12px;">£0.30</div>
+              </div>
             </div>
           </section>
 
@@ -601,22 +605,40 @@ function applyGateUI(data) {
       }
     }
 
-    // --- Purchase credit packs (Stripe Checkout via your endpoint) ---
-    document.querySelectorAll('.credit-pack').forEach(pack => {
-      pack.addEventListener('click', async () => {
-        const amount = parseInt(pack.dataset.amount, 10);
-        try {
-          pack.style.opacity = '0.5';
-          pack.style.pointerEvents = 'none';
-
-          const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount,
-              customerId: currentUser.uid,
-              customerEmail: currentUser.email
-            })
+   // --- Purchase credit packs ---
+    document.addEventListener('click', async (e) => {
+      const pack = e.target.closest('.credit-pack');
+      if (!pack || !pack.dataset.amount) return;
+      
+      // Special handling for test pack
+      if (pack.id === 'testPack') {
+        window.location.href = 'https://buy.stripe.com/5kQ5kF4Ec7VfcuZa4u4Ja0g';
+        return;
+      }
+      
+      const amount = parseFloat(pack.dataset.amount);
+      try {
+        pack.style.opacity = '0.5';
+        pack.style.pointerEvents = 'none';
+        const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount,
+            customerId: currentUser.uid,
+            customerEmail: currentUser.email
+          })
+        });
+        const session = await response.json();
+        const result = await stripe.redirectToCheckout({ sessionId: session.id });
+        if (result.error) showError(result.error.message);
+      } catch (error) {
+        showError('Failed to initiate payment. Please try again.');
+      } finally {
+        pack.style.opacity = '1';
+        pack.style.pointerEvents = 'auto';
+      }
+    });
           });
 
           const session = await response.json();
@@ -642,6 +664,12 @@ function applyGateUI(data) {
       successMessage.classList.add('show');
       setTimeout(() => successMessage.classList.remove('show'), 5000);
     }
+    // Show test pack when pressing 'T' key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 't' || e.key === 'T') {
+        document.getElementById('testPack').style.display = 'block';
+      }
+    });
   </script>
 </body>
 </html>
