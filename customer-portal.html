@@ -639,7 +639,6 @@ function applyGateUI(data) {
         pack.style.pointerEvents = 'auto';
       }
     });
-          });
 
           const session = await response.json();
           const result = await stripe.redirectToCheckout({ sessionId: session.id });
