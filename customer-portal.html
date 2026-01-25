@@ -640,19 +640,7 @@ function applyGateUI(data) {
       }
     });
 
-          const session = await response.json();
-          const result = await stripe.redirectToCheckout({ sessionId: session.id });
-          if (result.error) showError(result.error.message);
-        } catch (error) {
-          showError('Failed to initiate payment. Please try again.');
-        } finally {
-          pack.style.opacity = '1';
-          pack.style.pointerEvents = 'auto';
-        }
-      });
-    });
-
-    // --- Helpers ---
+      // --- Helpers ---
     function showError(message) {
       errorMessage.textContent = message;
       errorMessage.classList.add('show');
