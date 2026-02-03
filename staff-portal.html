@@ -242,8 +242,7 @@
   updateDoc, addDoc, onSnapshot, serverTimestamp, increment, Timestamp, deleteDoc, deleteField
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
     import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
-    const firebaseConfig = {
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
       apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
       authDomain: "forward-my-mail.firebaseapp.com",
       projectId: "forward-my-mail",
@@ -257,7 +256,7 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com
 
 // ⭐ ADD APP CHECK HERE
 const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LeTeF8sAAAAAMkkZbXnUX2NzCfYrlUdK8t-1Nk3'),
+  provider: new ReCaptchaEnterpriseProvider('6LeTeF8sAAAAAMkkZbXnUX2NzCfYrlUdK8t-1Nk3'),
   isTokenAutoRefreshEnabled: true
 });
 
