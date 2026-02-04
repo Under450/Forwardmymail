@@ -275,7 +275,7 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, browserSessionPersistence, setPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getFirestore, doc, getDoc, updateDoc, serverTimestamp, query, collection, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
+
     
     // --- Firebase Config ---
     const firebaseConfig = {
@@ -290,12 +290,6 @@ import { initializeAppCheck, ReCaptchaV3Provider } from 'https://www.gstatic.com
 
     // --- Init Firebase ---
 const app = initializeApp(firebaseConfig);
-
-// ⭐ ADD APP CHECK HERE
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider('6LeRL18sAAAAAJAbxwtRYY0baeLPIzZtFXXeI74m'),
-  isTokenAutoRefreshEnabled: true
-});
     
 const auth = getAuth(app); setPersistence(auth, browserSessionPersistence);
 const db = getFirestore(app);
