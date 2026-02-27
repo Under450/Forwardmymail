@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Shred Notice — 5 Days Remaining</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f8; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 620px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%); padding: 45px 30px; text-align: center; }
+        .header-logo { margin-bottom: 18px; }
+        .header h1 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.85); font-size: 15px; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 16px; color: #334155; line-height: 1.8; margin-bottom: 25px; }
+        .countdown-card { background: #7f1d1d; border-radius: 14px; padding: 28px; text-align: center; margin: 25px 0; color: white; }
+        .countdown-card .days-num { font-size: 72px; font-weight: 800; line-height: 1; }
+        .countdown-card .days-label { font-size: 14px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; }
+        .countdown-card .days-note { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 14px; line-height: 1.6; }
+        .danger-box { background: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 22px; margin: 25px 0; }
+        .danger-box .danger-label { font-size: 12px; font-weight: 700; color: #991b1b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .danger-box p { font-size: 15px; color: #7f1d1d; line-height: 1.7; margin: 0; }
+        .mail-list { background: #f8fafc; border-radius: 12px; padding: 22px; margin: 25px 0; border: 1px solid #e2e8f0; }
+        .mail-list h4 { font-size: 12px; font-weight: 700; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+        .mail-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+        .mail-item:last-child { border-bottom: none; }
+        .mail-item .item-type { font-size: 14px; color: #1e293b; font-weight: 600; }
+        .mail-item .item-date { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+        .mail-item .item-shred { font-size: 13px; color: #ef4444; font-weight: 700; }
+        .cta-btn { display: block; background: #991b1b; color: white; text-decoration: none; text-align: center; padding: 17px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; margin: 25px 0; box-shadow: 0 4px 14px rgba(153,27,27,0.3); }
+        .help-text { font-size: 14px; color: #64748b; text-align: center; line-height: 1.7; }
+        .help-text a { color: #1e3a8a; text-decoration: none; font-weight: 600; }
+        .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 28px 30px; text-align: center; }
+        .footer p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+        .footer strong { color: #64748b; }
+        .footer a { color: #1e3a8a; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-logo">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 18px;">
+                    <tr>
+                        <td style="padding-right:10px;vertical-align:middle;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+                                <path d="M6 12 L18 20 L30 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <rect x="6" y="11" width="24" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M6 20 L13 26 M30 20 L23 26" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </td>
+                        <td style="vertical-align:middle;">
+                            <div style="font-size:15px;font-weight:800;color:white;letter-spacing:0.5px;line-height:1.1;">Forward My Mail</div>
+                            <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Mail Forwarding Service</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <h1>Auto-shred scheduled in 5 days</h1>
+            <p>Your mail will be permanently destroyed unless you act</p>
+        </div>
+        <div class="content">
+            <p class="greeting">
+                Hi <strong>{{customerName}}</strong>{{#if companyName}} — <strong>{{companyName}}</strong>{{/if}},<br><br>
+                You have mail items that have been stored for 55 days. In 5 days they will be automatically and permanently shredded as per our terms and conditions.
+            </p>
+
+            <div class="countdown-card">
+                <div class="days-num">5</div>
+                <div class="days-label">days until auto-shred</div>
+                <div class="days-note">After this point your mail cannot be recovered — please act now</div>
+            </div>
+
+            <div class="danger-box">
+                <div class="danger-label">⚠ This cannot be undone</div>
+                <p>Once mail is shredded it is gone permanently. If any of these items are important — HMRC letters, legal documents, bank correspondence — please log in immediately and choose to scan or forward them before the deadline.</p>
+            </div>
+
+            <div class="mail-list">
+                <h4>Items scheduled for shredding on {{shredDate}}</h4>
+                <div class="mail-item">
+                    <div>
+                        <div class="item-type">{{letterType1}}</div>
+                        <div class="item-date">Received {{processedAt1}}</div>
+                    </div>
+                    <div class="item-shred">Shred {{shredDate}}</div>
+                </div>
+                <div class="mail-item">
+                    <div>
+                        <div class="item-type">{{letterType2}}</div>
+                        <div class="item-date">Received {{processedAt2}}</div>
+                    </div>
+                    <div class="item-shred">Shred {{shredDate}}</div>
+                </div>
+            </div>
+
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Log In to Save My Mail →</a>
+
+            <p class="help-text">Need to act before the deadline? Contact us at<br>
+            <a href="/cdn-cgi/l/email-protection#a2cbccc4cde2c4cdd0d5c3d0c6cfdbcfc3cbce8cc1cd8cd7c9"><span class="__cf_email__" data-cfemail="0e676068614e68617c796f7c6a6377636f6762206d61207b65">[email&#160;protected]</span></a></p>
+        </div>
+        <div class="footer">
+            <p>
+                <strong>Forward My Mail Ltd</strong><br>
+                8a Bore Street, Lichfield, Staffordshire, WS13 6PS<br>
+                Company No. 16912540<br><br>
+ 

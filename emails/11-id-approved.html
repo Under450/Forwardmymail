@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Identity Has Been Verified — Forward My Mail</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f8; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 620px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); padding: 45px 30px; text-align: center; }
+        .header-logo { margin-bottom: 18px; }
+        .header h1 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.85); font-size: 15px; }
+        .tick-circle { width: 72px; height: 72px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 22px; font-size: 36px; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 17px; color: #334155; line-height: 1.7; margin-bottom: 25px; }
+        .success-box { background: #f0fdf4; border: 2px solid #86efac; border-radius: 14px; padding: 28px; margin: 25px 0; text-align: center; }
+        .success-box .tick { font-size: 42px; margin-bottom: 12px; display: block; }
+        .success-box h3 { font-size: 20px; font-weight: 800; color: #14532d; margin-bottom: 8px; }
+        .success-box p { font-size: 15px; color: #166534; line-height: 1.6; margin: 0; }
+        .address-card { background: #1e3a8a; border-radius: 14px; padding: 28px; margin: 28px 0; text-align: center; }
+        .address-card .label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+        .address-card .name-line { font-size: 17px; color: white; font-weight: 700; margin-bottom: 4px; }
+        .address-card .address { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 500; line-height: 2; }
+        .address-card .active-badge { display: inline-block; background: #10b981; color: white; font-size: 11px; font-weight: 700; padding: 4px 14px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; margin-top: 14px; }
+        .unlocked-grid { display: table; width: 100%; margin: 25px 0; border-collapse: separate; border-spacing: 0 10px; }
+        .unlock-row { display: table-row; }
+        .unlock-cell { display: table-cell; padding: 14px 16px; background: #f8fafc; border-radius: 10px; font-size: 14px; color: #334155; vertical-align: middle; }
+        .feature-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 18px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .feature-icon { font-size: 20px; flex-shrink: 0; }
+        .feature-text h4 { font-size: 14px; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
+        .feature-text p { font-size: 12px; color: #64748b; margin: 0; }
+        .section-title { font-size: 17px; font-weight: 700; color: #1e3a8a; margin: 28px 0 16px; }
+        .cta-btn { display: block; background: #065f46; color: white; text-decoration: none; text-align: center; padding: 17px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; margin: 28px 0; box-shadow: 0 4px 14px rgba(6,95,70,0.3); }
+        .secondary-btn { display: block; background: #1e3a8a; color: white; text-decoration: none; text-align: center; padding: 14px 30px; border-radius: 10px; font-size: 15px; font-weight: 700; margin: -14px 0 28px; box-shadow: 0 4px 14px rgba(30,58,138,0.2); }
+        .help-text { font-size: 14px; color: #64748b; text-align: center; line-height: 1.7; }
+        .help-text a { color: #1e3a8a; text-decoration: none; font-weight: 600; }
+        .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 28px 30px; text-align: center; }
+        .footer p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+        .footer strong { color: #64748b; }
+        .footer a { color: #1e3a8a; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-logo">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 18px;">
+                    <tr>
+                        <td style="padding-right:10px;vertical-align:middle;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+                                <path d="M6 12 L18 20 L30 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <rect x="6" y="11" width="24" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M6 20 L13 26 M30 20 L23 26" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </td>
+                        <td style="vertical-align:middle;">
+                            <div style="font-size:15px;font-weight:800;color:white;letter-spacing:0.5px;line-height:1.1;">Forward My Mail</div>
+                            <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Mail Forwarding Service</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="tick-circle">✅</div>
+            <h1>Identity Verified!</h1>
+            <p>Your account is now fully active</p>
+        </div>
+        <div class="content">
+            <p class="greeting">
+                Hi <strong>{{customerName}}</strong>{{#if companyName}} — <strong>{{companyName}}</strong>{{/if}},<br><br>
+                Great news — your identity has been successfully verified. Your Forward My Mail account is now fully active and your UK business address is live and ready to use.
+            </p>
+
+            <div class="success-box">
+                <span class="tick">🎉</span>
+                <h3>You're all set!</h3>
+                <p>Your account has passed identity verification and all features are now unlocked. You can start using your address immediately.</p>
+            </div>
+
+            <div class="address-card">
+                <div class="label">Your Active UK Business Address</div>
+                <div class="name-line">{{customerName}}{{#if companyName}} / {{companyName}}{{/if}}</div>
+                <div class="address">
+                    8a Bore Street<br>
+                    Lichfield, Staffordshire<br>
+                    WS13 6PS<br>
+                    United Kingdom
+                </div>
+                <div class="active-badge">✓ Active</div>
+            </div>
+
+            <div class="section-title">What's now unlocked</div>
+
+            <div class="feature-item">
+                <span class="feature-icon">📬</span>
+                <div class="feature-text">
+                    <h4>Mail Dashboard</h4>
+                    <p>View, scan, forward or shred all incoming mail from your portal</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📄</span>
+                <div class="feature-text">
+                    <h4>Digital Scanning</h4>
+                    <p>Request high-quality PDF scans of any item sent to your address</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🚚</span>
+                <div class="feature-text">
+                    <h4>Mail Forwarding</h4>
+                    <p>Forward physical mail anywhere in the UK or internationally</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🏢</span>
+                <div class="feature-text">
+                    <h4>Companies House & HMRC</h4>
+                    <p>Use your address for official business registration — it's fully compliant</p>
+                </div>
+            </div>
+
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Go to Your Portal →</a>
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html#credits" class="secondary-btn">Top Up Credits to Get Started</a>
+
+            <p class="help-text">Questions about your account? <a href="mailto:hello@forwardmymail.co.uk">hello@forwardmymail.co.uk</a></p>
+        </div>
+        <div class="footer">
+            <p>
+                <strong>Forward My Mail Ltd</strong><br>
+                8a Bore Street, Lichfield, Staffordshire, WS13 6PS<br>
+                Company No. 16912540<br><br>
+                <a href="https://www.forwardmymail.co.uk">www.forwardmymail.co.uk</a> &nbsp;·&nbsp;
+                <a href="mailto:hello@forwardmymail.co.uk">hello@forwardmymail.co.uk</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

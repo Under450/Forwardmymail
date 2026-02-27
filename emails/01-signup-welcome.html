@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Forward My Mail</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f8; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 620px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); padding: 45px 30px; text-align: center; }
+        .header-logo { margin-bottom: 18px; }
+        .header h1 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 15px; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 17px; color: #334155; line-height: 1.7; margin-bottom: 25px; }
+        .highlight-box { background: #eff6ff; border-left: 4px solid #1e3a8a; border-radius: 0 10px 10px 0; padding: 20px 22px; margin: 25px 0; }
+        .highlight-box p { color: #1e3a8a; font-weight: 600; font-size: 15px; line-height: 1.6; margin: 0; }
+        .address-card { background: #1e3a8a; border-radius: 14px; padding: 28px; margin: 28px 0; text-align: center; }
+        .address-card .label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.6); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 14px; }
+        .address-card .name-line { font-size: 17px; color: white; font-weight: 700; margin-bottom: 4px; }
+        .address-card .address { font-size: 15px; color: rgba(255,255,255,0.85); font-weight: 500; line-height: 2; }
+        .didit-box { background: #fefce8; border: 2px solid #fbbf24; border-radius: 12px; padding: 22px; margin: 25px 0; }
+        .didit-box .didit-label { font-size: 12px; font-weight: 700; color: #92400e; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .didit-box p { font-size: 15px; color: #78350f; line-height: 1.7; margin: 0; }
+        .didit-name { font-weight: 800; color: #92400e; }
+        .steps-title { font-size: 18px; font-weight: 700; color: #1e3a8a; margin: 32px 0 18px; }
+        .step { display: flex; align-items: flex-start; margin-bottom: 14px; padding: 18px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .step.highlight-step { background: #fefce8; border-color: #fbbf24; }
+        .step-num { width: 34px; height: 34px; background: #1e3a8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; margin-right: 14px; margin-top: 2px; }
+        .highlight-step .step-num { background: #d97706; }
+        .step-text h4 { font-size: 15px; color: #1a1a1a; margin-bottom: 4px; font-weight: 600; }
+        .step-text p { font-size: 13px; color: #64748b; line-height: 1.5; margin: 0; }
+        .cta-btn { display: block; background: #1e3a8a; color: white; text-decoration: none; text-align: center; padding: 17px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; margin: 28px 0; box-shadow: 0 4px 14px rgba(30,58,138,0.25); }
+        .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 28px 30px; text-align: center; }
+        .footer p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+        .footer strong { color: #64748b; }
+        .footer a { color: #1e3a8a; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-logo">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 18px;">
+                    <tr>
+                        <td style="padding-right:10px;vertical-align:middle;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+                                <path d="M6 12 L18 20 L30 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <rect x="6" y="11" width="24" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M6 20 L13 26 M30 20 L23 26" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </td>
+                        <td style="vertical-align:middle;">
+                            <div style="font-size:15px;font-weight:800;color:white;letter-spacing:0.5px;line-height:1.1;">Forward My Mail</div>
+                            <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Mail Forwarding Service</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <h1>Welcome aboard! 👋</h1>
+            <p>Your account has been created successfully</p>
+        </div>
+        <div class="content">
+            <p class="greeting">
+                Hi <strong>{{customerName}}</strong>{{#if companyName}} — <strong>{{companyName}}</strong>{{/if}},<br><br>
+                Thank you for registering with Forward My Mail. Your account is set up and your UK business address is reserved and ready for you.
+            </p>
+
+            <div class="highlight-box">
+                <p>Your address is reserved. To activate it fully, you will need to complete a quick identity verification — details are below.</p>
+            </div>
+
+            <div class="address-card">
+                <div class="label">Your UK Business Address</div>
+                <div class="name-line">{{customerName}}{{#if companyName}} / {{companyName}}{{/if}}</div>
+                <div class="address">
+                    8a Bore Street<br>
+                    Lichfield, Staffordshire<br>
+                    WS13 6PS<br>
+                    United Kingdom
+                </div>
+            </div>
+
+            <div class="didit-box">
+                <div class="didit-label">⚠ Action Required — Identity Verification</div>
+                <p>To activate your account, you need to complete a quick identity check. <strong>Click the button below to go to your portal</strong> — the verification panel will be waiting for you. It takes under 2 minutes using your passport or driving licence.</p>
+            </div>
+
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html#verify" class="cta-btn" style="background:#d97706;">Complete Your Identity Verification →</a>
+
+            <div class="steps-title">Getting started</div>
+
+            <div class="step highlight-step">
+                <div class="step-num">1</div>
+                <div class="step-text">
+                    <h4>Complete your identity verification</h4>
+                    <p>Click the button above to go to your portal — the verification panel will guide you through scanning your ID and taking a quick selfie. Takes under 2 minutes.</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <div class="step-text">
+                    <h4>Log in to your portal</h4>
+                    <p>Once verified, log in to manage your mail, choose a package and top up credits</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <div class="step-text">
+                    <h4>Start using your address</h4>
+                    <p>Use it for business registration, HMRC, Companies House, banking or any correspondence</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">4</div>
+                <div class="step-text">
+                    <h4>We handle the rest</h4>
+                    <p>When mail arrives we'll notify you instantly — scan, forward, keep or shred from your portal</p>
+                </div>
+            </div>
+
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Go to Your Portal →</a>
+        </div>
+        <div class="footer">
+            <p>
+                <strong>Forward My Mail Ltd</strong><br>
+                8a Bore Street, Lichfield, Staffordshire, WS13 6PS<br>
+                Company No. 16912540<br><br>
+                Questions? <a href="/cdn-cgi/l/email-protection#325b5c545d72545d40455340565f4b5f535b5e1c515d1c4759"><span class="__cf_email__" data-cfemail="

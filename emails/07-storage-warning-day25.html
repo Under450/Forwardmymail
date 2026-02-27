@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free Storage Expiring Soon</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f8; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 620px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); padding: 45px 30px; text-align: center; }
+        .header-logo { margin-bottom: 18px; }
+        .header h1 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 15px; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 16px; color: #334155; line-height: 1.8; margin-bottom: 25px; }
+        .days-card { background: #1e3a8a; border-radius: 14px; padding: 28px; text-align: center; margin: 25px 0; color: white; }
+        .days-card .days-num { font-size: 72px; font-weight: 800; line-height: 1; }
+        .days-card .days-label { font-size: 14px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 8px; }
+        .days-card .days-note { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 14px; line-height: 1.6; }
+        .mail-list { background: #f8fafc; border-radius: 12px; padding: 22px; margin: 25px 0; border: 1px solid #e2e8f0; }
+        .mail-list h4 { font-size: 12px; font-weight: 700; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+        .mail-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #e2e8f0; }
+        .mail-item:last-child { border-bottom: none; }
+        .mail-item .item-type { font-size: 14px; color: #1e293b; font-weight: 600; }
+        .mail-item .item-date { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+        .mail-item .item-expiry { font-size: 13px; color: #d97706; font-weight: 600; }
+        .options-title { font-size: 17px; font-weight: 700; color: #1e3a8a; margin: 28px 0 14px; }
+        .option { display: flex; align-items: flex-start; padding: 16px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 10px; }
+        .option-icon { font-size: 22px; margin-right: 14px; flex-shrink: 0; }
+        .option-text h4 { font-size: 14px; color: #1e293b; font-weight: 600; margin-bottom: 3px; }
+        .option-text p { font-size: 13px; color: #64748b; margin: 0; line-height: 1.5; }
+        .cta-btn { display: block; background: #1e3a8a; color: white; text-decoration: none; text-align: center; padding: 17px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; margin: 25px 0; box-shadow: 0 4px 14px rgba(30,58,138,0.25); }
+        .portal-note { font-size: 13px; color: #64748b; text-align: center; line-height: 1.6; }
+        .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 28px 30px; text-align: center; }
+        .footer p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+        .footer strong { color: #64748b; }
+        .footer a { color: #1e3a8a; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-logo">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 18px;">
+                    <tr>
+                        <td style="padding-right:10px;vertical-align:middle;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+                                <path d="M6 12 L18 20 L30 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <rect x="6" y="11" width="24" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M6 20 L13 26 M30 20 L23 26" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </td>
+                        <td style="vertical-align:middle;">
+                            <div style="font-size:15px;font-weight:800;color:white;letter-spacing:0.5px;line-height:1.1;">Forward My Mail</div>
+                            <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Mail Forwarding Service</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <h1>Free storage expiring soon</h1>
+            <p>You have mail items that need a decision</p>
+        </div>
+        <div class="content">
+            <p class="greeting">
+                Hi <strong>{{customerName}}</strong>{{#if companyName}} — <strong>{{companyName}}</strong>{{/if}},<br><br>
+                You have mail items approaching the end of their free 30-day storage period. After this, a £0.50/month storage fee will begin automatically.
+            </p>
+
+            <div class="days-card">
+                <div class="days-num">5</div>
+                <div class="days-label">days of free storage remaining</div>
+                <div class="days-note">Log in to scan, forward or shred your items before charges begin</div>
+            </div>
+
+            <div class="mail-list">
+                <h4>Items approaching storage limit</h4>
+                <!-- letterType + processedAt are the fields from Firestore -->
+                <div class="mail-item">
+                    <div>
+                        <div class="item-type">{{letterType1}}</div>
+                        <div class="item-date">Received {{processedAt1}}</div>
+                    </div>
+                    <div class="item-expiry">Expires {{expiry1}}</div>
+                </div>
+                <div class="mail-item">
+                    <div>
+                        <div class="item-type">{{letterType2}}</div>
+                        <div class="item-date">Received {{processedAt2}}</div>
+                    </div>
+                    <div class="item-expiry">Expires {{expiry2}}</div>
+                </div>
+            </div>
+
+            <div class="options-title">Your options — log in to take action</div>
+
+            <!-- All options link to the customer portal mail dashboard where the customer selects the action -->
+            <div class="option">
+                <div class="option-icon">📄</div>
+                <div class="option-text">
+                    <h4>Scan it — from £0.50</h4>
+                    <p>We'll scan your mail to a PDF so you can read it digitally — no physical storage needed</p>
+                </div>
+            </div>
+            <div class="option">
+                <div class="option-icon">📦</div>
+                <div class="option-text">
+                    <h4>Forward it — from £2.50</h4>
+                    <p>We'll post it to any address you choose — ideal for important documents</p>
+                </div>
+            </div>
+            <div class="option">
+                <div class="option-icon">🗑️</div>
+                <div class="option-text">
+                    <h4>Shred it — free</h4>
+                    <p>Secure shredding at no cost — ideal for junk mail or items you no longer need</p>
+                </div>
+            </div>
+            <div class="option">
+                <div class="option-icon">🗄️</div>
+                <div class="option-text">
+                    <h4>Keep it — £0.50/month</h4>
+                    <p>We'll continue storing it — charges apply automatically after your free period ends</p>
+                </div>
+            </div>
+
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Manage My Mail Now →</a>
+            <p class="portal-note">All actions are managed through your customer portal dashboard.</p>
+        </div>
+        <div class="footer">
+            <p>
+                <strong>Forward My Mail Ltd</strong><br>
+                8a Bore Street, Lichfield, Staffordshire, WS13 6PS<br>
+                Company No. 16912540<br><br>
+                Questions? <a href="/cdn-cgi/l/email-protection#ff96919990bf99908d889e8d9b9286929e9693d19c90d18a94"><span class="__cf_email__" data-cfemail="

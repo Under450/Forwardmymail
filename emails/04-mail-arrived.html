@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Mail Arrived</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f8; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 620px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); padding: 45px 30px; text-align: center; }
+        .header-logo { margin-bottom: 18px; }
+        .header h1 { font-size: 28px; font-weight: 800; color: white; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.8); font-size: 15px; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 16px; color: #334155; line-height: 1.8; margin-bottom: 25px; }
+        .mail-card { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 14px; padding: 24px; margin: 25px 0; }
+        .mail-card .card-title { font-size: 12px; font-weight: 700; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 16px; }
+        .mail-detail { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid #e2e8f0; }
+        .mail-detail:last-child { border-bottom: none; }
+        .mail-detail .detail-label { font-size: 13px; color: #94a3b8; font-weight: 500; }
+        .mail-detail .detail-value { font-size: 14px; color: #1e293b; font-weight: 600; }
+        .free-badge { background: #dcfce7; color: #15803d; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .storage-bar { background: #f0f4f8; border-radius: 10px; padding: 20px; margin: 25px 0; }
+        .storage-bar .bar-label { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .storage-bar .bar-label span { font-size: 13px; color: #64748b; }
+        .storage-bar .bar-label strong { font-size: 13px; color: #1e3a8a; }
+        .bar-track { background: #e2e8f0; border-radius: 4px; height: 8px; overflow: hidden; }
+        .bar-fill { background: #1e3a8a; height: 100%; border-radius: 4px; width: 3%; }
+        .storage-bar .bar-note { font-size: 12px; color: #94a3b8; margin-top: 8px; text-align: center; }
+        .actions-title { font-size: 17px; font-weight: 700; color: #1e3a8a; margin: 28px 0 16px; }
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 0 0 25px; }
+        .action-item { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 16px 14px; text-align: center; }
+        .action-item .action-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+        .action-item .action-name { font-size: 14px; font-weight: 700; color: #1e293b; display: block; }
+        .action-item .action-cost { font-size: 12px; color: #64748b; display: block; margin-top: 3px; }
+        .cta-btn { display: block; background: #1e3a8a; color: white; text-decoration: none; text-align: center; padding: 17px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; margin: 20px 0; box-shadow: 0 4px 14px rgba(30,58,138,0.25); }
+        .storage-note { font-size: 13px; color: #64748b; text-align: center; line-height: 1.7; margin-top: 5px; }
+        .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 28px 30px; text-align: center; }
+        .footer p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+        .footer strong { color: #64748b; }
+        .footer a { color: #1e3a8a; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-logo">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 18px;">
+                    <tr>
+                        <td style="padding-right:10px;vertical-align:middle;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+                                <path d="M6 12 L18 20 L30 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <rect x="6" y="11" width="24" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M6 20 L13 26 M30 20 L23 26" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </td>
+                        <td style="vertical-align:middle;">
+                            <div style="font-size:15px;font-weight:800;color:white;letter-spacing:0.5px;line-height:1.1;">Forward My Mail</div>
+                            <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Mail Forwarding Service</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <h1>You've got mail! 📬</h1>
+            <p>New item received at your address</p>
+        </div>
+        <div class="content">
+            <p class="greeting">
+                Hi <strong>{{customerName}}</strong>{{#if companyName}} — <strong>{{companyName}}</strong>{{/if}},<br><br>
+                A new item has arrived at your Forward My Mail address. Log in to your portal to choose what you'd like us to do with it.
+            </p>
+
+            <div class="mail-card">
+                <div class="card-title">Item Details</div>
+                <!-- letterType is the field stored in Firestore by staff portal (values: personal, company, hmrc, companies-house, override) -->
+                <div class="mail-detail">
+                    <span class="detail-label">Type</span>
+                    <span class="detail-value">{{letterType}}</span>
+                </div>
+                <div class="mail-detail">
+                    <span class="detail-label">Received</span>
+                    <span class="detail-value">{{processedAt}}</span>
+                </div>
+                <div class="mail-detail">
+                    <span class="detail-label">Pages</span>
+                    <span class="detail-value">{{pages}}</span>
+                </div>
+                <div class="mail-detail">
+                    <span class="detail-label">Scan cost</span>
+                    <span class="detail-value">
+                        {{#if freeScanUsed}}
+                            <span class="free-badge">FREE — Registered Office</span>
+                        {{else}}
+                            £0.50 first page + £0.25 per additional page
+                        {{/if}}
+                    </span>
+                </div>
+                <div class="mail-detail">
+                    <span class="detail-label">Free storage until</span>
+                    <span class="detail-value">{{storageExpiryDate}}</span>
+                </div>
+            </div>
+
+            <div class="storage-bar">
+                <div class="bar-label">
+                    <span>Storage period</span>
+                    <strong>Day 1 of 30</strong>
+                </div>
+                <div class="bar-track"><div class="bar-fill"></div></div>
+                <div class="bar-note">Free storage for 30 days — after that £0.50/month applies automatically</div>
+            </div>
+
+            <div class="actions-title">What would you like to do?</div>
+
+            <div class="action-grid">
+                <div class="action-item">
+                    <span class="action-icon">📄</span>
+                    <span class="action-name">Scan It</span>
+                    <span class="action-cost">From £0.50</span>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">📦</span>
+                    <span class="action-name">Forward It</span>
+                    <span class="action-cost">From £2.50</span>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">🗄️</span>
+                    <span class="action-name">Keep It</span>
+                    <span class="action-cost">Free for 30 days</span>
+                </div>
+                <div class="action-item">
+                    <span class="action-icon">🗑️</span>
+                    <span class="action-name">Shred It</span>
+                    <span class="action-cost">No charge</span>
+                </div>
+            </div>
+
+            <!-- Links to portal mail dashboard where customer can action the item -->
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Log In to Manage This Item →</a>
+
+            <p class="storage-note">Item stored free for 30 days. After that, a £0.50/month storage fee applies automatically.</p>
+        </div>
+        <div class="footer">
+            <p>
+                <strong>Forward My Mail Ltd</strong><br>
+                8a Bore Street, Lichfield, Staffordshire, WS13 6PS<br>
+                Company No. 16912540<br><br>
+                Questions? <a href="/cdn-cgi/l/email-protection#4f262129200f29203d382e3d2b2236222e2623612c20613a24"><span class="__cf_email__" data-cfemail="

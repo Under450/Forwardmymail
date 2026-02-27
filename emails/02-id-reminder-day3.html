@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identity Verification Reminder</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f4f8; -webkit-font-smoothing: antialiased; }
+        .wrapper { max-width: 620px; margin: 0 auto; background: white; }
+        .header { background: linear-gradient(135deg, #92400e 0%, #b45309 100%); padding: 45px 30px; text-align: center; }
+        .header-logo { margin-bottom: 18px; }
+        .header h1 { font-size: 26px; font-weight: 800; color: white; margin-bottom: 8px; }
+        .header p { color: rgba(255,255,255,0.85); font-size: 15px; }
+        .content { padding: 40px 30px; }
+        .greeting { font-size: 16px; color: #334155; line-height: 1.8; margin-bottom: 25px; }
+        .status-card { border: 2px solid #fbbf24; background: #fffbeb; border-radius: 12px; padding: 24px; margin: 25px 0; }
+        .status-card .status-title { font-size: 13px; font-weight: 700; color: #92400e; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 14px; }
+        .status-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #fde68a; }
+        .status-row:last-child { border-bottom: none; }
+        .status-row .label { font-size: 14px; color: #78350f; }
+        .value.pending { color: #d97706; font-weight: 700; font-size: 14px; }
+        .value.locked { color: #ef4444; font-weight: 700; font-size: 14px; }
+        .value.active { color: #10b981; font-weight: 700; font-size: 14px; }
+        .didit-box { background: #fefce8; border: 2px solid #fbbf24; border-radius: 12px; padding: 22px; margin: 25px 0; }
+        .didit-box .didit-label { font-size: 12px; font-weight: 700; color: #92400e; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+        .didit-box p { font-size: 15px; color: #78350f; line-height: 1.7; margin: 0; }
+        .didit-name { font-weight: 800; }
+        .body-text { font-size: 15px; color: #334155; line-height: 1.8; margin: 20px 0; }
+        .cta-btn { display: block; background: #b45309; color: white; text-decoration: none; text-align: center; padding: 17px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; margin: 28px 0; box-shadow: 0 4px 14px rgba(180,83,9,0.3); }
+        .help-text { font-size: 14px; color: #64748b; text-align: center; line-height: 1.7; }
+        .help-text a { color: #1e3a8a; text-decoration: none; font-weight: 600; }
+        .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 28px 30px; text-align: center; }
+        .footer p { font-size: 12px; color: #94a3b8; line-height: 1.8; }
+        .footer strong { color: #64748b; }
+        .footer a { color: #1e3a8a; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <div class="header-logo">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto 18px;">
+                    <tr>
+                        <td style="padding-right:10px;vertical-align:middle;">
+                            <svg width="36" height="36" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="36" height="36" rx="8" fill="rgba(255,255,255,0.15)"/>
+                                <path d="M6 12 L18 20 L30 12" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                <rect x="6" y="11" width="24" height="16" rx="2" stroke="white" stroke-width="2" fill="none"/>
+                                <path d="M6 20 L13 26 M30 20 L23 26" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+                            </svg>
+                        </td>
+                        <td style="vertical-align:middle;">
+                            <div style="font-size:15px;font-weight:800;color:white;letter-spacing:0.5px;line-height:1.1;">Forward My Mail</div>
+                            <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:2px;text-transform:uppercase;margin-top:2px;">Mail Forwarding Service</div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <h1>Your account isn't active yet</h1>
+            <p>Identity verification is still outstanding</p>
+        </div>
+        <div class="content">
+            <p class="greeting">
+                Hi <strong>{{customerName}}</strong>{{#if companyName}} — <strong>{{companyName}}</strong>{{/if}},<br><br>
+                Your account was created 3 days ago but remains locked. We have not yet received confirmation that your identity verification has been completed.
+            </p>
+
+            <div class="status-card">
+                <div class="status-title">Account Status</div>
+                <div class="status-row">
+                    <span class="label">Account Created</span>
+                    <span class="value active">✓ Complete</span>
+                </div>
+                <div class="status-row">
+                    <span class="label">Identity Verification</span>
+                    <span class="value pending">⏳ Pending</span>
+                </div>
+                <div class="status-row">
+                    <span class="label">Address Active</span>
+                    <span class="value locked">✗ Locked</span>
+                </div>
+                <div class="status-row">
+                    <span class="label">Mail Handling</span>
+                    <span class="value locked">✗ Locked</span>
+                </div>
+            </div>
+
+            <div class="didit-box">
+                <div class="didit-label">Complete Your Verification in Your Portal</div>
+                <p>Your identity verification is waiting for you in your customer portal. Simply click the button below, log in, and the verification panel will guide you through scanning your ID — it takes under 2 minutes.</p>
+            </div>
+
+            <a href="https://www.forwardmymail.co.uk/customer-portal.html#verify" class="cta-btn">Complete My Verification Now →</a>
+
+            <p class="body-text">Having trouble? Reply to this email or contact us and we'll help you get verified straight away.</p>
+
+            <p class="help-text">Need help? Contact us at <a href="/cdn-cgi/l/email-protection#6801060e07280e071a1f091a0c051105090104460b07461d03"><span class="__cf_email__" data-cfemail="d2bbbcb4bd92b4bda0a5b3a0b6bfabbfb3bbbefcb1bdfca7b9">[email&#160;protected]</span></a></p>
+        </div>
+        <div class="footer">
+            <p>
+                <strong>Forward My Mail Ltd</strong><br>
+                8a Bore Street, Lichfield, Staffordshire, WS13 6PS<br>
+                Company No. 16912540<br><br>
+ 
