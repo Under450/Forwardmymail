@@ -549,6 +549,28 @@ function applyGateUI(data) {
     gateBanner.textContent = '';
     portalBody.classList.remove('gated');
   }
+
+  // Show/hide verify panel and update button state
+  const verifyPanel = document.getElementById('verifyPanel');
+  const startVerifyBtn = document.getElementById('startVerifyBtn');
+  const verifyStatus = document.getElementById('verifyStatus');
+  if (verifyPanel) {
+    verifyPanel.style.display = shouldGate ? 'block' : 'none';
+    if (startVerifyBtn) {
+      if (status === 'pending') {
+        startVerifyBtn.textContent = '⏳ Verification In Progress...';
+        startVerifyBtn.disabled = true;
+        if (verifyStatus) verifyStatus.textContent = 'Your documents are being reviewed. We will email you once complete.';
+      } else if (status === 'declined' || status === 'failed') {
+        startVerifyBtn.textContent = 'Try Again — Complete Verification →';
+        startVerifyBtn.disabled = false;
+        if (verifyStatus) verifyStatus.textContent = 'Your previous attempt was unsuccessful. Please try again.';
+      } else {
+        startVerifyBtn.textContent = 'Complete Your ID Verification →';
+        startVerifyBtn.disabled = false;
+      }
+    }
+  }
 }
 
     // --- Banner renderer (considers free scans + credits) ---
@@ -690,30 +712,7 @@ function applyGateUI(data) {
   const diditFrame = document.getElementById('diditFrame');
   const closeVerifyBtn = document.getElementById('closeVerifyBtn');
 
-  // Show/hide verify panel based on gate state
-  const origApplyGateUI = applyGateUI;
-  function applyGateUI(data) {
-    origApplyGateUI(data);
-    const status = (data.idStatus || 'not_started').toLowerCase();
-    const idGate = Boolean(data.idRequired || data.idGate);
-    const isVerified = status === 'verified' || status === 'approved';
-    const shouldGate = idGate && !isVerified;
-    verifyPanel.style.display = shouldGate ? 'block' : 'none';
-
-    // Update verify button text based on status
-    if (status === 'pending') {
-      startVerifyBtn.textContent = '⏳ Verification In Progress...';
-      startVerifyBtn.disabled = true;
-      verifyStatus.textContent = 'Your documents are being reviewed. We'll email you once complete.';
-    } else if (status === 'failed' || status === 'declined') {
-      startVerifyBtn.textContent = 'Try Again — Complete Verification →';
-      startVerifyBtn.disabled = false;
-      verifyStatus.textContent = 'Your previous attempt was unsuccessful. Please try again.';
-    } else {
-      startVerifyBtn.textContent = 'Complete Your ID Verification →';
-      startVerifyBtn.disabled = false;
-    }
-  }
+  // Verify panel show/hide is handled inside applyGateUI below
 
   startVerifyBtn.addEventListener('click', async () => {
     try {
