@@ -182,14 +182,20 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     try {
       let customerId = session.metadata?.customerId;
       let amount = session.metadata?.amount ? parseFloat(session.metadata.amount) : null;
-      const customerEmail = session.customer_email || session.metadata?.customerEmail;
+      // Payment Links use customer_details.email; programmatic checkout uses customer_email
+      const customerEmail = session.customer_details?.email
+        || session.customer_email
+        || session.metadata?.customerEmail;
 
       if (!amount && session.amount_total) {
         amount = session.amount_total / 100;
       }
 
       if (!amount || !customerEmail) {
-        console.error('Missing required data in session:', session);
+        console.error('Missing required data - amount:', amount, 'email:', customerEmail,
+          'customer_details:', session.customer_details,
+          'customer_email:', session.customer_email,
+          'amount_total:', session.amount_total);
         return res.status(400).send('Missing required data');
       }
 
