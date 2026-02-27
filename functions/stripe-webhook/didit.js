@@ -50,7 +50,6 @@ app.post('/createDiditSession', async (req, res) => {
     const customerDoc = await db.collection('customers').doc(customerId).get();
     const customerName = customerDoc.exists ? (customerDoc.data().name || customerEmail) : customerEmail;
 
-    const fetch = require('node-fetch');
     const diditResponse = await fetch('https://apx.didit.me/v2/session/', {
       method: 'POST',
       headers: {
