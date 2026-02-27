@@ -8,20 +8,20 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
     .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 100%; overflow: hidden; }
-    .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+    .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 40px 30px; text-align: center; }
     .header h1 { font-size: 32px; margin-bottom: 10px; }
     .header p { font-size: 16px; opacity: 0.9; }
     .content { padding: 40px; }
     .form-group { margin-bottom: 25px; }
     label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
     input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; transition: border-color 0.3s; }
-    input:focus { outline: none; border-color: #667eea; }
+    input:focus { outline: none; border-color: #1e3c72; }
     button {
-      width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      width: 100%; padding: 16px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: 600; cursor: pointer; transition: transform 0.2s; margin-top: 10px;
     }
     button:hover { transform: translateY(-2px); }
@@ -32,9 +32,8 @@
     .success-message { background-color: #efe; color: #3c3; border: 1px solid #cfc; }
     .error-message.show, .success-message.show { display: block; }
     .links { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; }
-    .links a { color: #667eea; text-decoration: none; font-weight: 500; }
+    .links a { color: #1e3c72; text-decoration: none; font-weight: 500; }
     .links a:hover { text-decoration: underline; }
-    .logo { font-size: 48px; margin-bottom: 10px; }
     .requirement { font-size: 14px; color: #666; margin-top: 5px; }
     .terms-container { margin: 25px 0; padding: 15px; background: #f9f9f9; border-radius: 8px; }
     .terms-notice { font-size: 14px; color: #ff9800; font-weight: 600; margin-bottom: 10px; text-align: center; }
@@ -48,7 +47,7 @@
     .terms-box p { margin: 10px 0; color: #333; }
     .terms-box::-webkit-scrollbar { width: 8px; }
     .terms-box::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-    .terms-box::-webkit-scrollbar-thumb { background: #667eea; border-radius: 4px; }
+    .terms-box::-webkit-scrollbar-thumb { background: #1e3c72; border-radius: 4px; }
     .checkbox-container { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
     .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
     .checkbox-container input[type="checkbox"]:disabled { cursor: not-allowed; opacity: 0.5; }
@@ -58,9 +57,9 @@
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">📬</div>
-      <h1>Create Your Account</h1>
-      <p>Join Forward My Mail today</p>
+      <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail" style="width:100px;height:auto;margin-bottom:15px;filter:brightness(0) invert(1);"/>
+      <h1>Forward My Mail</h1>
+      <p>Create your account</p>
     </div>
     <div class="content">
       <div id="errorMessage" class="error-message"></div>
@@ -140,9 +139,9 @@
   </div>
 
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-    import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -229,7 +228,7 @@
 
         // Optional post-signup functions (your existing calls)
         try {
-          const functionsModule = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js');
+          const functionsModule = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
           const functions = functionsModule.getFunctions(app);
 
           // Generate mailbox ID
