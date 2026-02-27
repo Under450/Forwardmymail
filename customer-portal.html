@@ -96,6 +96,34 @@
     }
     .gate-overlay.show { display: block; }
 
+    .verify-panel {
+      background: linear-gradient(135deg, #0b2a5b 0%, #1a3d7a 100%);
+      border-radius: 12px;
+      padding: 32px 24px;
+      margin-bottom: 20px;
+      color: white;
+      text-align: center;
+    }
+    .verify-panel-inner { max-width: 500px; margin: 0 auto; }
+    .verify-icon { font-size: 48px; margin-bottom: 12px; }
+    .verify-panel h2 { font-size: 22px; font-weight: 700; margin-bottom: 12px; }
+    .verify-panel p { font-size: 15px; opacity: 0.9; line-height: 1.5; }
+    .verify-btn {
+      display: inline-block;
+      margin-top: 20px;
+      background: #f59e0b;
+      color: #0b2a5b;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .verify-btn:hover { background: #d97706; }
+    .verify-btn:disabled { background: #ccc; cursor: not-allowed; }
+
     @media (max-width: 768px) { .credit-packs { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -163,6 +191,28 @@
 
         <!-- ===== ID Gate banner ===== -->
         <div id="gateBanner" class="gate-overlay"></div>
+
+        <!-- ===== ID Verification Panel (shown when gated) ===== -->
+        <div id="verifyPanel" class="verify-panel allow-while-gated" style="display:none;">
+          <div class="verify-panel-inner">
+            <div class="verify-icon">🪪</div>
+            <h2>Identity Verification Required</h2>
+            <p>To comply with UK anti-money laundering regulations, we need to verify your identity before you can use your mailbox.</p>
+            <p style="font-size:13px; color:#666; margin-top:8px;">This takes around 2 minutes. You'll need a valid photo ID and to take a short selfie.</p>
+            <button id="startVerifyBtn" class="verify-btn">Complete Your ID Verification →</button>
+            <p id="verifyStatus" style="margin-top:12px; font-size:13px; color:#666;"></p>
+          </div>
+
+          <!-- Didit iframe container -->
+          <div id="diditContainer" style="display:none; margin-top:20px;">
+            <iframe id="diditFrame" 
+              src="" 
+              style="width:100%; height:650px; border:none; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,0.15);"
+              allow="camera; microphone">
+            </iframe>
+            <button id="closeVerifyBtn" style="margin-top:12px; background:none; border:1px solid #ccc; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:13px;">Cancel verification</button>
+          </div>
+        </div>
 
         <!-- Banner area (will switch classes/content) -->
         <div id="lowBalanceWarning" class="low-balance-warning">
@@ -632,7 +682,89 @@ function applyGateUI(data) {
       successMessage.classList.add('show');
       setTimeout(() => successMessage.classList.remove('show'), 5000);
     }
-    // Show test pack when pressing 'T' key
+    // ===== Didit Verification =====
+  const verifyPanel = document.getElementById('verifyPanel');
+  const startVerifyBtn = document.getElementById('startVerifyBtn');
+  const verifyStatus = document.getElementById('verifyStatus');
+  const diditContainer = document.getElementById('diditContainer');
+  const diditFrame = document.getElementById('diditFrame');
+  const closeVerifyBtn = document.getElementById('closeVerifyBtn');
+
+  // Show/hide verify panel based on gate state
+  const origApplyGateUI = applyGateUI;
+  function applyGateUI(data) {
+    origApplyGateUI(data);
+    const status = (data.idStatus || 'not_started').toLowerCase();
+    const idGate = Boolean(data.idRequired || data.idGate);
+    const isVerified = status === 'verified' || status === 'approved';
+    const shouldGate = idGate && !isVerified;
+    verifyPanel.style.display = shouldGate ? 'block' : 'none';
+
+    // Update verify button text based on status
+    if (status === 'pending') {
+      startVerifyBtn.textContent = '⏳ Verification In Progress...';
+      startVerifyBtn.disabled = true;
+      verifyStatus.textContent = 'Your documents are being reviewed. We'll email you once complete.';
+    } else if (status === 'failed' || status === 'declined') {
+      startVerifyBtn.textContent = 'Try Again — Complete Verification →';
+      startVerifyBtn.disabled = false;
+      verifyStatus.textContent = 'Your previous attempt was unsuccessful. Please try again.';
+    } else {
+      startVerifyBtn.textContent = 'Complete Your ID Verification →';
+      startVerifyBtn.disabled = false;
+    }
+  }
+
+  startVerifyBtn.addEventListener('click', async () => {
+    try {
+      startVerifyBtn.disabled = true;
+      startVerifyBtn.textContent = 'Starting verification...';
+      verifyStatus.textContent = '';
+
+      // Call Cloud Function to create Didit session
+      const response = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/createDiditSession', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerId: currentUser.uid,
+          customerEmail: currentUser.email
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to start verification session');
+      }
+
+      const { sessionUrl } = await response.json();
+
+      // Show iframe with Didit session
+      diditFrame.src = sessionUrl;
+      diditContainer.style.display = 'block';
+      startVerifyBtn.style.display = 'none';
+
+      // Update Firestore status to pending
+      await updateDoc(doc(db, 'customers', currentUser.uid), {
+        idStatus: 'pending',
+        idStatusUpdatedAt: serverTimestamp()
+      });
+
+    } catch (err) {
+      console.error('Verification error:', err);
+      verifyStatus.textContent = 'Sorry, there was an error starting verification. Please try again.';
+      startVerifyBtn.disabled = false;
+      startVerifyBtn.textContent = 'Complete Your ID Verification →';
+    }
+  });
+
+  closeVerifyBtn.addEventListener('click', () => {
+    diditContainer.style.display = 'none';
+    diditFrame.src = '';
+    startVerifyBtn.style.display = 'inline-block';
+    startVerifyBtn.disabled = false;
+    startVerifyBtn.textContent = 'Complete Your ID Verification →';
+  });
+
+  // Show test pack when pressing 'T' key
     document.addEventListener('keydown', (e) => {
       if (e.key === 't' || e.key === 'T') {
         document.getElementById('testPack').style.display = 'block';

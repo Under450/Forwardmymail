@@ -407,3 +407,229 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
     console.error('Error greying out deleted customer:', error);
   }
 });
+
+// ── createDiditSession ────────────────────────────────────────────────────────
+// Called by customer portal when customer clicks "Complete Your ID Verification"
+// Creates a Didit verification session and returns the session URL
+exports.createDiditSession = functions.https.onRequest(async (req, res) => {
+  // CORS
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  const DIDIT_API_KEY = process.env.DIDIT_API_KEY;
+  const DIDIT_APP_ID  = '3938689d-7100-4e30-bd8a-7247b7d7a573';
+  const DIDIT_WORKFLOW_ID = '55b2af26-9854-4e58-afb5-b8694183ca3a';
+
+  if (!DIDIT_API_KEY) {
+    console.error('DIDIT_API_KEY not set');
+    return res.status(500).json({ error: 'Verification service not configured' });
+  }
+
+  const { customerId, customerEmail } = req.body;
+  if (!customerId || !customerEmail) {
+    return res.status(400).json({ error: 'Missing customerId or customerEmail' });
+  }
+
+  try {
+    // Get customer name from Firestore
+    const customerDoc = await db.collection('customers').doc(customerId).get();
+    const customerName = customerDoc.exists ? (customerDoc.data().name || customerEmail) : customerEmail;
+
+    // Create Didit session
+    const diditResponse = await fetch('https://apx.didit.me/v2/session/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DIDIT_API_KEY}`
+      },
+      body: JSON.stringify({
+        app_id: DIDIT_APP_ID,
+        workflow_id: DIDIT_WORKFLOW_ID,
+        vendor_data: customerId,  // pass Firebase UID so webhook can identify customer
+        redirect_url: 'https://www.forwardmymail.co.uk/customer-portal.html',
+        callback_url: 'https://us-central1-forward-my-mail.cloudfunctions.net/diditWebhook'
+      })
+    });
+
+    if (!diditResponse.ok) {
+      const errText = await diditResponse.text();
+      console.error('Didit API error:', diditResponse.status, errText);
+      return res.status(500).json({ error: 'Failed to create verification session' });
+    }
+
+    const session = await diditResponse.json();
+    console.log('Didit session created:', session.session_id, 'for customer:', customerId);
+
+    // Store session ID on customer doc
+    await db.collection('customers').doc(customerId).update({
+      diditSessionId: session.session_id,
+      idStatus: 'pending',
+      idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    return res.status(200).json({ sessionUrl: session.url });
+
+  } catch (err) {
+    console.error('createDiditSession error:', err);
+    return res.status(500).json({ error: 'Internal error creating verification session' });
+  }
+});
+
+// ── diditWebhook ──────────────────────────────────────────────────────────────
+// Called by Didit when verification is complete (approved or declined)
+// Updates customer Firestore doc and lifts or keeps the gate
+exports.diditWebhook = functions.https.onRequest(async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
+
+  try {
+    // Verify webhook signature if secret is configured
+    if (DIDIT_WEBHOOK_SECRET) {
+      const signature = req.headers['x-signature'] || req.headers['x-didit-signature'];
+      if (!signature) {
+        console.error('Missing Didit webhook signature');
+        return res.status(401).send('Missing signature');
+      }
+      const crypto = require('crypto');
+      const expectedSig = crypto
+        .createHmac('sha256', DIDIT_WEBHOOK_SECRET)
+        .update(JSON.stringify(req.body))
+        .digest('hex');
+      if (signature !== expectedSig && signature !== `sha256=${expectedSig}`) {
+        console.error('Invalid Didit webhook signature');
+        return res.status(401).send('Invalid signature');
+      }
+    }
+
+    const payload = req.body;
+    console.log('Didit webhook received:', JSON.stringify(payload));
+
+    // Extract key fields
+    const sessionId   = payload.session_id;
+    const status      = (payload.status || '').toLowerCase();      // approved / declined / expired
+    const customerId  = payload.vendor_data;                        // Firebase UID we passed in
+
+    if (!customerId) {
+      console.error('No vendor_data (customerId) in Didit webhook payload');
+      return res.status(400).send('Missing vendor_data');
+    }
+
+    // Map Didit status to our idStatus values
+    let idStatus = 'pending';
+    let idGate   = true;
+
+    if (status === 'approved') {
+      idStatus = 'approved';
+      idGate   = false;   // lift the gate!
+    } else if (status === 'declined' || status === 'rejected' || status === 'expired') {
+      idStatus = 'declined';
+      idGate   = true;    // keep gate, customer needs to retry
+    }
+
+    // Update customer Firestore document
+    await db.collection('customers').doc(customerId).update({
+      idStatus,
+      idGate,
+      idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      diditSessionId: sessionId,
+      diditResult: payload
+    });
+
+    console.log(`Customer ${customerId} verification result: ${idStatus}`);
+
+    // Send appropriate email via IONOS SMTP
+    const customerDoc = await db.collection('customers').doc(customerId).get();
+    if (customerDoc.exists) {
+      const customer = customerDoc.data();
+      if (idStatus === 'approved') {
+        await sendVerificationEmail(customer.email, customer.name || 'Customer', 'approved');
+      } else if (idStatus === 'declined') {
+        await sendVerificationEmail(customer.email, customer.name || 'Customer', 'declined');
+      }
+    }
+
+    return res.status(200).json({ received: true });
+
+  } catch (err) {
+    console.error('diditWebhook error:', err);
+    return res.status(500).send('Internal error');
+  }
+});
+
+// ── sendVerificationEmail helper ──────────────────────────────────────────────
+async function sendVerificationEmail(email, name, result) {
+  const isApproved = result === 'approved';
+  const subject = isApproved
+    ? 'Your Identity Has Been Verified — Forward My Mail'
+    : 'Identity Verification Unsuccessful — Forward My Mail';
+
+  const html = isApproved ? `
+    <!DOCTYPE html><html><head><style>
+      body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f5f5f5;}
+      .container{max-width:600px;margin:0 auto;background:white;}
+      .header{background:linear-gradient(135deg,#064e3b,#065f46);padding:40px 30px;text-align:center;}
+      .header img{height:60px;}
+      .body{padding:40px 30px;}
+      .tick{font-size:64px;text-align:center;margin-bottom:20px;}
+      h1{color:#064e3b;text-align:center;}
+      .btn{display:block;width:fit-content;margin:24px auto;background:#f59e0b;color:#0b2a5b;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none;}
+      .footer{background:#f5f5f5;padding:20px;text-align:center;font-size:12px;color:#999;}
+    </style></head><body>
+    <div class="container">
+      <div class="header">
+        <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail"/>
+      </div>
+      <div class="body">
+        <div class="tick">✅</div>
+        <h1>Identity Verified!</h1>
+        <p>Hi ${name},</p>
+        <p>Great news — your identity has been successfully verified. Your Forward My Mail portal is now fully active.</p>
+        <p>You can now access your mail dashboard, request scans, and manage your mail.</p>
+        <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="btn">Go to Your Portal →</a>
+      </div>
+      <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6PS</div>
+    </div>
+    </body></html>
+  ` : `
+    <!DOCTYPE html><html><head><style>
+      body{font-family:Arial,sans-serif;margin:0;padding:0;background:#f5f5f5;}
+      .container{max-width:600px;margin:0 auto;background:white;}
+      .header{background:linear-gradient(135deg,#7f1d1d,#991b1b);padding:40px 30px;text-align:center;}
+      .header img{height:60px;}
+      .body{padding:40px 30px;}
+      .icon{font-size:64px;text-align:center;margin-bottom:20px;}
+      h1{color:#7f1d1d;text-align:center;}
+      .btn{display:block;width:fit-content;margin:24px auto;background:#0b2a5b;color:white;font-weight:700;padding:14px 28px;border-radius:8px;text-decoration:none;}
+      .footer{background:#f5f5f5;padding:20px;text-align:center;font-size:12px;color:#999;}
+    </style></head><body>
+    <div class="container">
+      <div class="header">
+        <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail"/>
+      </div>
+      <div class="body">
+        <div class="icon">❌</div>
+        <h1>Verification Unsuccessful</h1>
+        <p>Hi ${name},</p>
+        <p>Unfortunately we were unable to verify your identity. Your portal remains locked until verification is completed successfully.</p>
+        <p><strong>Common reasons for failure:</strong> blurry photo, expired ID, poor lighting, or face not matching ID.</p>
+        <p>Please try again — make sure you're in good lighting with a valid, unexpired photo ID.</p>
+        <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="btn">Try Again →</a>
+        <p style="margin-top:20px;font-size:13px;color:#666;">Need help? Email us at <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a></p>
+      </div>
+      <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6PS</div>
+    </div>
+    </body></html>
+  `;
+
+  await transporter.sendMail({
+    from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+    to: email,
+    subject,
+    html
+  });
+  console.log(`Verification email (${result}) sent to ${email}`);
+}
