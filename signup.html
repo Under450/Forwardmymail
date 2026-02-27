@@ -223,7 +223,13 @@
           autoRenewFreeScans: false,
           lastAppliedMonthKey: "",
           applyAtMonthKey: null,
-          resetMode: "reset"
+          resetMode: "reset",
+
+          // 🔒 ID VERIFICATION GATE — always required for new signups
+          idGate: true,
+          idRequired: true,
+          idStatus: 'not_started',
+          idStatusUpdatedAt: serverTimestamp()
         });
 
         // Optional post-signup functions (your existing calls)
