@@ -70,6 +70,7 @@ app.post('/createDiditSession', async (req, res) => {
     }
 
     const session = await diditResponse.json();
+    console.log('Didit session full response:', JSON.stringify(session));
     console.log('Didit session created:', session.session_id, 'for:', customerId);
 
     await db.collection('customers').doc(customerId).update({
