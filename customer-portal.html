@@ -318,11 +318,15 @@ const db = getFirestore(app);
 
     // --- Stripe return messages ---
     const urlParams = new URLSearchParams(window.location.search);
-   if (urlParams.get('success')) {
-  showSuccess('Payment successful! Your credits have been added.');
-  
-}
-if (urlParams.get('cancelled')) showError('Payment cancelled.');
+    if (urlParams.get('success')) {
+      showSuccess('Payment successful! Your credits have been added.');
+      // Remove the query parameter so refreshing the page doesn't show it again
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    if (urlParams.get('cancelled')) {
+      showError('Payment cancelled.');
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
     // Clear autofill on load
     window.addEventListener('load', () => {
