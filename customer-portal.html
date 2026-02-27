@@ -705,17 +705,16 @@ function applyGateUI(data) {
       setTimeout(() => successMessage.classList.remove('show'), 5000);
     }
     // ===== Didit Verification =====
-  const verifyPanel = document.getElementById('verifyPanel');
-  const startVerifyBtn = document.getElementById('startVerifyBtn');
-  const verifyStatus = document.getElementById('verifyStatus');
-  const diditContainer = document.getElementById('diditContainer');
-  const diditFrame = document.getElementById('diditFrame');
-  const closeVerifyBtn = document.getElementById('closeVerifyBtn');
+    const diditContainer = document.getElementById('diditContainer');
+    const diditFrame = document.getElementById('diditFrame');
+    const closeVerifyBtn = document.getElementById('closeVerifyBtn');
 
-  // Verify panel show/hide is handled inside applyGateUI below
+    // Verify panel show/hide is handled inside applyGateUI
 
-  startVerifyBtn.addEventListener('click', async () => {
+    document.getElementById('startVerifyBtn').addEventListener('click', async () => {
     try {
+      const startVerifyBtn = document.getElementById('startVerifyBtn');
+      const verifyStatus = document.getElementById('verifyStatus');
       startVerifyBtn.disabled = true;
       startVerifyBtn.textContent = 'Starting verification...';
       verifyStatus.textContent = '';
