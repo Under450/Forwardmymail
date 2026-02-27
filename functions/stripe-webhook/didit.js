@@ -50,18 +50,16 @@ app.post('/createDiditSession', async (req, res) => {
     const customerDoc = await db.collection('customers').doc(customerId).get();
     const customerName = customerDoc.exists ? (customerDoc.data().name || customerEmail) : customerEmail;
 
-    const diditResponse = await fetch('https://apx.didit.me/v2/session/', {
+    const diditResponse = await fetch('https://verification.didit.me/v3/session/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DIDIT_API_KEY}`
+        'x-api-key': DIDIT_API_KEY
       },
       body: JSON.stringify({
-        app_id: DIDIT_APP_ID,
         workflow_id: DIDIT_WORKFLOW_ID,
         vendor_data: customerId,
-        redirect_url: 'https://www.forwardmymail.co.uk/customer-portal.html',
-        callback_url: 'https://didit-functions-933044287958.us-central1.run.app/diditWebhook'
+        callback: 'https://didit-functions-933044287958.us-central1.run.app/diditWebhook'
       })
     });
 
@@ -80,7 +78,7 @@ app.post('/createDiditSession', async (req, res) => {
       idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    return res.status(200).json({ sessionUrl: session.url });
+    return res.status(200).json({ sessionUrl: session.verification_url });
 
   } catch (err) {
     console.error('createDiditSession error:', err);
