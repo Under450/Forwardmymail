@@ -574,7 +574,7 @@ function applyGateUI(data) {
               </div>
               <div style="text-align: right;">
                 <span class="mail-item-status status-${status}">${status}</span>
-                <div style="margin-top: 5px; font-weight: bold; color: #1e3c72;">£${item.cost?.toFixed(2) || '0.00'}</div>
+                <div style="margin-top: 5px; font-weight: bold; color: #1e3c72;">${item.freeScanUsed ? '<span style="color:#1a7a1a;">Free scan</span>' : '£' + (item.cost?.toFixed(2) || '0.00')}</div>
               </div>
             </div>
           `;
