@@ -62,7 +62,7 @@ app.post('/createDiditSession', async (req, res) => {
         workflow_id: DIDIT_WORKFLOW_ID,
         vendor_data: customerId,
         redirect_url: 'https://www.forwardmymail.co.uk/customer-portal.html',
-        callback_url: 'https://us-central1-forward-my-mail.cloudfunctions.net/diditWebhook'
+        callback_url: 'https://didit-functions-933044287958.us-central1.run.app/diditWebhook'
       })
     });
 

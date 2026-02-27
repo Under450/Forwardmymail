@@ -722,7 +722,7 @@ function applyGateUI(data) {
       verifyStatus.textContent = '';
 
       // Call Cloud Function to create Didit session
-      const response = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/createDiditSession', {
+      const response = await fetch('https://didit-functions-933044287958.us-central1.run.app/createDiditSession', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
