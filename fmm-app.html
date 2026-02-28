@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FMM">
+<meta name="theme-color" content="#1a2b47">
+<title>Forward My Mail</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ===== RESET & VARIABLES ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root {
+  --brand: #1a2b47;
+  --brand-dark: #111d30;
+  --brand-mid: #243654;
+  --brand-pale: #eef1f7;
+  --teal: #2196b0;
+  --teal-dim: rgba(33,150,176,0.12);
+  --green: #27ae7a;
+  --green-dim: rgba(39,174,122,0.12);
+  --amber: #e8920a;
+  --amber-dim: rgba(232,146,10,0.12);
+  --red: #dc4444;
+  --off: #f5f7fb;
+  --white: #ffffff;
+  --text: #1a2b47;
+  --text-mid: #4a5c78;
+  --text-muted: #8a9ab5;
+  --border: #dde3ee;
+  --card: #ffffff;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--brand);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== SCREEN SYSTEM ===== */
+.screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  transform: translateY(20px);
+}
+.screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+.screen.slide-left { transform: translateX(-100%); }
+.screen.slide-right { transform: translateX(100%); }
+
+/* ===== SPLASH SCREEN ===== */
+#screen-splash {
+  background: var(--brand);
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+#screen-splash.active { opacity: 1; transform: none; }
+.splash-logo { width: 200px; height: auto; }
+.splash-subtitle { font-size: 13px; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; }
+.splash-loader {
+  width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; overflow: hidden; margin-top: 20px;
+}
+.splash-loader-bar {
+  height: 100%; width: 0; background: rgba(255,255,255,0.6); border-radius: 2px;
+  animation: loadBar 1.8s ease forwards;
+}
+@keyframes loadBar { 0%{width:0} 60%{width:70%} 100%{width:100%} }
+
+/* ===== LOGIN SCREEN ===== */
+#screen-login {
+  background: var(--brand);
+  padding-top: calc(var(--safe-top) + 60px);
+  padding-bottom: calc(var(--safe-bottom) + 24px);
+  padding-left: 28px;
+  padding-right: 28px;
+  overflow-y: auto;
+}
+.login-logo { width: 160px; height: auto; margin-bottom: 32px; }
+.login-heading { font-family: 'DM Serif Display', serif; font-size: 30px; color: #fff; margin-bottom: 6px; }
+.login-sub { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 36px; }
+
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; display: block; }
+.form-input {
+  width: 100%; padding: 15px 16px; border-radius: 14px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.07);
+  color: #fff; font-size: 16px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.2s;
+}
+.form-input::placeholder { color: rgba(255,255,255,0.3); }
+.form-input:focus { border-color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.1); }
+
+.btn-primary {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: #fff; color: var(--brand); border: none;
+  font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; margin-top: 8px;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-ghost {
+  width: 100%; padding: 14px; border-radius: 14px;
+  background: transparent; color: rgba(255,255,255,0.65); border: 1.5px solid rgba(255,255,255,0.15);
+  font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; margin-top: 10px;
+}
+
+.login-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+.login-divider::before, .login-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.12); }
+.login-divider span { font-size: 12px; color: rgba(255,255,255,0.3); }
+
+.login-register { text-align: center; margin-top: 24px; font-size: 13px; color: rgba(255,255,255,0.45); }
+.login-register a { color: rgba(255,255,255,0.75); font-weight: 600; text-decoration: none; }
+
+.error-msg { background: rgba(220,68,68,0.15); border: 1px solid rgba(220,68,68,0.3); border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #ff8585; margin-bottom: 14px; display: none; }
+.error-msg.show { display: block; }
+
+/* ===== OTP SCREEN ===== */
+#screen-otp {
+  background: var(--brand);
+  padding: calc(var(--safe-top) + 60px) 28px calc(var(--safe-bottom) + 24px);
+  align-items: center;
+}
+.otp-icon { font-size: 48px; margin-bottom: 20px; }
+.otp-heading { font-family: 'DM Serif Display', serif; font-size: 28px; color: #fff; margin-bottom: 8px; text-align: center; }
+.otp-sub { font-size: 14px; color: rgba(255,255,255,0.5); text-align: center; margin-bottom: 36px; line-height: 1.5; }
+.otp-email-highlight { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+.otp-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 32px; }
+.otp-input {
+  width: 48px; height: 58px; border-radius: 14px;
+  border: 1.5px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.08);
+  color: #fff; font-size: 24px; font-weight: 700;
+  text-align: center; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color 0.2s, background 0.2s;
+}
+.otp-input:focus { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); }
+
+.otp-resend { font-size: 13px; color: rgba(255,255,255,0.45); text-align: center; margin-top: 16px; }
+.otp-resend a { color: rgba(255,255,255,0.7); font-weight: 600; text-decoration: none; }
+
+/* ===== PIN SETUP SCREEN ===== */
+#screen-pin-setup {
+  background: var(--brand);
+  padding: calc(var(--safe-top) + 60px) 28px calc(var(--safe-bottom) + 24px);
+  align-items: center;
+}
+
+/* ===== PIN LOGIN SCREEN ===== */
+#screen-pin {
+  background: var(--brand);
+  padding: calc(var(--safe-top) + 40px) 28px calc(var(--safe-bottom) + 24px);
+  align-items: center;
+  justify-content: space-between;
+}
+.pin-header { text-align: center; }
+.pin-greeting { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
+.pin-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; }
+.pin-instruction { font-size: 14px; color: rgba(255,255,255,0.55); margin-top: 28px; }
+.pin-dots { display: flex; gap: 16px; justify-content: center; margin: 24px 0; }
+.pin-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35);
+  background: transparent; transition: all 0.15s;
+}
+.pin-dot.filled { background: #fff; border-color: #fff; }
+.pin-dot.error { background: var(--red); border-color: var(--red); animation: shake 0.4s ease; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-5px)} 40%,80%{transform:translateX(5px)} }
+
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
+.numpad-key {
+  aspect-ratio: 1; border-radius: 50%; border: none;
+  background: rgba(255,255,255,0.1); color: #fff;
+  font-size: 22px; font-weight: 500; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.1s, transform 0.1s;
+  user-select: none;
+}
+.numpad-key:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
+.numpad-key.empty { background: transparent; cursor: default; }
+.numpad-key.delete { font-size: 18px; }
+.numpad-key.biometric { font-size: 26px; }
+
+.pin-forgot { font-size: 12px; color: rgba(255,255,255,0.35); text-align: center; margin-top: 8px; }
+.pin-forgot a { color: rgba(255,255,255,0.55); text-decoration: none; }
+
+/* ===== APP SHELL ===== */
+#screen-app {
+  background: var(--off);
+  overflow: hidden;
+}
+.app-header {
+  background: var(--brand);
+  padding: calc(var(--safe-top) + 12px) 18px 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; position: relative; z-index: 10;
+}
+.header-logo { height: 20px; width: auto; }
+.header-right { display: flex; align-items: center; gap: 12px; }
+.header-bell { font-size: 18px; color: rgba(255,255,255,0.7); cursor: pointer; position: relative; }
+.header-bell .badge {
+  position: absolute; top: -4px; right: -4px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--red); font-size: 8px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid var(--brand);
+}
+.header-avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.9);
+  cursor: pointer;
+}
+
+/* Tab system */
+.tab-content { flex: 1; overflow: hidden; position: relative; }
+.tab-pane { position: absolute; inset: 0; overflow-y: auto; display: none; }
+.tab-pane.active { display: block; }
+
+/* Bottom nav */
+.bottom-nav {
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 0 calc(var(--safe-bottom) + 8px);
+  background: var(--card); border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 16px; border-radius: 12px; position: relative; }
+.nav-icon { font-size: 20px; line-height: 1; }
+.nav-label { font-size: 9px; font-weight: 600; color: var(--text-muted); transition: color 0.15s; }
+.nav-item.active .nav-label { color: var(--brand); }
+.nav-item .nav-dot {
+  position: absolute; top: 2px; right: 10px;
+  width: 7px; height: 7px; border-radius: 50%; background: var(--red);
+  border: 1.5px solid var(--card); display: none;
+}
+.nav-item.has-badge .nav-dot { display: block; }
+
+/* ===== DASHBOARD TAB ===== */
+.dash-hero {
+  background: var(--brand);
+  padding: 16px 18px 28px;
+}
+.dash-greet { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
+.dash-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: #fff; margin-bottom: 16px; }
+
+.credit-card {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 20px; padding: 18px 18px 16px; position: relative; overflow: hidden;
+}
+.credit-card::before {
+  content: ''; position: absolute; top: -30px; right: -20px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.credit-card::after {
+  content: ''; position: absolute; bottom: -20px; left: 40px;
+  width: 80px; height: 80px; border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.cc-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
+.cc-amount { font-family: 'DM Serif Display', serif; font-size: 36px; color: #fff; line-height: 1; }
+.cc-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.cc-topup {
+  position: absolute; right: 16px; bottom: 16px;
+  background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
+  color: #fff; font-size: 11px; font-weight: 700; padding: 7px 16px; border-radius: 20px;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; border: none;
+  transition: background 0.15s;
+}
+.cc-topup:active { background: rgba(255,255,255,0.28); }
+
+.dash-body { padding: 16px 16px 100px; }
+.dash-section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.dash-section-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.dash-section-link { font-size: 11px; color: var(--teal); font-weight: 500; cursor: pointer; }
+
+.quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.quick-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  padding: 14px 12px; display: flex; flex-direction: column; gap: 8px;
+  box-shadow: 0 1px 4px rgba(26,43,71,0.06); cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.quick-card:active { transform: scale(0.97); }
+.quick-card.highlight { border-color: rgba(33,150,176,0.3); background: #f0f8fb; }
+.qc-icon { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
+.qc-icon.teal { background: var(--teal-dim); }
+.qc-icon.amber { background: var(--amber-dim); }
+.qc-icon.blue { background: rgba(60,120,220,0.09); }
+.qc-icon.green { background: var(--green-dim); }
+.qc-count { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
+.qc-label { font-size: 11px; font-weight: 600; color: var(--text); }
+.qc-sub { font-size: 9px; color: var(--text-muted); }
+
+.mail-list { display: flex; flex-direction: column; gap: 8px; }
+.mail-row {
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px; display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 1px 3px rgba(26,43,71,0.04); cursor: pointer;
+  transition: transform 0.15s;
+}
+.mail-row:active { transform: scale(0.98); }
+.mail-row.unread { border-left: 3px solid var(--teal); }
+.mr-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--brand-pale); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.mr-body { flex: 1; min-width: 0; }
+.mr-from { font-size: 12px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mr-desc { font-size: 10px; color: var(--text-muted); margin-top: 1px; }
+.mr-badge { font-size: 8px; font-weight: 700; letter-spacing: 0.04em; padding: 3px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.badge-new { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(232,146,10,0.25); }
+.badge-scanned { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(33,150,176,0.25); }
+.badge-posted { background: rgba(60,120,220,0.09); color: #3a70c8; border: 1px solid rgba(60,120,220,0.2); }
+.badge-stored { background: var(--green-dim); color: var(--green); border: 1px solid rgba(39,174,122,0.25); }
+.badge-shredded { background: rgba(220,68,68,0.08); color: var(--red); border: 1px solid rgba(220,68,68,0.2); }
+
+/* ===== MAIL TAB ===== */
+.mail-tab-header { background: var(--off); padding: 16px 16px 8px; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid var(--border); }
+.mail-tab-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 10px; }
+.filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+.filter-row::-webkit-scrollbar { display: none; }
+.filter-pill {
+  flex-shrink: 0; padding: 6px 14px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; border: 1.5px solid var(--border);
+  background: var(--card); color: var(--text-muted); cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-pill.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+
+.mail-items { padding: 10px 16px 100px; display: flex; flex-direction: column; gap: 8px; }
+.mail-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(26,43,71,0.05); overflow: hidden; cursor: pointer;
+}
+.mail-card.unread { border-left: 3px solid var(--teal); }
+.mail-card-top { padding: 12px 12px 8px; display: flex; align-items: flex-start; gap: 10px; }
+.mc-avatar { width: 38px; height: 38px; border-radius: 11px; background: var(--brand-pale); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; border: 1px solid var(--border); }
+.mc-body { flex: 1; min-width: 0; }
+.mc-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.mc-from { font-size: 13px; font-weight: 600; color: var(--text); }
+.mc-date { font-size: 10px; color: var(--text-muted); }
+.mc-subject { font-size: 11px; color: var(--text-mid); margin-top: 3px; }
+.mail-card-actions { padding: 8px 12px 12px; display: flex; gap: 6px; flex-wrap: wrap; border-top: 1px solid var(--border); background: var(--off); }
+.mc-action {
+  font-size: 10px; font-weight: 600; padding: 5px 10px; border-radius: 8px;
+  border: 1px solid var(--border); color: var(--text-muted); background: var(--card);
+  cursor: pointer; transition: all 0.15s;
+}
+.mc-action.primary { border-color: rgba(26,43,71,0.3); color: var(--brand); background: var(--brand-pale); }
+.mc-action.free { border-color: rgba(39,174,122,0.3); color: var(--green); background: var(--green-dim); }
+.mc-action.cost { border-color: rgba(33,150,176,0.3); color: var(--teal); background: var(--teal-dim); }
+
+/* ===== ACCOUNT TAB ===== */
+.account-hero {
+  background: var(--brand); padding: 28px 18px 32px; text-align: center;
+}
+.acct-avatar {
+  width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.15);
+  border: 3px solid rgba(255,255,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: #fff;
+  margin: 0 auto 12px;
+}
+.acct-name { font-family: 'DM Serif Display', serif; font-size: 22px; color: #fff; }
+.acct-email { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.acct-credit-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px; padding: 6px 16px; margin-top: 14px;
+  font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
+}
+
+.account-body { padding: 16px 16px 100px; }
+.settings-section { margin-bottom: 20px; }
+.settings-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; padding-left: 4px; }
+.settings-group { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+.settings-row {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  border-bottom: 1px solid var(--border); cursor: pointer;
+  transition: background 0.1s;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:active { background: var(--off); }
+.sr-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.sr-icon.navy { background: var(--brand-pale); }
+.sr-icon.teal { background: var(--teal-dim); }
+.sr-icon.green { background: var(--green-dim); }
+.sr-icon.red { background: rgba(220,68,68,0.08); }
+.sr-body { flex: 1; }
+.sr-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.sr-sub { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+.sr-arrow { color: var(--text-muted); font-size: 16px; }
+
+/* ===== CREDIT TOP-UP SHEET ===== */
+.sheet-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 100; display: none; align-items: flex-end;
+  opacity: 0; transition: opacity 0.3s;
+}
+.sheet-overlay.open { display: flex; }
+.sheet-overlay.visible { opacity: 1; }
+.sheet {
+  background: var(--card); border-radius: 24px 24px 0 0;
+  padding: 20px 20px calc(var(--safe-bottom) + 24px);
+  width: 100%; max-height: 80vh; overflow-y: auto;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.sheet-overlay.visible .sheet { transform: translateY(0); }
+.sheet-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+.sheet-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 4px; }
+.sheet-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+
+.credit-packs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+.credit-pack {
+  border: 2px solid var(--border); border-radius: 16px; padding: 16px 12px;
+  text-align: center; cursor: pointer; transition: all 0.15s; background: var(--card);
+  position: relative;
+}
+.credit-pack:active { transform: scale(0.97); }
+.credit-pack.selected { border-color: var(--brand); background: var(--brand-pale); }
+.credit-pack.popular::before {
+  content: 'Popular'; position: absolute; top: -9px; left: 50%; transform: translateX(-50%);
+  background: var(--teal); color: #fff; font-size: 9px; font-weight: 700;
+  padding: 2px 10px; border-radius: 20px; letter-spacing: 0.05em;
+}
+.cp-amount { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brand); }
+.cp-letters { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+.sheet-btn {
+  width: 100%; padding: 16px; border-radius: 14px;
+  background: var(--brand); color: #fff; border: none;
+  font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.sheet-btn:active { opacity: 0.85; }
+
+/* ===== MAIL DETAIL SHEET ===== */
+.detail-hero-card {
+  background: var(--brand); border-radius: 18px; padding: 20px; text-align: center;
+  margin-bottom: 14px;
+}
+.dhc-emoji { font-size: 36px; margin-bottom: 10px; }
+.dhc-from { font-size: 15px; font-weight: 700; color: #fff; }
+.dhc-type { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+.dhc-date { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 6px; }
+
+.timeline { display: flex; gap: 6px; margin-bottom: 14px; }
+.tl-step { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 6px; text-align: center; }
+.tl-step.active { border-color: rgba(39,174,122,0.3); background: var(--green-dim); }
+.tl-icon { font-size: 18px; margin-bottom: 4px; }
+.tl-label { font-size: 9px; font-weight: 600; color: var(--text); }
+.tl-val { font-size: 8px; color: var(--text-muted); margin-top: 2px; }
+
+.price-box {
+  background: rgba(26,43,71,0.05); border: 1px solid rgba(26,43,71,0.1);
+  border-radius: 12px; padding: 10px 14px; margin-bottom: 14px;
+  font-size: 11px; color: var(--text-mid); line-height: 1.6;
+}
+.price-box strong { color: var(--brand); }
+
+.action-list { display: flex; flex-direction: column; gap: 8px; }
+.action-row {
+  border: 1.5px solid var(--border); border-radius: 14px; padding: 13px 14px;
+  display: flex; align-items: center; justify-content: space-between;
+  cursor: pointer; background: var(--card); transition: all 0.15s;
+}
+.action-row:active { transform: scale(0.98); background: var(--off); }
+.action-row.primary-action { background: var(--brand); border-color: var(--brand); }
+.ar-left { display: flex; align-items: center; gap: 10px; }
+.ar-icon { font-size: 17px; }
+.ar-title { font-size: 13px; font-weight: 600; color: var(--text); }
+.action-row.primary-action .ar-title { color: #fff; }
+.ar-sub { font-size: 10px; color: var(--text-muted); }
+.action-row.primary-action .ar-sub { color: rgba(255,255,255,0.55); }
+.ar-cost { font-size: 11px; font-weight: 700; color: var(--teal); white-space: nowrap; }
+.action-row.primary-action .ar-cost { color: rgba(255,255,255,0.7); }
+.ar-cost.free { color: var(--green); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; top: calc(var(--safe-top) + 60px); left: 16px; right: 16px;
+  background: var(--brand); color: #fff; border-radius: 14px; padding: 14px 18px;
+  font-size: 13px; font-weight: 500; z-index: 999;
+  transform: translateY(-20px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none; display: flex; align-items: center; gap: 10px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--green); }
+.toast.error { background: var(--red); }
+
+/* Loading spinner */
+.spinner {
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin 0.8s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-primary.loading .spinner { display: block; }
+.btn-primary.loading .btn-text { display: none; }
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== SPLASH ===== -->
+<div class="screen active" id="screen-splash">
+<img class="splash-logo" src="data:image/png;base64,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" alt="Forward My Mail">
+  <p class="splash-subtitle">MAIL MANAGEMENT</p>
+  <div class="splash-loader"><div class="splash-loader-bar"></div></div>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div class="screen" id="screen-login">
+<img class="login-logo" src="data:image/png;base64,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" alt="Forward My Mail">
+  <h1 class="login-heading">Welcome back</h1>
+  <p class="login-sub">Sign in to your account</p>
+  <div class="error-msg" id="login-error"></div>
+  <div class="form-group">
+    <label class="form-label">Email address</label>
+    <input class="form-input" type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+  </div>
+  <div class="form-group">
+    <label class="form-label">Password</label>
+    <input class="form-input" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+  <button class="btn-primary" id="login-btn">
+    <span class="btn-text">Sign In</span>
+    <div class="spinner"></div>
+  </button>
+  <button class="btn-ghost" id="login-forgot">Forgot password?</button>
+  <div class="login-register">
+    Don't have an account? <a href="#" id="login-to-register">Register here</a>
+  </div>
+</div>
+
+<!-- ===== OTP ===== -->
+<div class="screen" id="screen-otp">
+  <div class="otp-icon">📧</div>
+  <h2 class="otp-heading">Check your email</h2>
+  <p class="otp-sub">We've sent a 6-digit code to<br><span class="otp-email-highlight" id="otp-email-display"></span></p>
+  <div class="otp-inputs">
+    <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+    <input class="otp-input" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]">
+  </div>
+  <button class="btn-primary" id="otp-verify-btn">
+    <span class="btn-text">Verify Code</span>
+    <div class="spinner"></div>
+  </button>
+  <p class="otp-resend">Didn't get it? <a href="#" id="otp-resend-link">Resend code</a></p>
+</div>
+
+<!-- ===== PIN SETUP ===== -->
+<div class="screen" id="screen-pin-setup" style="justify-content:center;">
+  <div style="width:100%;max-width:320px;text-align:center;">
+    <div style="font-size:48px;margin-bottom:20px;">🔐</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:8px;">Create your PIN</h2>
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:32px;line-height:1.5;">Set a 4-digit PIN to quickly<br>unlock the app next time</p>
+    <div class="pin-dots" id="setup-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px;" id="setup-pin-step">Enter new PIN</p>
+    <div class="numpad" style="margin:0 auto;">
+      <button class="numpad-key" data-val="1">1</button>
+      <button class="numpad-key" data-val="2">2</button>
+      <button class="numpad-key" data-val="3">3</button>
+      <button class="numpad-key" data-val="4">4</button>
+      <button class="numpad-key" data-val="5">5</button>
+      <button class="numpad-key" data-val="6">6</button>
+      <button class="numpad-key" data-val="7">7</button>
+      <button class="numpad-key" data-val="8">8</button>
+      <button class="numpad-key" data-val="9">9</button>
+      <button class="numpad-key empty"></button>
+      <button class="numpad-key" data-val="0">0</button>
+      <button class="numpad-key delete" id="setup-delete">⌫</button>
+    </div>
+    <button class="btn-ghost" id="skip-pin-btn" style="max-width:260px;margin:20px auto 0;">Skip for now</button>
+  </div>
+</div>
+
+<!-- ===== PIN LOGIN ===== -->
+<div class="screen" id="screen-pin">
+  <div class="pin-header">
+    <p class="pin-greeting">Good to see you</p>
+    <h2 class="pin-name" id="pin-user-name">—</h2>
+    <p class="pin-instruction">Enter your PIN to continue</p>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+  </div>
+  <div style="text-align:center;">
+    <div class="numpad" style="margin:0 auto 16px;">
+      <button class="numpad-key" data-pin="1">1</button>
+      <button class="numpad-key" data-pin="2">2</button>
+      <button class="numpad-key" data-pin="3">3</button>
+      <button class="numpad-key" data-pin="4">4</button>
+      <button class="numpad-key" data-pin="5">5</button>
+      <button class="numpad-key" data-pin="6">6</button>
+      <button class="numpad-key" data-pin="7">7</button>
+      <button class="numpad-key" data-pin="8">8</button>
+      <button class="numpad-key" data-pin="9">9</button>
+      <button class="numpad-key biometric" id="biometric-btn">👆</button>
+      <button class="numpad-key" data-pin="0">0</button>
+      <button class="numpad-key delete" id="pin-delete">⌫</button>
+    </div>
+    <p class="pin-forgot"><a href="#" id="pin-use-password">Use password instead</a></p>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div class="screen" id="screen-app">
+  <div class="app-header">
+    <img class="header-logo" id="header-logo" alt="Forward My Mail" src="data:image/png;base64,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">
+    <div class="header-right">
+      <div class="header-bell" id="notif-bell">🔔<div class="badge" id="notif-badge">3</div></div>
+      <div class="header-avatar" id="user-avatar">JH</div>
+    </div>
+  </div>
+
+  <div class="tab-content">
+    <!-- DASHBOARD -->
+    <div class="tab-pane active" id="tab-home">
+      <div class="dash-hero">
+        <p class="dash-greet" id="dash-greet">Good morning</p>
+        <h2 class="dash-name" id="dash-name">Loading...</h2>
+        <div class="credit-card">
+          <div class="cc-label">Credit Balance</div>
+          <div class="cc-amount" id="dash-credit">£—</div>
+          <div class="cc-sub" id="dash-credit-sub">Loading...</div>
+          <button class="cc-topup" id="topup-btn">+ Top Up</button>
+        </div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-section-head" style="margin-bottom:8px;">
+          <span class="dash-section-title">Mail Overview</span>
+        </div>
+        <div class="quick-grid">
+          <div class="quick-card highlight" onclick="switchTab('mail')">
+            <div class="qc-icon teal">📬</div>
+            <div class="qc-count" id="stat-new">—</div>
+            <div class="qc-label">New Items</div>
+            <div class="qc-sub">Awaiting action</div>
+          </div>
+          <div class="quick-card" onclick="switchTab('mail')">
+            <div class="qc-icon amber">📄</div>
+            <div class="qc-count" id="stat-scanned">—</div>
+            <div class="qc-label">Scanned</div>
+            <div class="qc-sub">Ready to view</div>
+          </div>
+          <div class="quick-card" onclick="switchTab('mail')">
+            <div class="qc-icon blue">📦</div>
+            <div class="qc-count" id="stat-posted">—</div>
+            <div class="qc-label">Posted</div>
+            <div class="qc-sub">Dispatched</div>
+          </div>
+          <div class="quick-card" onclick="switchTab('mail')">
+            <div class="qc-icon green">🗑️</div>
+            <div class="qc-count" id="stat-shredded">—</div>
+            <div class="qc-label">Shredded</div>
+            <div class="qc-sub">This month</div>
+          </div>
+        </div>
+        <div class="dash-section-head">
+          <span class="dash-section-title">Recent Mail</span>
+          <span class="dash-section-link" onclick="switchTab('mail')">See all →</span>
+        </div>
+        <div class="mail-list" id="dash-mail-list">
+          <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">Loading mail...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIL TAB -->
+    <div class="tab-pane" id="tab-mail">
+      <div class="mail-tab-header">
+        <div class="mail-tab-title">My Mail</div>
+        <div class="filter-row">
+          <div class="filter-pill active" data-filter="all">All</div>
+          <div class="filter-pill" data-filter="new">New</div>
+          <div class="filter-pill" data-filter="scanned">Scanned</div>
+          <div class="filter-pill" data-filter="posted">Posted</div>
+          <div class="filter-pill" data-filter="stored">Stored</div>
+          <div class="filter-pill" data-filter="shredded">Shredded</div>
+        </div>
+      </div>
+      <div class="mail-items" id="mail-items-list">
+        <div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">Loading mail...</div>
+      </div>
+    </div>
+
+    <!-- ACCOUNT TAB -->
+    <div class="tab-pane" id="tab-account">
+      <div class="account-hero">
+        <div class="acct-avatar" id="acct-avatar">JH</div>
+        <div class="acct-name" id="acct-name">Loading...</div>
+        <div class="acct-email" id="acct-email">Loading...</div>
+        <div class="acct-credit-pill">💳 <span id="acct-credit">£—</span> credit</div>
+      </div>
+      <div class="account-body">
+        <div class="settings-section">
+          <div class="settings-label">Account</div>
+          <div class="settings-group">
+            <div class="settings-row" id="acct-topup-row">
+              <div class="sr-icon teal">💳</div>
+              <div class="sr-body"><div class="sr-title">Top Up Credits</div><div class="sr-sub">Buy more scanning & posting credit</div></div>
+              <div class="sr-arrow">›</div>
+            </div>
+            <div class="settings-row">
+              <div class="sr-icon navy">📍</div>
+              <div class="sr-body"><div class="sr-title">Forwarding Address</div><div class="sr-sub" id="acct-address">Loading...</div></div>
+              <div class="sr-arrow">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-label">Security</div>
+          <div class="settings-group">
+            <div class="settings-row" id="change-pin-row">
+              <div class="sr-icon navy">🔐</div>
+              <div class="sr-body"><div class="sr-title">Change PIN</div><div class="sr-sub">Update your app unlock PIN</div></div>
+              <div class="sr-arrow">›</div>
+            </div>
+            <div class="settings-row">
+              <div class="sr-icon navy">🔑</div>
+              <div class="sr-body"><div class="sr-title">Change Password</div><div class="sr-sub">Update your account password</div></div>
+              <div class="sr-arrow">›</div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-label">Support</div>
+          <div class="settings-group">
+            <div class="settings-row">
+              <div class="sr-icon green">💬</div>
+              <div class="sr-body"><div class="sr-title">Contact Us</div><div class="sr-sub">Get help with your mail</div></div>
+              <div class="sr-arrow">›</div>
+            </div>
+            <div class="settings-row" id="signout-row">
+              <div class="sr-icon red">🚪</div>
+              <div class="sr-body"><div class="sr-title" style="color:var(--red)">Sign Out</div><div class="sr-sub">Return to login screen</div></div>
+              <div class="sr-arrow">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-tab="home">
+      <div class="nav-icon">⊞</div>
+      <div class="nav-label">Home</div>
+    </div>
+    <div class="nav-item has-badge" data-tab="mail">
+      <div class="nav-icon">📬</div>
+      <div class="nav-dot"></div>
+      <div class="nav-label">Mail</div>
+    </div>
+    <div class="nav-item" data-tab="account">
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">Account</div>
+    </div>
+  </nav>
+</div>
+
+<!-- CREDIT TOP-UP SHEET -->
+<div class="sheet-overlay" id="topup-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title">Top Up Credits</h3>
+    <p class="sheet-sub">Credits are used for scanning, posting and storing your mail.</p>
+    <div class="credit-packs">
+      <div class="credit-pack" data-amount="10" data-link="https://buy.stripe.com/test_cNi00i3GR5RS9zVeGt14401">
+        <div class="cp-amount">£10</div><div class="cp-letters">~11 letters</div>
+      </div>
+      <div class="credit-pack popular" data-amount="20" data-link="https://buy.stripe.com/test_6oUaEW1yJgww5jFbuh14402">
+        <div class="cp-amount">£20</div><div class="cp-letters">~23 letters</div>
+      </div>
+      <div class="credit-pack" data-amount="25" data-link="https://buy.stripe.com/test_6oUeVc5OZbcc3bx0PD14403">
+        <div class="cp-amount">£25</div><div class="cp-letters">~28 letters</div>
+      </div>
+      <div class="credit-pack" data-amount="30" data-link="https://buy.stripe.com/test_dRmbJ03GR4NOdQb8i514404">
+        <div class="cp-amount">£30</div><div class="cp-letters">~34 letters</div>
+      </div>
+    </div>
+    <div class="credit-pack" style="margin-bottom:16px;" data-amount="50" data-link="https://buy.stripe.com/test_5kQdR83GR0xy6nJcyl14405">
+      <div class="cp-amount">£50</div><div class="cp-letters">~57 letters · Best value</div>
+    </div>
+    <button class="sheet-btn" id="topup-proceed">Proceed to Payment</button>
+  </div>
+</div>
+
+<!-- MAIL DETAIL SHEET -->
+<div class="sheet-overlay" id="detail-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="detail-hero-card">
+      <div class="dhc-emoji" id="detail-emoji">📬</div>
+      <div class="dhc-from" id="detail-from">—</div>
+      <div class="dhc-type" id="detail-type">—</div>
+      <div class="dhc-date" id="detail-date">—</div>
+    </div>
+    <div class="timeline" id="detail-timeline">
+      <div class="tl-step active"><div class="tl-icon">✅</div><div class="tl-label">Received</div><div class="tl-val" id="tl-received">—</div></div>
+      <div class="tl-step" id="tl-scanned-step"><div class="tl-icon">📄</div><div class="tl-label">Scanned</div><div class="tl-val" id="tl-scanned">—</div></div>
+      <div class="tl-step" id="tl-action-step"><div class="tl-icon">⏳</div><div class="tl-label">Awaiting</div><div class="tl-val">Your action</div></div>
+    </div>
+    <div class="price-box" id="detail-price-box" style="display:none;"></div>
+    <div class="action-list" id="detail-actions"></div>
+  </div>
+</div>
+
+<!-- Firebase + App Logic -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
+  authDomain: "forward-my-mail.firebaseapp.com",
+  projectId: "forward-my-mail",
+  storageBucket: "forward-my-mail.firebasestorage.app",
+  messagingSenderId: "933044287958",
+  appId: "1:933044287958:web:fa3a707dbec62b24e74c77"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ===== STATE =====
+let currentUser = null;
+let currentCustomer = null;
+let mailCache = [];
+let selectedPack = null;
+let pinBuffer = '';
+let setupPinFirst = '';
+let setupStep = 'first'; // 'first' | 'confirm'
+
+// ===== SCREEN MANAGEMENT =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+  });
+  const el = document.getElementById(id);
+  if (el) {
+    // Force reflow
+    setTimeout(() => el.classList.add('active'), 10);
+  }
+}
+
+// ===== TOAST =====
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ===== SPLASH =====
+setTimeout(() => {
+  // Check if user is already logged in
+  const savedPin = localStorage.getItem('fmm_pin');
+  const savedName = localStorage.getItem('fmm_name');
+  if (savedPin && savedName) {
+    document.getElementById('pin-user-name').textContent = savedName;
+    showScreen('screen-pin');
+  } else {
+    showScreen('screen-login');
+  }
+}, 2000);
+
+// ===== LOGIN =====
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  btn.classList.add('loading');
+  btn.disabled = true;
+  errEl.classList.remove('show');
+
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    currentUser = cred.user;
+    // Load customer data
+    await loadCustomerData(currentUser.uid);
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
+    // Check if PIN is set
+    const savedPin = localStorage.getItem('fmm_pin');
+    if (!savedPin) {
+      showScreen('screen-pin-setup');
+    } else {
+      goToApp();
+    }
+  } catch (err) {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    let msg = 'Sign in failed. Please try again.';
+    if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+      msg = 'Incorrect email or password.';
+    } else if (err.code === 'auth/too-many-requests') {
+      msg = 'Too many attempts. Please try again later.';
+    }
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+});
+
+document.getElementById('login-forgot').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) {
+    toast('Enter your email address first', 'error');
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast('Password reset email sent!', 'success');
+  } catch {
+    toast('Could not send reset email', 'error');
+  }
+});
+
+// ===== PIN SETUP =====
+function setupPinInput(val) {
+  if (pinBuffer.length < 4) pinBuffer += val;
+  updateSetupDots();
+  if (pinBuffer.length === 4) {
+    if (setupStep === 'first') {
+      setupPinFirst = pinBuffer;
+      pinBuffer = '';
+      setupStep = 'confirm';
+      document.getElementById('setup-pin-step').textContent = 'Confirm your PIN';
+      updateSetupDots();
+      setTimeout(() => {}, 300);
+    } else {
+      if (pinBuffer === setupPinFirst) {
+        localStorage.setItem('fmm_pin', pinBuffer);
+        toast('PIN set successfully!', 'success');
+        setTimeout(() => goToApp(), 400);
+      } else {
+        // Shake and reset
+        document.querySelectorAll('#setup-dots .pin-dot').forEach(d => d.classList.add('error'));
+        setTimeout(() => {
+          document.querySelectorAll('#setup-dots .pin-dot').forEach(d => d.classList.remove('error', 'filled'));
+          pinBuffer = '';
+          setupPinFirst = '';
+          setupStep = 'first';
+          document.getElementById('setup-pin-step').textContent = 'PINs did not match — try again';
+        }, 500);
+      }
+    }
+  }
+}
+
+function updateSetupDots() {
+  document.querySelectorAll('#setup-dots .pin-dot').forEach((d, i) => {
+    d.classList.toggle('filled', i < pinBuffer.length);
+  });
+}
+
+document.querySelectorAll('#screen-pin-setup .numpad-key[data-val]').forEach(k => {
+  k.addEventListener('click', () => setupPinInput(k.dataset.val));
+});
+document.getElementById('setup-delete').addEventListener('click', () => {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateSetupDots();
+});
+document.getElementById('skip-pin-btn').addEventListener('click', () => {
+  goToApp();
+});
+
+// ===== PIN LOGIN =====
+let pinEntry = '';
+
+function updatePinDots(entry, dotId = 'pin-dots') {
+  document.querySelectorAll(`#${dotId} .pin-dot`).forEach((d, i) => {
+    d.classList.toggle('filled', i < entry.length);
+    d.classList.remove('error');
+  });
+}
+
+function pinError() {
+  document.querySelectorAll('#pin-dots .pin-dot').forEach(d => {
+    d.classList.remove('filled');
+    d.classList.add('error');
+  });
+  setTimeout(() => {
+    document.querySelectorAll('#pin-dots .pin-dot').forEach(d => d.classList.remove('error'));
+    pinEntry = '';
+  }, 600);
+}
+
+document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
+  k.addEventListener('click', () => {
+    if (pinEntry.length < 4) {
+      pinEntry += k.dataset.pin;
+      updatePinDots(pinEntry);
+      if (pinEntry.length === 4) {
+        const saved = localStorage.getItem('fmm_pin');
+        if (pinEntry === saved) {
+          // Load user session if needed
+          onAuthStateChanged(auth, async (user) => {
+            if (user && !currentUser) {
+              currentUser = user;
+              await loadCustomerData(user.uid);
+            }
+            goToApp();
+          });
+          if (currentUser) {
+            loadCustomerData(currentUser.uid).then(() => goToApp());
+          }
+        } else {
+          pinError();
+        }
+      }
+    }
+  });
+});
+
+document.getElementById('pin-delete').addEventListener('click', () => {
+  pinEntry = pinEntry.slice(0, -1);
+  updatePinDots(pinEntry);
+});
+
+document.getElementById('biometric-btn').addEventListener('click', async () => {
+  if (window.PublicKeyCredential) {
+    toast('Biometric auth coming soon!');
+  } else {
+    toast('Biometrics not supported on this device');
+  }
+});
+
+document.getElementById('pin-use-password').addEventListener('click', (e) => {
+  e.preventDefault();
+  pinEntry = '';
+  showScreen('screen-login');
+});
+
+// ===== AUTH STATE (handles app reload) =====
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    // Already handled by splash logic
+  }
+});
+
+// ===== LOAD CUSTOMER DATA =====
+async function loadCustomerData(uid) {
+  try {
+    const docSnap = await getDoc(doc(db, 'customers', uid));
+    if (docSnap.exists()) {
+      currentCustomer = { id: uid, ...docSnap.data() };
+      localStorage.setItem('fmm_name', currentCustomer.firstName || currentCustomer.name || currentCustomer.email?.split('@')[0] || 'there');
+      return currentCustomer;
+    }
+  } catch (err) {
+    console.error('Error loading customer:', err);
+  }
+  return null;
+}
+
+// ===== GO TO APP =====
+function goToApp() {
+  pinBuffer = '';
+  pinEntry = '';
+  setupPinFirst = '';
+  setupStep = 'first';
+  showScreen('screen-app');
+  populateApp();
+  loadMailData();
+}
+
+// ===== POPULATE APP UI =====
+function populateApp() {
+  if (!currentCustomer) return;
+
+  const name = currentCustomer.firstName || currentCustomer.name || 'there';
+  const email = currentCustomer.email || '';
+  const credits = currentCustomer.credits || currentCustomer.creditBalance || 0;
+  const creditsDisplay = `£${parseFloat(credits).toFixed(2)}`;
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
+
+  // Greeting
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greet').textContent = greet;
+  document.getElementById('dash-name').textContent = name;
+  document.getElementById('dash-credit').textContent = creditsDisplay;
+  document.getElementById('dash-credit-sub').textContent = `~${Math.floor(parseFloat(credits) / 0.85)} standard letters`;
+
+  // Header
+  document.getElementById('user-avatar').textContent = initials;
+
+  // Account tab
+  document.getElementById('acct-name').textContent = currentCustomer.firstName && currentCustomer.lastName
+    ? `${currentCustomer.firstName} ${currentCustomer.lastName}`
+    : name;
+  document.getElementById('acct-email').textContent = email;
+  document.getElementById('acct-credit').textContent = creditsDisplay;
+  document.getElementById('acct-avatar').textContent = initials;
+  document.getElementById('acct-address').textContent = currentCustomer.forwardingAddress || 'Not set';
+}
+
+// ===== LOAD MAIL =====
+async function loadMailData() {
+  if (!currentUser) return;
+  try {
+    const q = query(
+      collection(db, 'mail'),
+      where('customerId', '==', currentUser.uid),
+      orderBy('receivedAt', 'desc'),
+      limit(20)
+    );
+    const snap = await getDocs(q);
+    mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderDashMail();
+    renderMailTab('all');
+    updateStats();
+  } catch (err) {
+    console.error('Error loading mail:', err);
+    // Show empty state
+    document.getElementById('dash-mail-list').innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
+    document.getElementById('mail-items-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
+    document.getElementById('stat-new').textContent = '0';
+    document.getElementById('stat-scanned').textContent = '0';
+    document.getElementById('stat-posted').textContent = '0';
+    document.getElementById('stat-shredded').textContent = '0';
+  }
+}
+
+function updateStats() {
+  document.getElementById('stat-new').textContent = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
+  document.getElementById('stat-scanned').textContent = mailCache.filter(m => m.status === 'scanned').length;
+  document.getElementById('stat-posted').textContent = mailCache.filter(m => m.status === 'posted').length;
+  document.getElementById('stat-shredded').textContent = mailCache.filter(m => m.status === 'shredded').length;
+
+  const newCount = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
+  document.querySelector('[data-tab="mail"]').classList.toggle('has-badge', newCount > 0);
+  document.getElementById('notif-badge').textContent = newCount;
+  document.getElementById('notif-badge').style.display = newCount > 0 ? 'flex' : 'none';
+}
+
+const SENDER_EMOJI = {
+  hmrc: '🏛️', 'companies house': '🏢', barclays: '🏦', lloyds: '🏦', natwest: '🏦',
+  hsbc: '🏦', santander: '🏦', amazon: '📦', royal mail: '✉️', default: '📬'
+};
+
+function getEmoji(sender) {
+  if (!sender) return '📬';
+  const s = sender.toLowerCase();
+  for (const [k, v] of Object.entries(SENDER_EMOJI)) {
+    if (s.includes(k)) return v;
+  }
+  return '📬';
+}
+
+function getBadgeClass(status) {
+  const map = { new: 'badge-new', received: 'badge-new', scanned: 'badge-scanned', posted: 'badge-posted', stored: 'badge-stored', shredded: 'badge-shredded' };
+  return map[status] || 'badge-new';
+}
+
+function getBadgeLabel(status) {
+  const map = { new: 'NEW', received: 'NEW', scanned: 'SCANNED', posted: 'POSTED', stored: 'STORED', shredded: 'SHREDDED' };
+  return map[status] || status?.toUpperCase() || 'NEW';
+}
+
+function renderDashMail() {
+  const list = document.getElementById('dash-mail-list');
+  if (!mailCache.length) {
+    list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
+    return;
+  }
+  list.innerHTML = mailCache.slice(0, 5).map(m => `
+    <div class="mail-row ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
+      <div class="mr-icon">${getEmoji(m.sender)}</div>
+      <div class="mr-body">
+        <div class="mr-from">${m.sender || 'Unknown Sender'}</div>
+        <div class="mr-desc">${m.description || m.type || 'Letter'}</div>
+      </div>
+      <div class="mr-badge ${getBadgeClass(m.status)}">${getBadgeLabel(m.status)}</div>
+    </div>
+  `).join('');
+}
+
+function renderMailTab(filter) {
+  const list = document.getElementById('mail-items-list');
+  let items = filter === 'all' ? mailCache : mailCache.filter(m => {
+    if (filter === 'new') return m.status === 'new' || m.status === 'received';
+    return m.status === filter;
+  });
+
+  if (!items.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No ${filter === 'all' ? '' : filter + ' '}mail</div>`;
+    return;
+  }
+
+  list.innerHTML = items.map(m => {
+    const isFree = m.isFreeOfficialMail || m.freeOfficial;
+    const actions = m.status === 'received' || m.status === 'new'
+      ? `<div class="mc-action primary" onclick="openDetail('${m.id}');event.stopPropagation()">📄 View</div>
+         <div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>
+         ${isFree ? `<div class="mc-action free">✓ Free (Official)</div>` : `<div class="mc-action" onclick="event.stopPropagation()">🗑️ Shred</div>`}`
+      : m.status === 'scanned'
+      ? `<div class="mc-action primary" onclick="openDetail('${m.id}');event.stopPropagation()">📄 View Scan</div>
+         <div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>`
+      : `<div class="mc-action primary">✓ ${getBadgeLabel(m.status)}</div>`;
+
+    return `
+      <div class="mail-card ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
+        <div class="mail-card-top">
+          <div class="mc-avatar">${getEmoji(m.sender)}</div>
+          <div class="mc-body">
+            <div class="mc-top">
+              <div class="mc-from">${m.sender || 'Unknown'}</div>
+              <div class="mc-date">${formatDate(m.receivedAt)}</div>
+            </div>
+            <div class="mc-subject">${m.description || m.type || 'Letter'}${m.pages ? ` · ${m.pages} page${m.pages > 1 ? 's' : ''}` : ''}</div>
+          </div>
+        </div>
+        <div class="mail-card-actions">${actions}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const today = new Date();
+  const diff = Math.floor((today - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+// ===== FILTER PILLS =====
+document.querySelectorAll('.filter-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    renderMailTab(pill.dataset.filter);
+  });
+});
+
+// ===== DETAIL SHEET =====
+window.openDetail = function(id) {
+  const m = mailCache.find(item => item.id === id);
+  if (!m) return;
+
+  document.getElementById('detail-emoji').textContent = getEmoji(m.sender);
+  document.getElementById('detail-from').textContent = m.sender || 'Unknown';
+  document.getElementById('detail-type').textContent = `${m.type || 'Letter'}${m.pages ? ` · ${m.pages} pages` : ''}`;
+  document.getElementById('detail-date').textContent = `Received ${formatDate(m.receivedAt)}`;
+
+  // Timeline
+  document.getElementById('tl-received').textContent = formatDate(m.receivedAt);
+  const scannedStep = document.getElementById('tl-scanned-step');
+  if (m.scannedAt) {
+    scannedStep.classList.add('active');
+    document.getElementById('tl-scanned').textContent = formatDate(m.scannedAt);
+  }
+
+  // Price box
+  const priceBox = document.getElementById('detail-price-box');
+  if (m.pages && m.status === 'scanned') {
+    const cost = m.pages === 1 ? 0.50 : 0.50 + (m.pages - 1) * 0.25;
+    priceBox.style.display = 'block';
+    priceBox.innerHTML = `<strong>Scanning:</strong> £0.50 first page · £0.25 per additional page<br><strong>Total deducted:</strong> £${cost.toFixed(2)} for ${m.pages} page${m.pages > 1 ? 's' : ''}`;
+  } else {
+    priceBox.style.display = 'none';
+  }
+
+  // Actions
+  const isFree = m.isFreeOfficialMail || m.freeOfficial;
+  let actionsHtml = '';
+  if (m.scanUrl) {
+    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${m.scanUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+  }
+  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
+  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
+  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
+
+  document.getElementById('detail-actions').innerHTML = actionsHtml;
+  openSheet('detail-sheet');
+};
+
+// ===== SHEETS =====
+function openSheet(id) {
+  const overlay = document.getElementById(id);
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => overlay.classList.add('visible'));
+  });
+}
+
+function closeSheet(id) {
+  const overlay = document.getElementById(id);
+  overlay.classList.remove('visible');
+  setTimeout(() => { overlay.style.display = 'none'; }, 350);
+}
+
+document.querySelectorAll('.sheet-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeSheet(overlay.id);
+  });
+});
+
+// ===== TOP-UP =====
+document.getElementById('topup-btn').addEventListener('click', () => openSheet('topup-sheet'));
+document.getElementById('acct-topup-row').addEventListener('click', () => openSheet('topup-sheet'));
+
+document.querySelectorAll('.credit-pack').forEach(pack => {
+  pack.addEventListener('click', () => {
+    document.querySelectorAll('.credit-pack').forEach(p => p.classList.remove('selected'));
+    pack.classList.add('selected');
+    selectedPack = { amount: pack.dataset.amount, link: pack.dataset.link };
+  });
+});
+
+document.getElementById('topup-proceed').addEventListener('click', () => {
+  if (!selectedPack) {
+    toast('Please select a credit pack', 'error');
+    return;
+  }
+  window.open(selectedPack.link, '_blank');
+  closeSheet('topup-sheet');
+  toast('Redirecting to secure payment...', 'success');
+});
+
+// ===== TAB NAV =====
+window.switchTab = function(tabName) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+  document.getElementById(`tab-${tabName}`).classList.add('active');
+};
+
+document.querySelectorAll('.nav-item').forEach(nav => {
+  nav.addEventListener('click', () => switchTab(nav.dataset.tab));
+});
+
+// ===== SIGN OUT =====
+document.getElementById('signout-row').addEventListener('click', async () => {
+  await signOut(auth);
+  currentUser = null;
+  currentCustomer = null;
+  mailCache = [];
+  localStorage.removeItem('fmm_pin');
+  localStorage.removeItem('fmm_name');
+  showScreen('screen-login');
+  toast('Signed out successfully');
+});
+
+// ===== CHANGE PIN =====
+document.getElementById('change-pin-row').addEventListener('click', () => {
+  pinBuffer = '';
+  setupStep = 'first';
+  setupPinFirst = '';
+  updateSetupDots();
+  document.getElementById('setup-pin-step').textContent = 'Enter new PIN';
+  showScreen('screen-pin-setup');
+});
+
+</script>
+</body>
+</html>
