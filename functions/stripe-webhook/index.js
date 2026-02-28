@@ -27,16 +27,22 @@ const sheets = google.sheets({ version: 'v4', auth });
 
 async function syncCustomerToSheet(customerId, customerData) {
   try {
+    const idCompleted = customerData.idStatus === 'approved'
+      ? (customerData.idApprovedAt ? new Date(customerData.idApprovedAt.toDate()).toLocaleDateString() : 'Yes')
+      : (customerData.idStatus === 'declined' ? 'Declined' : 'Pending');
+
     const values = [[
       customerData.name || '',
       customerData.email || '',
       customerData.company || '',
+      customerData.phone || '',
       customerData.mailboxId || '',
       customerData.package || 'None',
       customerData.credits || 0,
       customerData.totalSpent || 0,
       customerData.lastPurchaseDate ? new Date(customerData.lastPurchaseDate.toDate()).toLocaleDateString() : '',
       customerData.created ? new Date(customerData.created.toDate()).toLocaleDateString() : '',
+      idCompleted,
       ''
     ]];
 
@@ -51,7 +57,7 @@ async function syncCustomerToSheet(customerId, customerData) {
     if (rowIndex >= 0) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `Sheet1!A${rowIndex + 2}:J${rowIndex + 2}`,
+        range: `Sheet1!A${rowIndex + 2}:L${rowIndex + 2}`,
         valueInputOption: 'RAW',
         resource: { values },
       });
@@ -59,7 +65,7 @@ async function syncCustomerToSheet(customerId, customerData) {
     } else {
       await sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID,
-        range: 'Sheet1!A:J',
+        range: 'Sheet1!A:L',
         valueInputOption: 'RAW',
         resource: { values },
       });
@@ -414,7 +420,7 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
                 startRowIndex: actualRow - 1,
                 endRowIndex: actualRow,
                 startColumnIndex: 0,
-                endColumnIndex: 10
+                endColumnIndex: 12
               },
               cell: {
                 userEnteredFormat: {
@@ -429,7 +435,7 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
 
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `Sheet1!J${actualRow}`,
+        range: `Sheet1!L${actualRow}`,
         valueInputOption: 'RAW',
         resource: { values: [['DELETED']] },
       });
