@@ -481,7 +481,10 @@ const storage = getStorage(app);
       idStatusSel.value = String(cust.idStatus || 'pending');
       idRequiredSel.value = String(Boolean(cust.idGate));
       const lastUpd = tsToDate(cust.idStatusUpdatedAt);
-      idNote.textContent = lastUpd ? `Last updated: ${lastUpd.toLocaleString()}` : '';
+      const diditRef = cust.diditSessionId || '';
+      let noteText = lastUpd ? `Last updated: ${lastUpd.toLocaleString()}` : '';
+      if (diditRef) noteText += ` | Didit Ref: ${diditRef}`;
+      idNote.textContent = noteText;
     }
 
   // Save ID settings
