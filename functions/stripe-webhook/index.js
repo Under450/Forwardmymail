@@ -843,7 +843,7 @@ function buildLowCreditsEmail(name, balance) {
 
 async function getGoogleDriveClient() {
   const driveAuth = new google.auth.GoogleAuth({
-    scopes: ["https://www.googleapis.com/auth/drive.file"],
+    scopes: ["https://www.googleapis.com/auth/drive"],
   });
   return google.drive({ version: "v3", auth: driveAuth });
 }
@@ -1149,7 +1149,7 @@ exports.archiveMailItemToDrive = onDocumentCreated('mailItems/{mailItemId}', asy
 
     // Build Drive client
     const driveAuth = new google.auth.GoogleAuth({
-      scopes: ['https://www.googleapis.com/auth/drive.file'],
+      scopes: ['https://www.googleapis.com/auth/drive'],
     });
     const drive = google.drive({ version: 'v3', auth: driveAuth });
 
@@ -1165,10 +1165,22 @@ exports.archiveMailItemToDrive = onDocumentCreated('mailItems/{mailItemId}', asy
     const files = mailData.files || [];
     const uploadedFileNames = [];
 
+    const bucket = admin.storage().bucket('forward-my-mail.firebasestorage.app');
+
     for (const f of files) {
       if (!f.url) continue;
       try {
-        const fileBuffer = await fetchFileAsBuffer(f.url);
+        // Extract the storage path from the download URL
+        // URL format: https://firebasestorage.googleapis.com/v0/b/BUCKET/o/PATH?...
+        const urlObj = new URL(f.url);
+        const encodedPath = urlObj.pathname.split('/o/')[1];
+        if (!encodedPath) throw new Error('Could not parse storage path from URL');
+        const storagePath = decodeURIComponent(encodedPath);
+
+        // Download file buffer via Admin SDK (bypasses auth)
+        const file = bucket.file(storagePath);
+        const [fileBuffer] = await file.download();
+
         const bufStream = new stream.PassThrough();
         bufStream.end(fileBuffer);
 
