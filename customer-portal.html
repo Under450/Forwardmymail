@@ -558,9 +558,9 @@ function applyGateUI(data) {
     verifyPanel.style.display = shouldGate ? 'block' : 'none';
     if (startVerifyBtn) {
       if (status === 'pending') {
-        startVerifyBtn.textContent = '⏳ Verification In Progress...';
-        startVerifyBtn.disabled = true;
-        if (verifyStatus) verifyStatus.textContent = 'Your documents are being reviewed. We will email you once complete.';
+        startVerifyBtn.textContent = '⏳ Continue Verification →';
+        startVerifyBtn.disabled = false;
+        if (verifyStatus) verifyStatus.textContent = 'Your verification is in progress. Click to continue or check your status.';
       } else if (status === 'declined' || status === 'failed') {
         startVerifyBtn.textContent = 'Try Again — Complete Verification →';
         startVerifyBtn.disabled = false;
@@ -735,10 +735,8 @@ function applyGateUI(data) {
 
       const { sessionUrl } = await response.json();
 
-      // Show iframe with Didit session
-      diditFrame.src = sessionUrl;
-      diditContainer.style.display = 'block';
-      startVerifyBtn.style.display = 'none';
+      // Open Didit verification in new tab
+      window.open(sessionUrl, '_blank');
 
       // Update Firestore status to pending
       await updateDoc(doc(db, 'customers', currentUser.uid), {
