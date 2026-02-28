@@ -1086,3 +1086,158 @@ function buildAutoShredEmail(name, mailItem) {
     <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6PS</div>
   </div></body></html>`;
 }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// GOOGLE DRIVE ARCHIVE — triggers on every new mailItem logged by staff
+// Saves: (1) the scanned file, (2) a text record — both under customer folder
+// ═════════════════════════════════════════════════════════════════════════════
+
+const https = require('https');
+const http = require('http');
+
+function fetchFileAsBuffer(url) {
+  return new Promise((resolve, reject) => {
+    const client = url.startsWith('https') ? https : http;
+    client.get(url, (res) => {
+      const chunks = [];
+      res.on('data', chunk => chunks.push(chunk));
+      res.on('end', () => resolve(Buffer.concat(chunks)));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+async function getOrCreateFolder(drive, name, parentId) {
+  const q = parentId
+    ? `name='${name}' and '${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`
+    : `name='${name}' and mimeType='application/vnd.google-apps.folder' and trashed=false`;
+
+  const res = await drive.files.list({ q, fields: 'files(id)', pageSize: 1 });
+  if (res.data.files.length > 0) return res.data.files[0].id;
+
+  const folder = await drive.files.create({
+    resource: {
+      name,
+      mimeType: 'application/vnd.google-apps.folder',
+      ...(parentId ? { parents: [parentId] } : {})
+    },
+    fields: 'id'
+  });
+  return folder.data.id;
+}
+
+exports.archiveMailItemToDrive = onDocumentCreated('mailItems/{mailItemId}', async (event) => {
+  const mailData = event.data.data();
+  const mailItemId = event.params.mailItemId;
+
+  if (!mailData || !mailData.customerId) {
+    console.log('No customer ID on mail item, skipping archive');
+    return;
+  }
+
+  try {
+    // Get customer details
+    const customerDoc = await db.collection('customers').doc(mailData.customerId).get();
+    if (!customerDoc.exists) {
+      console.log(`Customer ${mailData.customerId} not found, skipping archive`);
+      return;
+    }
+    const customer = customerDoc.data();
+    const customerName = customer.name || 'Unknown';
+    const mailboxId = customer.mailboxId || mailData.customerId;
+    const folderName = `${mailboxId} — ${customerName}`;
+
+    // Build Drive client
+    const driveAuth = new google.auth.GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/drive.file'],
+    });
+    const drive = google.drive({ version: 'v3', auth: driveAuth });
+
+    // Get/create folder structure: FMM Mail Archive / [Customer Folder]
+    const rootId = await getOrCreateFolder(drive, 'FMM Mail Archive', null);
+    const customerFolderId = await getOrCreateFolder(drive, folderName, rootId);
+
+    const processedDate = mailData.processedAt
+      ? new Date(mailData.processedAt.toDate()).toLocaleDateString('en-GB')
+      : new Date().toLocaleDateString('en-GB');
+
+    // 1. Upload each scanned file to Drive
+    const files = mailData.files || [];
+    const uploadedFileNames = [];
+
+    for (const f of files) {
+      if (!f.url) continue;
+      try {
+        const fileBuffer = await fetchFileAsBuffer(f.url);
+        const bufStream = new stream.PassThrough();
+        bufStream.end(fileBuffer);
+
+        const mimeType = f.type || 'application/octet-stream';
+        const safeName = `${processedDate.replace(/\//g, '-')} — ${f.name}`;
+
+        await drive.files.create({
+          resource: { name: safeName, parents: [customerFolderId] },
+          media: { mimeType, body: bufStream },
+          fields: 'id'
+        });
+
+        uploadedFileNames.push(safeName);
+        console.log(`Archived file ${safeName} for customer ${customerName}`);
+      } catch (fileErr) {
+        console.error(`Failed to archive file ${f.name}:`, fileErr.message);
+      }
+    }
+
+    // 2. Create text record summarising the mail item
+    const textRecord = `FORWARD MY MAIL — MAIL ITEM ARCHIVE RECORD
+============================================
+Customer:    ${customerName}
+Company:     ${customer.company || 'N/A'}
+Mailbox ID:  ${mailboxId}
+Email:       ${customer.email || 'N/A'}
+
+Mail Item ID:   ${mailItemId}
+Processed:      ${processedDate}
+Processed by:   ${mailData.processedBy || 'staff'}
+Pages:          ${mailData.pages || 1}
+Letter type:    ${mailData.letterType || 'N/A'}
+Cost charged:   £${(mailData.cost || 0).toFixed(2)}${mailData.freeScanUsed ? ' (free scan)' : ''}
+Notes:          ${mailData.notes || 'None'}
+Status:         ${mailData.status || 'scanned'}
+
+Files archived: ${uploadedFileNames.length > 0 ? uploadedFileNames.join(', ') : 'No files uploaded'}
+
+This record was created automatically when staff processed this mail item.
+Archive created: ${new Date().toLocaleString('en-GB')}
+============================================`;
+
+    const textStream = new stream.PassThrough();
+    textStream.end(Buffer.from(textRecord, 'utf8'));
+
+    const recordName = `${processedDate.replace(/\//g, '-')} — Record — ${mailItemId.slice(0, 8)}`;
+    await drive.files.create({
+      resource: { name: recordName, parents: [customerFolderId] },
+      media: { mimeType: 'text/plain', body: textStream },
+      fields: 'id'
+    });
+
+    console.log(`Drive archive complete for mail item ${mailItemId} (${customerName})`);
+
+    // Mark the Firestore doc as archived
+    await event.data.ref.update({
+      driveArchived: true,
+      driveArchivedAt: admin.firestore.FieldValue.serverTimestamp(),
+      driveFolderName: folderName
+    });
+
+  } catch (err) {
+    console.error(`Drive archive failed for mail item ${mailItemId}:`, err);
+    // Log failure so staff can manually recover
+    await db.collection('driveArchiveErrors').add({
+      mailItemId,
+      customerId: mailData.customerId,
+      error: err.message,
+      timestamp: admin.firestore.FieldValue.serverTimestamp()
+    });
+  }
+});
