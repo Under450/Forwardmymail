@@ -79,7 +79,9 @@ app.post('/createDiditSession', async (req, res) => {
       idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
     });
 
-    return res.status(200).json({ sessionUrl: session.verification_url });
+    const sessionUrl = session.verification_url || session.url;
+    console.log('Session URL:', sessionUrl);
+    return res.status(200).json({ sessionUrl });
 
   } catch (err) {
     console.error('createDiditSession error:', err);
