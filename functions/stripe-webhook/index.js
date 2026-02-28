@@ -5,7 +5,6 @@ const admin = require('firebase-admin');
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
-const serviceAccount = require('./serviceAccountKey.json');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECRETS — never hardcoded here. Set as environment variables in Google Cloud.
@@ -18,11 +17,10 @@ const EMAIL_PASS     = process.env.EMAIL_PASS;
 admin.initializeApp();
 const db = admin.firestore();
 
-// ── Google Sheets setup ──────────────────────────────────────────────────────
+// ── Google Sheets setup (uses Application Default Credentials on Cloud Run) ──
 const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
 const auth = new google.auth.GoogleAuth({
-  credentials: serviceAccount,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  scopes: ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive.file'],
 });
 const sheets = google.sheets({ version: 'v4', auth });
 
@@ -836,12 +834,12 @@ function buildLowCreditsEmail(name, balance) {
 // stream already required at top
 
 async function getGoogleDriveClient() {
-  const auth = new google.auth.GoogleAuth({
-    keyFile: './serviceAccountKey.json',
-    scopes: ['https://www.googleapis.com/auth/drive.file'],
+  const driveAuth = new google.auth.GoogleAuth({
+    scopes: ["https://www.googleapis.com/auth/drive.file"],
   });
-  return google.drive({ version: 'v3', auth });
+  return google.drive({ version: "v3", auth: driveAuth });
 }
+
 
 async function archiveMailToDrive(mailItem, customerData) {
   const drive = await getGoogleDriveClient();
