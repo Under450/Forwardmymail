@@ -109,18 +109,20 @@ app.post('/diditWebhook', async (req, res) => {
 
     const payload = req.body;
     const sessionId  = payload.session_id;
-    const status     = (payload.status || '').toLowerCase();
+    const status     = (payload.status || payload.decision?.status || '').toLowerCase();
+    console.log('Didit webhook status:', payload.status, '→ normalized:', status);
     const customerId = payload.vendor_data;
 
     if (!customerId) return res.status(400).send('Missing vendor_data');
 
     let idStatus = 'pending';
     let idGate   = true;
-    if (status === 'approved') { idStatus = 'approved'; idGate = false; }
-    else if (['declined','rejected','expired'].includes(status)) { idStatus = 'declined'; idGate = true; }
+    if (['approved','approve'].includes(status)) { idStatus = 'approved'; idGate = false; }
+    else if (['declined','rejected','expired','decline','reject'].includes(status)) { idStatus = 'declined'; idGate = true; }
 
     await db.collection('customers').doc(customerId).update({
       idStatus, idGate,
+      idRequired: idGate,
       idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
       diditSessionId: sessionId,
       diditResult: payload
