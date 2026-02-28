@@ -1,5 +1,6 @@
 const stream = require('stream');
 const functions = require('firebase-functions');
+const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
 const { onDocumentCreated, onDocumentDeleted } = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
 const cors = require('cors')({ origin: true });
@@ -110,7 +111,7 @@ async function sendWelcomeEmail(email, name, mailboxId, company) {
 }
 
 // ── createCheckoutSession ────────────────────────────────────────────────────
-exports.createCheckoutSession = functions.https.onRequest((req, res) => {
+exports.createCheckoutSession = onRequest((req, res) => {
   cors(req, res, async () => {
     if (req.method !== 'POST') {
       return res.status(405).json({ error: 'Method not allowed' });
@@ -171,7 +172,7 @@ exports.createCheckoutSession = functions.https.onRequest((req, res) => {
 });
 
 // ── stripeWebhook ────────────────────────────────────────────────────────────
-exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
+exports.stripeWebhook = onRequest(async (req, res) => {
   if (!WEBHOOK_SECRET) {
     console.error('STRIPE_WEBHOOK_SECRET env var not set');
     return res.status(500).send('Webhook secret not configured');
@@ -332,11 +333,12 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
 });
 
 // ── sendWelcomeEmail (callable) ──────────────────────────────────────────────
-exports.sendWelcomeEmail = functions.https.onCall(async (data, context) => {
+exports.sendWelcomeEmail = onCall(async (request) => {
+  const data = request.data;
   const { email, name, mailboxId } = data;
 
   if (!email || !name || !mailboxId) {
-    throw new functions.https.HttpsError('invalid-argument', 'Missing required fields');
+    throw new HttpsError('invalid-argument', 'Missing required fields');
   }
 
   await sendWelcomeEmail(email, name, mailboxId);
@@ -442,7 +444,7 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
 // ── createDiditSession ────────────────────────────────────────────────────────
 // Called by customer portal when customer clicks "Complete Your ID Verification"
 // Creates a Didit verification session and returns the session URL
-exports.createDiditSession = functions.https.onRequest(async (req, res) => {
+exports.createDiditSession = onRequest(async (req, res) => {
   // CORS
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -512,7 +514,7 @@ exports.createDiditSession = functions.https.onRequest(async (req, res) => {
 // ── diditWebhook ──────────────────────────────────────────────────────────────
 // Called by Didit when verification is complete (approved or declined)
 // Updates customer Firestore doc and lifts or keeps the gate
-exports.diditWebhook = functions.https.onRequest(async (req, res) => {
+exports.diditWebhook = onRequest(async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
