@@ -889,8 +889,8 @@ function toast(msg, type = '') {
 }
 
 // ===== SPLASH =====
+// Splash → Login (always go to login first, PIN check happens after auth)
 setTimeout(() => {
-  // Check if user is already logged in
   const savedPin = localStorage.getItem('fmm_pin');
   const savedName = localStorage.getItem('fmm_name');
   if (savedPin && savedName) {
@@ -899,7 +899,15 @@ setTimeout(() => {
   } else {
     showScreen('screen-login');
   }
-}, 2000);
+}, 2500);
+
+// Safety fallback — if still on splash after 5s, force to login
+setTimeout(() => {
+  const splash = document.getElementById('screen-splash');
+  if (splash.classList.contains('active')) {
+    showScreen('screen-login');
+  }
+}, 5000);
 
 // ===== LOGIN =====
 document.getElementById('login-btn').addEventListener('click', async () => {
@@ -1183,7 +1191,7 @@ function updateStats() {
 
 const SENDER_EMOJI = {
   hmrc: '🏛️', 'companies house': '🏢', barclays: '🏦', lloyds: '🏦', natwest: '🏦',
-  hsbc: '🏦', santander: '🏦', amazon: '📦', royal mail: '✉️', default: '📬'
+  hsbc: '🏦', santander: '🏦', amazon: '📦', 'royal mail': '✉️', default: '📬'
 };
 
 function getEmoji(sender) {
@@ -1237,14 +1245,20 @@ function renderMailTab(filter) {
 
   list.innerHTML = items.map(m => {
     const isFree = m.isFreeOfficialMail || m.freeOfficial;
-    const actions = m.status === 'received' || m.status === 'new'
-      ? `<div class="mc-action primary" onclick="openDetail('${m.id}');event.stopPropagation()">📄 View</div>
-         <div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>
-         ${isFree ? `<div class="mc-action free">✓ Free (Official)</div>` : `<div class="mc-action" onclick="event.stopPropagation()">🗑️ Shred</div>`}`
-      : m.status === 'scanned'
-      ? `<div class="mc-action primary" onclick="openDetail('${m.id}');event.stopPropagation()">📄 View Scan</div>
-         <div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>`
-      : `<div class="mc-action primary">✓ ${getBadgeLabel(m.status)}</div>`;
+    let actions;
+    if (m.status === 'received' || m.status === 'new') {
+      const freeTag = isFree
+        ? '<div class="mc-action free">✓ Free (Official)</div>'
+        : '<div class="mc-action" onclick="event.stopPropagation()">🗑️ Shred</div>';
+      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View</div>'
+        + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>'
+        + freeTag;
+    } else if (m.status === 'scanned') {
+      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>'
+        + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>';
+    } else {
+      actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
+    }
 
     return `
       <div class="mail-card ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
@@ -1290,7 +1304,7 @@ window.openDetail = function(id) {
 
   document.getElementById('detail-emoji').textContent = getEmoji(m.sender);
   document.getElementById('detail-from').textContent = m.sender || 'Unknown';
-  document.getElementById('detail-type').textContent = `${m.type || 'Letter'}${m.pages ? ` · ${m.pages} pages` : ''}`;
+  document.getElementById('detail-type').textContent = (m.type || 'Letter') + (m.pages ? ' · ' + m.pages + ' pages' : '');
   document.getElementById('detail-date').textContent = `Received ${formatDate(m.receivedAt)}`;
 
   // Timeline
