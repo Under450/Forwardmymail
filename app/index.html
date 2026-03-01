@@ -1284,7 +1284,10 @@ function renderMailTab(filter) {
         + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
-      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>'
+      const canView = (currentCustomer?.credits || 0) >= 0;
+      actions = (canView
+        ? '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>'
+        : '<div class="mc-action" style="opacity:0.4;cursor:not-allowed" onclick="event.stopPropagation()">🔒 Top Up</div>')
         + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>';
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
