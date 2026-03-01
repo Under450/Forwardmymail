@@ -1574,8 +1574,7 @@ document.getElementById('signout-row').addEventListener('click', async () => {
   currentUser = null;
   currentCustomer = null;
   mailCache = [];
-  localStorage.removeItem('fmm_pin');
-  localStorage.removeItem('fmm_name');
+  // Keep PIN + name so re-login goes to PIN entry, not setup
   showScreen('screen-login');
   toast('Signed out successfully');
 });
