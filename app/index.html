@@ -172,14 +172,14 @@ html, body {
 /* ===== PIN SETUP SCREEN ===== */
 #screen-pin-setup {
   background: var(--brand);
-  padding: calc(var(--safe-top) + 60px) 28px calc(var(--safe-bottom) + 24px);
+  padding: calc(var(--safe-top) + 40px) 20px calc(var(--safe-bottom) + 24px);
   align-items: center;
 }
 
 /* ===== PIN LOGIN SCREEN ===== */
 #screen-pin {
   background: var(--brand);
-  padding: calc(var(--safe-top) + 40px) 28px calc(var(--safe-bottom) + 24px);
+  padding: calc(var(--safe-top) + 40px) 20px calc(var(--safe-bottom) + 24px);
   align-items: center;
   justify-content: space-between;
 }
@@ -197,7 +197,7 @@ html, body {
 .pin-dot.error { background: var(--red); border-color: var(--red); animation: shake 0.4s ease; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-5px)} 40%,80%{transform:translateX(5px)} }
 
-.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 320px; margin: 0 auto; }
 .numpad-key {
   aspect-ratio: 1; border-radius: 50%; border: none;
   background: rgba(255,255,255,0.1); color: #fff;
@@ -897,7 +897,7 @@ html, body {
         <textarea id="action-note" rows="3" placeholder="e.g. Please use recorded delivery..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;resize:none;font-family:inherit;box-sizing:border-box;"></textarea>
       </div>
       <button id="action-confirm-btn" class="btn-primary" style="width:100%;margin-bottom:8px;">Confirm Request</button>
-      <button onclick="closeSheet('action-sheet')" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;">Cancel</button>
+      <button id="action-cancel-btn" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;">Cancel</button>
     </div>
   </div>
 </div>
@@ -913,7 +913,7 @@ html, body {
         <textarea id="address-input" rows="4" placeholder="Enter your full postal address..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;resize:none;font-family:inherit;box-sizing:border-box;"></textarea>
       </div>
       <button id="address-save-btn" class="btn-primary" style="width:100%;margin-bottom:8px;">Save Address</button>
-      <button onclick="closeSheet('address-sheet')" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;">Cancel</button>
+      <button id="address-cancel-btn" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;">Cancel</button>
     </div>
   </div>
 </div>
@@ -1499,9 +1499,18 @@ document.getElementById('topup-proceed').addEventListener('click', async () => {
       })
     });
     const session = await response.json();
-    closeSheet('topup-sheet');
-    window.location.href = 'https://checkout.stripe.com/pay/' + session.id;
+    if (session.url) {
+      closeSheet('topup-sheet');
+      window.location.href = session.url;
+    } else if (session.id) {
+      closeSheet('topup-sheet');
+      const stripe = window.Stripe('pk_live_51QWDNrGpXMkF4r4tq1I0T6qJE0YIjXCL3uFjmjjOHxHRAFJZV0vFrOEiX8hFkOdMQAo7k7w8XT6tBwVPu3hR00yGFuB4Pg');
+      await stripe.redirectToCheckout({ sessionId: session.id });
+    } else {
+      throw new Error('No session returned');
+    }
   } catch (err) {
+    console.error('Payment error:', err);
     toast('Payment error. Please try again.', 'error');
     btn.textContent = 'Continue to Payment';
     btn.disabled = false;
@@ -1553,6 +1562,29 @@ document.getElementById('change-pin-row').addEventListener('click', () => {
   document.getElementById('setup-pin-step').textContent = 'Enter new PIN';
   showScreen('screen-pin-setup');
 });
+
+// ===== CHANGE PASSWORD =====
+document.querySelector('[data-tab="account"] .settings-row:has(.sr-title)')
+// Find change password row by its content
+document.querySelectorAll('.settings-row').forEach(row => {
+  const title = row.querySelector('.sr-title');
+  if (title && title.textContent === 'Change Password') {
+    row.addEventListener('click', async () => {
+      const email = currentUser?.email;
+      if (!email) return;
+      try {
+        await sendPasswordResetEmail(auth, email);
+        toast('Password reset email sent to ' + email, 'success');
+      } catch(e) {
+        toast('Failed to send reset email', 'error');
+      }
+    });
+  }
+});
+
+// ===== CANCEL BUTTONS =====
+document.getElementById('action-cancel-btn').addEventListener('click', () => closeSheet('action-sheet'));
+document.getElementById('address-cancel-btn').addEventListener('click', () => closeSheet('address-sheet'));
 
 // ===== FORWARDING ADDRESS =====
 document.getElementById('address-row').addEventListener('click', () => {
