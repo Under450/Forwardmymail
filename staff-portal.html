@@ -274,7 +274,7 @@
 
 
         <!-- ===== MAIL REQUESTS SECTION ===== -->
-        <div class="requests-section" id="mailRequestsSection">
+        <div class="requests-section" id="mailRequestsSection" style="display:none;">
           <div class="requests-header">
             <h3>📥 Mail Requests</h3>
             <span class="pending-badge zero" id="reqPendingBadge">0 pending</span>
@@ -462,6 +462,7 @@ const storage = getStorage(app);
       recentActivity.style.display='block';
       freeScansPanel.style.display='block';
       idPanel.style.display='block';
+      document.getElementById('mailRequestsSection').style.display='block';
       await loadRecentActivity(id);
 
       if (unsubscribeCustomer) unsubscribeCustomer();
