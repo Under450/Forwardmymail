@@ -742,9 +742,9 @@ html, body {
               <div class="sr-body"><div class="sr-title">Top Up Credits</div><div class="sr-sub">Buy more scanning & posting credit</div></div>
               <div class="sr-arrow">›</div>
             </div>
-            <div class="settings-row">
+            <div class="settings-row" id="address-row">
               <div class="sr-icon navy">📍</div>
-              <div class="sr-body"><div class="sr-title">Forwarding Address</div><div class="sr-sub" id="acct-address">Loading...</div></div>
+              <div class="sr-body"><div class="sr-title">Forwarding Address</div><div class="sr-sub" id="acct-address">Tap to set</div></div>
               <div class="sr-arrow">›</div>
             </div>
           </div>
@@ -767,7 +767,7 @@ html, body {
         <div class="settings-section">
           <div class="settings-label">Support</div>
           <div class="settings-group">
-            <div class="settings-row">
+            <div class="settings-row" id="contact-row">
               <div class="sr-icon green">💬</div>
               <div class="sr-body"><div class="sr-title">Contact Us</div><div class="sr-sub">Get help with your mail</div></div>
               <div class="sr-arrow">›</div>
@@ -847,6 +847,76 @@ html, body {
   </div>
 </div>
 
+
+<!-- Contact Us Sheet -->
+<div class="sheet-overlay" id="contact-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div style="padding:0 20px 20px">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;">Contact Us</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">We'll reply within 1 business day</p>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">Subject</label>
+        <select id="contact-subject" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:#fff;">
+          <option value="">Select a topic...</option>
+          <option value="Scan quality issue">Scan quality issue</option>
+          <option value="Missing mail">Missing mail</option>
+          <option value="Forwarding question">Forwarding question</option>
+          <option value="Billing / credits">Billing / credits</option>
+          <option value="Account change">Account change</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">Message</label>
+        <textarea id="contact-message" rows="5" placeholder="How can we help?" style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;resize:none;font-family:inherit;box-sizing:border-box;"></textarea>
+      </div>
+      <button id="contact-send-btn" class="btn-primary" style="width:100%;">Send Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- Action Confirmation Sheet (Post / Keep / Shred) -->
+<div class="sheet-overlay" id="action-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div style="padding:0 20px 20px">
+      <div id="action-sheet-icon" style="font-size:36px;text-align:center;margin-bottom:8px;">📦</div>
+      <h2 id="action-sheet-title" style="font-size:18px;font-weight:700;text-align:center;margin-bottom:4px;">Post to Me</h2>
+      <p id="action-sheet-desc" style="font-size:13px;color:var(--text-muted);text-align:center;margin-bottom:16px;">We'll post this to your forwarding address</p>
+      <div id="action-sheet-address-block" style="display:none;background:var(--off);border-radius:10px;padding:12px;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:600;color:var(--text-muted);margin-bottom:2px;">POSTING TO</div>
+        <div id="action-sheet-address" style="font-size:13px;font-weight:600;color:var(--text);"></div>
+      </div>
+      <div id="action-sheet-cost-block" style="background:var(--off);border-radius:10px;padding:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:13px;color:var(--text-muted);">Estimated cost</span>
+        <span id="action-sheet-cost" style="font-size:15px;font-weight:700;color:var(--brand);">From £0.85</span>
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px;font-weight:600;color:var(--text-muted);display:block;margin-bottom:4px;">Notes / Instructions (optional)</label>
+        <textarea id="action-note" rows="3" placeholder="e.g. Please use recorded delivery..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;resize:none;font-family:inherit;box-sizing:border-box;"></textarea>
+      </div>
+      <button id="action-confirm-btn" class="btn-primary" style="width:100%;margin-bottom:8px;">Confirm Request</button>
+      <button onclick="closeSheet('action-sheet')" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Forwarding Address Sheet -->
+<div class="sheet-overlay" id="address-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div style="padding:0 20px 20px">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;">Forwarding Address</h2>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">This is where we'll post your mail when you request forwarding</p>
+      <div style="margin-bottom:16px;">
+        <textarea id="address-input" rows="4" placeholder="Enter your full postal address..." style="width:100%;padding:12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;resize:none;font-family:inherit;box-sizing:border-box;"></textarea>
+      </div>
+      <button id="address-save-btn" class="btn-primary" style="width:100%;margin-bottom:8px;">Save Address</button>
+      <button onclick="closeSheet('address-sheet')" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;">Cancel</button>
+    </div>
+  </div>
+</div>
 <!-- Firebase + App Logic -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1369,9 +1439,9 @@ window.openDetail = function(id) {
       actionsHtml += `<div class="action-row" style="opacity:0.5;cursor:not-allowed"><div class="ar-left"><div class="ar-icon">🔒</div><div><div class="ar-title">Top Up to View Scan</div><div class="ar-sub">Add credits to your account to view</div></div></div><div class="ar-cost" style="color:#e53935">No credit</div></div>`;
     }
   }
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="openActionSheet('post','${m.id}')"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="openActionSheet('keep','${m.id}')"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="openActionSheet('shred','${m.id}')"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
 
   document.getElementById('detail-actions').innerHTML = actionsHtml;
   openSheet('detail-sheet');
@@ -1482,6 +1552,176 @@ document.getElementById('change-pin-row').addEventListener('click', () => {
   updateSetupDots();
   document.getElementById('setup-pin-step').textContent = 'Enter new PIN';
   showScreen('screen-pin-setup');
+});
+
+// ===== FORWARDING ADDRESS =====
+document.getElementById('address-row').addEventListener('click', () => {
+  const current = currentCustomer?.forwardingAddress || '';
+  document.getElementById('address-input').value = current;
+  openSheet('address-sheet');
+});
+
+document.getElementById('address-save-btn').addEventListener('click', async () => {
+  const addr = document.getElementById('address-input').value.trim();
+  if (!addr) { toast('Please enter your address', 'error'); return; }
+  const btn = document.getElementById('address-save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  try {
+    const { updateDoc, doc: fdoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    await updateDoc(fdoc(db, 'customers', currentUser.uid), { forwardingAddress: addr });
+    currentCustomer.forwardingAddress = addr;
+    document.getElementById('acct-address').textContent = addr;
+    closeSheet('address-sheet');
+    toast('Address saved!', 'success');
+  } catch(e) {
+    toast('Failed to save address', 'error');
+  } finally {
+    btn.textContent = 'Save Address'; btn.disabled = false;
+  }
+});
+
+// ===== CONTACT US =====
+document.getElementById('contact-row').addEventListener('click', () => {
+  document.getElementById('contact-subject').value = '';
+  document.getElementById('contact-message').value = '';
+  openSheet('contact-sheet');
+});
+
+document.getElementById('contact-send-btn').addEventListener('click', async () => {
+  const subject = document.getElementById('contact-subject').value;
+  const message = document.getElementById('contact-message').value.trim();
+  if (!subject) { toast('Please select a subject', 'error'); return; }
+  if (!message) { toast('Please enter a message', 'error'); return; }
+  const btn = document.getElementById('contact-send-btn');
+  btn.textContent = 'Sending...'; btn.disabled = true;
+  try {
+    const { addDoc, collection: fcol, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    await addDoc(fcol(db, 'support'), {
+      customerId: currentUser.uid,
+      customerEmail: currentUser.email,
+      customerName: currentCustomer?.name || '',
+      mailboxId: currentCustomer?.mailboxId || '',
+      subject,
+      message,
+      status: 'open',
+      createdAt: serverTimestamp()
+    });
+    closeSheet('contact-sheet');
+    toast('Message sent! We\'ll reply within 1 business day.', 'success');
+  } catch(e) {
+    toast('Failed to send message', 'error');
+  } finally {
+    btn.textContent = 'Send Message'; btn.disabled = false;
+  }
+});
+
+// ===== POST / KEEP / SHRED =====
+let currentActionMailId = null;
+let currentActionType = null;
+
+window.openActionSheet = function(type, mailId) {
+  currentActionMailId = mailId;
+  currentActionType = type;
+  const configs = {
+    post: {
+      icon: '📦',
+      title: 'Post to Me',
+      desc: "We\'ll post this to your forwarding address",
+      cost: 'From £0.85',
+      showAddress: true
+    },
+    keep: {
+      icon: '📁',
+      title: 'Keep & Store',
+      desc: 'Your mail will be held securely at our facility',
+      cost: 'No charge',
+      showAddress: false
+    },
+    shred: {
+      icon: '🗑️',
+      title: 'Secure Shred',
+      desc: 'Your mail will be confidentially destroyed',
+      cost: 'Free',
+      showAddress: false
+    }
+  };
+  const c = configs[type];
+  document.getElementById('action-sheet-icon').textContent = c.icon;
+  document.getElementById('action-sheet-title').textContent = c.title;
+  document.getElementById('action-sheet-desc').textContent = c.desc;
+  document.getElementById('action-sheet-cost').textContent = c.cost;
+  document.getElementById('action-note').value = '';
+
+  const addrBlock = document.getElementById('action-sheet-address-block');
+  if (c.showAddress) {
+    const addr = currentCustomer?.forwardingAddress;
+    if (addr) {
+      document.getElementById('action-sheet-address').textContent = addr;
+      addrBlock.style.display = 'block';
+    } else {
+      addrBlock.style.display = 'none';
+    }
+  } else {
+    addrBlock.style.display = 'none';
+  }
+
+  closeSheet('detail-sheet');
+  openSheet('action-sheet');
+};
+
+document.getElementById('action-confirm-btn').addEventListener('click', async () => {
+  if (!currentActionMailId || !currentActionType) return;
+
+  if (currentActionType === 'post' && !currentCustomer?.forwardingAddress) {
+    toast('Please set your forwarding address first', 'error');
+    closeSheet('action-sheet');
+    openSheet('address-sheet');
+    return;
+  }
+
+  const btn = document.getElementById('action-confirm-btn');
+  btn.textContent = 'Submitting...'; btn.disabled = true;
+
+  try {
+    const { addDoc, updateDoc, collection: fcol, doc: fdoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    const note = document.getElementById('action-note').value.trim();
+    const actionLabels = { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' };
+
+    // Create request in Firestore
+    await addDoc(fcol(db, 'mailRequests'), {
+      mailId: currentActionMailId,
+      customerId: currentUser.uid,
+      customerEmail: currentUser.email,
+      customerName: currentCustomer?.name || '',
+      mailboxId: currentCustomer?.mailboxId || '',
+      action: currentActionType,
+      actionLabel: actionLabels[currentActionType],
+      forwardingAddress: currentCustomer?.forwardingAddress || '',
+      note: note,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+
+    // Update mail status
+    const statusMap = { post: 'post_requested', keep: 'keep_requested', shred: 'shred_requested' };
+    await updateDoc(fdoc(db, 'mail', currentActionMailId), {
+      status: statusMap[currentActionType],
+      actionRequestedAt: serverTimestamp()
+    });
+
+    // Update local cache
+    const cached = mailCache.find(m => m.id === currentActionMailId);
+    if (cached) cached.status = statusMap[currentActionType];
+
+    closeSheet('action-sheet');
+    renderMailTab(document.querySelector('.filter-pill.active')?.dataset.filter || 'all');
+    toast(actionLabels[currentActionType] + ' request submitted!', 'success');
+  } catch(e) {
+    console.error(e);
+    toast('Failed to submit request', 'error');
+  } finally {
+    btn.textContent = 'Confirm Request'; btn.disabled = false;
+  }
 });
 
 </script>
