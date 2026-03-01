@@ -621,7 +621,7 @@ function applyGateUI(data) {
           const status = item.status || 'scanned';
           const files = item.files || [];
 
-          // Build file links
+          // Build file links - handle both files array and direct scanUrl
           let filesHtml = '';
           if (files.length > 0) {
             filesHtml = '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">';
@@ -629,15 +629,21 @@ function applyGateUI(data) {
               const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
               filesHtml += `
                 <div style="margin-top: 5px;">
-                  <a href="${file.url}" target="_blank" download="${file.name}"
+                  <a href="${file.url}" target="_blank"
                     style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
-                    ${fileIcon} ${file.name}
-                    <span style="color: #999; font-size: 12px;">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    ${fileIcon} ${file.name || 'View Scan'}
                   </a>
                 </div>
               `;
             });
             filesHtml += '</div>';
+          } else if (item.scanUrl) {
+            filesHtml = `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+              <a href="${item.scanUrl}" target="_blank"
+                style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                📄 ${item.description || 'View Scan'}
+              </a>
+            </div>`;
           }
 
           html += `
