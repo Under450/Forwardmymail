@@ -1164,11 +1164,15 @@ async function loadMailData() {
     const q = query(
       collection(db, 'mail'),
       where('customerId', '==', currentUser.uid),
-      orderBy('receivedAt', 'desc'),
-      limit(20)
+      limit(50)
     );
     const snap = await getDocs(q);
-    mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a, b) => {
+        const aTime = a.receivedAt?.seconds || 0;
+        const bTime = b.receivedAt?.seconds || 0;
+        return bTime - aTime;
+      });
     renderDashMail();
     renderMailTab('all');
     updateStats();
