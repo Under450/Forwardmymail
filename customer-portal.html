@@ -597,7 +597,7 @@ function applyGateUI(data) {
     async function loadMailItems() {
       try {
         const q = query(
-          collection(db, 'mailItems'),
+          collection(db, 'mail'),
           where('customerId', '==', currentUser.uid),
           orderBy('processedAt', 'desc'),
           limit(10)
