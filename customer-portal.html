@@ -624,26 +624,38 @@ function applyGateUI(data) {
           // Build file links - handle both files array and direct scanUrl
           let filesHtml = '';
           if (files.length > 0) {
+            const hasCredits = (customerCredits >= 0);
             filesHtml = '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">';
             files.forEach((file) => {
               const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
-              filesHtml += `
-                <div style="margin-top: 5px;">
-                  <a href="${file.url}" target="_blank"
-                    style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
-                    ${fileIcon} ${file.name || 'View Scan'}
-                  </a>
-                </div>
-              `;
+              if (hasCredits) {
+                filesHtml += `
+                  <div style="margin-top: 5px;">
+                    <a href="${file.url}" target="_blank"
+                      style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                      ${fileIcon} ${file.name || 'View Scan'}
+                    </a>
+                  </div>
+                `;
+              } else {
+                filesHtml += `<div style="margin-top: 5px;"><span style="color: #999; font-size: 13px;">⚠️ Top up credits to view this scan</span></div>`;
+              }
             });
             filesHtml += '</div>';
           } else if (item.scanUrl) {
-            filesHtml = `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
-              <a href="${item.scanUrl}" target="_blank"
-                style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
-                📄 ${item.description || 'View Scan'}
-              </a>
-            </div>`;
+            const hasCredits = (customerCredits >= 0);
+            if (hasCredits) {
+              filesHtml = `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                <a href="${item.scanUrl}" target="_blank"
+                  style="color: #1e3c72; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center; gap: 5px;">
+                  📄 ${item.description || 'View Scan'}
+                </a>
+              </div>`;
+            } else {
+              filesHtml = `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                <span style="color: #999; font-size: 13px;">⚠️ Top up credits to view this scan</span>
+              </div>`;
+            }
           }
 
           html += `
