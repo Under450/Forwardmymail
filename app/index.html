@@ -1039,7 +1039,11 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     if (!savedPin) {
       showScreen('screen-pin-setup');
     } else {
-      goToApp();
+      // PIN exists - show PIN entry screen
+      const savedName = localStorage.getItem('fmm_name') || currentCustomer?.name || '';
+      localStorage.setItem('fmm_name', savedName);
+      document.getElementById('pin-user-name').textContent = savedName;
+      showScreen('screen-pin');
     }
   } catch (err) {
     btn.classList.remove('loading');
