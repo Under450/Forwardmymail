@@ -1253,3 +1253,52 @@ Archive created: ${new Date().toLocaleString('en-GB')}
     });
   }
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MAIL REQUEST NOTIFICATION — fires when customer submits Post/Keep/Shred
+// ─────────────────────────────────────────────────────────────────────────────
+exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (event) => {
+  const req = event.data.data();
+  if (!req) return;
+
+  const actionIcons = { post: '📦', keep: '📁', shred: '🗑️' };
+  const icon = actionIcons[req.action] || '📬';
+  const label = req.actionLabel || req.action;
+
+  const mailOptions = {
+    from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+    to: 'info@forwardmymail.co.uk',
+    subject: `${icon} New Request: ${label} — ${req.mailboxId || req.customerEmail}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8f9fa;padding:20px;">
+        <div style="background:#1e3a8a;border-radius:12px;padding:24px;margin-bottom:16px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:8px;">${icon}</div>
+          <h1 style="color:#fff;font-size:22px;margin:0;">${label} Request</h1>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:24px;margin-bottom:16px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;color:#666;font-size:14px;width:140px;">Customer</td><td style="padding:8px 0;font-weight:600;font-size:14px;">${req.customerName || '—'}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;font-size:14px;">Email</td><td style="padding:8px 0;font-size:14px;">${req.customerEmail || '—'}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;font-size:14px;">Mailbox ID</td><td style="padding:8px 0;font-size:14px;font-family:monospace;">${req.mailboxId || '—'}</td></tr>
+            <tr><td style="padding:8px 0;color:#666;font-size:14px;">Action</td><td style="padding:8px 0;font-weight:600;font-size:14px;color:#1e3a8a;">${label}</td></tr>
+            ${req.forwardingAddress ? `<tr><td style="padding:8px 0;color:#666;font-size:14px;">Post to</td><td style="padding:8px 0;font-size:14px;">${req.forwardingAddress.replace(/\n/g,'<br>')}</td></tr>` : ''}
+            ${req.note ? `<tr><td style="padding:8px 0;color:#666;font-size:14px;">Note</td><td style="padding:8px 0;font-size:14px;color:#333;">${req.note}</td></tr>` : ''}
+            <tr><td style="padding:8px 0;color:#666;font-size:14px;">Mail ID</td><td style="padding:8px 0;font-size:12px;font-family:monospace;color:#999;">${req.mailId || '—'}</td></tr>
+          </table>
+        </div>
+        <div style="text-align:center;color:#999;font-size:12px;">
+          Log in to your staff portal to process this request.
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Mail request notification sent for ${req.action} — ${req.mailboxId}`);
+    await event.data.ref.update({ emailSent: true });
+  } catch(err) {
+    console.error('Failed to send mail request email:', err);
+    await event.data.ref.update({ emailSent: false, emailError: err.message });
+  }
+});
