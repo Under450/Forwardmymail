@@ -364,6 +364,7 @@ const db = getFirestore(app);
     const gateBanner = document.getElementById('gateBanner');
 
     let currentUser = null;
+    let customerCredits = 0;
     let unsubscribe = null;
 
     // --- Stripe return messages ---
@@ -498,6 +499,7 @@ const db = getFirestore(app);
         userName.textContent = data.name || currentUser.email || 'Customer';
         document.getElementById('portalTitle').textContent = (data.name || 'Customer') + "'s Portal";
         creditBalance.textContent = (data.credits || 0).toFixed(2);
+        customerCredits = data.credits || 0;
 
         refreshBanner(data);
         applyGateUI(data); // <<<<<<<<<< ID GATE
@@ -508,6 +510,7 @@ const db = getFirestore(app);
           if (!docLive.exists()) return;
           const d = docLive.data();
           creditBalance.textContent = (d.credits || 0).toFixed(2);
+          customerCredits = d.credits || 0;
           refreshBanner(d);
           applyGateUI(d);  // <<<<<<<< keep gate state live
         });
