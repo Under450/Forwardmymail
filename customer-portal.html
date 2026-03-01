@@ -599,11 +599,15 @@ function applyGateUI(data) {
         const q = query(
           collection(db, 'mail'),
           where('customerId', '==', currentUser.uid),
-          orderBy('processedAt', 'desc'),
-          limit(10)
+          limit(50)
         );
 
         const querySnapshot = await getDocs(q);
+        const sortedDocs = querySnapshot.docs.sort((a, b) => {
+          const aTime = a.data().processedAt?.seconds || a.data().receivedAt?.seconds || 0;
+          const bTime = b.data().processedAt?.seconds || b.data().receivedAt?.seconds || 0;
+          return bTime - aTime;
+        });
 
         if (querySnapshot.empty) {
           mailItemsList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No recent mail items</p>';
@@ -611,7 +615,7 @@ function applyGateUI(data) {
         }
 
         let html = '';
-        querySnapshot.forEach((docSnap) => {
+        sortedDocs.forEach((docSnap) => {
           const item = docSnap.data();
           const date = item.processedAt?.toDate().toLocaleDateString() || 'Unknown';
           const status = item.status || 'scanned';
