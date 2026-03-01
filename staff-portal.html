@@ -70,6 +70,43 @@
     #scanFiles{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;clip-path:inset(50%);border:0;padding:0;margin:-1px;}
 
     @media (max-width:768px){ .customer-info{grid-template-columns:1fr;} }
+
+    /* ===== MAIL REQUESTS SECTION ===== */
+    .requests-section { margin-top: 30px; }
+    .requests-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .requests-header h3 { font-size:16px; color:#333; margin:0; }
+    .pending-badge { background:#dc3545; color:#fff; border-radius:999px; font-size:12px; font-weight:700; padding:3px 10px; }
+    .pending-badge.zero { background:#28a745; }
+    .req-filters { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+    .req-filter { padding:5px 12px; border-radius:999px; font-size:13px; font-weight:600; border:1.5px solid #e0e0e0; background:#fff; color:#666; cursor:pointer; transition:all 0.15s; }
+    .req-filter.active { background:#1e3c72; color:#fff; border-color:#1e3c72; }
+    .req-filter:hover:not(.active) { border-color:#1e3c72; color:#1e3c72; }
+    .req-card { border:1px solid #e0e0e0; border-radius:8px; padding:15px; margin-bottom:10px; display:flex; align-items:flex-start; gap:14px; background:#fff; }
+    .req-card.type-post { border-left:4px solid #1e3c72; }
+    .req-card.type-keep { border-left:4px solid #16a34a; }
+    .req-card.type-shred { border-left:4px solid #dc3545; }
+    .req-emoji { font-size:24px; margin-top:2px; flex-shrink:0; }
+    .req-body { flex:1; min-width:0; }
+    .req-top { display:flex; align-items:center; gap:8px; margin-bottom:5px; flex-wrap:wrap; }
+    .req-name { font-size:15px; font-weight:700; color:#333; }
+    .req-pill { font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:0.04em; }
+    .req-pill.post { background:#eff6ff; color:#1e3c72; }
+    .req-pill.keep { background:#f0fdf4; color:#16a34a; }
+    .req-pill.shred { background:#fef2f2; color:#dc3545; }
+    .req-detail { font-size:13px; color:#666; display:flex; gap:14px; flex-wrap:wrap; margin-bottom:4px; }
+    .req-address { background:#eff6ff; border-radius:6px; padding:7px 10px; font-size:13px; color:#1e3c72; margin-top:6px; display:flex; gap:6px; }
+    .req-address strong { flex-shrink:0; }
+    .req-note { background:#f8f9fa; border-radius:6px; padding:6px 10px; font-size:12px; color:#555; margin-top:6px; font-style:italic; }
+    .req-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+    .req-time { font-size:12px; color:#999; }
+    .req-btns { display:flex; gap:8px; }
+    .btn-req-done { padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid #e0e0e0; background:#f8f9fa; color:#333; transition:background 0.15s; }
+    .btn-req-done:hover { background:#f0fdf4; color:#16a34a; border-color:#16a34a; transform:none; }
+    .btn-req-shred { padding:8px 14px; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc3545; transition:background 0.15s; }
+    .btn-req-shred:hover { background:#fee2e2; transform:none; }
+    .req-done-label { font-size:12px; color:#16a34a; font-weight:700; }
+    .req-empty { color:#666; text-align:center; padding:20px; font-size:14px; }
+    @media (max-width:600px) { .req-card { flex-direction:column; } .req-right { align-items:flex-start; } }
   </style>
 </head>
 <body>
@@ -233,6 +270,23 @@
         <div class="recent-activity" id="recentActivity" style="display:none;">
           <h3 style="margin-bottom:15px;">Recent Activity</h3>
           <div id="activityList"><p style="color:#666;text-align:center;padding:20px;">No recent activity</p></div>
+        </div>
+
+
+        <!-- ===== MAIL REQUESTS SECTION ===== -->
+        <div class="requests-section" id="mailRequestsSection">
+          <div class="requests-header">
+            <h3>📥 Mail Requests</h3>
+            <span class="pending-badge zero" id="reqPendingBadge">0 pending</span>
+          </div>
+          <div class="req-filters">
+            <div class="req-filter active" onclick="filterRequests(this,'all')">All</div>
+            <div class="req-filter" onclick="filterRequests(this,'post')">📦 Post</div>
+            <div class="req-filter" onclick="filterRequests(this,'keep')">📁 Keep</div>
+            <div class="req-filter" onclick="filterRequests(this,'shred')">🗑️ Shred</div>
+            <div class="req-filter" onclick="filterRequests(this,'done')">✅ Completed</div>
+          </div>
+          <div id="mailRequestsList"><p class="req-empty">No pending requests</p></div>
         </div>
 
         <button id="logoutBtn" class="logout-btn" style="margin-top:20px;">Logout</button>
@@ -758,6 +812,124 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         showError('Failed to delete scan: ' + err.message);
       }
     });
+
+
+    // ===== MAIL REQUESTS =====
+    let allRequests = [];
+
+    async function loadMailRequests(customerId) {
+      try {
+        const q = query(
+          collection(db, 'mailRequests'),
+          where('customerId', '==', customerId),
+          orderBy('createdAt', 'desc'),
+          limit(50)
+        );
+        const snap = await getDocs(q);
+        allRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderRequests('all');
+      } catch(e) {
+        console.error('Failed to load mail requests:', e);
+      }
+    }
+
+    function renderRequests(filter) {
+      const list = document.getElementById('mailRequestsList');
+      const badge = document.getElementById('reqPendingBadge');
+      
+      let items = allRequests;
+      if (filter === 'done') items = allRequests.filter(r => r.status === 'completed');
+      else if (filter === 'all') items = allRequests.filter(r => r.status !== 'completed');
+      else items = allRequests.filter(r => r.action === filter && r.status !== 'completed');
+
+      const pending = allRequests.filter(r => r.status !== 'completed').length;
+      badge.textContent = pending + ' pending';
+      badge.className = 'pending-badge' + (pending === 0 ? ' zero' : '');
+
+      if (!items.length) {
+        list.innerHTML = '<p class="req-empty">No requests to show</p>';
+        return;
+      }
+
+      const icons = { post: '📦', keep: '📁', shred: '🗑️' };
+      const labels = { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' };
+
+      list.innerHTML = items.map(r => {
+        const icon = icons[r.action] || '📬';
+        const label = labels[r.action] || r.action;
+        const isDone = r.status === 'completed';
+        const time = r.createdAt?.toDate ? formatReqDate(r.createdAt.toDate()) : '—';
+        const addressHtml = r.forwardingAddress && r.action === 'post'
+          ? `<div class="req-address"><strong>Post to:</strong> <span>${r.forwardingAddress.replace(/\n/g, ', ')}</span></div>` : '';
+        const noteHtml = r.note
+          ? `<div class="req-note">💬 "${r.note}"</div>` : '';
+        const actionBtns = isDone
+          ? `<span class="req-done-label">✅ Done</span>`
+          : r.action === 'shred'
+            ? `<button class="btn-req-shred" onclick="completeRequest('${r.id}')">🗑️ Confirm Shred</button>`
+            : `<button class="btn-req-done" onclick="completeRequest('${r.id}')">✅ Mark Done</button>`;
+
+        return `<div class="req-card type-${r.action}" id="reqcard-${r.id}" style="${isDone ? 'opacity:0.45' : ''}">
+          <div class="req-emoji">${icon}</div>
+          <div class="req-body">
+            <div class="req-top">
+              <span class="req-name">${r.customerName || r.customerEmail || '—'}</span>
+              <span class="req-pill ${r.action}">${label}</span>
+            </div>
+            <div class="req-detail">
+              <span>📬 ${r.mailboxId || '—'}</span>
+              <span>✉️ ${r.customerEmail || '—'}</span>
+              <span>📄 Ref: ${r.mailId ? r.mailId.slice(0,8) : '—'}</span>
+            </div>
+            ${addressHtml}${noteHtml}
+          </div>
+          <div class="req-right">
+            <span class="req-time">${time}</span>
+            <div class="req-btns">${actionBtns}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function formatReqDate(date) {
+      const now = new Date();
+      const diff = Math.floor((now - date) / 60000);
+      if (diff < 60) return diff + 'm ago';
+      if (diff < 1440) return Math.floor(diff/60) + 'h ago';
+      return date.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    }
+
+    window.filterRequests = function(el, type) {
+      document.querySelectorAll('.req-filter').forEach(f => f.classList.remove('active'));
+      el.classList.add('active');
+      renderRequests(type);
+    };
+
+    window.completeRequest = async function(reqId) {
+      try {
+        await updateDoc(doc(db, 'mailRequests', reqId), {
+          status: 'completed',
+          completedAt: serverTimestamp(),
+          completedBy: auth.currentUser?.email || 'staff'
+        });
+        const req = allRequests.find(r => r.id === reqId);
+        if (req) req.status = 'completed';
+        // Also update the mail item status
+        if (req?.mailId) {
+          const statusMap = { post: 'posted', keep: 'stored', shred: 'shredded' };
+          try {
+            await updateDoc(doc(db, 'mail', req.mailId), {
+              status: statusMap[req.action] || req.action,
+              actionCompletedAt: serverTimestamp()
+            });
+          } catch(e) { console.warn('Could not update mail status:', e); }
+        }
+        renderRequests(document.querySelector('.req-filter.active')?.dataset?.filter || 'all');
+      } catch(e) {
+        console.error('Failed to complete request:', e);
+        alert('Failed to update request. Please try again.');
+      }
+    };
   </script>
 </body>
 </html>
