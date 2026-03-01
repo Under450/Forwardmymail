@@ -1359,7 +1359,12 @@ window.openDetail = function(id) {
   const isFree = m.isFreeOfficialMail || m.freeOfficial;
   let actionsHtml = '';
   if (m.scanUrl) {
-    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${m.scanUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+    const canView = (currentCustomer?.credits || 0) >= 0;
+    if (canView) {
+      actionsHtml += `<div class="action-row primary-action" onclick="window.open('${m.scanUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+    } else {
+      actionsHtml += `<div class="action-row" style="opacity:0.5;cursor:not-allowed"><div class="ar-left"><div class="ar-icon">🔒</div><div><div class="ar-title">Top Up to View Scan</div><div class="ar-sub">Add credits to your account to view</div></div></div><div class="ar-cost" style="color:#e53935">No credit</div></div>`;
+    }
   }
   actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
   actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
