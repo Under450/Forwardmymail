@@ -54,6 +54,29 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+
+/* ===== PULL TO REFRESH ===== */
+#ptr-indicator {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  display: flex; align-items: center; justify-content: center;
+  height: 0; overflow: hidden;
+  background: var(--brand);
+  z-index: 999;
+  transition: height 0.2s ease;
+}
+#ptr-spinner {
+  width: 24px; height: 24px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#ptr-indicator.visible { height: 56px; }
+#ptr-indicator.visible #ptr-spinner { opacity: 1; }
+#ptr-indicator.refreshing #ptr-spinner { animation: spin 0.7s linear infinite; }
 /* ===== SCREEN SYSTEM ===== */
 .screen {
   position: fixed;
@@ -1752,6 +1775,55 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
     btn.textContent = 'Confirm Request'; btn.disabled = false;
   }
 });
+
+// ===== PULL TO REFRESH =====
+(function() {
+  let startY = 0;
+  let pulling = false;
+  let threshold = 80;
+
+  document.addEventListener('touchstart', (e) => {
+    // Only activate on the mail/home tab when scrolled to top
+    const activeTab = document.querySelector('.tab-content.active');
+    if (!activeTab) return;
+    const scrollable = activeTab.querySelector('.mail-list') || activeTab;
+    if (scrollable.scrollTop > 0) return;
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!pulling) return;
+    const dy = e.touches[0].clientY - startY;
+    if (dy <= 0) return;
+    const indicator = document.getElementById('ptr-indicator');
+    if (dy > 10) indicator.classList.add('visible');
+  }, { passive: true });
+
+  document.addEventListener('touchend', async (e) => {
+    if (!pulling) return;
+    pulling = false;
+    const dy = e.changedTouches[0].clientY - startY;
+    const indicator = document.getElementById('ptr-indicator');
+
+    if (dy >= threshold) {
+      indicator.classList.add('refreshing');
+      try {
+        // Reload mail data
+        if (typeof loadMailData === 'function') await loadMailData();
+        else if (typeof loadCustomerData === 'function' && currentUser) await loadCustomerData(currentUser.uid);
+        toast('Refreshed', 'success');
+      } catch(e) {
+        console.error('Refresh failed:', e);
+      }
+      setTimeout(() => {
+        indicator.classList.remove('visible', 'refreshing');
+      }, 600);
+    } else {
+      indicator.classList.remove('visible');
+    }
+  }, { passive: true });
+})();
 
 </script>
 </body>
