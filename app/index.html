@@ -1754,20 +1754,14 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
       createdAt: serverTimestamp()
     });
 
-    // Update mail status
+    // Update local cache only (staff update Firestore status via portal)
     const statusMap = { post: 'post_requested', keep: 'keep_requested', shred: 'shred_requested' };
-    await updateDoc(doc(db, 'mail', currentActionMailId), {
-      status: statusMap[currentActionType],
-      actionRequestedAt: serverTimestamp()
-    });
-
-    // Update local cache
     const cached = mailCache.find(m => m.id === currentActionMailId);
     if (cached) cached.status = statusMap[currentActionType];
 
     closeSheet('action-sheet');
     renderMailTab(document.querySelector('.filter-pill.active')?.dataset.filter || 'all');
-    toast(actionLabels[currentActionType] + ' request submitted!', 'success');
+    toast(actionLabels[currentActionType] + ' request submitted! We\'ll action this shortly.', 'success');
   } catch(e) {
     console.error(e);
     toast('Failed to submit request', 'error');
