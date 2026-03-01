@@ -158,8 +158,8 @@ exports.createCheckoutSession = onRequest((req, res) => {
           quantity: 1,
         }],
         mode: 'payment',
-        success_url: 'https://forwardmymail.co.uk/customer-portal.html?success=true',
-        cancel_url: 'https://forwardmymail.co.uk/customer-portal.html?cancelled=true',
+        success_url: 'https://forwardmymail.co.uk/app/?payment=success',
+        cancel_url: 'https://forwardmymail.co.uk/app/?payment=cancelled',
         client_reference_id: customerId,
         customer_email: customerEmail,
         metadata: {
@@ -169,7 +169,7 @@ exports.createCheckoutSession = onRequest((req, res) => {
         },
       });
 
-      return res.status(200).json({ id: session.id });
+      return res.status(200).json({ id: session.id, url: session.url });
     } catch (error) {
       console.error('Error creating checkout session:', error);
       return res.status(500).json({ error: 'Internal server error' });
