@@ -1103,14 +1103,33 @@ onAuthStateChanged(auth, async (user) => {
 // ===== LOAD CUSTOMER DATA =====
 async function loadCustomerData(uid) {
   try {
+    console.log('Loading customer data for uid:', uid);
     const docSnap = await getDoc(doc(db, 'customers', uid));
     if (docSnap.exists()) {
       currentCustomer = { id: uid, ...docSnap.data() };
+      console.log('Customer loaded:', currentCustomer.name, 'credits:', currentCustomer.credits);
       localStorage.setItem('fmm_name', currentCustomer.firstName || currentCustomer.name || currentCustomer.email?.split('@')[0] || 'there');
       return currentCustomer;
+    } else {
+      console.error('No customer document found for uid:', uid);
+      // Try searching by email as fallback
+      const auth = getAuth();
+      const email = auth.currentUser?.email;
+      console.log('Trying email fallback:', email);
+      if (email) {
+        const q = query(collection(db, 'customers'), where('email', '==', email), limit(1));
+        const snap = await getDocs(q);
+        if (!snap.empty) {
+          const d = snap.docs[0];
+          currentCustomer = { id: d.id, ...d.data() };
+          console.log('Customer found by email:', currentCustomer.name);
+          localStorage.setItem('fmm_name', currentCustomer.firstName || currentCustomer.name || email.split('@')[0] || 'there');
+          return currentCustomer;
+        }
+      }
     }
   } catch (err) {
-    console.error('Error loading customer:', err);
+    console.error('Error loading customer:', err.message, err.code);
   }
   return null;
 }
