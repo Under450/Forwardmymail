@@ -1034,15 +1034,16 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     btn.classList.remove('loading');
     btn.disabled = false;
 
+    // Save name for PIN screen
+    const nameToSave = currentCustomer?.firstName || currentCustomer?.name || currentUser.email?.split('@')[0] || '';
+    localStorage.setItem('fmm_name', nameToSave);
+    document.getElementById('pin-user-name').textContent = nameToSave;
+
     // Check if PIN is set
     const savedPin = localStorage.getItem('fmm_pin');
     if (!savedPin) {
       showScreen('screen-pin-setup');
     } else {
-      // PIN exists - show PIN entry screen
-      const savedName = localStorage.getItem('fmm_name') || currentCustomer?.name || '';
-      localStorage.setItem('fmm_name', savedName);
-      document.getElementById('pin-user-name').textContent = savedName;
       showScreen('screen-pin');
     }
   } catch (err) {
@@ -1152,16 +1153,15 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
         const saved = localStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
           // Load user session if needed
-          onAuthStateChanged(auth, async (user) => {
-            if (user && !currentUser) {
+          // Auth confirmed - go to app (PIN was correct)
+          if (!currentUser) {
+            const user = auth.currentUser;
+            if (user) {
               currentUser = user;
               await loadCustomerData(user.uid);
             }
-            goToApp();
-          });
-          if (currentUser) {
-            loadCustomerData(currentUser.uid).then(() => goToApp());
           }
+          goToApp();
         } else {
           pinError();
         }
@@ -1241,6 +1241,9 @@ function goToApp() {
   populateApp();
   loadMailData();
 }
+
+// Expose to window for pull-to-refresh
+window._refreshApp = () => loadMailData();
 
 // ===== POPULATE APP UI =====
 function populateApp() {
@@ -1807,8 +1810,7 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
       indicator.classList.add('refreshing');
       try {
         // Reload mail data
-        if (typeof loadMailData === 'function') await loadMailData();
-        else if (typeof loadCustomerData === 'function' && currentUser) await loadCustomerData(currentUser.uid);
+        if (typeof window._refreshApp === 'function') await window._refreshApp();
         toast('Refreshed', 'success');
       } catch(e) {
         console.error('Refresh failed:', e);
