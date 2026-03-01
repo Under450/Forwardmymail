@@ -1780,14 +1780,25 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
 (function() {
   let startY = 0;
   let pulling = false;
-  let threshold = 80;
+  let threshold = 70;
+  const indicator = document.getElementById('ptr-indicator');
+
+  // The scrollable mail list
+  function getScrollEl() {
+    return document.getElementById('mail-items-list');
+  }
+
+  // Only activate when on the mail tab and at top of scroll
+  function canPull(e) {
+    const mailTab = document.getElementById('tab-mail');
+    if (!mailTab || !mailTab.classList.contains('active')) return false;
+    const el = getScrollEl();
+    if (el && el.scrollTop > 2) return false;
+    return true;
+  }
 
   document.addEventListener('touchstart', (e) => {
-    // Only activate on the mail/home tab when scrolled to top
-    const activeTab = document.querySelector('.tab-content.active');
-    if (!activeTab) return;
-    const scrollable = activeTab.querySelector('.mail-list') || activeTab;
-    if (scrollable.scrollTop > 0) return;
+    if (!canPull(e)) { pulling = false; return; }
     startY = e.touches[0].clientY;
     pulling = true;
   }, { passive: true });
@@ -1795,8 +1806,6 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
   document.addEventListener('touchmove', (e) => {
     if (!pulling) return;
     const dy = e.touches[0].clientY - startY;
-    if (dy <= 0) return;
-    const indicator = document.getElementById('ptr-indicator');
     if (dy > 10) indicator.classList.add('visible');
   }, { passive: true });
 
@@ -1804,20 +1813,16 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
     if (!pulling) return;
     pulling = false;
     const dy = e.changedTouches[0].clientY - startY;
-    const indicator = document.getElementById('ptr-indicator');
 
     if (dy >= threshold) {
       indicator.classList.add('refreshing');
       try {
-        // Reload mail data
-        if (typeof window._refreshApp === 'function') await window._refreshApp();
+        if (window._refreshApp) await window._refreshApp();
         toast('Refreshed', 'success');
-      } catch(e) {
-        console.error('Refresh failed:', e);
+      } catch(err) {
+        console.error('Refresh failed:', err);
       }
-      setTimeout(() => {
-        indicator.classList.remove('visible', 'refreshing');
-      }, 600);
+      setTimeout(() => indicator.classList.remove('visible', 'refreshing'), 700);
     } else {
       indicator.classList.remove('visible');
     }
