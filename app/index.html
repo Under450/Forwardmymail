@@ -1000,14 +1000,39 @@ function toast(msg, type = '') {
 
 // ===== SPLASH =====
 // Splash → Login (always go to login first, PIN check happens after auth)
-setTimeout(() => {
+setTimeout(async () => {
   const savedPin = localStorage.getItem('fmm_pin');
   const savedName = localStorage.getItem('fmm_name');
   if (savedPin) {
     document.getElementById('pin-user-name').textContent = savedName || '';
     showScreen('screen-pin');
   } else {
-    showScreen('screen-login');
+    // Check if Firebase auth session exists and customer has a PIN in Firestore
+    try {
+      await new Promise(resolve => {
+        const unsub = onAuthStateChanged(auth, async (user) => {
+          unsub();
+          if (user) {
+            const snap = await getDoc(doc(db, 'customers', user.uid));
+            if (snap.exists() && snap.data().pin) {
+              localStorage.setItem('fmm_pin', snap.data().pin);
+              const name = snap.data().firstName || snap.data().name || '';
+              localStorage.setItem('fmm_name', name);
+              document.getElementById('pin-user-name').textContent = name;
+              showScreen('screen-pin');
+            } else {
+              showScreen('screen-login');
+            }
+          } else {
+            showScreen('screen-login');
+          }
+          resolve();
+        });
+        setTimeout(resolve, 3000);
+      });
+    } catch(e) {
+      showScreen('screen-login');
+    }
   }
 }, 2500);
 
@@ -1100,6 +1125,10 @@ function setupPinInput(val) {
     } else {
       if (pinBuffer === setupPinFirst) {
         localStorage.setItem('fmm_pin', pinBuffer);
+        // Save PIN to Firestore so it works across devices/PWA
+        if (currentUser) {
+          try { await updateDoc(doc(db, 'customers', currentUser.uid), { pin: pinBuffer }); } catch(e) {}
+        }
         toast('PIN set successfully!', 'success');
         setTimeout(() => goToApp(), 400);
       } else {
@@ -1265,7 +1294,18 @@ function goToApp() {
 }
 
 // Expose to window for pull-to-refresh
-window._refreshApp = async () => { if (currentUser) { await loadCustomerData(currentUser.uid); populateApp(); } await loadMailData(); };
+window._refreshApp = async () => {
+  try {
+    if (currentUser) {
+      await loadCustomerData(currentUser.uid);
+      populateApp();
+    }
+    await loadMailData();
+    toast('Refreshed', 'success');
+  } catch(e) {
+    console.error('Refresh error:', e);
+  }
+};
 
 // ===== POPULATE APP UI =====
 function populateApp() {
@@ -1810,13 +1850,12 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
 
   // The scrollable mail list
   function getScrollEl() {
-    return document.getElementById('mail-items-list');
+    const active = document.querySelector('.tab-content.active, .screen.active .scroll-area');
+    return active || document.getElementById('mail-items-list') || document.querySelector('.screen.active');
   }
 
   // Only activate when on the mail tab and at top of scroll
   function canPull(e) {
-    const mailTab = document.getElementById('tab-mail');
-    if (!mailTab || !mailTab.classList.contains('active')) return false;
     const el = getScrollEl();
     if (el && el.scrollTop > 2) return false;
     return true;
