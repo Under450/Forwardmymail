@@ -1447,13 +1447,13 @@ function renderMailTab(filter) {
         ? '<div class="mc-action free">✓ Free (Official)</div>'
         : '<div class="mc-action" onclick="event.stopPropagation()">🗑️ Shred</div>';
       actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View</div>'
-        + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
       const canView = (currentCustomer?.credits || 0) >= 0;
       actions = canView
         ? '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>'
         : '<div class="mc-action" style="opacity:0.4;cursor:not-allowed" onclick="event.stopPropagation()">🔒 Top Up to View</div>';
+      // No Post button on card - customer chooses action after viewing
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
@@ -1464,7 +1464,7 @@ function renderMailTab(filter) {
           <div class="mc-avatar">${getEmoji(m.sender)}</div>
           <div class="mc-body">
             <div class="mc-top">
-              <div class="mc-from">${m.description || m.sender || 'Mail Item'}</div>
+              <div class="mc-from">${m.description || (m.sender === 'personal' ? 'Personal Mail' : m.sender === 'official' ? 'Official Mail' : m.sender === 'parcel' ? 'Parcel' : 'Mail Item')}</div>
               <div class="mc-date">${formatDate(m.receivedAt)}</div>
             </div>
             <div class="mc-subject">${m.description || m.type || 'Letter'}${m.pages ? ` · ${m.pages} page${m.pages > 1 ? 's' : ''}` : ''}</div>
