@@ -1003,8 +1003,8 @@ function toast(msg, type = '') {
 setTimeout(() => {
   const savedPin = localStorage.getItem('fmm_pin');
   const savedName = localStorage.getItem('fmm_name');
-  if (savedPin && savedName) {
-    document.getElementById('pin-user-name').textContent = savedName;
+  if (savedPin) {
+    document.getElementById('pin-user-name').textContent = savedName || '';
     showScreen('screen-pin');
   } else {
     showScreen('screen-login');
@@ -1054,6 +1054,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     if (!savedPin) {
       showScreen('screen-pin-setup');
     } else {
+      // PIN exists — go straight to entry, customer data already loaded
       showScreen('screen-pin');
     }
   } catch (err) {
@@ -1163,12 +1164,21 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
         const saved = localStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
           // Load user session if needed
-          // Auth confirmed - go to app (PIN was correct)
           if (!currentUser) {
-            const user = auth.currentUser;
-            if (user) {
-              currentUser = user;
-              await loadCustomerData(user.uid);
+            // Wait for Firebase auth to resolve
+            await new Promise(resolve => {
+              const unsub = onAuthStateChanged(auth, user => {
+                if (user) {
+                  currentUser = user;
+                  unsub();
+                  resolve();
+                }
+              });
+              // Timeout fallback after 3s
+              setTimeout(resolve, 3000);
+            });
+            if (currentUser) {
+              await loadCustomerData(currentUser.uid);
             }
           }
           goToApp();
@@ -1203,7 +1213,12 @@ document.getElementById('pin-use-password').addEventListener('click', (e) => {
 onAuthStateChanged(auth, async (user) => {
   if (user && !isSigningOut) {
     currentUser = user;
-    // Already handled by splash logic
+    // If we're already on the app screen (e.g. PWA reload), load data
+    const appScreen = document.getElementById('screen-app');
+    if (appScreen && appScreen.classList.contains('active')) {
+      await loadCustomerData(user.uid);
+      loadMailData();
+    }
   }
 });
 
