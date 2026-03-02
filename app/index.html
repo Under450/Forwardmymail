@@ -1156,7 +1156,7 @@ function pinError() {
 }
 
 document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
-  k.addEventListener('click', () => {
+  k.addEventListener('click', async () => {
     if (pinEntry.length < 4) {
       pinEntry += k.dataset.pin;
       updatePinDots(pinEntry);
