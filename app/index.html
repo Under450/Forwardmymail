@@ -1531,14 +1531,24 @@ window.openDetail = function(id) {
   const isFree = m.isFreeOfficialMail || m.freeOfficial;
   let actionsHtml = '';
   // Support both scanUrl (old Python watcher) and files[].url (staff portal upload)
-  const viewUrl = m.scanUrl || (m.files && m.files[0] && m.files[0].url) || null;
-  if (viewUrl) {
-    const canView = (currentCustomer?.credits || 0) >= 0;
-    if (canView) {
+  let viewUrl = null;
+  if (m.scanUrl) {
+    viewUrl = m.scanUrl;
+  } else if (m.files && Array.isArray(m.files) && m.files.length > 0 && m.files[0].url) {
+    viewUrl = m.files[0].url;
+  } else if (m.files && m.files[0] && m.files[0].url) {
+    viewUrl = m.files[0].url;
+  }
+  console.log('openDetail: id=' + m.id + ' viewUrl=' + viewUrl + ' files=' + JSON.stringify(m.files));
+  // Always show View Scan button for scanned items - even without URL show message
+  if (m.status === 'scanned') {
+    if (viewUrl) {
       actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">Tap to open your scan</div></div></div><div class="ar-cost">Free</div></div>`;
     } else {
-      actionsHtml += `<div class="action-row" style="opacity:0.5;cursor:not-allowed"><div class="ar-left"><div class="ar-icon">🔒</div><div><div class="ar-title">Top Up to View Scan</div><div class="ar-sub">Add credits to your account to view</div></div></div><div class="ar-cost" style="color:#e53935">No credit</div></div>`;
+      actionsHtml += `<div class="action-row primary-action" style="opacity:0.6"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">Scan Processing</div><div class="ar-sub">Your scan will be available shortly</div></div></div></div>`;
     }
+  } else if (viewUrl) {
+    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">Tap to open your scan</div></div></div><div class="ar-cost">Free</div></div>`;
   }
   actionsHtml += `<div class="action-row" onclick="openActionSheet('post','${m.id}')"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
   actionsHtml += `<div class="action-row" onclick="openActionSheet('keep','${m.id}')"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
