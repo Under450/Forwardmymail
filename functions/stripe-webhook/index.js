@@ -13,7 +13,7 @@ const { google } = require('googleapis');
 // ─────────────────────────────────────────────────────────────────────────────
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-const EMAIL_PASS     = process.env.EMAIL_PASS;
+const EMAIL_PASS     = process.env.EMAIL_PASS || 'Av@8@XzC235!';
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -927,9 +927,8 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
   for (const customerDoc of customersSnapshot.docs) {
     const customerData = customerDoc.data();
 
-    const mailSnapshot = await db.collection('customers')
-      .doc(customerDoc.id)
-      .collection('mail')
+    const mailSnapshot = await db.collection('mail')
+      .where('customerId', '==', customerDoc.id)
       .where('status', '==', 'stored')
       .get();
 
