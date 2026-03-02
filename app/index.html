@@ -1164,7 +1164,7 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
         const saved = localStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
           // Load user session if needed
-          // Always ensure auth is resolved
+          // Ensure auth is resolved
           if (!currentUser) {
             await new Promise(resolve => {
               const unsub = onAuthStateChanged(auth, user => {
@@ -1173,8 +1173,8 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
               setTimeout(resolve, 3000);
             });
           }
-          // Always reload customer data to ensure name/credits are fresh
-          if (currentUser) {
+          // Load customer data if not already loaded
+          if (currentUser && !currentCustomer) {
             await loadCustomerData(currentUser.uid);
           }
           goToApp();
@@ -1259,12 +1259,13 @@ function goToApp() {
   setupPinFirst = '';
   setupStep = 'first';
   showScreen('screen-app');
+  console.log('goToApp: currentUser=', currentUser?.uid, 'currentCustomer=', currentCustomer?.name, 'credits=', currentCustomer?.credits);
   populateApp();
   loadMailData();
 }
 
 // Expose to window for pull-to-refresh
-window._refreshApp = async () => { if (currentUser) await loadCustomerData(currentUser.uid); populateApp(); await loadMailData(); };
+window._refreshApp = async () => { if (currentUser) { await loadCustomerData(currentUser.uid); populateApp(); } await loadMailData(); };
 
 // ===== POPULATE APP UI =====
 function populateApp() {
@@ -1299,7 +1300,8 @@ function populateApp() {
 
 // ===== LOAD MAIL =====
 async function loadMailData() {
-  if (!currentUser) return;
+  if (!currentUser) { console.error('loadMailData: no currentUser'); return; }
+  console.log('loadMailData: querying mail for uid:', currentUser.uid);
   try {
     const q = query(
       collection(db, 'mail'),
@@ -1307,6 +1309,7 @@ async function loadMailData() {
       limit(50)
     );
     const snap = await getDocs(q);
+    console.log('loadMailData: got', snap.docs.length, 'docs');
     mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }))
       .sort((a, b) => {
         const aTime = a.receivedAt?.seconds || 0;
