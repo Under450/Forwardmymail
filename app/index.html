@@ -1164,22 +1164,18 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
         const saved = localStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
           // Load user session if needed
+          // Always ensure auth is resolved
           if (!currentUser) {
-            // Wait for Firebase auth to resolve
             await new Promise(resolve => {
               const unsub = onAuthStateChanged(auth, user => {
-                if (user) {
-                  currentUser = user;
-                  unsub();
-                  resolve();
-                }
+                if (user) { currentUser = user; unsub(); resolve(); }
               });
-              // Timeout fallback after 3s
               setTimeout(resolve, 3000);
             });
-            if (currentUser) {
-              await loadCustomerData(currentUser.uid);
-            }
+          }
+          // Always reload customer data to ensure name/credits are fresh
+          if (currentUser) {
+            await loadCustomerData(currentUser.uid);
           }
           goToApp();
         } else {
@@ -1268,7 +1264,7 @@ function goToApp() {
 }
 
 // Expose to window for pull-to-refresh
-window._refreshApp = () => loadMailData();
+window._refreshApp = async () => { if (currentUser) await loadCustomerData(currentUser.uid); populateApp(); await loadMailData(); };
 
 // ===== POPULATE APP UI =====
 function populateApp() {
