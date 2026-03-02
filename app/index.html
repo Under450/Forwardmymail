@@ -1193,18 +1193,19 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
         const saved = localStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
           // Load user session if needed
-          // Ensure auth is resolved
-          if (!currentUser) {
+          // Wait for auth + customer data to be ready
+          if (!currentUser || !currentCustomer) {
             await new Promise(resolve => {
-              const unsub = onAuthStateChanged(auth, user => {
-                if (user) { currentUser = user; unsub(); resolve(); }
+              const unsub = onAuthStateChanged(auth, async user => {
+                if (user) {
+                  currentUser = user;
+                  if (!currentCustomer) await loadCustomerData(user.uid);
+                  unsub();
+                  resolve();
+                }
               });
-              setTimeout(resolve, 3000);
+              setTimeout(resolve, 4000);
             });
-          }
-          // Load customer data if not already loaded
-          if (currentUser && !currentCustomer) {
-            await loadCustomerData(currentUser.uid);
           }
           goToApp();
         } else {
@@ -1238,10 +1239,12 @@ document.getElementById('pin-use-password').addEventListener('click', (e) => {
 onAuthStateChanged(auth, async (user) => {
   if (user && !isSigningOut) {
     currentUser = user;
-    // If we're already on the app screen (e.g. PWA reload), load data
+    // Always load customer data when auth resolves
+    await loadCustomerData(user.uid);
+    // If already on app screen (PWA reload), also load mail and populate
     const appScreen = document.getElementById('screen-app');
     if (appScreen && appScreen.classList.contains('active')) {
-      await loadCustomerData(user.uid);
+      populateApp();
       loadMailData();
     }
   }
@@ -1288,7 +1291,7 @@ function goToApp() {
   setupPinFirst = '';
   setupStep = 'first';
   showScreen('screen-app');
-  console.log('goToApp: currentUser=', currentUser?.uid, 'currentCustomer=', currentCustomer?.name, 'credits=', currentCustomer?.credits);
+  // Always populate and load - currentCustomer should be set by now
   populateApp();
   loadMailData();
 }
@@ -1345,8 +1348,7 @@ async function loadMailData() {
   try {
     const q = query(
       collection(db, 'mail'),
-      where('customerId', '==', currentUser.uid),
-      limit(50)
+      where('customerId', '==', currentUser.uid)
     );
     const snap = await getDocs(q);
     console.log('loadMailData: got', snap.docs.length, 'docs');
