@@ -754,7 +754,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
     });
 
     async function loadRecentActivity(customerId){
-      const qy = query(collection(db,'mail'), where('customerId','==', customerId), orderBy('receivedAt','desc'), limit(10));
+      const qy = query(collection(db,'mail'), where('customerId','==', customerId), orderBy('processedAt','desc'), limit(10));
       const qs = await getDocs(qy);
       const list = document.getElementById('activityList');
       if (qs.empty){ list.innerHTML = '<p style="color:#666;text-align:center;padding:20px;">No recent activity</p>'; return; }
