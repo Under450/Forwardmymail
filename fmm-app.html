@@ -1349,10 +1349,13 @@ function openSheet(id) {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       overlay.classList.add('visible');
-      const sheet = overlay.querySelector('.sheet');
-      if (sheet) sheet.scrollTop = 0;
     });
   });
+  // Scroll to top after animation completes
+  setTimeout(() => {
+    const sheet = overlay.querySelector('.sheet');
+    if (sheet) sheet.scrollTop = 0;
+  }, 50);
 }
 
 function closeSheet(id) {
