@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v1772492902 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -970,7 +971,7 @@ document.getElementById('login-forgot').addEventListener('click', async () => {
 });
 
 // ===== PIN SETUP =====
-function setupPinInput(val) {
+async function setupPinInput(val) {
   if (pinBuffer.length < 4) pinBuffer += val;
   updateSetupDots();
   if (pinBuffer.length === 4) {
@@ -1328,8 +1329,9 @@ window.openDetail = function(id) {
   // Actions
   const isFree = m.isFreeOfficialMail || m.freeOfficial;
   let actionsHtml = '';
-  if (m.scanUrl) {
-    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${m.scanUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+  const viewUrl = m.scanUrl || (m.files && m.files[0] && m.files[0].url) || null;
+  if (viewUrl) {
+    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
   }
   actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
   actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
@@ -1344,7 +1346,11 @@ function openSheet(id) {
   const overlay = document.getElementById(id);
   overlay.style.display = 'flex';
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => overlay.classList.add('visible'));
+    requestAnimationFrame(() => {
+      overlay.classList.add('visible');
+      const sheet = overlay.querySelector('.sheet');
+      if (sheet) sheet.scrollTop = 0;
+    });
   });
 }
 
