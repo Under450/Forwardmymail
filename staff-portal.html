@@ -709,10 +709,17 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         let uploadedFiles = [];
         if (files.length){ uploadProgressDiv.style.display='block'; uploadedFiles = await uploadScanFiles(currentCustomer.id, files); uploadProgressDiv.style.display='none'; }
 
-        await addDoc(collection(db,'mailItems'), {
+        await addDoc(collection(db,'mail'), {
           customerId: currentCustomer.id,
+          customerEmail: currentCustomer.email || '',
+          customerName: currentCustomer.name || '',
+          mailboxId: currentCustomer.mailboxId || '',
           pages, cost: payable, notes,
+          description: document.getElementById('letterType').options[document.getElementById('letterType').selectedIndex].text,
+          sender: selectedType,
           files: uploadedFiles,
+          receivedAt: serverTimestamp(),
+          scannedAt: serverTimestamp(),
           processedAt: serverTimestamp(),
           processedBy: auth.currentUser?.email || 'staff',
           status: 'scanned',
@@ -747,7 +754,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
     });
 
     async function loadRecentActivity(customerId){
-      const qy = query(collection(db,'mailItems'), where('customerId','==', customerId), orderBy('processedAt','desc'), limit(10));
+      const qy = query(collection(db,'mail'), where('customerId','==', customerId), orderBy('receivedAt','desc'), limit(10));
       const qs = await getDocs(qy);
       const list = document.getElementById('activityList');
       if (qs.empty){ list.innerHTML = '<p style="color:#666;text-align:center;padding:20px;">No recent activity</p>'; return; }
@@ -788,7 +795,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
       if (!confirm('Delete this scan? This will remove its files and record.')) return;
 
       try{
-        const miRef = doc(db,'mailItems', mailItemId);
+        const miRef = doc(db,'mail', mailItemId);
         const snap = await getDoc(miRef);
         if (snap.exists()){
           const data = snap.data();
