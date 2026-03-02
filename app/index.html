@@ -1552,11 +1552,13 @@ window.openDetail = function(id) {
 function openSheet(id) {
   const overlay = document.getElementById(id);
   overlay.style.display = 'flex';
-  // Reset scroll to top so sheet content starts from beginning
-  const sheet = overlay.querySelector('.sheet');
-  if (sheet) sheet.scrollTop = 0;
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => overlay.classList.add('visible'));
+    requestAnimationFrame(() => {
+      overlay.classList.add('visible');
+      // Force scroll to top AFTER sheet is visible
+      const sheet = overlay.querySelector('.sheet');
+      if (sheet) sheet.scrollTop = 0;
+    });
   });
 }
 
