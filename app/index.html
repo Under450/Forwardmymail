@@ -1526,10 +1526,12 @@ window.openDetail = function(id) {
   // Actions
   const isFree = m.isFreeOfficialMail || m.freeOfficial;
   let actionsHtml = '';
-  if (m.scanUrl) {
+  // Support both scanUrl (old Python watcher) and files[].url (staff portal upload)
+  const viewUrl = m.scanUrl || (m.files && m.files[0] && m.files[0].url) || null;
+  if (viewUrl) {
     const canView = (currentCustomer?.credits || 0) >= 0;
     if (canView) {
-      actionsHtml += `<div class="action-row primary-action" onclick="window.open('${m.scanUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+      actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">Tap to open your scan</div></div></div><div class="ar-cost">Free</div></div>`;
     } else {
       actionsHtml += `<div class="action-row" style="opacity:0.5;cursor:not-allowed"><div class="ar-left"><div class="ar-icon">🔒</div><div><div class="ar-title">Top Up to View Scan</div><div class="ar-sub">Add credits to your account to view</div></div></div><div class="ar-cost" style="color:#e53935">No credit</div></div>`;
     }
