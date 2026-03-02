@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772492902 -->
+<!-- v1772493917 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -825,6 +825,7 @@ html, body {
 <div class="sheet-overlay" id="detail-sheet">
   <div class="sheet">
     <div class="sheet-handle"></div>
+    <button onclick="closeSheet('detail-sheet')" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);">✕</button>
     <div class="detail-hero-card">
       <div class="dhc-emoji" id="detail-emoji">📬</div>
       <div class="dhc-from" id="detail-from">—</div>
@@ -841,11 +842,26 @@ html, body {
   </div>
 </div>
 
+<!-- ACTION SHEET -->
+<div class="sheet-overlay" id="action-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <h3 class="sheet-title" id="action-sheet-title">Confirm Action</h3>
+    <p class="sheet-sub" id="action-sheet-sub"></p>
+    <div style="margin:16px 0;">
+      <label style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px;">Note (optional)</label>
+      <textarea id="action-note" rows="3" style="width:100%;border:1.5px solid var(--border);border-radius:12px;padding:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);resize:none;outline:none;" placeholder="Any special instructions..."></textarea>
+    </div>
+    <button class="sheet-btn" id="action-confirm-btn">Confirm</button>
+    <button id="action-cancel-btn" style="width:100%;padding:14px;border:none;background:none;font-size:14px;color:var(--text-muted);cursor:pointer;margin-top:4px;">Cancel</button>
+  </div>
+</div>
+
 <!-- Firebase + App Logic -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -1041,24 +1057,30 @@ function pinError() {
 }
 
 document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
-  k.addEventListener('click', () => {
+  k.addEventListener('click', async () => {
     if (pinEntry.length < 4) {
       pinEntry += k.dataset.pin;
       updatePinDots(pinEntry);
       if (pinEntry.length === 4) {
         const saved = localStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
-          // Load user session if needed
-          onAuthStateChanged(auth, async (user) => {
-            if (user && !currentUser) {
-              currentUser = user;
-              await loadCustomerData(user.uid);
-            }
-            goToApp();
-          });
-          if (currentUser) {
-            loadCustomerData(currentUser.uid).then(() => goToApp());
+          // Ensure we have auth + customer data before going to app
+          if (!currentUser) {
+            await new Promise(resolve => {
+              const unsub = onAuthStateChanged(auth, async user => {
+                if (user) {
+                  currentUser = user;
+                  unsub();
+                  resolve();
+                }
+              });
+              setTimeout(resolve, 4000);
+            });
           }
+          if (currentUser && !currentCustomer) {
+            await loadCustomerData(currentUser.uid);
+          }
+          goToApp();
         } else {
           pinError();
         }
@@ -1110,12 +1132,15 @@ async function loadCustomerData(uid) {
 }
 
 // ===== GO TO APP =====
-function goToApp() {
+async function goToApp() {
   pinBuffer = '';
   pinEntry = '';
   setupPinFirst = '';
   setupStep = 'first';
   showScreen('screen-app');
+  if (!currentCustomer && currentUser) {
+    await loadCustomerData(currentUser.uid);
+  }
   populateApp();
   loadMailData();
 }
@@ -1334,9 +1359,9 @@ window.openDetail = function(id) {
   if (viewUrl) {
     actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
   }
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="openActionSheet('post','${m.id}')"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="openActionSheet('keep','${m.id}')"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="openActionSheet('shred','${m.id}')"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
 
   document.getElementById('detail-actions').innerHTML = actionsHtml;
   openSheet('detail-sheet');
@@ -1425,6 +1450,122 @@ document.getElementById('change-pin-row').addEventListener('click', () => {
   document.getElementById('setup-pin-step').textContent = 'Enter new PIN';
   showScreen('screen-pin-setup');
 });
+
+// ===== ACTION SHEET (Post / Keep / Shred) =====
+let currentActionMailId = null;
+let currentActionType = null;
+
+window.openActionSheet = function(type, mailId) {
+  currentActionMailId = mailId;
+  currentActionType = type;
+  const titles = { post: '📦 Post to Me', keep: '📁 Keep & Store', shred: '🗑️ Secure Shred' };
+  const subs = {
+    post: 'We will post this item to your forwarding address. Cost: £0.85 + carrier postage.',
+    keep: 'We will store this item securely at our facility at no charge.',
+    shred: 'We will confidentially destroy this item. This cannot be undone.'
+  };
+  document.getElementById('action-sheet-title').textContent = titles[type];
+  document.getElementById('action-sheet-sub').textContent = subs[type];
+  document.getElementById('action-note').value = '';
+  document.getElementById('action-confirm-btn').textContent = 'Confirm';
+  document.getElementById('action-confirm-btn').disabled = false;
+  closeSheet('detail-sheet');
+  setTimeout(() => openSheet('action-sheet'), 350);
+};
+
+document.getElementById('action-confirm-btn').addEventListener('click', async () => {
+  if (!currentActionMailId || !currentActionType) return;
+  const btn = document.getElementById('action-confirm-btn');
+  btn.textContent = 'Submitting...';
+  btn.disabled = true;
+  try {
+    const note = document.getElementById('action-note').value.trim();
+    const actionLabels = { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' };
+    await addDoc(collection(db, 'mailRequests'), {
+      mailId: currentActionMailId,
+      customerId: currentUser.uid,
+      customerName: currentCustomer?.name || currentCustomer?.firstName || '',
+      customerEmail: currentCustomer?.email || '',
+      mailboxId: currentCustomer?.mailboxId || '',
+      action: currentActionType,
+      actionLabel: actionLabels[currentActionType],
+      notes: note,
+      status: 'pending',
+      createdAt: serverTimestamp()
+    });
+    toast('Request submitted!', 'success');
+    closeSheet('action-sheet');
+    currentActionMailId = null;
+    currentActionType = null;
+  } catch(err) {
+    console.error('Action error:', err);
+    toast('Failed to submit. Please try again.', 'error');
+    btn.textContent = 'Confirm';
+    btn.disabled = false;
+  }
+});
+
+document.getElementById('action-cancel-btn').addEventListener('click', () => {
+  closeSheet('action-sheet');
+});
+
+// ===== PULL TO REFRESH =====
+(function() {
+  let startY = 0;
+  let pulling = false;
+  const threshold = 70;
+
+  function isAppActive() {
+    const s = document.getElementById('screen-app');
+    return s && s.classList.contains('active');
+  }
+  function anySheetOpen() {
+    return !!document.querySelector('.sheet-overlay[style*="flex"]');
+  }
+  function atScrollTop() {
+    const els = [
+      document.getElementById('mail-items-list'),
+      document.querySelector('.tab-pane.active')
+    ];
+    for (const el of els) {
+      if (el && el.scrollTop > 2) return false;
+    }
+    return true;
+  }
+
+  document.addEventListener('touchstart', (e) => {
+    pulling = false;
+    if (!isAppActive() || anySheetOpen() || !atScrollTop()) return;
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!pulling) return;
+    if (e.touches[0].clientY - startY > 15) {
+      document.body.style.setProperty('--ptr-visible', '1');
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchend', async (e) => {
+    if (!pulling) return;
+    pulling = false;
+    document.body.style.setProperty('--ptr-visible', '0');
+    const dy = e.changedTouches[0].clientY - startY;
+    if (dy >= threshold) {
+      try {
+        if (currentUser) {
+          await loadCustomerData(currentUser.uid);
+          populateApp();
+        }
+        await loadMailData();
+        toast('Refreshed ✓', 'success');
+      } catch(err) {
+        console.error('Refresh error:', err);
+      }
+    }
+  }, { passive: true });
+})();
 
 </script>
 </body>
