@@ -1302,6 +1302,7 @@ document.querySelectorAll('.filter-pill').forEach(pill => {
 window.openDetail = function(id) {
   const m = mailCache.find(item => item.id === id);
   if (!m) return;
+  console.log('openDetail:', id, 'status:', m.status, 'scanUrl:', m.scanUrl, 'files:', JSON.stringify(m.files));
 
   document.getElementById('detail-emoji').textContent = getEmoji(m.sender);
   document.getElementById('detail-from').textContent = m.sender || 'Unknown';
