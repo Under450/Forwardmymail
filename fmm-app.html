@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772566368 -->
+<!-- v1772566741 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -844,24 +844,36 @@ function toast(msg, type = '') {
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-// ===== SPLASH =====
-// Auth state handler routes user - splash just shows briefly
-// If no auth session after 2.5s, show login
-setTimeout(() => {
-  if (!currentUser) {
+// ===== SPLASH & AUTH =====
+// Wait for splash, then route based on auth state
+let authUser = null;
+let authResolved = false;
+
+// Listen for auth state once
+onAuthStateChanged(auth, async (user) => {
+  authUser = user || null;
+  authResolved = true;
+});
+
+// After splash duration, route user
+setTimeout(async () => {
+  // Wait up to 3s for Firebase auth to resolve
+  let waited = 0;
+  while (!authResolved && waited < 3000) {
+    await new Promise(r => setTimeout(r, 100));
+    waited += 100;
+  }
+
+  if (authUser) {
+    // Returning user - load their data then go to app
+    currentUser = authUser;
+    await loadCustomerData(authUser.uid);
+    goToApp();
+  } else {
+    // No session - show login
     showScreen('screen-login');
   }
-}, 2500);
-
-// ===== AUTH STATE =====
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    // Auth persisted from previous session - load data and go straight to app
-    await loadCustomerData(user.uid);
-    goToApp();
-  }
-});
+}, 1800);
 
 // ===== LOGIN =====
 document.getElementById('login-btn').addEventListener('click', async () => {
