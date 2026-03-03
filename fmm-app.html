@@ -1577,15 +1577,17 @@ document.getElementById('action-cancel-btn').addEventListener('click', () => {
   }, { passive: true });
 })();
 
-<script>
+
+// ===== SERVICE WORKER AUTO-REFRESH =====
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js").then(reg => {
-    setInterval(() => { if (reg.active) reg.active.postMessage("CHECK_UPDATE"); }, 60000);
+  navigator.serviceWorker.register("/sw.js").then(function(reg) {
+    setInterval(function() { if (reg.active) reg.active.postMessage("CHECK_UPDATE"); }, 60000);
   });
-  navigator.serviceWorker.addEventListener("message", e => {
+  navigator.serviceWorker.addEventListener("message", function(e) {
     if (e.data === "RELOAD") window.location.reload();
   });
 }
+
 </script>
 </body>
 </html>
