@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772561913 -->
+<!-- v1772562447 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -756,7 +756,7 @@ html, body {
         <div class="settings-section">
           <div class="settings-label">Support</div>
           <div class="settings-group">
-            <div class="settings-row" onclick="window.location.href='mailto:info@forwardmymail.co.uk?subject=Support Request - ' + encodeURIComponent((currentCustomer?.mailboxId || currentCustomer?.email || ''))">
+            <div class="settings-row" onclick="window.contactUs()">
               <div class="sr-icon green">💬</div>
               <div class="sr-body"><div class="sr-title">Contact Us</div><div class="sr-sub">Get help with your mail</div></div>
               <div class="sr-arrow">›</div>
@@ -1397,7 +1397,7 @@ window.openDetail = function(id) {
 };
 
 // ===== SHEETS =====
-function openSheet(id) {
+window.openSheet = function openSheet(id) {
   const overlay = document.getElementById(id);
   overlay.style.display = 'flex';
   requestAnimationFrame(() => {
@@ -1412,7 +1412,7 @@ function openSheet(id) {
   }, 50);
 }
 
-function closeSheet(id) {
+window.closeSheet = function closeSheet(id) {
   const overlay = document.getElementById(id);
   overlay.classList.remove('visible');
   setTimeout(() => { overlay.style.display = 'none'; }, 350);
@@ -1606,6 +1606,12 @@ document.getElementById('action-cancel-btn').addEventListener('click', () => {
   }, { passive: true });
 })();
 
+
+// ===== CONTACT US =====
+window.contactUs = function() {
+  const ref = currentCustomer?.mailboxId || currentCustomer?.email || '';
+  window.location.href = 'mailto:info@forwardmymail.co.uk?subject=' + encodeURIComponent('Support Request - ' + ref);
+};
 
 // ===== FORWARDING ADDRESS SHEET =====
 window.openAddressSheet = function() {
