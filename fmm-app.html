@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772493917 -->
+<!-- v1772545326 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1001,6 +1001,9 @@ async function setupPinInput(val) {
     } else {
       if (pinBuffer === setupPinFirst) {
         localStorage.setItem('fmm_pin', pinBuffer);
+        // Also save name so splash screen can show PIN entry next time
+        const nameToSave = currentCustomer?.firstName || currentCustomer?.name || currentUser?.email?.split('@')[0] || '';
+        localStorage.setItem('fmm_name', nameToSave);
         toast('PIN set successfully!', 'success');
         setTimeout(() => goToApp(), 400);
       } else {
@@ -1493,6 +1496,13 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
       status: 'pending',
       createdAt: serverTimestamp()
     });
+    // Update local cache so card status reflects action immediately
+    const statusMap = { post: 'posted', keep: 'stored', shred: 'shredded' };
+    const cached = mailCache.find(m => m.id === currentActionMailId);
+    if (cached) cached.status = statusMap[currentActionType];
+    renderDashMail();
+    renderMailTab(document.querySelector('.filter-pill.active')?.dataset?.filter || 'all');
+    updateStats();
     toast('Request submitted!', 'success');
     closeSheet('action-sheet');
     currentActionMailId = null;
