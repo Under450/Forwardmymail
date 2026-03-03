@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772562447 -->
+<!-- v1772562744 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1105,7 +1105,7 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
                   resolve();
                 }
               });
-              setTimeout(resolve, 4000);
+              setTimeout(resolve, 8000);
             });
           }
           if (currentUser && !currentCustomer) {
@@ -1169,10 +1169,13 @@ async function goToApp() {
   setupPinFirst = '';
   setupStep = 'first';
   showScreen('screen-app');
-  if (!currentCustomer && currentUser) {
+  // Always reload customer data to ensure fresh state
+  if (currentUser) {
     await loadCustomerData(currentUser.uid);
   }
-  populateApp();
+  if (currentCustomer) {
+    populateApp();
+  }
   loadMailData();
 }
 
