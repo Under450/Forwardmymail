@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772562744 -->
+<!-- v1772563022 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -162,51 +162,6 @@ html, body {
 
 .otp-resend { font-size: 13px; color: rgba(255,255,255,0.45); text-align: center; margin-top: 16px; }
 .otp-resend a { color: rgba(255,255,255,0.7); font-weight: 600; text-decoration: none; }
-
-/* ===== PIN SETUP SCREEN ===== */
-#screen-pin-setup {
-  background: var(--brand);
-  padding: calc(var(--safe-top) + 60px) 28px calc(var(--safe-bottom) + 24px);
-  align-items: center;
-}
-
-/* ===== PIN LOGIN SCREEN ===== */
-#screen-pin {
-  background: var(--brand);
-  padding: calc(var(--safe-top) + 40px) 28px calc(var(--safe-bottom) + 24px);
-  align-items: center;
-  justify-content: space-between;
-}
-.pin-header { text-align: center; }
-.pin-greeting { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 4px; }
-.pin-name { font-family: 'DM Serif Display', serif; font-size: 26px; color: #fff; }
-.pin-instruction { font-size: 14px; color: rgba(255,255,255,0.55); margin-top: 28px; }
-.pin-dots { display: flex; gap: 16px; justify-content: center; margin: 24px 0; }
-.pin-dot {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid rgba(255,255,255,0.35);
-  background: transparent; transition: all 0.15s;
-}
-.pin-dot.filled { background: #fff; border-color: #fff; }
-.pin-dot.error { background: var(--red); border-color: var(--red); animation: shake 0.4s ease; }
-@keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-5px)} 40%,80%{transform:translateX(5px)} }
-
-.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
-.numpad-key {
-  aspect-ratio: 1; border-radius: 50%; border: none;
-  background: rgba(255,255,255,0.1); color: #fff;
-  font-size: 22px; font-weight: 500; font-family: 'DM Sans', sans-serif;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  transition: background 0.1s, transform 0.1s;
-  user-select: none;
-}
-.numpad-key:active { background: rgba(255,255,255,0.22); transform: scale(0.93); }
-.numpad-key.empty { background: transparent; cursor: default; }
-.numpad-key.delete { font-size: 18px; }
-.numpad-key.biometric { font-size: 26px; }
-
-.pin-forgot { font-size: 12px; color: rgba(255,255,255,0.35); text-align: center; margin-top: 8px; }
-.pin-forgot a { color: rgba(255,255,255,0.55); text-decoration: none; }
 
 /* ===== APP SHELL ===== */
 #screen-app {
@@ -580,64 +535,7 @@ html, body {
   <p class="otp-resend">Didn't get it? <a href="#" id="otp-resend-link">Resend code</a></p>
 </div>
 
-<!-- ===== PIN SETUP ===== -->
-<div class="screen" id="screen-pin-setup" style="justify-content:center;">
-  <div style="width:100%;max-width:320px;text-align:center;">
-    <div style="font-size:48px;margin-bottom:20px;">🔐</div>
-    <h2 style="font-family:'DM Serif Display',serif;font-size:26px;color:#fff;margin-bottom:8px;">Create your PIN</h2>
-    <p style="font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:32px;line-height:1.5;">Set a 4-digit PIN to quickly<br>unlock the app next time</p>
-    <div class="pin-dots" id="setup-dots">
-      <div class="pin-dot"></div><div class="pin-dot"></div>
-      <div class="pin-dot"></div><div class="pin-dot"></div>
-    </div>
-    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px;" id="setup-pin-step">Enter new PIN</p>
-    <div class="numpad" style="margin:0 auto;">
-      <button class="numpad-key" data-val="1">1</button>
-      <button class="numpad-key" data-val="2">2</button>
-      <button class="numpad-key" data-val="3">3</button>
-      <button class="numpad-key" data-val="4">4</button>
-      <button class="numpad-key" data-val="5">5</button>
-      <button class="numpad-key" data-val="6">6</button>
-      <button class="numpad-key" data-val="7">7</button>
-      <button class="numpad-key" data-val="8">8</button>
-      <button class="numpad-key" data-val="9">9</button>
-      <button class="numpad-key empty"></button>
-      <button class="numpad-key" data-val="0">0</button>
-      <button class="numpad-key delete" id="setup-delete">⌫</button>
-    </div>
-    <button class="btn-ghost" id="skip-pin-btn" style="max-width:260px;margin:20px auto 0;">Skip for now</button>
-  </div>
-</div>
 
-<!-- ===== PIN LOGIN ===== -->
-<div class="screen" id="screen-pin">
-  <div class="pin-header">
-    <p class="pin-greeting">Good to see you</p>
-    <h2 class="pin-name" id="pin-user-name">—</h2>
-    <p class="pin-instruction">Enter your PIN to continue</p>
-    <div class="pin-dots" id="pin-dots">
-      <div class="pin-dot"></div><div class="pin-dot"></div>
-      <div class="pin-dot"></div><div class="pin-dot"></div>
-    </div>
-  </div>
-  <div style="text-align:center;">
-    <div class="numpad" style="margin:0 auto 16px;">
-      <button class="numpad-key" data-pin="1">1</button>
-      <button class="numpad-key" data-pin="2">2</button>
-      <button class="numpad-key" data-pin="3">3</button>
-      <button class="numpad-key" data-pin="4">4</button>
-      <button class="numpad-key" data-pin="5">5</button>
-      <button class="numpad-key" data-pin="6">6</button>
-      <button class="numpad-key" data-pin="7">7</button>
-      <button class="numpad-key" data-pin="8">8</button>
-      <button class="numpad-key" data-pin="9">9</button>
-      <button class="numpad-key biometric" id="biometric-btn">👆</button>
-      <button class="numpad-key" data-pin="0">0</button>
-      <button class="numpad-key delete" id="pin-delete">⌫</button>
-    </div>
-    <p class="pin-forgot"><a href="#" id="pin-use-password">Use password instead</a></p>
-  </div>
-</div>
 
 <!-- ===== MAIN APP ===== -->
 <div class="screen" id="screen-app">
@@ -741,9 +639,6 @@ html, body {
         <div class="settings-section">
           <div class="settings-label">Security</div>
           <div class="settings-group">
-            <div class="settings-row" id="change-pin-row">
-              <div class="sr-icon navy">🔐</div>
-              <div class="sr-body"><div class="sr-title">Change PIN</div><div class="sr-sub">Update your app unlock PIN</div></div>
               <div class="sr-arrow">›</div>
             </div>
             <div class="settings-row">
@@ -885,7 +780,7 @@ html, body {
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, limit, getDocs, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -900,25 +795,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ===== STATE =====
 let currentUser = null;
 let currentCustomer = null;
 let mailCache = [];
 let selectedPack = null;
-let pinBuffer = '';
-let setupPinFirst = '';
-let setupStep = 'first'; // 'first' | 'confirm'
 
-// ===== SCREEN MANAGEMENT =====
+// ===== SCREEN =====
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('active');
-  });
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   const el = document.getElementById(id);
-  if (el) {
-    // Force reflow
-    setTimeout(() => el.classList.add('active'), 10);
-  }
+  if (el) setTimeout(() => el.classList.add('active'), 10);
 }
 
 // ===== TOAST =====
@@ -930,29 +816,23 @@ function toast(msg, type = '') {
 }
 
 // ===== SPLASH =====
-let splashDone = false;
-function afterSplash() {
-  if (splashDone) return;
-  splashDone = true;
-  const savedPin = localStorage.getItem('fmm_pin');
-  const savedName = localStorage.getItem('fmm_name') || '';
-  if (savedPin) {
-    document.getElementById('pin-user-name').textContent = savedName;
-    showScreen('screen-pin');
-  } else {
-    showScreen('screen-login');
-  }
-}
-setTimeout(afterSplash, 2500);
-
-// Safety fallback — if still on splash after 5s, force to login
+// After splash, go straight to login - no PIN
 setTimeout(() => {
-  const splash = document.getElementById('screen-splash');
-  if (!splashDone && splash.classList.contains('active')) {
-    splashDone = true;
-    showScreen('screen-login');
+  showScreen('screen-login');
+}, 1800);
+
+// ===== AUTH STATE =====
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    // If we're on the login screen after a page reload and auth persisted, go straight to app
+    const loginActive = document.getElementById('screen-login').classList.contains('active');
+    const splashActive = document.getElementById('screen-splash').classList.contains('active');
+    if (!loginActive && !splashActive) {
+      // Already went to app via login button - do nothing
+    }
   }
-}, 5000);
+});
 
 // ===== LOGIN =====
 document.getElementById('login-btn').addEventListener('click', async () => {
@@ -974,18 +854,10 @@ document.getElementById('login-btn').addEventListener('click', async () => {
   try {
     const cred = await signInWithEmailAndPassword(auth, email, password);
     currentUser = cred.user;
-    // Load customer data
     await loadCustomerData(currentUser.uid);
     btn.classList.remove('loading');
     btn.disabled = false;
-
-    // Check if PIN is set
-    const savedPin = localStorage.getItem('fmm_pin');
-    if (!savedPin) {
-      showScreen('screen-pin-setup');
-    } else {
-      goToApp();
-    }
+    goToApp();
   } catch (err) {
     btn.classList.remove('loading');
     btn.disabled = false;
@@ -1002,148 +874,12 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 
 document.getElementById('login-forgot').addEventListener('click', async () => {
   const email = document.getElementById('login-email').value.trim();
-  if (!email) {
-    toast('Enter your email address first', 'error');
-    return;
-  }
+  if (!email) { toast('Enter your email address first', 'error'); return; }
   try {
     await sendPasswordResetEmail(auth, email);
     toast('Password reset email sent!', 'success');
   } catch {
     toast('Could not send reset email', 'error');
-  }
-});
-
-// ===== PIN SETUP =====
-async function setupPinInput(val) {
-  if (pinBuffer.length < 4) pinBuffer += val;
-  updateSetupDots();
-  if (pinBuffer.length === 4) {
-    if (setupStep === 'first') {
-      setupPinFirst = pinBuffer;
-      pinBuffer = '';
-      setupStep = 'confirm';
-      document.getElementById('setup-pin-step').textContent = 'Confirm your PIN';
-      updateSetupDots();
-      setTimeout(() => {}, 300);
-    } else {
-      if (pinBuffer === setupPinFirst) {
-        localStorage.setItem('fmm_pin', pinBuffer);
-        // Also save name so splash screen can show PIN entry next time
-        const nameToSave = currentCustomer?.firstName || currentCustomer?.name || currentUser?.email?.split('@')[0] || '';
-        localStorage.setItem('fmm_name', nameToSave);
-        toast('PIN set successfully!', 'success');
-        setTimeout(() => goToApp(), 400);
-      } else {
-        // Shake and reset
-        document.querySelectorAll('#setup-dots .pin-dot').forEach(d => d.classList.add('error'));
-        setTimeout(() => {
-          document.querySelectorAll('#setup-dots .pin-dot').forEach(d => d.classList.remove('error', 'filled'));
-          pinBuffer = '';
-          setupPinFirst = '';
-          setupStep = 'first';
-          document.getElementById('setup-pin-step').textContent = 'PINs did not match — try again';
-        }, 500);
-      }
-    }
-  }
-}
-
-function updateSetupDots() {
-  document.querySelectorAll('#setup-dots .pin-dot').forEach((d, i) => {
-    d.classList.toggle('filled', i < pinBuffer.length);
-  });
-}
-
-document.querySelectorAll('#screen-pin-setup .numpad-key[data-val]').forEach(k => {
-  k.addEventListener('click', () => setupPinInput(k.dataset.val));
-});
-document.getElementById('setup-delete').addEventListener('click', () => {
-  pinBuffer = pinBuffer.slice(0, -1);
-  updateSetupDots();
-});
-document.getElementById('skip-pin-btn').addEventListener('click', () => {
-  goToApp();
-});
-
-// ===== PIN LOGIN =====
-let pinEntry = '';
-
-function updatePinDots(entry, dotId = 'pin-dots') {
-  document.querySelectorAll(`#${dotId} .pin-dot`).forEach((d, i) => {
-    d.classList.toggle('filled', i < entry.length);
-    d.classList.remove('error');
-  });
-}
-
-function pinError() {
-  document.querySelectorAll('#pin-dots .pin-dot').forEach(d => {
-    d.classList.remove('filled');
-    d.classList.add('error');
-  });
-  setTimeout(() => {
-    document.querySelectorAll('#pin-dots .pin-dot').forEach(d => d.classList.remove('error'));
-    pinEntry = '';
-  }, 600);
-}
-
-document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
-  k.addEventListener('click', async () => {
-    if (pinEntry.length < 4) {
-      pinEntry += k.dataset.pin;
-      updatePinDots(pinEntry);
-      if (pinEntry.length === 4) {
-        const saved = localStorage.getItem('fmm_pin');
-        if (pinEntry === saved) {
-          // Ensure we have auth + customer data before going to app
-          if (!currentUser) {
-            await new Promise(resolve => {
-              const unsub = onAuthStateChanged(auth, async user => {
-                if (user) {
-                  currentUser = user;
-                  unsub();
-                  resolve();
-                }
-              });
-              setTimeout(resolve, 8000);
-            });
-          }
-          if (currentUser && !currentCustomer) {
-            await loadCustomerData(currentUser.uid);
-          }
-          goToApp();
-        } else {
-          pinError();
-        }
-      }
-    }
-  });
-});
-
-document.getElementById('pin-delete').addEventListener('click', () => {
-  pinEntry = pinEntry.slice(0, -1);
-  updatePinDots(pinEntry);
-});
-
-document.getElementById('biometric-btn').addEventListener('click', async () => {
-  if (window.PublicKeyCredential) {
-    toast('Biometric auth coming soon!');
-  } else {
-    toast('Biometrics not supported on this device');
-  }
-});
-
-document.getElementById('pin-use-password').addEventListener('click', (e) => {
-  e.preventDefault();
-  pinEntry = '';
-  showScreen('screen-login');
-});
-
-// ===== AUTH STATE (handles app reload) =====
-onAuthStateChanged(auth, async (user) => {
-  if (user && !currentUser) {
-    currentUser = user;
-    afterSplash(); // go to PIN if splash still pending
   }
 });
 
@@ -1153,7 +889,6 @@ async function loadCustomerData(uid) {
     const docSnap = await getDoc(doc(db, 'customers', uid));
     if (docSnap.exists()) {
       currentCustomer = { id: uid, ...docSnap.data() };
-      localStorage.setItem('fmm_name', currentCustomer.firstName || currentCustomer.name || currentCustomer.email?.split('@')[0] || 'there');
       return currentCustomer;
     }
   } catch (err) {
@@ -1164,22 +899,15 @@ async function loadCustomerData(uid) {
 
 // ===== GO TO APP =====
 async function goToApp() {
-  pinBuffer = '';
-  pinEntry = '';
-  setupPinFirst = '';
-  setupStep = 'first';
   showScreen('screen-app');
-  // Always reload customer data to ensure fresh state
-  if (currentUser) {
+  if (currentUser && !currentCustomer) {
     await loadCustomerData(currentUser.uid);
   }
-  if (currentCustomer) {
-    populateApp();
-  }
+  populateApp();
   loadMailData();
 }
 
-// ===== POPULATE APP UI =====
+// ===== POPULATE APP =====
 function populateApp() {
   if (!currentCustomer) return;
 
@@ -1188,61 +916,49 @@ function populateApp() {
   const credits = currentCustomer.credits || currentCustomer.creditBalance || 0;
   const creditsDisplay = `£${parseFloat(credits).toFixed(2)}`;
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
-
-  // Greeting
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+
   document.getElementById('dash-greet').textContent = greet;
   document.getElementById('dash-name').textContent = name;
   document.getElementById('dash-credit').textContent = creditsDisplay;
   document.getElementById('dash-credit-sub').textContent = `~${Math.floor(parseFloat(credits) / 0.85)} standard letters`;
-
-  // Header
   document.getElementById('user-avatar').textContent = initials;
 
-  // Account tab
-  document.getElementById('acct-name').textContent = currentCustomer.firstName && currentCustomer.lastName
-    ? `${currentCustomer.firstName} ${currentCustomer.lastName}`
-    : name;
+  const fullName = currentCustomer.firstName && currentCustomer.lastName
+    ? `${currentCustomer.firstName} ${currentCustomer.lastName}` : name;
+  document.getElementById('acct-name').textContent = fullName;
   document.getElementById('acct-email').textContent = email;
   document.getElementById('acct-credit').textContent = creditsDisplay;
   document.getElementById('acct-avatar').textContent = initials;
-  document.getElementById('acct-address').textContent = currentCustomer.forwardingAddress || 'Not set';
+
+  const addr = currentCustomer.forwardingAddress || '';
+  document.getElementById('acct-address').textContent = addr ? addr.replace(/
+/g, ', ') : 'Not set';
 }
 
 // ===== LOAD MAIL =====
 async function loadMailData() {
   if (!currentUser) return;
   try {
-    const q = query(
-      collection(db, 'mail'),
-      where('customerId', '==', currentUser.uid),
-      orderBy('receivedAt', 'desc'),
-      limit(20)
-    );
+    const q = query(collection(db, 'mail'), where('customerId', '==', currentUser.uid), orderBy('receivedAt', 'desc'), limit(50));
     const snap = await getDocs(q);
     mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderDashMail();
     renderMailTab('all');
     updateStats();
   } catch (err) {
     console.error('Error loading mail:', err);
-    // Show empty state
-    document.getElementById('mail-items-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
-    document.getElementById('stat-new').textContent = '0';
-    document.getElementById('stat-scanned').textContent = '0';
-    document.getElementById('stat-posted').textContent = '0';
-    document.getElementById('stat-shredded').textContent = '0';
+    const list = document.getElementById('mail-items-list');
+    if (list) list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
   }
 }
 
 function updateStats() {
-  document.getElementById('stat-new').textContent = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
+  const newCount = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
+  document.getElementById('stat-new').textContent = newCount;
   document.getElementById('stat-scanned').textContent = mailCache.filter(m => m.status === 'scanned').length;
   document.getElementById('stat-posted').textContent = mailCache.filter(m => m.status === 'posted').length;
   document.getElementById('stat-shredded').textContent = mailCache.filter(m => m.status === 'shredded').length;
-
-  const newCount = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
   document.querySelector('[data-tab="mail"]').classList.toggle('has-badge', newCount > 0);
   document.getElementById('notif-badge').textContent = newCount;
   document.getElementById('notif-badge').style.display = newCount > 0 ? 'flex' : 'none';
@@ -1256,43 +972,30 @@ const SENDER_EMOJI = {
 function getEmoji(sender) {
   if (!sender) return '📬';
   const s = sender.toLowerCase();
-  for (const [k, v] of Object.entries(SENDER_EMOJI)) {
-    if (s.includes(k)) return v;
-  }
+  for (const [k, v] of Object.entries(SENDER_EMOJI)) { if (s.includes(k)) return v; }
   return '📬';
 }
 
 function getBadgeClass(status) {
-  const map = { new: 'badge-new', received: 'badge-new', scanned: 'badge-scanned', posted: 'badge-posted', stored: 'badge-stored', shredded: 'badge-shredded' };
-  return map[status] || 'badge-new';
+  return { new: 'badge-new', received: 'badge-new', scanned: 'badge-scanned', posted: 'badge-posted', stored: 'badge-stored', shredded: 'badge-shredded' }[status] || 'badge-new';
 }
 
 function getBadgeLabel(status) {
-  const map = { new: 'NEW', received: 'NEW', scanned: 'SCANNED', posted: 'POSTED', stored: 'STORED', shredded: 'SHREDDED' };
-  return map[status] || status?.toUpperCase() || 'NEW';
+  return { new: 'NEW', received: 'NEW', scanned: 'SCANNED', posted: 'POSTED', stored: 'STORED', shredded: 'SHREDDED' }[status] || status?.toUpperCase() || 'NEW';
 }
 
-function renderDashMail() {
-  const list = document.getElementById('dash-mail-list');
-  if (!list) return;
-  if (!mailCache.length) {
-    list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
-    return;
-  }
-  list.innerHTML = mailCache.slice(0, 5).map(m => `
-    <div class="mail-row ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
-      <div class="mr-icon">${getEmoji(m.sender)}</div>
-      <div class="mr-body">
-        <div class="mr-from">${m.sender || 'Unknown Sender'}</div>
-        <div class="mr-desc">${m.description || m.type || 'Letter'}</div>
-      </div>
-      <div class="mr-badge ${getBadgeClass(m.status)}">${getBadgeLabel(m.status)}</div>
-    </div>
-  `).join('');
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const diff = Math.floor((new Date() - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 function renderMailTab(filter) {
   const list = document.getElementById('mail-items-list');
+  if (!list) return;
   let items = filter === 'all' ? mailCache : mailCache.filter(m => {
     if (filter === 'new') return m.status === 'new' || m.status === 'received';
     return m.status === filter;
@@ -1307,43 +1010,24 @@ function renderMailTab(filter) {
     const isFree = m.isFreeOfficialMail || m.freeOfficial;
     let actions;
     if (m.status === 'received' || m.status === 'new') {
-      const freeTag = isFree
-        ? '<div class="mc-action free">✓ Free (Official)</div>'
-        : '<div class="mc-action" onclick="event.stopPropagation()">🗑️ Shred</div>';
-      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View</div>'
-        + freeTag;
+      actions = '<div class="mc-action primary" onclick="openDetail('' + m.id + '');event.stopPropagation()">📄 View</div>'
+        + (isFree ? '<div class="mc-action free">✓ Free (Official)</div>' : '<div class="mc-action" onclick="openActionSheet('shred','' + m.id + '');event.stopPropagation()">🗑️ Shred</div>');
     } else if (m.status === 'scanned') {
-      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>';
+      actions = '<div class="mc-action primary" onclick="openDetail('' + m.id + '');event.stopPropagation()">📄 View Scan</div>';
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
-
-    return `
-      <div class="mail-card ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
-        <div class="mail-card-top">
-          <div class="mc-avatar">${getEmoji(m.sender)}</div>
-          <div class="mc-body">
-            <div class="mc-top">
-              <div class="mc-from">${m.sender || 'Unknown'}</div>
-              <div class="mc-date">${formatDate(m.receivedAt)}</div>
-            </div>
-            <div class="mc-subject">${m.description || m.type || 'Letter'}${m.pages ? ` · ${m.pages} page${m.pages > 1 ? 's' : ''}` : ''}</div>
-          </div>
+    return `<div class="mail-card ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
+      <div class="mail-card-top">
+        <div class="mc-avatar">${getEmoji(m.sender)}</div>
+        <div class="mc-body">
+          <div class="mc-top"><div class="mc-from">${m.sender || 'Unknown'}</div><div class="mc-date">${formatDate(m.receivedAt)}</div></div>
+          <div class="mc-subject">${m.description || m.type || 'Letter'}${m.pages ? ' · ' + m.pages + ' page' + (m.pages > 1 ? 's' : '') : ''}</div>
         </div>
-        <div class="mail-card-actions">${actions}</div>
       </div>
-    `;
+      <div class="mail-card-actions">${actions}</div>
+    </div>`;
   }).join('');
-}
-
-function formatDate(ts) {
-  if (!ts) return '—';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  const today = new Date();
-  const diff = Math.floor((today - d) / 86400000);
-  if (diff === 0) return 'Today';
-  if (diff === 1) return 'Yesterday';
-  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 // ===== FILTER PILLS =====
@@ -1359,22 +1043,19 @@ document.querySelectorAll('.filter-pill').forEach(pill => {
 window.openDetail = function(id) {
   const m = mailCache.find(item => item.id === id);
   if (!m) return;
-  console.log('openDetail:', id, 'status:', m.status, 'scanUrl:', m.scanUrl, 'files:', JSON.stringify(m.files));
 
   document.getElementById('detail-emoji').textContent = getEmoji(m.sender);
   document.getElementById('detail-from').textContent = m.sender || 'Unknown';
   document.getElementById('detail-type').textContent = (m.type || 'Letter') + (m.pages ? ' · ' + m.pages + ' pages' : '');
   document.getElementById('detail-date').textContent = `Received ${formatDate(m.receivedAt)}`;
-
-  // Timeline
   document.getElementById('tl-received').textContent = formatDate(m.receivedAt);
+
   const scannedStep = document.getElementById('tl-scanned-step');
   if (m.scannedAt) {
     scannedStep.classList.add('active');
     document.getElementById('tl-scanned').textContent = formatDate(m.scannedAt);
   }
 
-  // Price box
   const priceBox = document.getElementById('detail-price-box');
   if (m.pages && m.status === 'scanned') {
     const cost = m.pages === 1 ? 0.50 : 0.50 + (m.pages - 1) * 0.25;
@@ -1384,52 +1065,37 @@ window.openDetail = function(id) {
     priceBox.style.display = 'none';
   }
 
-  // Actions
-  const isFree = m.isFreeOfficialMail || m.freeOfficial;
-  let actionsHtml = '';
   const viewUrl = m.scanUrl || (m.files && m.files[0] && m.files[0].url) || null;
-  if (viewUrl) {
-    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
-  }
+  let actionsHtml = '';
+  if (viewUrl) actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
   actionsHtml += `<div class="action-row" onclick="openActionSheet('post','${m.id}')"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
   actionsHtml += `<div class="action-row" onclick="openActionSheet('keep','${m.id}')"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
   actionsHtml += `<div class="action-row" onclick="openActionSheet('shred','${m.id}')"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
-
   document.getElementById('detail-actions').innerHTML = actionsHtml;
-  openSheet('detail-sheet');
+  window.openSheet('detail-sheet');
 };
 
 // ===== SHEETS =====
-window.openSheet = function openSheet(id) {
+window.openSheet = function(id) {
   const overlay = document.getElementById(id);
   overlay.style.display = 'flex';
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      overlay.classList.add('visible');
-    });
-  });
-  // Scroll to top after animation completes
-  setTimeout(() => {
-    const sheet = overlay.querySelector('.sheet');
-    if (sheet) sheet.scrollTop = 0;
-  }, 50);
-}
+  requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
+  setTimeout(() => { const s = overlay.querySelector('.sheet'); if (s) s.scrollTop = 0; }, 50);
+};
 
-window.closeSheet = function closeSheet(id) {
+window.closeSheet = function(id) {
   const overlay = document.getElementById(id);
   overlay.classList.remove('visible');
   setTimeout(() => { overlay.style.display = 'none'; }, 350);
-}
+};
 
 document.querySelectorAll('.sheet-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeSheet(overlay.id);
-  });
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) window.closeSheet(overlay.id); });
 });
 
 // ===== TOP-UP =====
-document.getElementById('topup-btn').addEventListener('click', () => openSheet('topup-sheet'));
-document.getElementById('acct-topup-row').addEventListener('click', () => openSheet('topup-sheet'));
+document.getElementById('topup-btn').addEventListener('click', () => window.openSheet('topup-sheet'));
+document.getElementById('acct-topup-row').addEventListener('click', () => window.openSheet('topup-sheet'));
 
 document.querySelectorAll('.credit-pack').forEach(pack => {
   pack.addEventListener('click', () => {
@@ -1440,12 +1106,9 @@ document.querySelectorAll('.credit-pack').forEach(pack => {
 });
 
 document.getElementById('topup-proceed').addEventListener('click', () => {
-  if (!selectedPack) {
-    toast('Please select a credit pack', 'error');
-    return;
-  }
+  if (!selectedPack) { toast('Please select a credit pack', 'error'); return; }
   window.open(selectedPack.link, '_blank');
-  closeSheet('topup-sheet');
+  window.closeSheet('topup-sheet');
   toast('Redirecting to secure payment...', 'success');
 });
 
@@ -1458,7 +1121,7 @@ window.switchTab = function(tabName) {
 };
 
 document.querySelectorAll('.nav-item').forEach(nav => {
-  nav.addEventListener('click', () => switchTab(nav.dataset.tab));
+  nav.addEventListener('click', () => window.switchTab(nav.dataset.tab));
 });
 
 // ===== SIGN OUT =====
@@ -1467,21 +1130,11 @@ document.getElementById('signout-row').addEventListener('click', async () => {
   currentUser = null;
   currentCustomer = null;
   mailCache = [];
-  showScreen('screen-login');  // keep fmm_pin + fmm_name so PIN screen shows on next login
+  showScreen('screen-login');
   toast('Signed out successfully');
 });
 
-// ===== CHANGE PIN =====
-document.getElementById('change-pin-row').addEventListener('click', () => {
-  pinBuffer = '';
-  setupStep = 'first';
-  setupPinFirst = '';
-  updateSetupDots();
-  document.getElementById('setup-pin-step').textContent = 'Enter new PIN';
-  showScreen('screen-pin-setup');
-});
-
-// ===== ACTION SHEET (Post / Keep / Shred) =====
+// ===== ACTION SHEET =====
 let currentActionMailId = null;
 let currentActionType = null;
 
@@ -1499,8 +1152,8 @@ window.openActionSheet = function(type, mailId) {
   document.getElementById('action-note').value = '';
   document.getElementById('action-confirm-btn').textContent = 'Confirm';
   document.getElementById('action-confirm-btn').disabled = false;
-  closeSheet('detail-sheet');
-  setTimeout(() => openSheet('action-sheet'), 350);
+  window.closeSheet('detail-sheet');
+  setTimeout(() => window.openSheet('action-sheet'), 350);
 };
 
 document.getElementById('action-confirm-btn').addEventListener('click', async () => {
@@ -1510,7 +1163,6 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
   btn.disabled = true;
   try {
     const note = document.getElementById('action-note').value.trim();
-    const actionLabels = { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' };
     await addDoc(collection(db, 'mailRequests'), {
       mailId: currentActionMailId,
       customerId: currentUser.uid,
@@ -1518,25 +1170,21 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
       customerEmail: currentCustomer?.email || '',
       mailboxId: currentCustomer?.mailboxId || '',
       action: currentActionType,
-      actionLabel: actionLabels[currentActionType],
+      actionLabel: { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' }[currentActionType],
       notes: note,
       status: 'pending',
       createdAt: serverTimestamp()
     });
-    // Update local cache so card status reflects action immediately
     const cached = mailCache.find(m => m.id === currentActionMailId);
     if (cached) cached.status = { post: 'posted', keep: 'stored', shred: 'shredded' }[currentActionType];
-    renderDashMail();
-    // Reset filter pills to 'all' and re-render so updated card is visible
     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
     const allPill = document.querySelector('.filter-pill[data-filter="all"]');
     if (allPill) allPill.classList.add('active');
     renderMailTab('all');
     updateStats();
-    // Switch to mail tab so user sees the updated list
-    switchTab('mail');
+    window.switchTab('mail');
     toast('Request submitted!', 'success');
-    closeSheet('action-sheet');
+    window.closeSheet('action-sheet');
     currentActionMailId = null;
     currentActionType = null;
   } catch(err) {
@@ -1547,85 +1195,18 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
   }
 });
 
-document.getElementById('action-cancel-btn').addEventListener('click', () => {
-  closeSheet('action-sheet');
-});
+document.getElementById('action-cancel-btn').addEventListener('click', () => window.closeSheet('action-sheet'));
 
-// ===== PULL TO REFRESH =====
-(function() {
-  let startY = 0;
-  let pulling = false;
-  const threshold = 70;
-
-  function isAppActive() {
-    const s = document.getElementById('screen-app');
-    return s && s.classList.contains('active');
-  }
-  function anySheetOpen() {
-    return !!document.querySelector('.sheet-overlay[style*="flex"]');
-  }
-  function atScrollTop() {
-    const els = [
-      document.getElementById('mail-items-list'),
-      document.querySelector('.tab-pane.active')
-    ];
-    for (const el of els) {
-      if (el && el.scrollTop > 2) return false;
-    }
-    return true;
-  }
-
-  document.addEventListener('touchstart', (e) => {
-    pulling = false;
-    if (!isAppActive() || anySheetOpen() || !atScrollTop()) return;
-    startY = e.touches[0].clientY;
-    pulling = true;
-  }, { passive: true });
-
-  document.addEventListener('touchmove', (e) => {
-    if (!pulling) return;
-    if (e.touches[0].clientY - startY > 15) {
-      document.body.style.setProperty('--ptr-visible', '1');
-    }
-  }, { passive: true });
-
-  document.addEventListener('touchend', async (e) => {
-    if (!pulling) return;
-    pulling = false;
-    document.body.style.setProperty('--ptr-visible', '0');
-    const dy = e.changedTouches[0].clientY - startY;
-    if (dy >= threshold) {
-      try {
-        if (currentUser) {
-          await loadCustomerData(currentUser.uid);
-          populateApp();
-        }
-        await loadMailData();
-        toast('Refreshed ✓', 'success');
-      } catch(err) {
-        console.error('Refresh error:', err);
-      }
-    }
-  }, { passive: true });
-})();
-
-
-// ===== CONTACT US =====
-window.contactUs = function() {
-  const ref = currentCustomer?.mailboxId || currentCustomer?.email || '';
-  window.location.href = 'mailto:info@forwardmymail.co.uk?subject=' + encodeURIComponent('Support Request - ' + ref);
-};
-
-// ===== FORWARDING ADDRESS SHEET =====
+// ===== FORWARDING ADDRESS =====
 window.openAddressSheet = function() {
-  // Pre-fill with current address if set
   const addr = currentCustomer?.forwardingAddress || '';
-  const parts = addr.split('\n');
+  const parts = addr.split('
+');
   document.getElementById('addr-line1').value = parts[0] || '';
   document.getElementById('addr-line2').value = parts[1] || '';
   document.getElementById('addr-city').value = parts[2] || '';
   document.getElementById('addr-postcode').value = parts[3] || '';
-  openSheet('address-sheet');
+  window.openSheet('address-sheet');
 };
 
 document.getElementById('addr-save-btn').addEventListener('click', async () => {
@@ -1633,28 +1214,19 @@ document.getElementById('addr-save-btn').addEventListener('click', async () => {
   const line2 = document.getElementById('addr-line2').value.trim();
   const city = document.getElementById('addr-city').value.trim();
   const postcode = document.getElementById('addr-postcode').value.trim();
-
-  if (!line1 || !city || !postcode) {
-    toast('Please fill in address, city and postcode', 'error');
-    return;
-  }
+  if (!line1 || !city || !postcode) { toast('Please fill in address, city and postcode', 'error'); return; }
 
   const parts = [line1, line2, city, postcode].filter(Boolean);
-  const fullAddress = parts.join('\n');
-  const displayAddress = parts.join(', ');
-
+  const fullAddress = parts.join('
+');
   const btn = document.getElementById('addr-save-btn');
   btn.textContent = 'Saving...';
   btn.disabled = true;
-
   try {
-    // Update customer document
     await updateDoc(doc(db, 'customers', currentUser.uid), {
       forwardingAddress: fullAddress,
       forwardingAddressUpdatedAt: serverTimestamp()
     });
-
-    // Also save a permanent copy to addressHistory (staff can always see this)
     await addDoc(collection(db, 'addressHistory'), {
       customerId: currentUser.uid,
       customerEmail: currentCustomer?.email || '',
@@ -1662,23 +1234,56 @@ document.getElementById('addr-save-btn').addEventListener('click', async () => {
       address: fullAddress,
       updatedAt: serverTimestamp()
     });
-
-    // Update local state
     if (currentCustomer) currentCustomer.forwardingAddress = fullAddress;
-    document.getElementById('acct-address').textContent = displayAddress;
-
-    closeSheet('address-sheet');
-    toast('Address saved successfully', 'success');
+    document.getElementById('acct-address').textContent = parts.join(', ');
+    window.closeSheet('address-sheet');
+    toast('Address saved', 'success');
   } catch(err) {
-    console.error('Address save error:', err);
-    toast('Failed to save address. Please try again.', 'error');
+    console.error('Address error:', err);
+    toast('Failed to save address', 'error');
   } finally {
     btn.textContent = 'Save Address';
     btn.disabled = false;
   }
 });
 
+// ===== CONTACT US =====
+window.contactUs = function() {
+  const ref = currentCustomer?.mailboxId || currentCustomer?.email || '';
+  window.location.href = 'mailto:info@forwardmymail.co.uk?subject=' + encodeURIComponent('Support Request - ' + ref);
+};
 
+// ===== PULL TO REFRESH =====
+(function() {
+  let startY = 0, pulling = false;
+  const threshold = 70;
+  function isAppActive() { return document.getElementById('screen-app')?.classList.contains('active'); }
+  function anySheetOpen() { return !!document.querySelector('.sheet-overlay[style*="flex"]'); }
+  function atScrollTop() {
+    const el = document.querySelector('.tab-pane.active');
+    return !el || el.scrollTop <= 2;
+  }
+  document.addEventListener('touchstart', (e) => {
+    pulling = false;
+    if (!isAppActive() || anySheetOpen() || !atScrollTop()) return;
+    startY = e.touches[0].clientY;
+    pulling = true;
+  }, { passive: true });
+  document.addEventListener('touchend', async (e) => {
+    if (!pulling) return;
+    pulling = false;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (dy >= threshold) {
+      try {
+        if (currentUser) { await loadCustomerData(currentUser.uid); populateApp(); }
+        await loadMailData();
+        toast('Refreshed ✓', 'success');
+      } catch(err) { console.error('Refresh error:', err); }
+    }
+  }, { passive: true });
+})();
+
+// ===== SERVICE WORKER =====
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
 }
