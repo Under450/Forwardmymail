@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772566997 -->
+<!-- v1772567256 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -836,91 +836,47 @@ function showScreen(id) {
 }
 
 // ===== TOAST =====
-function toast(msg, type = '') {
+function toast(msg, type) {
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.className = 'toast show ' + type;
+  el.className = 'toast show ' + (type || '');
   setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-// ===== SPLASH =====
-// Auth state handler routes user - splash just shows briefly
-// If no auth session after 2.5s, show login
-setTimeout(() => {
-  if (!currentUser) {
+// ===== SPLASH + AUTH =====
+let authResolved = false;
+let authUser = null;
+
+onAuthStateChanged(auth, (user) => {
+  authUser = user || null;
+  authResolved = true;
+});
+
+setTimeout(async () => {
+  let waited = 0;
+  while (!authResolved && waited < 3000) {
+    await new Promise(r => setTimeout(r, 100));
+    waited += 100;
+  }
+  if (authUser) {
+    currentUser = authUser;
+    await loadCustomerData(authUser.uid);
+    goToApp();
+  } else {
     showScreen('screen-login');
   }
-}, 2500);
+}, 1800);
 
-// ===== AUTH STATE =====
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    currentUser = user;
-    // Auth persisted from previous session - load data and go straight to app
-    await loadCustomerData(user.uid);
-    goToApp();
-  }
-});
-
-// ===== LOGIN =====
-document.getElementById('login-btn').addEventListener('click', async () => {
-  const email = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const btn = document.getElementById('login-btn');
-  const errEl = document.getElementById('login-error');
-
-  if (!email || !password) {
-    errEl.textContent = 'Please enter your email and password.';
-    errEl.classList.add('show');
-    return;
-  }
-
-  btn.classList.add('loading');
-  btn.disabled = true;
-  errEl.classList.remove('show');
-
-  try {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    currentUser = cred.user;
-    await loadCustomerData(currentUser.uid);
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    goToApp();
-  } catch (err) {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    let msg = 'Sign in failed. Please try again.';
-    if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-      msg = 'Incorrect email or password.';
-    } else if (err.code === 'auth/too-many-requests') {
-      msg = 'Too many attempts. Please try again later.';
-    }
-    errEl.textContent = msg;
-    errEl.classList.add('show');
-  }
-});
-
-document.getElementById('login-forgot').addEventListener('click', async () => {
-  const email = document.getElementById('login-email').value.trim();
-  if (!email) { toast('Enter your email address first', 'error'); return; }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    toast('Password reset email sent!', 'success');
-  } catch {
-    toast('Could not send reset email', 'error');
-  }
-});
-
-// ===== LOAD CUSTOMER DATA =====
+// ===== LOAD CUSTOMER =====
 async function loadCustomerData(uid) {
   try {
-    const docSnap = await getDoc(doc(db, 'customers', uid));
-    if (docSnap.exists()) {
-      currentCustomer = { id: uid, ...docSnap.data() };
+    const snap = await getDoc(doc(db, 'customers', uid));
+    if (snap.exists()) {
+      currentCustomer = { id: uid, ...snap.data() };
       return currentCustomer;
     }
   } catch (err) {
-    console.error('Error loading customer:', err);
+    console.error('loadCustomerData error:', err);
   }
   return null;
 }
@@ -938,31 +894,29 @@ async function goToApp() {
 // ===== POPULATE APP =====
 function populateApp() {
   if (!currentCustomer) return;
-
   const name = currentCustomer.firstName || currentCustomer.name || 'there';
   const email = currentCustomer.email || '';
-  const credits = currentCustomer.credits || currentCustomer.creditBalance || 0;
-  const creditsDisplay = `£${parseFloat(credits).toFixed(2)}`;
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
+  const credits = parseFloat(currentCustomer.credits || currentCustomer.creditBalance || 0);
+  const creditsDisplay = '£' + credits.toFixed(2);
+  const initials = name.split(' ').map(function(n){ return n[0]; }).join('').toUpperCase().slice(0,2) || '?';
   const hour = new Date().getHours();
   const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 
   document.getElementById('dash-greet').textContent = greet;
   document.getElementById('dash-name').textContent = name;
   document.getElementById('dash-credit').textContent = creditsDisplay;
-  document.getElementById('dash-credit-sub').textContent = `~${Math.floor(parseFloat(credits) / 0.85)} standard letters`;
+  document.getElementById('dash-credit-sub').textContent = '~' + Math.floor(credits / 0.85) + ' standard letters';
   document.getElementById('user-avatar').textContent = initials;
 
-  const fullName = currentCustomer.firstName && currentCustomer.lastName
-    ? `${currentCustomer.firstName} ${currentCustomer.lastName}` : name;
+  const fullName = (currentCustomer.firstName && currentCustomer.lastName)
+    ? currentCustomer.firstName + ' ' + currentCustomer.lastName : name;
   document.getElementById('acct-name').textContent = fullName;
   document.getElementById('acct-email').textContent = email;
   document.getElementById('acct-credit').textContent = creditsDisplay;
   document.getElementById('acct-avatar').textContent = initials;
 
   const addr = currentCustomer.forwardingAddress || '';
-  document.getElementById('acct-address').textContent = addr ? addr.replace(/
-/g, ', ') : 'Not set';
+  document.getElementById('acct-address').textContent = addr ? addr.split('\n').join(', ') : 'Not set';
 }
 
 // ===== LOAD MAIL =====
@@ -971,51 +925,47 @@ async function loadMailData() {
   try {
     const q = query(collection(db, 'mail'), where('customerId', '==', currentUser.uid), orderBy('receivedAt', 'desc'), limit(50));
     const snap = await getDocs(q);
-    mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    mailCache = snap.docs.map(function(d){ return Object.assign({ id: d.id }, d.data()); });
     renderMailTab('all');
     updateStats();
   } catch (err) {
-    console.error('Error loading mail:', err);
+    console.error('loadMailData error:', err);
     const list = document.getElementById('mail-items-list');
-    if (list) list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
+    if (list) list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>';
   }
 }
 
 function updateStats() {
-  const newCount = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
+  const newCount = mailCache.filter(function(m){ return m.status === 'received' || m.status === 'new'; }).length;
   document.getElementById('stat-new').textContent = newCount;
-  document.getElementById('stat-scanned').textContent = mailCache.filter(m => m.status === 'scanned').length;
-  document.getElementById('stat-posted').textContent = mailCache.filter(m => m.status === 'posted').length;
-  document.getElementById('stat-shredded').textContent = mailCache.filter(m => m.status === 'shredded').length;
-  document.querySelector('[data-tab="mail"]').classList.toggle('has-badge', newCount > 0);
-  document.getElementById('notif-badge').textContent = newCount;
-  document.getElementById('notif-badge').style.display = newCount > 0 ? 'flex' : 'none';
+  document.getElementById('stat-scanned').textContent = mailCache.filter(function(m){ return m.status === 'scanned'; }).length;
+  document.getElementById('stat-posted').textContent = mailCache.filter(function(m){ return m.status === 'posted'; }).length;
+  document.getElementById('stat-shredded').textContent = mailCache.filter(function(m){ return m.status === 'shredded'; }).length;
+  const badge = document.getElementById('notif-badge');
+  badge.textContent = newCount;
+  badge.style.display = newCount > 0 ? 'flex' : 'none';
 }
-
-const SENDER_EMOJI = {
-  hmrc: '🏛️', 'companies house': '🏢', barclays: '🏦', lloyds: '🏦', natwest: '🏦',
-  hsbc: '🏦', santander: '🏦', amazon: '📦', 'royal mail': '✉️', default: '📬'
-};
 
 function getEmoji(sender) {
   if (!sender) return '📬';
   const s = sender.toLowerCase();
-  for (const [k, v] of Object.entries(SENDER_EMOJI)) { if (s.includes(k)) return v; }
+  if (s.includes('hmrc') || s.includes('revenue')) return '🏛️';
+  if (s.includes('companies house')) return '🏢';
+  if (s.includes('barclays') || s.includes('lloyds') || s.includes('natwest') || s.includes('hsbc') || s.includes('santander')) return '🏦';
+  if (s.includes('amazon')) return '📦';
+  if (s.includes('royal mail')) return '✉️';
   return '📬';
 }
 
-function getBadgeClass(status) {
-  return { new: 'badge-new', received: 'badge-new', scanned: 'badge-scanned', posted: 'badge-posted', stored: 'badge-stored', shredded: 'badge-shredded' }[status] || 'badge-new';
-}
-
 function getBadgeLabel(status) {
-  return { new: 'NEW', received: 'NEW', scanned: 'SCANNED', posted: 'POSTED', stored: 'STORED', shredded: 'SHREDDED' }[status] || status?.toUpperCase() || 'NEW';
+  var labels = { new: 'NEW', received: 'NEW', scanned: 'SCANNED', posted: 'POSTED', stored: 'STORED', shredded: 'SHREDDED' };
+  return labels[status] || (status ? status.toUpperCase() : 'NEW');
 }
 
 function formatDate(ts) {
   if (!ts) return '—';
-  const d = ts.toDate ? ts.toDate() : new Date(ts);
-  const diff = Math.floor((new Date() - d) / 86400000);
+  var d = ts.toDate ? ts.toDate() : new Date(ts);
+  var diff = Math.floor((new Date() - d) / 86400000);
   if (diff === 0) return 'Today';
   if (diff === 1) return 'Yesterday';
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
@@ -1024,44 +974,46 @@ function formatDate(ts) {
 function renderMailTab(filter) {
   const list = document.getElementById('mail-items-list');
   if (!list) return;
-  let items = filter === 'all' ? mailCache : mailCache.filter(m => {
+  var items = filter === 'all' ? mailCache : mailCache.filter(function(m) {
     if (filter === 'new') return m.status === 'new' || m.status === 'received';
     return m.status === filter;
   });
 
   if (!items.length) {
-    list.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No ${filter === 'all' ? '' : filter + ' '}mail</div>`;
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No ' + (filter === 'all' ? '' : filter + ' ') + 'mail</div>';
     return;
   }
 
-  list.innerHTML = items.map(m => {
-    const isFree = m.isFreeOfficialMail || m.freeOfficial;
-    let actions;
+  list.innerHTML = items.map(function(m) {
+    var isFree = m.isFreeOfficialMail || m.freeOfficial;
+    var actions;
     if (m.status === 'received' || m.status === 'new') {
-      actions = '<div class="mc-action primary" onclick="openDetail('' + m.id + '');event.stopPropagation()">📄 View</div>'
-        + (isFree ? '<div class="mc-action free">✓ Free (Official)</div>' : '<div class="mc-action" onclick="openActionSheet('shred','' + m.id + '');event.stopPropagation()">🗑️ Shred</div>');
+      var shredBtn = isFree
+        ? '<div class="mc-action free">✓ Free (Official)</div>'
+        : '<div class="mc-action" onclick="window.openActionSheet(\'shred\',\'' + m.id + '\');event.stopPropagation()">🗑️ Shred</div>';
+      actions = '<div class="mc-action primary" onclick="window.openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View</div>' + shredBtn;
     } else if (m.status === 'scanned') {
-      actions = '<div class="mc-action primary" onclick="openDetail('' + m.id + '');event.stopPropagation()">📄 View Scan</div>';
+      actions = '<div class="mc-action primary" onclick="window.openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>';
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
-    return `<div class="mail-card ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
-      <div class="mail-card-top">
-        <div class="mc-avatar">${getEmoji(m.sender)}</div>
-        <div class="mc-body">
-          <div class="mc-top"><div class="mc-from">${m.sender || 'Unknown'}</div><div class="mc-date">${formatDate(m.receivedAt)}</div></div>
-          <div class="mc-subject">${m.description || m.type || 'Letter'}${m.pages ? ' · ' + m.pages + ' page' + (m.pages > 1 ? 's' : '') : ''}</div>
-        </div>
-      </div>
-      <div class="mail-card-actions">${actions}</div>
-    </div>`;
+    var unread = (m.status === 'new' || m.status === 'received') ? ' unread' : '';
+    return '<div class="mail-card' + unread + '" onclick="window.openDetail(\'' + m.id + '\')">'
+      + '<div class="mail-card-top">'
+      + '<div class="mc-avatar">' + getEmoji(m.sender) + '</div>'
+      + '<div class="mc-body">'
+      + '<div class="mc-top"><div class="mc-from">' + (m.sender || 'Unknown') + '</div><div class="mc-date">' + formatDate(m.receivedAt) + '</div></div>'
+      + '<div class="mc-subject">' + (m.description || m.type || 'Letter') + (m.pages ? ' · ' + m.pages + ' page' + (m.pages > 1 ? 's' : '') : '') + '</div>'
+      + '</div></div>'
+      + '<div class="mail-card-actions">' + actions + '</div>'
+      + '</div>';
   }).join('');
 }
 
 // ===== FILTER PILLS =====
-document.querySelectorAll('.filter-pill').forEach(pill => {
-  pill.addEventListener('click', () => {
-    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+document.querySelectorAll('.filter-pill').forEach(function(pill) {
+  pill.addEventListener('click', function() {
+    document.querySelectorAll('.filter-pill').forEach(function(p){ p.classList.remove('active'); });
     pill.classList.add('active');
     renderMailTab(pill.dataset.filter);
   });
@@ -1069,71 +1021,64 @@ document.querySelectorAll('.filter-pill').forEach(pill => {
 
 // ===== DETAIL SHEET =====
 window.openDetail = function(id) {
-  const m = mailCache.find(item => item.id === id);
+  var m = mailCache.find(function(item){ return item.id === id; });
   if (!m) return;
-
   document.getElementById('detail-emoji').textContent = getEmoji(m.sender);
   document.getElementById('detail-from').textContent = m.sender || 'Unknown';
   document.getElementById('detail-type').textContent = (m.type || 'Letter') + (m.pages ? ' · ' + m.pages + ' pages' : '');
-  document.getElementById('detail-date').textContent = `Received ${formatDate(m.receivedAt)}`;
+  document.getElementById('detail-date').textContent = 'Received ' + formatDate(m.receivedAt);
   document.getElementById('tl-received').textContent = formatDate(m.receivedAt);
-
-  const scannedStep = document.getElementById('tl-scanned-step');
-  if (m.scannedAt) {
-    scannedStep.classList.add('active');
-    document.getElementById('tl-scanned').textContent = formatDate(m.scannedAt);
+  var scannedStep = document.getElementById('tl-scanned-step');
+  if (scannedStep) {
+    if (m.scannedAt) { scannedStep.classList.add('active'); document.getElementById('tl-scanned').textContent = formatDate(m.scannedAt); }
+    else { scannedStep.classList.remove('active'); }
   }
-
-  const priceBox = document.getElementById('detail-price-box');
-  if (m.pages && m.status === 'scanned') {
-    const cost = m.pages === 1 ? 0.50 : 0.50 + (m.pages - 1) * 0.25;
-    priceBox.style.display = 'block';
-    priceBox.innerHTML = `<strong>Scanning:</strong> £0.50 first page · £0.25 per additional page<br><strong>Total deducted:</strong> £${cost.toFixed(2)} for ${m.pages} page${m.pages > 1 ? 's' : ''}`;
-  } else {
-    priceBox.style.display = 'none';
+  var priceBox = document.getElementById('detail-price-box');
+  if (priceBox) {
+    if (m.pages && m.status === 'scanned') {
+      var cost = m.pages === 1 ? 0.50 : 0.50 + (m.pages - 1) * 0.25;
+      priceBox.style.display = 'block';
+      priceBox.innerHTML = '<strong>Scanning:</strong> £0.50 first page · £0.25 per additional page<br><strong>Total deducted:</strong> £' + cost.toFixed(2) + ' for ' + m.pages + ' page' + (m.pages > 1 ? 's' : '');
+    } else { priceBox.style.display = 'none'; }
   }
-
-  const viewUrl = m.scanUrl || (m.files && m.files[0] && m.files[0].url) || null;
-  let actionsHtml = '';
-  if (viewUrl) actionsHtml += `<div class="action-row primary-action" onclick="window.open('${viewUrl}','_blank')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
-  actionsHtml += `<div class="action-row" onclick="openActionSheet('post','${m.id}')"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
-  actionsHtml += `<div class="action-row" onclick="openActionSheet('keep','${m.id}')"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
-  actionsHtml += `<div class="action-row" onclick="openActionSheet('shred','${m.id}')"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
+  var viewUrl = m.scanUrl || (m.files && m.files[0] && m.files[0].url) || null;
+  var actionsHtml = '';
+  if (viewUrl) actionsHtml += '<div class="action-row primary-action" onclick="window.open(\'' + viewUrl + '\',\'_blank\')"><div class="ar-left"><div class="ar-icon">📄</div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>';
+  actionsHtml += '<div class="action-row" onclick="window.openActionSheet(\'post\',\'' + m.id + '\')"><div class="ar-left"><div class="ar-icon">📦</div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>';
+  actionsHtml += '<div class="action-row" onclick="window.openActionSheet(\'keep\',\'' + m.id + '\')"><div class="ar-left"><div class="ar-icon">📁</div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>';
+  actionsHtml += '<div class="action-row" onclick="window.openActionSheet(\'shred\',\'' + m.id + '\')"><div class="ar-left"><div class="ar-icon">🗑️</div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>';
   document.getElementById('detail-actions').innerHTML = actionsHtml;
   window.openSheet('detail-sheet');
 };
 
 // ===== SHEETS =====
 window.openSheet = function(id) {
-  const overlay = document.getElementById(id);
+  var overlay = document.getElementById(id);
+  if (!overlay) return;
   overlay.style.display = 'flex';
-  requestAnimationFrame(() => requestAnimationFrame(() => overlay.classList.add('visible')));
-  setTimeout(() => { const s = overlay.querySelector('.sheet'); if (s) s.scrollTop = 0; }, 50);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ overlay.classList.add('visible'); }); });
 };
-
 window.closeSheet = function(id) {
-  const overlay = document.getElementById(id);
+  var overlay = document.getElementById(id);
+  if (!overlay) return;
   overlay.classList.remove('visible');
-  setTimeout(() => { overlay.style.display = 'none'; }, 350);
+  setTimeout(function(){ overlay.style.display = 'none'; }, 350);
 };
-
-document.querySelectorAll('.sheet-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) window.closeSheet(overlay.id); });
+document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) window.closeSheet(overlay.id); });
 });
 
 // ===== TOP-UP =====
-document.getElementById('topup-btn').addEventListener('click', () => window.openSheet('topup-sheet'));
-document.getElementById('acct-topup-row').addEventListener('click', () => window.openSheet('topup-sheet'));
-
-document.querySelectorAll('.credit-pack').forEach(pack => {
-  pack.addEventListener('click', () => {
-    document.querySelectorAll('.credit-pack').forEach(p => p.classList.remove('selected'));
+document.getElementById('topup-btn').addEventListener('click', function(){ window.openSheet('topup-sheet'); });
+document.getElementById('acct-topup-row').addEventListener('click', function(){ window.openSheet('topup-sheet'); });
+document.querySelectorAll('.credit-pack').forEach(function(pack) {
+  pack.addEventListener('click', function() {
+    document.querySelectorAll('.credit-pack').forEach(function(p){ p.classList.remove('selected'); });
     pack.classList.add('selected');
     selectedPack = { amount: pack.dataset.amount, link: pack.dataset.link };
   });
 });
-
-document.getElementById('topup-proceed').addEventListener('click', () => {
+document.getElementById('topup-proceed').addEventListener('click', function() {
   if (!selectedPack) { toast('Please select a credit pack', 'error'); return; }
   window.open(selectedPack.link, '_blank');
   window.closeSheet('topup-sheet');
@@ -1142,35 +1087,77 @@ document.getElementById('topup-proceed').addEventListener('click', () => {
 
 // ===== TAB NAV =====
 window.switchTab = function(tabName) {
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-  document.getElementById(`tab-${tabName}`).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(n){ n.classList.remove('active'); });
+  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.remove('active'); });
+  var navEl = document.querySelector('[data-tab="' + tabName + '"]');
+  var paneEl = document.getElementById('tab-' + tabName);
+  if (navEl) navEl.classList.add('active');
+  if (paneEl) paneEl.classList.add('active');
 };
-
-document.querySelectorAll('.nav-item').forEach(nav => {
-  nav.addEventListener('click', () => window.switchTab(nav.dataset.tab));
+document.querySelectorAll('.nav-item').forEach(function(nav) {
+  nav.addEventListener('click', function(){ window.switchTab(nav.dataset.tab); });
 });
 
 // ===== SIGN OUT =====
-document.getElementById('signout-row').addEventListener('click', async () => {
+document.getElementById('signout-row').addEventListener('click', async function() {
   await signOut(auth);
   currentUser = null;
   currentCustomer = null;
   mailCache = [];
+  authResolved = false;
+  authUser = null;
   showScreen('screen-login');
   toast('Signed out successfully');
 });
 
-// ===== ACTION SHEET =====
-let currentActionMailId = null;
-let currentActionType = null;
+// ===== LOGIN =====
+document.getElementById('login-btn').addEventListener('click', async function() {
+  var email = document.getElementById('login-email').value.trim();
+  var password = document.getElementById('login-password').value;
+  var btn = document.getElementById('login-btn');
+  var errEl = document.getElementById('login-error');
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.classList.add('show');
+    return;
+  }
+  btn.classList.add('loading');
+  btn.disabled = true;
+  errEl.classList.remove('show');
+  try {
+    var cred = await signInWithEmailAndPassword(auth, email, password);
+    currentUser = cred.user;
+    await loadCustomerData(currentUser.uid);
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    goToApp();
+  } catch (err) {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    var msg = 'Sign in failed. Please try again.';
+    if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') msg = 'Incorrect email or password.';
+    else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Please try again later.';
+    errEl.textContent = msg;
+    errEl.classList.add('show');
+  }
+});
+document.getElementById('login-forgot').addEventListener('click', async function() {
+  var email = document.getElementById('login-email').value.trim();
+  if (!email) { toast('Enter your email address first', 'error'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast('Password reset email sent!', 'success');
+  } catch(e) { toast('Could not send reset email', 'error'); }
+});
 
+// ===== ACTION SHEET =====
+var currentActionMailId = null;
+var currentActionType = null;
 window.openActionSheet = function(type, mailId) {
   currentActionMailId = mailId;
   currentActionType = type;
-  const titles = { post: '📦 Post to Me', keep: '📁 Keep & Store', shred: '🗑️ Secure Shred' };
-  const subs = {
+  var titles = { post: '📦 Post to Me', keep: '📁 Keep & Store', shred: '🗑️ Secure Shred' };
+  var subs = {
     post: 'We will post this item to your forwarding address. Cost: £0.85 + carrier postage.',
     keep: 'We will store this item securely at our facility at no charge.',
     shred: 'We will confidentially destroy this item. This cannot be undone.'
@@ -1178,41 +1165,43 @@ window.openActionSheet = function(type, mailId) {
   document.getElementById('action-sheet-title').textContent = titles[type];
   document.getElementById('action-sheet-sub').textContent = subs[type];
   document.getElementById('action-note').value = '';
-  document.getElementById('action-confirm-btn').textContent = 'Confirm';
-  document.getElementById('action-confirm-btn').disabled = false;
+  var btn = document.getElementById('action-confirm-btn');
+  btn.textContent = 'Confirm';
+  btn.disabled = false;
   window.closeSheet('detail-sheet');
-  setTimeout(() => window.openSheet('action-sheet'), 350);
+  setTimeout(function(){ window.openSheet('action-sheet'); }, 350);
 };
-
-document.getElementById('action-confirm-btn').addEventListener('click', async () => {
+document.getElementById('action-confirm-btn').addEventListener('click', async function() {
   if (!currentActionMailId || !currentActionType) return;
-  const btn = document.getElementById('action-confirm-btn');
+  var btn = document.getElementById('action-confirm-btn');
   btn.textContent = 'Submitting...';
   btn.disabled = true;
   try {
-    const note = document.getElementById('action-note').value.trim();
+    var note = document.getElementById('action-note').value.trim();
+    var labels = { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' };
+    var statuses = { post: 'posted', keep: 'stored', shred: 'shredded' };
     await addDoc(collection(db, 'mailRequests'), {
       mailId: currentActionMailId,
       customerId: currentUser.uid,
-      customerName: currentCustomer?.name || currentCustomer?.firstName || '',
-      customerEmail: currentCustomer?.email || '',
-      mailboxId: currentCustomer?.mailboxId || '',
+      customerName: currentCustomer ? (currentCustomer.name || currentCustomer.firstName || '') : '',
+      customerEmail: currentCustomer ? (currentCustomer.email || '') : '',
+      mailboxId: currentCustomer ? (currentCustomer.mailboxId || '') : '',
       action: currentActionType,
-      actionLabel: { post: 'Post to Me', keep: 'Keep & Store', shred: 'Secure Shred' }[currentActionType],
+      actionLabel: labels[currentActionType],
       notes: note,
       status: 'pending',
       createdAt: serverTimestamp()
     });
-    const cached = mailCache.find(m => m.id === currentActionMailId);
-    if (cached) cached.status = { post: 'posted', keep: 'stored', shred: 'shredded' }[currentActionType];
-    document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-    const allPill = document.querySelector('.filter-pill[data-filter="all"]');
+    var cached = mailCache.find(function(m){ return m.id === currentActionMailId; });
+    if (cached) cached.status = statuses[currentActionType];
+    document.querySelectorAll('.filter-pill').forEach(function(p){ p.classList.remove('active'); });
+    var allPill = document.querySelector('.filter-pill[data-filter="all"]');
     if (allPill) allPill.classList.add('active');
     renderMailTab('all');
     updateStats();
     window.switchTab('mail');
-    toast('Request submitted!', 'success');
     window.closeSheet('action-sheet');
+    toast('Request submitted!', 'success');
     currentActionMailId = null;
     currentActionType = null;
   } catch(err) {
@@ -1222,32 +1211,27 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
     btn.disabled = false;
   }
 });
-
-document.getElementById('action-cancel-btn').addEventListener('click', () => window.closeSheet('action-sheet'));
+document.getElementById('action-cancel-btn').addEventListener('click', function(){ window.closeSheet('action-sheet'); });
 
 // ===== FORWARDING ADDRESS =====
 window.openAddressSheet = function() {
-  const addr = currentCustomer?.forwardingAddress || '';
-  const parts = addr.split('
-');
+  var addr = currentCustomer && currentCustomer.forwardingAddress ? currentCustomer.forwardingAddress : '';
+  var parts = addr.split('\n');
   document.getElementById('addr-line1').value = parts[0] || '';
   document.getElementById('addr-line2').value = parts[1] || '';
   document.getElementById('addr-city').value = parts[2] || '';
   document.getElementById('addr-postcode').value = parts[3] || '';
   window.openSheet('address-sheet');
 };
-
-document.getElementById('addr-save-btn').addEventListener('click', async () => {
-  const line1 = document.getElementById('addr-line1').value.trim();
-  const line2 = document.getElementById('addr-line2').value.trim();
-  const city = document.getElementById('addr-city').value.trim();
-  const postcode = document.getElementById('addr-postcode').value.trim();
+document.getElementById('addr-save-btn').addEventListener('click', async function() {
+  var line1 = document.getElementById('addr-line1').value.trim();
+  var line2 = document.getElementById('addr-line2').value.trim();
+  var city = document.getElementById('addr-city').value.trim();
+  var postcode = document.getElementById('addr-postcode').value.trim();
   if (!line1 || !city || !postcode) { toast('Please fill in address, city and postcode', 'error'); return; }
-
-  const parts = [line1, line2, city, postcode].filter(Boolean);
-  const fullAddress = parts.join('
-');
-  const btn = document.getElementById('addr-save-btn');
+  var parts = [line1, line2, city, postcode].filter(Boolean);
+  var fullAddress = parts.join('\n');
+  var btn = document.getElementById('addr-save-btn');
   btn.textContent = 'Saving...';
   btn.disabled = true;
   try {
@@ -1257,8 +1241,8 @@ document.getElementById('addr-save-btn').addEventListener('click', async () => {
     });
     await addDoc(collection(db, 'addressHistory'), {
       customerId: currentUser.uid,
-      customerEmail: currentCustomer?.email || '',
-      mailboxId: currentCustomer?.mailboxId || '',
+      customerEmail: currentCustomer ? (currentCustomer.email || '') : '',
+      mailboxId: currentCustomer ? (currentCustomer.mailboxId || '') : '',
       address: fullAddress,
       updatedAt: serverTimestamp()
     });
@@ -1275,33 +1259,29 @@ document.getElementById('addr-save-btn').addEventListener('click', async () => {
   }
 });
 
-// ===== CONTACT US SHEET =====
+// ===== CONTACT US =====
 window.openContactSheet = function() {
   document.getElementById('contact-subject').value = '';
   document.getElementById('contact-message').value = '';
-  const btn = document.getElementById('contact-send-btn');
+  var btn = document.getElementById('contact-send-btn');
   btn.textContent = 'Send Message';
   btn.disabled = false;
   window.openSheet('contact-sheet');
 };
-
-document.getElementById('contact-send-btn').addEventListener('click', async () => {
-  const subject = document.getElementById('contact-subject').value;
-  const message = document.getElementById('contact-message').value.trim();
-
+document.getElementById('contact-send-btn').addEventListener('click', async function() {
+  var subject = document.getElementById('contact-subject').value;
+  var message = document.getElementById('contact-message').value.trim();
   if (!subject) { toast('Please select a subject', 'error'); return; }
   if (!message) { toast('Please enter a message', 'error'); return; }
-
-  const btn = document.getElementById('contact-send-btn');
+  var btn = document.getElementById('contact-send-btn');
   btn.textContent = 'Sending...';
   btn.disabled = true;
-
   try {
     await addDoc(collection(db, 'contactRequests'), {
-      customerId: currentUser?.uid || '',
-      customerName: currentCustomer?.firstName || currentCustomer?.name || '',
-      customerEmail: currentCustomer?.email || '',
-      mailboxId: currentCustomer?.mailboxId || '',
+      customerId: currentUser ? currentUser.uid : '',
+      customerName: currentCustomer ? (currentCustomer.firstName || currentCustomer.name || '') : '',
+      customerEmail: currentCustomer ? (currentCustomer.email || '') : '',
+      mailboxId: currentCustomer ? (currentCustomer.mailboxId || '') : '',
       subject: subject,
       message: message,
       status: 'new',
@@ -1310,7 +1290,7 @@ document.getElementById('contact-send-btn').addEventListener('click', async () =
     window.closeSheet('contact-sheet');
     toast('Message sent! We\'ll be in touch soon.', 'success');
   } catch(err) {
-    console.error('Contact send error:', err);
+    console.error('Contact error:', err);
     toast('Failed to send. Please email info@forwardmymail.co.uk', 'error');
     btn.textContent = 'Send Message';
     btn.disabled = false;
@@ -1319,37 +1299,31 @@ document.getElementById('contact-send-btn').addEventListener('click', async () =
 
 // ===== PULL TO REFRESH =====
 (function() {
-  let startY = 0, pulling = false;
-  const threshold = 70;
-  function isAppActive() { return document.getElementById('screen-app')?.classList.contains('active'); }
-  function anySheetOpen() { return !!document.querySelector('.sheet-overlay[style*="flex"]'); }
-  function atScrollTop() {
-    const el = document.querySelector('.tab-pane.active');
-    return !el || el.scrollTop <= 2;
-  }
-  document.addEventListener('touchstart', (e) => {
+  var startY = 0, pulling = false, threshold = 70;
+  function isAppActive(){ return document.getElementById('screen-app') && document.getElementById('screen-app').classList.contains('active'); }
+  function anySheetOpen(){ return !!document.querySelector('.sheet-overlay[style*="flex"]'); }
+  function atScrollTop(){ var el = document.querySelector('.tab-pane.active'); return !el || el.scrollTop <= 2; }
+  document.addEventListener('touchstart', function(e) {
     pulling = false;
     if (!isAppActive() || anySheetOpen() || !atScrollTop()) return;
-    startY = e.touches[0].clientY;
-    pulling = true;
+    startY = e.touches[0].clientY; pulling = true;
   }, { passive: true });
-  document.addEventListener('touchend', async (e) => {
+  document.addEventListener('touchend', async function(e) {
     if (!pulling) return;
     pulling = false;
-    const dy = e.changedTouches[0].clientY - startY;
-    if (dy >= threshold) {
+    if (e.changedTouches[0].clientY - startY >= threshold) {
       try {
         if (currentUser) { await loadCustomerData(currentUser.uid); populateApp(); }
         await loadMailData();
         toast('Refreshed ✓', 'success');
-      } catch(err) { console.error('Refresh error:', err); }
+      } catch(err){ console.error('Refresh error:', err); }
     }
   }, { passive: true });
 })();
 
 // ===== SERVICE WORKER =====
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/sw.js");
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
 }
 
 </script>
