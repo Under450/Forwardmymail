@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772549882 -->
+<!-- v1772550597 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1577,6 +1577,15 @@ document.getElementById('action-cancel-btn').addEventListener('click', () => {
   }, { passive: true });
 })();
 
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").then(reg => {
+    setInterval(() => { if (reg.active) reg.active.postMessage("CHECK_UPDATE"); }, 60000);
+  });
+  navigator.serviceWorker.addEventListener("message", e => {
+    if (e.data === "RELOAD") window.location.reload();
+  });
+}
 </script>
 </body>
 </html>
