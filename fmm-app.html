@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772563022 -->
+<!-- v1772566368 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -651,7 +651,7 @@ html, body {
         <div class="settings-section">
           <div class="settings-label">Support</div>
           <div class="settings-group">
-            <div class="settings-row" onclick="window.contactUs()">
+            <div class="settings-row" onclick="window.openContactSheet()">
               <div class="sr-icon green">💬</div>
               <div class="sr-body"><div class="sr-title">Contact Us</div><div class="sr-sub">Get help with your mail</div></div>
               <div class="sr-arrow">›</div>
@@ -747,6 +747,35 @@ html, body {
   </div>
 </div>
 
+<!-- CONTACT SHEET -->
+<div class="sheet-overlay" id="contact-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <button onclick="window.closeSheet('contact-sheet')" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);">✕</button>
+    <h3 class="sheet-title">Contact Us</h3>
+    <p class="sheet-sub">We usually respond within one business day.</p>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
+      <div>
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:block;margin-bottom:6px;">Subject</label>
+        <select id="contact-subject" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--surface);outline:none;appearance:none;">
+          <option value="">Select a topic...</option>
+          <option value="Mail item query">Mail item query</option>
+          <option value="Credits & billing">Credits &amp; billing</option>
+          <option value="Forwarding address">Forwarding address</option>
+          <option value="Account access">Account access</option>
+          <option value="General enquiry">General enquiry</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:block;margin-bottom:6px;">Message</label>
+        <textarea id="contact-message" rows="5" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);resize:none;outline:none;background:var(--surface);" placeholder="Describe your query..."></textarea>
+      </div>
+    </div>
+    <button class="sheet-btn" id="contact-send-btn">Send Message</button>
+  </div>
+</div>
+
 <!-- ADDRESS SHEET -->
 <div class="sheet-overlay" id="address-sheet">
   <div class="sheet">
@@ -816,21 +845,21 @@ function toast(msg, type = '') {
 }
 
 // ===== SPLASH =====
-// After splash, go straight to login - no PIN
+// Auth state handler routes user - splash just shows briefly
+// If no auth session after 2.5s, show login
 setTimeout(() => {
-  showScreen('screen-login');
-}, 1800);
+  if (!currentUser) {
+    showScreen('screen-login');
+  }
+}, 2500);
 
 // ===== AUTH STATE =====
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     currentUser = user;
-    // If we're on the login screen after a page reload and auth persisted, go straight to app
-    const loginActive = document.getElementById('screen-login').classList.contains('active');
-    const splashActive = document.getElementById('screen-splash').classList.contains('active');
-    if (!loginActive && !splashActive) {
-      // Already went to app via login button - do nothing
-    }
+    // Auth persisted from previous session - load data and go straight to app
+    await loadCustomerData(user.uid);
+    goToApp();
   }
 });
 
@@ -1247,11 +1276,47 @@ document.getElementById('addr-save-btn').addEventListener('click', async () => {
   }
 });
 
-// ===== CONTACT US =====
-window.contactUs = function() {
-  const ref = currentCustomer?.mailboxId || currentCustomer?.email || '';
-  window.location.href = 'mailto:info@forwardmymail.co.uk?subject=' + encodeURIComponent('Support Request - ' + ref);
+// ===== CONTACT US SHEET =====
+window.openContactSheet = function() {
+  document.getElementById('contact-subject').value = '';
+  document.getElementById('contact-message').value = '';
+  const btn = document.getElementById('contact-send-btn');
+  btn.textContent = 'Send Message';
+  btn.disabled = false;
+  window.openSheet('contact-sheet');
 };
+
+document.getElementById('contact-send-btn').addEventListener('click', async () => {
+  const subject = document.getElementById('contact-subject').value;
+  const message = document.getElementById('contact-message').value.trim();
+
+  if (!subject) { toast('Please select a subject', 'error'); return; }
+  if (!message) { toast('Please enter a message', 'error'); return; }
+
+  const btn = document.getElementById('contact-send-btn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    await addDoc(collection(db, 'contactRequests'), {
+      customerId: currentUser?.uid || '',
+      customerName: currentCustomer?.firstName || currentCustomer?.name || '',
+      customerEmail: currentCustomer?.email || '',
+      mailboxId: currentCustomer?.mailboxId || '',
+      subject: subject,
+      message: message,
+      status: 'new',
+      createdAt: serverTimestamp()
+    });
+    window.closeSheet('contact-sheet');
+    toast('Message sent! We\'ll be in touch soon.', 'success');
+  } catch(err) {
+    console.error('Contact send error:', err);
+    toast('Failed to send. Please email info@forwardmymail.co.uk', 'error');
+    btn.textContent = 'Send Message';
+    btn.disabled = false;
+  }
+});
 
 // ===== PULL TO REFRESH =====
 (function() {
