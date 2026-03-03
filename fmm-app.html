@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772560572 -->
+<!-- v1772561913 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -731,7 +731,7 @@ html, body {
               <div class="sr-body"><div class="sr-title">Top Up Credits</div><div class="sr-sub">Buy more scanning & posting credit</div></div>
               <div class="sr-arrow">›</div>
             </div>
-            <div class="settings-row">
+            <div class="settings-row" id="address-row" onclick="openAddressSheet()">
               <div class="sr-icon navy">📍</div>
               <div class="sr-body"><div class="sr-title">Forwarding Address</div><div class="sr-sub" id="acct-address">Loading...</div></div>
               <div class="sr-arrow">›</div>
@@ -756,7 +756,7 @@ html, body {
         <div class="settings-section">
           <div class="settings-label">Support</div>
           <div class="settings-group">
-            <div class="settings-row">
+            <div class="settings-row" onclick="window.location.href='mailto:info@forwardmymail.co.uk?subject=Support Request - ' + encodeURIComponent((currentCustomer?.mailboxId || currentCustomer?.email || ''))">
               <div class="sr-icon green">💬</div>
               <div class="sr-body"><div class="sr-title">Contact Us</div><div class="sr-sub">Get help with your mail</div></div>
               <div class="sr-arrow">›</div>
@@ -852,11 +852,40 @@ html, body {
   </div>
 </div>
 
+<!-- ADDRESS SHEET -->
+<div class="sheet-overlay" id="address-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <button onclick="closeSheet('address-sheet')" style="position:absolute;top:16px;right:16px;background:var(--border);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);">✕</button>
+    <h3 class="sheet-title">Forwarding Address</h3>
+    <p class="sheet-sub">This is where we post your mail. Changes are saved to your account.</p>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+      <div>
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:block;margin-bottom:6px;">Address Line 1</label>
+        <input id="addr-line1" type="text" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;" placeholder="House number and street">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:block;margin-bottom:6px;">Address Line 2 (optional)</label>
+        <input id="addr-line2" type="text" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;" placeholder="Apartment, suite, etc.">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:block;margin-bottom:6px;">Town / City</label>
+        <input id="addr-city" type="text" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;" placeholder="City">
+      </div>
+      <div>
+        <label style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);display:block;margin-bottom:6px;">Postcode</label>
+        <input id="addr-postcode" type="text" style="width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-size:14px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;" placeholder="Postcode">
+      </div>
+    </div>
+    <button class="sheet-btn" id="addr-save-btn">Save Address</button>
+  </div>
+</div>
+
 <!-- Firebase + App Logic -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -1578,7 +1607,69 @@ document.getElementById('action-cancel-btn').addEventListener('click', () => {
 })();
 
 
-// ===== SERVICE WORKER AUTO-REFRESH =====
+// ===== FORWARDING ADDRESS SHEET =====
+window.openAddressSheet = function() {
+  // Pre-fill with current address if set
+  const addr = currentCustomer?.forwardingAddress || '';
+  const parts = addr.split('\n');
+  document.getElementById('addr-line1').value = parts[0] || '';
+  document.getElementById('addr-line2').value = parts[1] || '';
+  document.getElementById('addr-city').value = parts[2] || '';
+  document.getElementById('addr-postcode').value = parts[3] || '';
+  openSheet('address-sheet');
+};
+
+document.getElementById('addr-save-btn').addEventListener('click', async () => {
+  const line1 = document.getElementById('addr-line1').value.trim();
+  const line2 = document.getElementById('addr-line2').value.trim();
+  const city = document.getElementById('addr-city').value.trim();
+  const postcode = document.getElementById('addr-postcode').value.trim();
+
+  if (!line1 || !city || !postcode) {
+    toast('Please fill in address, city and postcode', 'error');
+    return;
+  }
+
+  const parts = [line1, line2, city, postcode].filter(Boolean);
+  const fullAddress = parts.join('\n');
+  const displayAddress = parts.join(', ');
+
+  const btn = document.getElementById('addr-save-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  try {
+    // Update customer document
+    await updateDoc(doc(db, 'customers', currentUser.uid), {
+      forwardingAddress: fullAddress,
+      forwardingAddressUpdatedAt: serverTimestamp()
+    });
+
+    // Also save a permanent copy to addressHistory (staff can always see this)
+    await addDoc(collection(db, 'addressHistory'), {
+      customerId: currentUser.uid,
+      customerEmail: currentCustomer?.email || '',
+      mailboxId: currentCustomer?.mailboxId || '',
+      address: fullAddress,
+      updatedAt: serverTimestamp()
+    });
+
+    // Update local state
+    if (currentCustomer) currentCustomer.forwardingAddress = fullAddress;
+    document.getElementById('acct-address').textContent = displayAddress;
+
+    closeSheet('address-sheet');
+    toast('Address saved successfully', 'success');
+  } catch(err) {
+    console.error('Address save error:', err);
+    toast('Failed to save address. Please try again.', 'error');
+  } finally {
+    btn.textContent = 'Save Address';
+    btn.disabled = false;
+  }
+});
+
+
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js");
 }
