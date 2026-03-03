@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772559308 -->
+<!-- v1772560207 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1435,9 +1435,7 @@ document.getElementById('signout-row').addEventListener('click', async () => {
   currentUser = null;
   currentCustomer = null;
   mailCache = [];
-  localStorage.removeItem('fmm_pin');
-  localStorage.removeItem('fmm_name');
-  showScreen('screen-login');
+  showScreen('screen-login');  // keep fmm_pin + fmm_name so PIN screen shows on next login
   toast('Signed out successfully');
 });
 
