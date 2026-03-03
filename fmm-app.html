@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772553314 -->
+<!-- v1772555873 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -924,7 +924,8 @@ setTimeout(() => {
 // Safety fallback — if still on splash after 5s, force to login
 setTimeout(() => {
   const splash = document.getElementById('screen-splash');
-  if (splash.classList.contains('active')) {
+  if (!splashDone && splash.classList.contains('active')) {
+    splashDone = true;
     showScreen('screen-login');
   }
 }, 5000);
@@ -1501,7 +1502,7 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
     const statusMap = { post: 'posted', keep: 'stored', shred: 'shredded' };
     const newStatus = statusMap[currentActionType];
     const cached = mailCache.find(m => m.id === currentActionMailId);
-    if (cached) cached.status = newStatus;
+    if (cached) cached.pendingAction = actionLabels[currentActionType];
     renderDashMail();
     // Reset filter pills to 'all' and re-render so updated card is visible
     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
