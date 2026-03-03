@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772556666 -->
+<!-- v1772558457 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -902,7 +902,7 @@ function toast(msg, type = '') {
 
 // ===== SPLASH =====
 let splashDone = false;
-setTimeout(() => {
+function afterSplash() {
   if (splashDone) return;
   splashDone = true;
   const savedPin = localStorage.getItem('fmm_pin');
@@ -913,7 +913,8 @@ setTimeout(() => {
   } else {
     showScreen('screen-login');
   }
-}, 2500);
+}
+setTimeout(afterSplash, 2500);
 
 // Safety fallback — if still on splash after 5s, force to login
 setTimeout(() => {
@@ -1113,7 +1114,7 @@ document.getElementById('pin-use-password').addEventListener('click', (e) => {
 onAuthStateChanged(auth, async (user) => {
   if (user && !currentUser) {
     currentUser = user;
-    splashDone = true; // prevent splash from redirecting to login
+    afterSplash(); // go to PIN if splash still pending
   }
 });
 
@@ -1195,7 +1196,6 @@ async function loadMailData() {
   } catch (err) {
     console.error('Error loading mail:', err);
     // Show empty state
-    document.getElementById('dash-mail-list').innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
     document.getElementById('mail-items-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
     document.getElementById('stat-new').textContent = '0';
     document.getElementById('stat-scanned').textContent = '0';
@@ -1494,10 +1494,8 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
       createdAt: serverTimestamp()
     });
     // Update local cache so card status reflects action immediately
-    const statusMap = { post: 'posted', keep: 'stored', shred: 'shredded' };
-    const newStatus = statusMap[currentActionType];
     const cached = mailCache.find(m => m.id === currentActionMailId);
-    if (cached) cached.status = { post: "posted", keep: "stored", shred: "shredded" }[currentActionType];
+    if (cached) cached.status = { post: 'posted', keep: 'stored', shred: 'shredded' }[currentActionType];
     renderDashMail();
     // Reset filter pills to 'all' and re-render so updated card is visible
     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
