@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772545326 -->
+<!-- v1772549882 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1280,11 +1280,9 @@ function renderMailTab(filter) {
         ? '<div class="mc-action free">✓ Free (Official)</div>'
         : '<div class="mc-action" onclick="event.stopPropagation()">🗑️ Shred</div>';
       actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View</div>'
-        + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
-      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>'
-        + '<div class="mc-action cost" onclick="event.stopPropagation()">📦 Post</div>';
+      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">📄 View Scan</div>';
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
@@ -1498,10 +1496,12 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
     });
     // Update local cache so card status reflects action immediately
     const statusMap = { post: 'posted', keep: 'stored', shred: 'shredded' };
+    const newStatus = statusMap[currentActionType];
     const cached = mailCache.find(m => m.id === currentActionMailId);
-    if (cached) cached.status = statusMap[currentActionType];
+    if (cached) cached.status = newStatus;
+    const activeFilter = document.querySelector('.filter-pill.active')?.dataset?.filter || 'all';
     renderDashMail();
-    renderMailTab(document.querySelector('.filter-pill.active')?.dataset?.filter || 'all');
+    renderMailTab(activeFilter);
     updateStats();
     toast('Request submitted!', 'success');
     closeSheet('action-sheet');
