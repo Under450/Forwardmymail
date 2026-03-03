@@ -1,4 +1,4 @@
-const CACHE = 'fmm-v2';
+const CACHE = 'fmm-v3';
 const FILES = ['/fmm-app.html'];
 
 self.addEventListener('install', e => {
@@ -26,22 +26,5 @@ self.addEventListener('fetch', e => {
         })
         .catch(() => caches.match(e.request))
     );
-  }
-});
-
-self.addEventListener('message', e => {
-  if (e.data === 'CHECK_UPDATE') {
-    fetch('/fmm-app.html', { cache: 'no-store' })
-      .then(r => r.text())
-      .then(html => {
-        const match = html.match(/<!-- v(\d+) -->/);
-        const serverV = match ? parseInt(match[1]) : 0;
-        const currentV = parseInt(CACHE.replace('fmm-v',''));
-        if (serverV > currentV) {
-          self.clients.matchAll().then(clients => {
-            clients.forEach(c => c.postMessage('RELOAD'));
-          });
-        }
-      });
   }
 });
