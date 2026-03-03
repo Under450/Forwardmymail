@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772560207 -->
+<!-- v1772560572 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -906,8 +906,8 @@ function afterSplash() {
   if (splashDone) return;
   splashDone = true;
   const savedPin = localStorage.getItem('fmm_pin');
-  const savedName = localStorage.getItem('fmm_name');
-  if (savedPin && savedName) {
+  const savedName = localStorage.getItem('fmm_name') || '';
+  if (savedPin) {
     document.getElementById('pin-user-name').textContent = savedName;
     showScreen('screen-pin');
   } else {
