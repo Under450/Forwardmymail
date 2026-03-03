@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772555873 -->
+<!-- v1772556371 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -692,13 +692,7 @@ html, body {
             <div class="qc-sub">This month</div>
           </div>
         </div>
-        <div class="dash-section-head">
-          <span class="dash-section-title">Recent Mail</span>
-          <span class="dash-section-link" onclick="switchTab('mail')">See all →</span>
-        </div>
-        <div class="mail-list" id="dash-mail-list">
-          <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">Loading mail...</div>
-        </div>
+
       </div>
     </div>
 
@@ -1502,7 +1496,7 @@ document.getElementById('action-confirm-btn').addEventListener('click', async ()
     const statusMap = { post: 'posted', keep: 'stored', shred: 'shredded' };
     const newStatus = statusMap[currentActionType];
     const cached = mailCache.find(m => m.id === currentActionMailId);
-    if (cached) cached.pendingAction = actionLabels[currentActionType];
+    if (cached) cached.status = { post: "posted", keep: "stored", shred: "shredded" }[currentActionType];
     renderDashMail();
     // Reset filter pills to 'all' and re-render so updated card is visible
     document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
