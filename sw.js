@@ -1,4 +1,4 @@
-const CACHE = 'fmm-v3';
+const CACHE = 'fmm-v1772567782';
 const FILES = ['/fmm-app.html'];
 
 self.addEventListener('install', e => {
