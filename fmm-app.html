@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- v1772556371 -->
+<!-- v1772556666 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1242,6 +1242,7 @@ function getBadgeLabel(status) {
 
 function renderDashMail() {
   const list = document.getElementById('dash-mail-list');
+  if (!list) return;
   if (!mailCache.length) {
     list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
     return;
