@@ -966,6 +966,40 @@ html, body {
   <div class="scan-modal-body" id="scan-modal-body"></div>
 </div>
 
+<!-- Auto-update: checks GitHub for new version and reloads silently -->
+<script>
+(function() {
+  const CURRENT_VERSION = '2026.03.05.001';
+  const VERSION_URL = 'https://raw.githubusercontent.com/Under450/Forwardmymail/main/app-version.json';
+  const RELOAD_KEY = 'fmm_last_reload';
+
+  function checkForUpdate() {
+    fetch(VERSION_URL + '?t=' + Date.now())
+      .then(r => r.json())
+      .then(data => {
+        if (data.version && data.version !== CURRENT_VERSION) {
+          // Prevent reload loop: only reload once per 60s
+          const lastReload = parseInt(sessionStorage.getItem(RELOAD_KEY) || '0');
+          const now = Date.now();
+          if (now - lastReload > 60000) {
+            sessionStorage.setItem(RELOAD_KEY, now);
+            window.location.reload(true);
+          }
+        }
+      })
+      .catch(function() {}); // Silently fail if offline
+  }
+
+  // Check on load
+  window.addEventListener('load', function() {
+    setTimeout(checkForUpdate, 2000);
+  });
+
+  // Check every 5 minutes while app is open
+  setInterval(checkForUpdate, 5 * 60 * 1000);
+})();
+</script>
+
 <!-- Firebase + App Logic -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
