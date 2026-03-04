@@ -685,7 +685,7 @@ html, body {
           <div class="cc-label">Credit Balance</div>
           <div class="cc-amount" id="dash-credit">£—</div>
           <div class="cc-sub" id="dash-credit-sub">Loading...</div>
-          <button class="cc-topup" id="topup-btn">+ Top Up</button>
+          <button class="cc-topup" id="topup-btn">+ Credit Top Up</button>
         </div>
       </div>
       <div class="dash-body">
@@ -693,25 +693,25 @@ html, body {
           <span class="dash-section-title">Mail Overview</span>
         </div>
         <div class="quick-grid">
-          <div class="quick-card highlight" onclick="switchTab('mail')">
+          <div class="quick-card highlight" onclick="switchTab('mail');setMailFilter('new')">
             <div class="qc-icon teal"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b8964a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
             <div class="qc-count" id="stat-new">—</div>
             <div class="qc-label">New Items</div>
             <div class="qc-sub">Awaiting action</div>
           </div>
-          <div class="quick-card" onclick="switchTab('mail')">
+          <div class="quick-card" onclick="switchTab('mail');setMailFilter('scanned')">
             <div class="qc-icon amber"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b8964a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
             <div class="qc-count" id="stat-scanned">—</div>
             <div class="qc-label">Scanned</div>
             <div class="qc-sub">Ready to view</div>
           </div>
-          <div class="quick-card" onclick="switchTab('mail')">
+          <div class="quick-card" onclick="switchTab('mail');setMailFilter('posted')">
             <div class="qc-icon blue"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b8964a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
             <div class="qc-count" id="stat-posted">—</div>
             <div class="qc-label">Posted</div>
             <div class="qc-sub">Dispatched</div>
           </div>
-          <div class="quick-card" onclick="switchTab('mail')">
+          <div class="quick-card" onclick="switchTab('mail');setMailFilter('shredded')">
             <div class="qc-icon green"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#27ae7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
             <div class="qc-count" id="stat-shredded">—</div>
             <div class="qc-label">Shredded</div>
@@ -767,7 +767,7 @@ html, body {
               <div class="sr-body"><div class="sr-title">Change PIN</div><div class="sr-sub">Update your app unlock PIN</div></div>
               <div class="sr-arrow">›</div>
             </div>
-            <div class="settings-row">
+            <div class="settings-row" id="change-password-row">
               <div class="sr-icon navy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1e2b3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
               <div class="sr-body"><div class="sr-title">Change Password</div><div class="sr-sub">Update your account password</div></div>
               <div class="sr-arrow">›</div>
@@ -874,11 +874,20 @@ html, body {
     <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Send us a message and we'll get back to you within one business day.</p>
     <div style="margin-bottom:14px;">
       <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Subject</label>
-      <input type="text" id="contact-subject" placeholder="What's this about?" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;">
+      <select id="contact-subject" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;appearance:none;-webkit-appearance:none;cursor:pointer;">
+        <option value="">Select a topic...</option>
+        <option value="I haven't received my mail scan">I haven't received my mail scan</option>
+        <option value="I want to change my forwarding address">I want to change my forwarding address</option>
+        <option value="My credit balance is incorrect">My credit balance is incorrect</option>
+        <option value="I have a question about posting my mail">I have a question about posting my mail</option>
+        <option value="I want to cancel my subscription">I want to cancel my subscription</option>
+        <option value="I have a question about my account">I have a question about my account</option>
+        <option value="I need help with something else">I need help with something else</option>
+      </select>
     </div>
     <div style="margin-bottom:20px;">
       <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Message</label>
-      <textarea id="contact-message" placeholder="Tell us how we can help..." rows="4" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;resize:none;line-height:1.5;"></textarea>
+      <textarea id="contact-message" placeholder="Tell us how we can help..." rows="4" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;resize:none;line-height:1.5;box-sizing:border-box;"></textarea>
     </div>
     <div id="contact-msg" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;"></div>
     <button class="sheet-btn" id="contact-send-btn">Send Message</button>
@@ -1505,6 +1514,16 @@ window.switchTab = function(tabName) {
   document.getElementById(`tab-${tabName}`).classList.add('active');
 };
 
+window.setMailFilter = function(filter) {
+  // Small delay so switchTab renders first
+  setTimeout(() => {
+    document.querySelectorAll('.filter-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.filter === filter);
+    });
+    renderMailTab(filter);
+  }, 50);
+};
+
 document.querySelectorAll('.nav-item').forEach(nav => {
   nav.addEventListener('click', () => switchTab(nav.dataset.tab));
 });
@@ -1585,6 +1604,18 @@ document.getElementById('addr-save-btn').addEventListener('click', async () => {
 });
 
 // ===== CONTACT US =====
+document.getElementById('change-password-row').addEventListener('click', async () => {
+  const email = currentUser?.email;
+  if (!email) { toast('Not logged in', 'error'); return; }
+  if (!confirm(`Send a password reset link to ${email}?`)) return;
+  try {
+    await sendPasswordResetEmail(auth, email);
+    toast('✓ Password reset email sent — check your inbox', 'success');
+  } catch (err) {
+    toast(`Error: ${err.message}`, 'error');
+  }
+});
+
 document.getElementById('contact-row').addEventListener('click', () => {
   document.getElementById('contact-subject').value = '';
   document.getElementById('contact-message').value = '';
@@ -1602,7 +1633,7 @@ document.getElementById('contact-send-btn').addEventListener('click', async () =
     msgEl.style.background = 'rgba(220,68,68,0.1)';
     msgEl.style.color = '#dc4444';
     msgEl.style.border = '1px solid rgba(220,68,68,0.2)';
-    msgEl.textContent = 'Please fill in both subject and message.';
+    msgEl.textContent = 'Please select a subject and write a message.';
     return;
   }
 
@@ -1611,15 +1642,15 @@ document.getElementById('contact-send-btn').addEventListener('click', async () =
   btn.disabled = true;
 
   try {
-    const { addDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
     await addDoc(collection(db, 'contactRequests'), {
       customerId: currentUser.uid,
       customerEmail: currentUser.email,
-      customerName: currentCustomer?.firstName ? `${currentCustomer.firstName} ${currentCustomer.lastName}` : currentUser.email,
+      customerName: currentCustomer?.firstName ? `${currentCustomer.firstName} ${currentCustomer.lastName || ''}`.trim() : currentUser.email,
       subject,
       message,
       submittedAt: new Date(),
-      status: 'new'
+      status: 'new',
+      notifyEmail: 'info@forwardmymail.co.uk'
     });
     msgEl.style.display = 'block';
     msgEl.style.background = 'rgba(39,174,122,0.1)';
@@ -1633,7 +1664,7 @@ document.getElementById('contact-send-btn').addEventListener('click', async () =
     msgEl.style.background = 'rgba(220,68,68,0.1)';
     msgEl.style.color = '#dc4444';
     msgEl.style.border = '1px solid rgba(220,68,68,0.2)';
-    msgEl.textContent = 'Failed to send. Please try again.';
+    msgEl.textContent = `Failed to send: ${err.message}`;
   } finally {
     btn.textContent = 'Send Message';
     btn.disabled = false;
