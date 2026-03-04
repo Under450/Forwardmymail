@@ -895,11 +895,16 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         const q = query(
           collection(db, 'mailRequests'),
           where('customerId', '==', customerId),
-          orderBy('createdAt', 'desc'),
           limit(50)
         );
         const snap = await getDocs(q);
         allRequests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sort by createdAt descending in JS - avoids needing composite index
+        allRequests.sort((a, b) => {
+          const aTime = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+          const bTime = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+          return bTime - aTime;
+        });
         renderRequests('all');
       } catch(e) {
         console.error('Failed to load mail requests:', e);
