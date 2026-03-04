@@ -1381,7 +1381,9 @@ function renderMailTab(filter) {
       actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
-      actions = `<div class="mc-action primary" onclick="openScanModal('${m.scanUrl || ''}','${(m.sender||'Scan').replace(/'/g,"\\'")}');event.stopPropagation()">View Scan</div>`;
+      const scanUrl = m.scanUrl || (m.files && m.files.length ? m.files[0].url : '');
+      const hasMultiple = m.files && m.files.length > 1;
+      actions = `<div class="mc-action primary" onclick="openScanModal('${scanUrl}','${(m.sender||'Scan').replace(/'/g,"\\'")}');event.stopPropagation()">View Scan${hasMultiple ? ' (' + m.files.length + ')' : ''}</div>`;
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
@@ -1429,12 +1431,13 @@ window.openDetail = function(id) {
   if (!m) return;
 
   // Store scanUrl for hero card click
-  window._currentDetailScanUrl = m.scanUrl || null;
+  window._currentDetailScanUrl = m.scanUrl || (m.files && m.files.length ? m.files[0].url : null);
   window._currentDetailSender = m.sender || 'Scan';
 
   // Show/hide scan hint on hero card
+  const scanUrl = m.scanUrl || (m.files && m.files.length ? m.files[0].url : null);
   const hint = document.getElementById('dhc-scan-hint');
-  if (m.scanUrl) {
+  if (scanUrl) {
     hint.classList.add('visible');
   } else {
     hint.classList.remove('visible');
@@ -1466,8 +1469,12 @@ window.openDetail = function(id) {
   // Actions
   const isFree = m.isFreeOfficialMail || m.freeOfficial;
   let actionsHtml = '';
-  if (m.scanUrl) {
-    actionsHtml += `<div class="action-row primary-action" onclick="openScanModal('${m.scanUrl}','${(m.sender||'Scan').replace(/'/g,"\\'")}')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+  if (scanUrl) {
+    // Build links for all files if multiple
+    const fileLinks = (m.files && m.files.length > 1)
+      ? m.files.map((f, i) => `<div class="ar-title">View Scan ${i + 1}${f.name ? ' — ' + f.name : ''}</div>`).join('')
+      : `<div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div>`;
+    actionsHtml += `<div class="action-row primary-action" onclick="openScanModal('${scanUrl}','${(m.sender||'Scan').replace(/'/g,"\\'")}')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div>${fileLinks}</div></div><div class="ar-cost">Free</div></div>`;
   }
   actionsHtml += `<div class="action-row" onclick="requestAction('${m.id}','post')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg></div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
   actionsHtml += `<div class="action-row" onclick="requestAction('${m.id}','store')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
