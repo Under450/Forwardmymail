@@ -217,12 +217,7 @@ html, body {
   background: var(--off);
   overflow: hidden;
 }
-.app-header {
-  background: var(--brand);
-  padding: calc(var(--safe-top) + 12px) 18px 12px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0; position: relative; z-index: 10;
-}
+.app-header { display: none; }
 .header-logo { height: 20px; width: auto; }
 .header-right { display: flex; align-items: center; gap: 12px; }
 .header-bell { font-size: 18px; color: rgba(255,255,255,0.7); cursor: pointer; position: relative; }
@@ -277,7 +272,7 @@ html, body {
 /* ===== DASHBOARD TAB ===== */
 .dash-hero {
   background: var(--brand);
-  padding: 20px 18px 32px;
+  padding: calc(var(--safe-top) + 20px) 18px 32px;
 }
 .dash-greet { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
 .dash-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fff; margin-bottom: 20px; }
@@ -352,7 +347,7 @@ html, body {
 .badge-shredded { background: rgba(220,68,68,0.08); color: var(--red); border: 1px solid rgba(220,68,68,0.2); }
 
 /* ===== MAIL TAB ===== */
-.mail-tab-header { background: var(--off); padding: 16px 16px 8px; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid var(--border); }
+.mail-tab-header { background: var(--off); padding: calc(var(--safe-top) + 16px) 16px 8px; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid var(--border); }
 .mail-tab-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text); margin-bottom: 10px; }
 .filter-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
 .filter-row::-webkit-scrollbar { display: none; }
@@ -389,22 +384,22 @@ html, body {
 
 /* ===== ACCOUNT TAB ===== */
 .account-hero {
-  background: var(--brand); padding: 28px 18px 32px; text-align: center;
+  background: var(--off); padding: calc(var(--safe-top) + 20px) 18px 24px; text-align: center; border-bottom: 1px solid var(--border);
 }
 .acct-avatar {
-  width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.15);
-  border: 3px solid rgba(255,255,255,0.2);
+  width: 72px; height: 72px; border-radius: 50%; background: var(--brand);
+  border: 3px solid var(--brand);
   display: flex; align-items: center; justify-content: center;
   font-size: 28px; font-weight: 700; color: #fff;
   margin: 0 auto 12px;
 }
-.acct-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; }
-.acct-email { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 4px; }
+.acct-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text); }
+.acct-email { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
 .acct-credit-pill {
   display: inline-flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18);
+  background: var(--brand); border: 1px solid var(--brand);
   border-radius: 20px; padding: 6px 16px; margin-top: 14px;
-  font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
+  font-size: 13px; font-weight: 600; color: #fff;
 }
 
 .account-body { padding: 16px 16px 100px; }
@@ -535,6 +530,29 @@ html, body {
 @keyframes spin { to { transform: rotate(360deg); } }
 .btn-primary.loading .spinner { display: block; }
 .btn-primary.loading .btn-text { display: none; }
+
+/* ===== SCAN VIEWER MODAL ===== */
+#scan-modal {
+  display: none; position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.92); flex-direction: column;
+  align-items: center; justify-content: flex-start;
+}
+#scan-modal.open { display: flex; }
+.scan-modal-bar {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: calc(var(--safe-top) + 14px) 18px 14px;
+  background: rgba(0,0,0,0.6);
+  flex-shrink: 0;
+}
+.scan-modal-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #fff; }
+.scan-modal-close {
+  width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,0.15);
+  border: none; color: #fff; font-size: 20px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.scan-modal-body { flex: 1; width: 100%; overflow: auto; display: flex; align-items: flex-start; justify-content: center; padding: 10px; box-sizing: border-box; }
+.scan-modal-body iframe { width: 100%; height: 100%; border: none; border-radius: 8px; min-height: calc(100vh - 120px); }
+.scan-modal-body .scan-no-url { color: rgba(255,255,255,0.5); font-size: 14px; text-align: center; padding-top: 40px; }
 </style>
 </head>
 <body>
@@ -892,11 +910,20 @@ html, body {
   </div>
 </div>
 
+<!-- SCAN VIEWER MODAL -->
+<div id="scan-modal">
+  <div class="scan-modal-bar">
+    <div class="scan-modal-title" id="scan-modal-title">Scan</div>
+    <button class="scan-modal-close" onclick="closeScanModal()">✕</button>
+  </div>
+  <div class="scan-modal-body" id="scan-modal-body"></div>
+</div>
+
 <!-- Firebase + App Logic -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot, addDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -1287,7 +1314,7 @@ function renderMailTab(filter) {
       actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
-      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View Scan</div>';
+      actions = `<div class="mc-action primary" onclick="openScanModal('${m.scanUrl || ''}','${(m.sender||'Scan').replace(/'/g,"\\'")}');event.stopPropagation()">View Scan</div>`;
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
@@ -1361,11 +1388,11 @@ window.openDetail = function(id) {
   const isFree = m.isFreeOfficialMail || m.freeOfficial;
   let actionsHtml = '';
   if (m.scanUrl) {
-    actionsHtml += `<div class="action-row primary-action" onclick="window.open('${m.scanUrl}','_blank')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
+    actionsHtml += `<div class="action-row primary-action" onclick="openScanModal('${m.scanUrl}','${(m.sender||'Scan').replace(/'/g,"\\'")}')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div class="ar-title">View PDF Scan</div><div class="ar-sub">High-quality · OCR searchable</div></div></div><div class="ar-cost">Free</div></div>`;
   }
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg></div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
-  actionsHtml += `<div class="action-row"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="requestAction('${m.id}','post')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg></div><div><div class="ar-title">Post to Me</div><div class="ar-sub">£0.85 + carrier postage</div></div></div><div class="ar-cost">From £0.85</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="requestAction('${m.id}','store')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div><div><div class="ar-title">Keep & Store</div><div class="ar-sub">Held securely at our facility</div></div></div><div class="ar-cost free">No charge</div></div>`;
+  actionsHtml += `<div class="action-row" onclick="requestAction('${m.id}','shred')"><div class="ar-left"><div class="ar-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div><div><div class="ar-title">Secure Shred</div><div class="ar-sub">Confidential destruction</div></div></div><div class="ar-cost free">Free</div></div>`;
 
   document.getElementById('detail-actions').innerHTML = actionsHtml;
   openSheet('detail-sheet');
@@ -1385,6 +1412,67 @@ function closeSheet(id) {
   overlay.classList.remove('visible');
   setTimeout(() => { overlay.style.display = 'none'; }, 350);
 }
+
+// ===== SCAN MODAL =====
+window.openScanModal = function(url, title) {
+  const modal = document.getElementById('scan-modal');
+  document.getElementById('scan-modal-title').textContent = title || 'Scan';
+  const body = document.getElementById('scan-modal-body');
+  if (url) {
+    body.innerHTML = `<iframe src="${url}" title="Mail scan"></iframe>`;
+  } else {
+    body.innerHTML = `<div class="scan-no-url">No scan available yet</div>`;
+  }
+  modal.classList.add('open');
+};
+
+window.closeScanModal = function() {
+  const modal = document.getElementById('scan-modal');
+  modal.classList.remove('open');
+  document.getElementById('scan-modal-body').innerHTML = '';
+};
+
+// ===== REQUEST ACTION (Post / Store / Shred) =====
+window.requestAction = async function(mailId, action) {
+  const labels = { post: 'Post to Me', store: 'Keep & Store', shred: 'Secure Shred' };
+  const statuses = { post: 'posted', store: 'stored', shred: 'shredded' };
+  const label = labels[action];
+  if (!confirm(`Request "${label}" for this item?`)) return;
+
+  try {
+    const mailRef = doc(db, 'mail', mailId);
+    const newStatus = statuses[action];
+
+    // Update the mail document status
+    await updateDoc(mailRef, {
+      status: newStatus,
+      [`${action}RequestedAt`]: new Date(),
+      actionRequestedBy: currentUser?.uid || 'unknown'
+    });
+
+    // Write a staff notification to a 'staff_notifications' collection
+    await addDoc(collection(db, 'staff_notifications'), {
+      type: action,
+      mailId: mailId,
+      customerId: currentCustomer?.id || currentUser?.uid || '',
+      customerName: currentCustomer?.name || currentCustomer?.firstName || '',
+      customerRef: currentCustomer?.ref || '',
+      requestedAt: new Date(),
+      status: 'pending',
+      message: `Customer requested "${label}" for mail item ${mailId}`
+    });
+
+    // Update local cache and re-render
+    const idx = mailCache.findIndex(m => m.id === mailId);
+    if (idx !== -1) mailCache[idx].status = newStatus;
+    closeSheet('detail-sheet');
+    renderMailTab(document.querySelector('.filter-pill.active')?.dataset.filter || 'all');
+    toast(`✓ ${label} requested — staff have been notified`, 'success');
+  } catch (err) {
+    console.error('Action error:', err);
+    toast('Something went wrong. Please try again.', 'error');
+  }
+};
 
 document.querySelectorAll('.sheet-overlay').forEach(overlay => {
   overlay.addEventListener('click', (e) => {
