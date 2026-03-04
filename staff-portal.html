@@ -266,6 +266,7 @@
           </div>
 
           <button id="processScanBtn" type="button" style="width:100%;margin-top:20px;">Process Scan</button>
+          <div id="scanErrorBox" style="display:none;margin-top:12px;background:#fee;border:2px solid #c33;border-radius:8px;padding:14px;font-size:14px;color:#c33;font-weight:600;white-space:pre-wrap;"></div>
         </div>
 
         <div class="recent-activity" id="recentActivity" style="display:none;">
@@ -688,74 +689,133 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
     }
 
     // Process scan
-    processScanBtn.addEventListener('click', async (e)=>{
+    const scanErrorBox = document.getElementById('scanErrorBox');
+    function showScanError(msg) {
+      scanErrorBox.textContent = msg;
+      scanErrorBox.style.display = 'block';
+      console.error('SCAN ERROR:', msg);
+    }
+    function clearScanError() {
+      scanErrorBox.style.display = 'none';
+      scanErrorBox.textContent = '';
+    }
+
+    processScanBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      if (!currentCustomer?.id) return showError('Please select a customer first');
-      const pages = Math.max(parseInt(pagesInput.value)||1,1);
+      clearScanError();
+
+      // STEP 1: Validate customer
+      if (!currentCustomer?.id) {
+        showScanError('ERROR: No customer selected. Please select a customer first.');
+        return;
+      }
+
+      // STEP 2: Gather form values
+      const pages = Math.max(parseInt(pagesInput.value) || 1, 1);
       const notes = document.getElementById('notes').value || '';
       const baseCost = 0.50 + ((pages - 1) * 0.25);
-      // Capture files immediately into a plain array before any async work
       const files = Array.from(scanFilesInput.files || []);
-
-      // enforce letter type rules + override
       const selectedType = letterType.value;
       const selectedOpt = letterType.options[letterType.selectedIndex];
-      if (selectedOpt.disabled && selectedType !== 'override'){ return showError("This letter type is not included in the customer's package. Use Override if approved."); }
-      if (selectedType === 'override'){ const ok = confirm('Use Override for this scan?'); if (!ok) return; }
 
+      // STEP 3: Letter type check
+      if (selectedOpt.disabled && selectedType !== 'override') {
+        showScanError("This letter type is not in the customer's package. Use Override if approved.");
+        return;
+      }
+      if (selectedType === 'override') {
+        if (!confirm('Use Override for this scan?')) return;
+      }
+
+      // STEP 4: Credits check
       const freeScans = Number(currentCustomer.freeScansRemaining || 0);
-      let usedFreeScan = false; let payable = baseCost;
-      if (freeScans > 0){ usedFreeScan = true; payable = 0; }
-      else if ((currentCustomer.credits || 0) < baseCost){ return showError(`Insufficient credits. Need £${baseCost.toFixed(2)}.`); }
+      let usedFreeScan = false;
+      let payable = baseCost;
+      if (freeScans > 0) {
+        usedFreeScan = true;
+        payable = 0;
+      } else if ((currentCustomer.credits || 0) < baseCost) {
+        showScanError(`ERROR: Insufficient credits. Customer has £${(currentCustomer.credits||0).toFixed(2)} but needs £${baseCost.toFixed(2)}. Top up required.`);
+        return;
+      }
 
-      try{
-        processScanBtn.disabled = true; processScanBtn.textContent='Processing...';
+      processScanBtn.disabled = true;
+      processScanBtn.textContent = 'Processing...';
 
-        let uploadedFiles = [];
-        if (files.length){ uploadProgressDiv.style.display='block'; uploadedFiles = await uploadScanFiles(currentCustomer.id, files); uploadProgressDiv.style.display='none'; }
+      // STEP 5: Upload files
+      let uploadedFiles = [];
+      if (files.length) {
+        uploadProgressDiv.style.display = 'block';
+        try {
+          uploadedFiles = await uploadScanFiles(currentCustomer.id, files);
+        } catch (uploadErr) {
+          uploadProgressDiv.style.display = 'none';
+          processScanBtn.disabled = false;
+          processScanBtn.textContent = 'Process Scan';
+          showScanError('UPLOAD FAILED: ' + (uploadErr?.message || uploadErr?.code || String(uploadErr)));
+          return;
+        }
+        uploadProgressDiv.style.display = 'none';
+      }
 
-        await addDoc(collection(db,'mail'), {
+      // STEP 6: Write to Firestore
+      try {
+        const mailDoc = {
           customerId: currentCustomer.id,
           customerEmail: currentCustomer.email || '',
           customerName: currentCustomer.name || '',
           mailboxId: currentCustomer.mailboxId || '',
-          pages, cost: payable, notes,
-          description: document.getElementById('letterType').options[document.getElementById('letterType').selectedIndex].text,
+          type: selectedType,
+          letterType: selectedType,
           sender: selectedType,
+          description: selectedOpt.text,
+          pages: pages,
+          cost: payable,
+          notes: notes,
           files: uploadedFiles,
+          status: 'scanned',
+          freeScanUsed: usedFreeScan,
           receivedAt: serverTimestamp(),
           scannedAt: serverTimestamp(),
           processedAt: serverTimestamp(),
-          processedBy: auth.currentUser?.email || 'staff',
-          status: 'scanned',
-          freeScanUsed: usedFreeScan,
-          ttlAt: Timestamp.fromDate(new Date(Date.now() + 30*24*60*60*1000)),
-          letterType: selectedType
-        });
+          processedBy: auth.currentUser?.email || 'staff'
+        };
 
-        if (usedFreeScan){
-          await updateDoc(doc(db,'customers', currentCustomer.id), { freeScansRemaining: increment(-1) });
-          currentCustomer.freeScansRemaining = Math.max((currentCustomer.freeScansRemaining||0)-1, 0);
+        await addDoc(collection(db, 'mail'), mailDoc);
+      } catch (firestoreErr) {
+        processScanBtn.disabled = false;
+        processScanBtn.textContent = 'Process Scan';
+        showScanError('FIRESTORE WRITE FAILED: ' + (firestoreErr?.message || firestoreErr?.code || String(firestoreErr)) + '\n\nCode: ' + (firestoreErr?.code || 'none'));
+        return;
+      }
+
+      // STEP 7: Deduct credits or free scan
+      try {
+        if (usedFreeScan) {
+          await updateDoc(doc(db, 'customers', currentCustomer.id), { freeScansRemaining: increment(-1) });
+          currentCustomer.freeScansRemaining = Math.max((currentCustomer.freeScansRemaining || 0) - 1, 0);
         } else {
           const newCredits = (currentCustomer.credits || 0) - baseCost;
-          await updateDoc(doc(db,'customers', currentCustomer.id), { credits: newCredits });
+          await updateDoc(doc(db, 'customers', currentCustomer.id), { credits: newCredits });
           currentCustomer.credits = newCredits;
         }
-
-        renderCustomer(currentCustomer);
-        showSuccess(`Scan processed: ${pages} page(s) -- ${usedFreeScan ? 'free' : '£'+baseCost.toFixed(2)+' deducted'}.`);
-
-        pagesInput.value=1; document.getElementById('notes').value='';
-        scanFilesInput.value=''; fileListDiv.innerHTML=''; if (fileStatus) fileStatus.textContent='No file chosen';
-        costAmount.textContent='0.50'; progressBar.style.width='0%';
-        await loadRecentActivity(currentCustomer.id);
-      }catch(e){
-        console.error('process scan error:', e);
-        showError('Error processing scan: ' + e.message);
-        uploadProgressDiv.style.display='none';
-      }finally{
-        processScanBtn.disabled=false; processScanBtn.textContent='Process Scan';
+      } catch (creditErr) {
+        showScanError('WARNING: Scan saved but credit deduction failed: ' + (creditErr?.message || String(creditErr)));
       }
+
+      // STEP 8: Reset form and refresh
+      renderCustomer(currentCustomer);
+      showSuccess(`Scan processed: ${pages} page(s) — ${usedFreeScan ? 'FREE scan used' : '£' + baseCost.toFixed(2) + ' deducted'}.`);
+      pagesInput.value = 1;
+      document.getElementById('notes').value = '';
+      scanFilesInput.value = '';
+      fileListDiv.innerHTML = '';
+      if (fileStatus) fileStatus.textContent = 'No file chosen';
+      costAmount.textContent = '0.50';
+      progressBar.style.width = '0%';
+      processScanBtn.disabled = false;
+      processScanBtn.textContent = 'Process Scan';
+      await loadRecentActivity(currentCustomer.id);
     });
 
     async function loadRecentActivity(customerId){
