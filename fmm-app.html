@@ -785,6 +785,23 @@ html, body {
           </div>
         </div>
         <div class="settings-section">
+          <div class="settings-label">My Account Details</div>
+          <div class="settings-group">
+            <div class="settings-row" style="cursor:default;">
+              <div class="sr-icon navy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1e2b3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+              <div class="sr-body"><div class="sr-title">Mailbox ID</div><div class="sr-sub" id="acct-mailbox-id">—</div></div>
+            </div>
+            <div class="settings-row" style="cursor:default;">
+              <div class="sr-icon teal"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#b8964a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+              <div class="sr-body"><div class="sr-title">Free Scans</div><div class="sr-sub" id="acct-free-scans">—</div></div>
+            </div>
+            <div class="settings-row" style="cursor:default;">
+              <div class="sr-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#27ae7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+              <div class="sr-body"><div class="sr-title">ID Verification</div><div class="sr-sub" id="acct-id-status">—</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="settings-section">
           <div class="settings-label">Security</div>
           <div class="settings-group">
             <div class="settings-row" id="change-pin-row">
@@ -1208,7 +1225,7 @@ async function loadCustomerData(uid) {
     const docSnap = await getDoc(doc(db, 'customers', uid));
     if (docSnap.exists()) {
       currentCustomer = { id: uid, ...docSnap.data() };
-      localStorage.setItem('fmm_name', currentCustomer.firstName || currentCustomer.name || currentCustomer.email?.split('@')[0] || 'there');
+      localStorage.setItem('fmm_name', currentCustomer.name || currentCustomer.firstName || currentCustomer.email?.split('@')[0] || 'there');
       return currentCustomer;
     }
   } catch (err) {
@@ -1232,11 +1249,12 @@ function goToApp() {
 function populateApp() {
   if (!currentCustomer) return;
 
-  const name = currentCustomer.firstName || currentCustomer.name || 'there';
+  const name = currentCustomer.name || currentCustomer.firstName || 'there';
   const email = currentCustomer.email || '';
   const credits = currentCustomer.credits || currentCustomer.creditBalance || 0;
   const creditsDisplay = `£${parseFloat(credits).toFixed(2)}`;
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2) || '?';
+  const freeScans = Number(currentCustomer.freeScansRemaining || 0);
 
   // Greeting
   const hour = new Date().getHours();
@@ -1244,16 +1262,30 @@ function populateApp() {
   document.getElementById('dash-greet').textContent = greet;
   document.getElementById('dash-name').textContent = name;
   document.getElementById('dash-credit').textContent = creditsDisplay;
-  document.getElementById('dash-credit-sub').textContent = `~${Math.floor(parseFloat(credits) / 0.85)} standard letters`;
+  document.getElementById('dash-credit-sub').textContent = freeScans > 0
+    ? `${freeScans} free scan${freeScans !== 1 ? 's' : ''} remaining this month`
+    : `~${Math.floor(parseFloat(credits) / 0.85)} standard letters`;
 
   // Account tab
-  document.getElementById('acct-name').textContent = currentCustomer.firstName && currentCustomer.lastName
-    ? `${currentCustomer.firstName} ${currentCustomer.lastName}`
-    : name;
+  document.getElementById('acct-name').textContent = name;
   document.getElementById('acct-email').textContent = email;
   document.getElementById('acct-credit').textContent = creditsDisplay;
   document.getElementById('acct-avatar').textContent = initials;
   document.getElementById('acct-address').textContent = currentCustomer.forwardingAddress || 'Not set';
+
+  // Mailbox ID, free scans, ID status
+  const mailboxEl = document.getElementById('acct-mailbox-id');
+  if (mailboxEl) mailboxEl.textContent = currentCustomer.mailboxId || 'Not assigned';
+  const freeScansEl = document.getElementById('acct-free-scans');
+  if (freeScansEl) freeScansEl.textContent = freeScans > 0 ? `${freeScans} remaining this month` : 'None remaining';
+  const idStatusEl = document.getElementById('acct-id-status');
+  if (idStatusEl) {
+    const status = currentCustomer.idStatus || 'pending';
+    const statusMap = { approved: '✓ Verified', pending: 'Pending review', rejected: 'Action required' };
+    const colourMap = { approved: '#27ae7a', pending: '#b8964a', rejected: '#dc4444' };
+    idStatusEl.textContent = statusMap[status] || status;
+    idStatusEl.style.color = colourMap[status] || '#666';
+  }
 }
 
 // ===== LOAD MAIL =====
@@ -1513,9 +1545,9 @@ window.requestAction = async function(mailId, action) {
       mailId: mailId,
       customerId: uid,
       customerEmail: currentUser.email || '',
-      customerName: ((currentCustomer?.firstName || '') + ' ' + (currentCustomer?.lastName || '')).trim() || currentUser.email,
-      customerRef: currentCustomer?.ref || currentCustomer?.referenceNumber || '',
-      mailboxId: currentCustomer?.mailboxId || currentCustomer?.virtualAddress || '',
+      customerName: currentCustomer?.name || currentCustomer?.firstName ? `${currentCustomer.firstName} ${currentCustomer.lastName || ''}`.trim() : currentUser.email,
+      customerRef: currentCustomer?.mailboxId || '',
+      mailboxId: currentCustomer?.mailboxId || '',
       forwardingAddress: currentCustomer?.forwardingAddress || '',
       mailSender: mailItem?.sender || '',
       mailType: mailItem?.type || 'Letter',
@@ -1707,7 +1739,7 @@ document.getElementById('contact-send-btn').addEventListener('click', async () =
     await addDoc(collection(db, 'contactRequests'), {
       customerId: currentUser.uid,
       customerEmail: currentUser.email,
-      customerName: currentCustomer?.firstName ? `${currentCustomer.firstName} ${currentCustomer.lastName || ''}`.trim() : currentUser.email,
+      customerName: currentCustomer?.name || currentUser.email,
       subject,
       message,
       submittedAt: new Date(),
