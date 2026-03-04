@@ -249,32 +249,42 @@ html, body {
 /* Bottom nav */
 .bottom-nav {
   display: flex; justify-content: space-around; align-items: center;
-  padding: 8px 0 calc(var(--safe-bottom) + 8px);
-  background: var(--card); border-top: 1px solid var(--border);
+  padding: 10px 0 calc(var(--safe-bottom) + 10px);
+  background: var(--brand); border-top: none;
   flex-shrink: 0;
+  position: relative;
 }
-.nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 16px; border-radius: 12px; position: relative; }
-.nav-icon { font-size: 20px; line-height: 1; }
-.nav-label { font-size: 9px; font-weight: 600; color: var(--text-muted); transition: color 0.15s; }
-.nav-item.active .nav-label { color: var(--brand); }
+.bottom-nav::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20px; right: 20px; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(184,150,74,0.4), transparent);
+}
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 6px 20px; border-radius: 8px; position: relative; transition: background 0.15s; }
+.nav-item:hover { background: rgba(255,255,255,0.06); }
+.nav-icon { line-height: 1; }
+.nav-icon svg { stroke: rgba(255,255,255,0.35); transition: stroke 0.15s; }
+.nav-label { font-size: 9px; font-weight: 500; letter-spacing: 1px; color: rgba(255,255,255,0.35); transition: color 0.15s; }
+.nav-item.active .nav-label { color: #b8964a; }
+.nav-item.active .nav-icon svg { stroke: #b8964a; }
 .nav-item .nav-dot {
-  position: absolute; top: 2px; right: 10px;
-  width: 7px; height: 7px; border-radius: 50%; background: var(--red);
-  border: 1.5px solid var(--card); display: none;
+  position: absolute; top: 4px; right: 12px;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--red);
+  border: 1.5px solid var(--brand); display: none;
 }
 .nav-item.has-badge .nav-dot { display: block; }
 
 /* ===== DASHBOARD TAB ===== */
 .dash-hero {
   background: var(--brand);
-  padding: 16px 18px 28px;
+  padding: 20px 18px 32px;
 }
 .dash-greet { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 2px; }
-.dash-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #fff; margin-bottom: 16px; }
+.dash-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fff; margin-bottom: 20px; }
 
 .credit-card {
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 20px; padding: 18px 18px 16px; position: relative; overflow: hidden;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(184,150,74,0.3);
+  border-radius: 16px; padding: 22px 20px 20px; position: relative; overflow: hidden;
 }
 .credit-card::before {
   content: ''; position: absolute; top: -30px; right: -20px;
@@ -286,9 +296,9 @@ html, body {
   width: 80px; height: 80px; border-radius: 50%;
   background: rgba(255,255,255,0.04);
 }
-.cc-label { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 4px; }
-.cc-amount { font-family: 'Cormorant Garamond', serif; font-size: 36px; color: #fff; line-height: 1; }
-.cc-sub { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+.cc-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #b8964a; margin-bottom: 6px; font-weight: 500; }
+.cc-amount { font-family: 'Cormorant Garamond', serif; font-size: 52px; color: #fff; line-height: 1; font-weight: 400; }
+.cc-sub { font-size: 10px; color: rgba(255,255,255,0.35); margin-top: 6px; letter-spacing: 0.5px; }
 .cc-topup {
   position: absolute; right: 16px; bottom: 16px;
   background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
@@ -695,13 +705,6 @@ html, body {
             <div class="qc-sub">This month</div>
           </div>
         </div>
-        <div class="dash-section-head">
-          <span class="dash-section-title">Recent Mail</span>
-          <span class="dash-section-link" onclick="switchTab('mail')">See all →</span>
-        </div>
-        <div class="mail-list" id="dash-mail-list">
-          <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">Loading mail...</div>
-        </div>
       </div>
     </div>
 
@@ -740,11 +743,7 @@ html, body {
               <div class="sr-body"><div class="sr-title">Top Up Credits</div><div class="sr-sub">Buy more scanning & posting credit</div></div>
               <div class="sr-arrow">›</div>
             </div>
-            <div class="settings-row">
-              <div class="sr-icon navy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1e2b3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-              <div class="sr-body"><div class="sr-title">Forwarding Address</div><div class="sr-sub" id="acct-address">Loading...</div></div>
-              <div class="sr-arrow">›</div>
-            </div>
+            <div class="settings-row" id="address-row">
           </div>
         </div>
         <div class="settings-section">
@@ -765,7 +764,7 @@ html, body {
         <div class="settings-section">
           <div class="settings-label">Support</div>
           <div class="settings-group">
-            <div class="settings-row">
+            <div class="settings-row" id="contact-row">
               <div class="sr-icon green"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#27ae7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
               <div class="sr-body"><div class="sr-title">Contact Us</div><div class="sr-sub">Get help with your mail</div></div>
               <div class="sr-arrow">›</div>
@@ -825,6 +824,54 @@ html, body {
   </div>
 </div>
 
+<!-- FORWARDING ADDRESS SHEET -->
+<div class="sheet-overlay" id="address-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Forwarding Address</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Update the address where we post your mail when you request forwarding.</p>
+    <div style="margin-bottom:14px;">
+      <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Address Line 1</label>
+      <input type="text" id="addr-line1" placeholder="House / flat number and street" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;">
+    </div>
+    <div style="margin-bottom:14px;">
+      <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Address Line 2</label>
+      <input type="text" id="addr-line2" placeholder="Town / City" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+      <div>
+        <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">County</label>
+        <input type="text" id="addr-county" placeholder="Optional" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;">
+      </div>
+      <div>
+        <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Postcode</label>
+        <input type="text" id="addr-postcode" placeholder="SW1A 1AA" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;">
+      </div>
+    </div>
+    <div id="addr-msg" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;"></div>
+    <button class="sheet-btn" id="addr-save-btn">Save Address</button>
+  </div>
+</div>
+
+<!-- CONTACT US SHEET -->
+<div class="sheet-overlay" id="contact-sheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Contact Us</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px;line-height:1.5;">Send us a message and we'll get back to you within one business day.</p>
+    <div style="margin-bottom:14px;">
+      <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Subject</label>
+      <input type="text" id="contact-subject" placeholder="What's this about?" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;">
+    </div>
+    <div style="margin-bottom:20px;">
+      <label class="form-label" style="color:var(--text-muted);font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;display:block;margin-bottom:6px;">Message</label>
+      <textarea id="contact-message" placeholder="Tell us how we can help..." rows="4" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);font-size:15px;font-family:'Jost',sans-serif;color:var(--text);background:#fff;outline:none;resize:none;line-height:1.5;"></textarea>
+    </div>
+    <div id="contact-msg" style="display:none;padding:10px 14px;border-radius:10px;font-size:13px;margin-bottom:14px;"></div>
+    <button class="sheet-btn" id="contact-send-btn">Send Message</button>
+  </div>
+</div>
+
 <!-- MAIL DETAIL SHEET -->
 <div class="sheet-overlay" id="detail-sheet">
   <div class="sheet">
@@ -849,7 +896,7 @@ html, body {
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, orderBy, limit, getDocs, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -1167,13 +1214,11 @@ async function loadMailData() {
     );
     const snap = await getDocs(q);
     mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderDashMail();
     renderMailTab('all');
     updateStats();
   } catch (err) {
     console.error('Error loading mail:', err);
     // Show empty state
-    document.getElementById('dash-mail-list').innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
     document.getElementById('mail-items-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
     document.getElementById('stat-new').textContent = '0';
     document.getElementById('stat-scanned').textContent = '0';
@@ -1220,24 +1265,6 @@ function getBadgeLabel(status) {
   return map[status] || status?.toUpperCase() || 'NEW';
 }
 
-function renderDashMail() {
-  const list = document.getElementById('dash-mail-list');
-  if (!mailCache.length) {
-    list.innerHTML = `<div style="text-align:center;padding:30px;color:var(--text-muted);font-size:13px;">No mail yet</div>`;
-    return;
-  }
-  list.innerHTML = mailCache.slice(0, 5).map(m => `
-    <div class="mail-row ${m.status === 'new' || m.status === 'received' ? 'unread' : ''}" onclick="openDetail('${m.id}')">
-      <div class="mr-icon">${getEmoji(m.sender)}</div>
-      <div class="mr-body">
-        <div class="mr-from">${m.sender || 'Unknown Sender'}</div>
-        <div class="mr-desc">${m.description || m.type || 'Letter'}</div>
-      </div>
-      <div class="mr-badge ${getBadgeClass(m.status)}">${getBadgeLabel(m.status)}</div>
-    </div>
-  `).join('');
-}
-
 function renderMailTab(filter) {
   const list = document.getElementById('mail-items-list');
   let items = filter === 'all' ? mailCache : mailCache.filter(m => {
@@ -1258,11 +1285,9 @@ function renderMailTab(filter) {
         ? '<div class="mc-action free">✓ Free (Official)</div>'
         : '<div class="mc-action" onclick="event.stopPropagation()">Shred</div>';
       actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View</div>'
-        + '<div class="mc-action cost" onclick="event.stopPropagation()">Post</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
-      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View Scan</div>'
-        + '<div class="mc-action cost" onclick="event.stopPropagation()">Post</div>';
+      actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View Scan</div>';
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
@@ -1309,7 +1334,7 @@ window.openDetail = function(id) {
   const m = mailCache.find(item => item.id === id);
   if (!m) return;
 
-  document.getElementById('detail-emoji').textContent = getEmoji(m.sender);
+  document.getElementById('detail-emoji').innerHTML = getEmoji(m.sender);
   document.getElementById('detail-from').textContent = m.sender || 'Unknown';
   document.getElementById('detail-type').textContent = (m.type || 'Letter') + (m.pages ? ' · ' + m.pages + ' pages' : '');
   document.getElementById('detail-date').textContent = `Received ${formatDate(m.receivedAt)}`;
@@ -1421,6 +1446,115 @@ document.getElementById('change-pin-row').addEventListener('click', () => {
   updateSetupDots();
   document.getElementById('setup-pin-step').textContent = 'Enter new PIN';
   showScreen('screen-pin-setup');
+});
+
+// ===== FORWARDING ADDRESS =====
+document.getElementById('address-row').addEventListener('click', () => {
+  const current = currentCustomer?.forwardingAddress || '';
+  const parts = current.split(',').map(s => s.trim());
+  document.getElementById('addr-line1').value = parts[0] || '';
+  document.getElementById('addr-line2').value = parts[1] || '';
+  document.getElementById('addr-county').value = parts[2] || '';
+  document.getElementById('addr-postcode').value = parts[3] || '';
+  document.getElementById('addr-msg').style.display = 'none';
+  openSheet('address-sheet');
+});
+
+document.getElementById('addr-save-btn').addEventListener('click', async () => {
+  const line1 = document.getElementById('addr-line1').value.trim();
+  const line2 = document.getElementById('addr-line2').value.trim();
+  const county = document.getElementById('addr-county').value.trim();
+  const postcode = document.getElementById('addr-postcode').value.trim();
+  const msgEl = document.getElementById('addr-msg');
+
+  if (!line1 || !line2 || !postcode) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(220,68,68,0.1)';
+    msgEl.style.color = '#dc4444';
+    msgEl.style.border = '1px solid rgba(220,68,68,0.2)';
+    msgEl.textContent = 'Please fill in address line 1, town/city and postcode.';
+    return;
+  }
+
+  const parts = [line1, line2, county, postcode].filter(Boolean);
+  const fullAddress = parts.join(', ');
+
+  const btn = document.getElementById('addr-save-btn');
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+
+  try {
+    await updateDoc(doc(db, 'customers', currentUser.uid), { forwardingAddress: fullAddress });
+    currentCustomer.forwardingAddress = fullAddress;
+    document.getElementById('acct-address').textContent = fullAddress;
+    closeSheet('address-sheet');
+    toast('Address updated successfully');
+  } catch (err) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(220,68,68,0.1)';
+    msgEl.style.color = '#dc4444';
+    msgEl.style.border = '1px solid rgba(220,68,68,0.2)';
+    msgEl.textContent = 'Failed to save. Please try again.';
+  } finally {
+    btn.textContent = 'Save Address';
+    btn.disabled = false;
+  }
+});
+
+// ===== CONTACT US =====
+document.getElementById('contact-row').addEventListener('click', () => {
+  document.getElementById('contact-subject').value = '';
+  document.getElementById('contact-message').value = '';
+  document.getElementById('contact-msg').style.display = 'none';
+  openSheet('contact-sheet');
+});
+
+document.getElementById('contact-send-btn').addEventListener('click', async () => {
+  const subject = document.getElementById('contact-subject').value.trim();
+  const message = document.getElementById('contact-message').value.trim();
+  const msgEl = document.getElementById('contact-msg');
+
+  if (!subject || !message) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(220,68,68,0.1)';
+    msgEl.style.color = '#dc4444';
+    msgEl.style.border = '1px solid rgba(220,68,68,0.2)';
+    msgEl.textContent = 'Please fill in both subject and message.';
+    return;
+  }
+
+  const btn = document.getElementById('contact-send-btn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  try {
+    const { addDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+    await addDoc(collection(db, 'contactRequests'), {
+      customerId: currentUser.uid,
+      customerEmail: currentUser.email,
+      customerName: currentCustomer?.firstName ? `${currentCustomer.firstName} ${currentCustomer.lastName}` : currentUser.email,
+      subject,
+      message,
+      submittedAt: new Date(),
+      status: 'new'
+    });
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(39,174,122,0.1)';
+    msgEl.style.color = '#27ae7a';
+    msgEl.style.border = '1px solid rgba(39,174,122,0.2)';
+    msgEl.textContent = 'Message sent! We\'ll reply within one business day.';
+    document.getElementById('contact-subject').value = '';
+    document.getElementById('contact-message').value = '';
+  } catch (err) {
+    msgEl.style.display = 'block';
+    msgEl.style.background = 'rgba(220,68,68,0.1)';
+    msgEl.style.color = '#dc4444';
+    msgEl.style.border = '1px solid rgba(220,68,68,0.2)';
+    msgEl.textContent = 'Failed to send. Please try again.';
+  } finally {
+    btn.textContent = 'Send Message';
+    btn.disabled = false;
+  }
 });
 
 </script>
