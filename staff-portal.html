@@ -465,6 +465,7 @@ const storage = getStorage(app);
       idPanel.style.display='block';
       document.getElementById('mailRequestsSection').style.display='block';
       await loadRecentActivity(id);
+      await loadMailRequests(id);
 
       if (unsubscribeCustomer) unsubscribeCustomer();
       unsubscribeCustomer = onSnapshot(doc(db,'customers', id), live=>{
@@ -570,10 +571,10 @@ saveIdBtn.addEventListener('click', async ()=>{
 
 // Reset ID status
 document.getElementById('resetIdBtn').addEventListener('click', async () => {
-  if (!selectedCustomerId) return showError('No customer selected');
-  if (!confirm('Reset this customer\'s ID status to Not Started? This will re-enable the verification button for them.')) return;
+  if (!currentCustomer?.id) return showError('No customer selected');
+  if (!confirm("Reset this customer's ID status to Not Started?")) return;
   try {
-    await updateDoc(doc(db, 'customers', selectedCustomerId), {
+    await updateDoc(doc(db, 'customers', currentCustomer.id), {
       idStatus: 'not_started',
       idGate: true,
       idRequired: true,
