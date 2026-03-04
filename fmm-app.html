@@ -323,6 +323,7 @@ html, body {
 .qc-icon.amber { background: var(--amber-dim); }
 .qc-icon.blue { background: rgba(60,120,220,0.09); }
 .qc-icon.green { background: var(--green-dim); }
+.qc-icon.navy { background: var(--brand-pale); }
 .qc-count { font-size: 22px; font-weight: 700; color: var(--text); line-height: 1; }
 .qc-label { font-size: 11px; font-weight: 600; color: var(--text); }
 .qc-sub { font-size: 9px; color: var(--text-muted); }
@@ -701,7 +702,7 @@ html, body {
         <div class="dash-section-head" style="margin-bottom:8px;">
           <span class="dash-section-title">Mail Overview</span>
         </div>
-        <div class="quick-grid">
+        <div class="quick-grid" style="grid-template-columns:1fr 1fr 1fr;">
           <div class="quick-card highlight" onclick="switchTab('mail');setMailFilter('new')">
             <div class="qc-icon teal"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#b8964a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
             <div class="qc-count" id="stat-new">—</div>
@@ -719,6 +720,12 @@ html, body {
             <div class="qc-count" id="stat-posted">—</div>
             <div class="qc-label">Posted</div>
             <div class="qc-sub">Dispatched</div>
+          </div>
+          <div class="quick-card" onclick="switchTab('mail');setMailFilter('stored')">
+            <div class="qc-icon navy"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#1e2b3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></div>
+            <div class="qc-count" id="stat-stored">—</div>
+            <div class="qc-label">Stored</div>
+            <div class="qc-sub">Held securely</div>
           </div>
           <div class="quick-card" onclick="switchTab('mail');setMailFilter('shredded')">
             <div class="qc-icon green"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#27ae7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></div>
@@ -1241,34 +1248,44 @@ function populateApp() {
 }
 
 // ===== LOAD MAIL =====
-async function loadMailData() {
+let mailUnsubscribe = null;
+
+function loadMailData() {
   if (!currentUser) return;
-  try {
-    const q = query(
-      collection(db, 'mail'),
-      where('customerId', '==', currentUser.uid),
-      orderBy('receivedAt', 'desc'),
-      limit(20)
-    );
-    const snap = await getDocs(q);
+
+  // Cancel any existing listener first
+  if (mailUnsubscribe) { mailUnsubscribe(); mailUnsubscribe = null; }
+
+  const q = query(
+    collection(db, 'mail'),
+    where('customerId', '==', currentUser.uid),
+    orderBy('receivedAt', 'desc'),
+    limit(50)
+  );
+
+  // Real-time listener — fires immediately and on every change
+  mailUnsubscribe = onSnapshot(q, (snap) => {
     mailCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderMailTab('all');
+    // Re-render with whatever filter is currently active
+    const activeFilter = document.querySelector('.filter-pill.active')?.dataset.filter || 'all';
+    renderMailTab(activeFilter);
     updateStats();
-  } catch (err) {
-    console.error('Error loading mail:', err);
-    // Show empty state
+  }, (err) => {
+    console.error('Mail listener error:', err);
     document.getElementById('mail-items-list').innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No mail yet — check back soon!</div>`;
     document.getElementById('stat-new').textContent = '0';
     document.getElementById('stat-scanned').textContent = '0';
     document.getElementById('stat-posted').textContent = '0';
+    document.getElementById('stat-stored').textContent = '0';
     document.getElementById('stat-shredded').textContent = '0';
-  }
+  });
 }
 
 function updateStats() {
   document.getElementById('stat-new').textContent = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
   document.getElementById('stat-scanned').textContent = mailCache.filter(m => m.status === 'scanned').length;
   document.getElementById('stat-posted').textContent = mailCache.filter(m => m.status === 'posted').length;
+  document.getElementById('stat-stored').textContent = mailCache.filter(m => m.status === 'stored').length;
   document.getElementById('stat-shredded').textContent = mailCache.filter(m => m.status === 'shredded').length;
 
   const newCount = mailCache.filter(m => m.status === 'received' || m.status === 'new').length;
@@ -1555,6 +1572,7 @@ document.querySelectorAll('.nav-item').forEach(nav => {
 
 // ===== SIGN OUT =====
 document.getElementById('signout-row').addEventListener('click', async () => {
+  if (mailUnsubscribe) { mailUnsubscribe(); mailUnsubscribe = null; }
   await signOut(auth);
   currentUser = null;
   currentCustomer = null;
