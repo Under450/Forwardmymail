@@ -430,7 +430,7 @@ const storage = getStorage(app);
         const c = d.data();
         const opt = document.createElement('option');
         opt.value = d.id;
-        opt.textContent = `${c.name || 'Unnamed'} — ${c.company || 'No company'}`;
+        opt.textContent = `${c.name || 'Unnamed'} -- ${c.company || 'No company'}`;
         customerSelect.appendChild(opt);
       });
     }
@@ -449,7 +449,7 @@ const storage = getStorage(app);
       if (firstAllowed) letterType.value = firstAllowed.value;
       const pkg = packageType || 'PERSONAL MAILBOX';
       const unavailable = Array.from(letterType.options).filter(o=>o.disabled).map(o=>o.textContent).join(', ');
-      letterTypeHelp.textContent = unavailable ? `Package: ${pkg}. Unavailable types (greyed out): ${unavailable}. Use “Override” only with approval.` : `Package: ${pkg}.`;
+      letterTypeHelp.textContent = unavailable ? `Package: ${pkg}. Unavailable types (greyed out): ${unavailable}. Use "Override" only with approval.` : `Package: ${pkg}.`;
     }
 
     customerSelect.addEventListener('change', async (e)=>{
@@ -699,7 +699,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
       // enforce letter type rules + override
       const selectedType = letterType.value;
       const selectedOpt = letterType.options[letterType.selectedIndex];
-      if (selectedOpt.disabled && selectedType !== 'override'){ return showError('This letter type is not included in the customer’s package. Use “Override” if approved.'); }
+      if (selectedOpt.disabled && selectedType !== 'override'){ return showError("This letter type is not included in the customer's package. Use Override if approved."); }
       if (selectedType === 'override'){ const ok = confirm('Use Override for this scan?'); if (!ok) return; }
 
       const freeScans = Number(currentCustomer.freeScansRemaining || 0);
@@ -742,7 +742,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         }
 
         renderCustomer(currentCustomer);
-        showSuccess(`Scan processed: ${pages} page(s) — ${usedFreeScan ? 'free' : '£'+baseCost.toFixed(2)+' deducted'}.`);
+        showSuccess(`Scan processed: ${pages} page(s) -- ${usedFreeScan ? 'free' : '£'+baseCost.toFixed(2)+' deducted'}.`);
 
         pagesInput.value=1; document.getElementById('notes').value='';
         scanFilesInput.value=''; fileListDiv.innerHTML=''; if (fileStatus) fileStatus.textContent='No file chosen';
@@ -870,7 +870,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         const icon = icons[r.action] || '📬';
         const label = labels[r.action] || r.action;
         const isDone = r.status === 'completed';
-        const time = r.createdAt?.toDate ? formatReqDate(r.createdAt.toDate()) : '—';
+        const time = r.createdAt?.toDate ? formatReqDate(r.createdAt.toDate()) : '--';
         const addressHtml = r.forwardingAddress && r.action === 'post'
           ? `<div class="req-address"><strong>Post to:</strong> <span>${r.forwardingAddress.replace(/\n/g, ', ')}</span></div>` : '';
         const noteHtml = r.note
@@ -885,13 +885,13 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           <div class="req-emoji">${icon}</div>
           <div class="req-body">
             <div class="req-top">
-              <span class="req-name">${r.customerName || r.customerEmail || '—'}</span>
+              <span class="req-name">${r.customerName || r.customerEmail || '--'}</span>
               <span class="req-pill ${r.action}">${label}</span>
             </div>
             <div class="req-detail">
-              <span>📬 ${r.mailboxId || '—'}</span>
-              <span>✉️ ${r.customerEmail || '—'}</span>
-              <span>📄 Ref: ${r.mailId ? r.mailId.slice(0,8) : '—'}</span>
+              <span>📬 ${r.mailboxId || '--'}</span>
+              <span>✉️ ${r.customerEmail || '--'}</span>
+              <span>📄 Ref: ${r.mailId ? r.mailId.slice(0,8) : '--'}</span>
             </div>
             ${addressHtml}${noteHtml}
           </div>
