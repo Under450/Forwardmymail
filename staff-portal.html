@@ -156,6 +156,7 @@
             <div class="info-item"><div class="info-label">Package</div><div class="info-value"><span id="customerPackage" class="pkg-badge">-</span></div></div>
             <div class="info-item"><div class="info-label">Credit Balance</div><div class="info-value credit-value" id="customerCredits">£0.00</div></div>
             <div class="info-item"><div class="info-label">Free scans left (this month)</div><div class="info-value" id="customerFreeScans">0</div></div>
+            <div class="info-item" style="grid-column:1/-1;"><div class="info-label">Forwarding Address</div><div class="info-value" id="customerForwardingAddress" style="white-space:pre-line;color:#1e3c72;">Not set</div></div>
           </div>
 
           <div id="lowCreditWarning" style="display:none;"></div>
@@ -498,6 +499,7 @@ const storage = getStorage(app);
       document.getElementById('customerEmail').textContent = cust.email || '-';
       customerMailboxIdEl.textContent = cust.mailboxId || '-';
       customerPackageEl.textContent = (cust.packageType || 'Not set').toString();
+      document.getElementById('customerForwardingAddress').textContent = cust.forwardingAddress || 'Not set';
 
       const credits = Number(cust.credits || 0);
       const freeScans = Number(cust.freeScansRemaining || 0);
