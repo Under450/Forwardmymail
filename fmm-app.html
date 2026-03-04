@@ -1488,9 +1488,17 @@ window.requestAction = async function(mailId, action) {
   if (!uid) { toast('Not logged in', 'error'); return; }
 
   const mailItem = mailCache.find(m => m.id === mailId);
+  const newStatus = newStatuses[action];
 
   try {
-    // Write to root mailRequests collection — matches exactly what the staff portal reads
+    // 1. Write status directly to the mail doc so it persists on refresh/re-login
+    await updateDoc(doc(db, 'mail', mailId), {
+      status: newStatus,
+      actionRequestedAt: new Date(),
+      actionRequestedBy: uid
+    });
+
+    // 2. Write mailRequest so staff are notified
     await addDoc(collection(db, 'mailRequests'), {
       action: actionMap[action],
       mailId: mailId,
@@ -1508,18 +1516,21 @@ window.requestAction = async function(mailId, action) {
       label: label
     });
 
-    // Update local cache optimistically and re-render
+    // 3. Update local cache immediately (onSnapshot will also confirm shortly after)
     const idx = mailCache.findIndex(m => m.id === mailId);
-    if (idx !== -1) mailCache[idx].status = newStatuses[action];
+    if (idx !== -1) mailCache[idx].status = newStatus;
+
+    // 4. Re-render mail list AND update dashboard stats
     closeSheet('detail-sheet');
     renderMailTab(document.querySelector('.filter-pill.active')?.dataset.filter || 'all');
+    updateStats();
+
     toast(`✓ ${label} requested — staff have been notified`, 'success');
   } catch (err) {
     console.error('Action error:', err);
     toast(`Error: ${err.message || 'Something went wrong'}`, 'error');
   }
 };
-
 document.querySelectorAll('.sheet-overlay').forEach(overlay => {
   overlay.addEventListener('click', (e) => {
     if (e.target === overlay) closeSheet(overlay.id);
