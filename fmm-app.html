@@ -237,7 +237,7 @@ html, body {
 
 /* Tab system */
 .tab-content { flex: 1; overflow: hidden; position: relative; }
-.tab-pane { position: absolute; inset: 0; overflow-y: auto; display: none; }
+.tab-pane { position: absolute; inset: 0; overflow-y: auto; display: none; padding-bottom: 70px; }
 .tab-pane.active { display: block; }
 
 /* Bottom nav */
@@ -248,7 +248,7 @@ html, body {
   flex-shrink: 0;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  z-index: 200;
+  z-index: 50;
 }
 .bottom-nav::before {
   content: '';
@@ -427,7 +427,7 @@ html, body {
 /* ===== CREDIT TOP-UP SHEET ===== */
 .sheet-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
-  z-index: 100; display: none; align-items: flex-end;
+  z-index: 300; display: none; align-items: flex-end;
   opacity: 0; transition: opacity 0.3s;
 }
 .sheet-overlay.open { display: flex; }
