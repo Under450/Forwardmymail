@@ -246,7 +246,9 @@ html, body {
   padding: 10px 0 calc(var(--safe-bottom) + 10px);
   background: var(--brand); border-top: none;
   flex-shrink: 0;
-  position: relative;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 200;
 }
 .bottom-nav::before {
   content: '';
