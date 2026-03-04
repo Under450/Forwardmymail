@@ -2,33 +2,132 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Customers can read their own doc
+    // ─────────────────────────────────────────────
+    // HELPER FUNCTIONS
+    // ─────────────────────────────────────────────
+
+    // Is the request from a signed-in user?
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Does the signed-in user own this resource?
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    // Is the signed-in user a verified staff member?
+    // Staff must have a document in the /staff collection with their uid
+    function isStaff() {
+      return isAuth() &&
+        exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+
+    // Does the incoming data claim to belong to the signed-in user?
+    function ownedByMe() {
+      return isAuth() &&
+        request.resource.data.customerId == request.auth.uid;
+    }
+
+    // ─────────────────────────────────────────────
+    // STAFF COLLECTION
+    // Staff docs are read-only to staff themselves;
+    // only writable by other staff (e.g. admin adds staff members)
+    // ─────────────────────────────────────────────
+    match /staff/{staffId} {
+      allow read: if isOwner(staffId) || isStaff();
+      allow write: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // CUSTOMERS COLLECTION
+    // ─────────────────────────────────────────────
     match /customers/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Customer can read their own doc
+      allow read: if isOwner(userId);
+
+      // Customer can create their own doc (signup flow)
+      allow create: if isOwner(userId);
+
+      // Customer can update limited fields on their own doc
+      // (forwardingAddress, etc.) — staff can update anything
+      allow update: if isOwner(userId) || isStaff();
+
+      // Only staff can delete customer docs
+      allow delete: if isStaff();
+
+      // Staff can read all customer docs (for the staff portal list)
+      allow read: if isStaff();
     }
 
-    // Mail: customers can read their own mail
+    // ─────────────────────────────────────────────
+    // MAIL COLLECTION
+    // ─────────────────────────────────────────────
     match /mail/{mailId} {
-      allow read: if request.auth != null && resource.data.customerId == request.auth.uid;
-      allow update: if request.auth != null && resource.data.customerId == request.auth.uid;
+      // Customer can read their own mail items
+      allow read: if isAuth() && resource.data.customerId == request.auth.uid;
+
+      // Customer can update their own mail (e.g. marking as read)
+      allow update: if isAuth() && resource.data.customerId == request.auth.uid;
+
+      // Only staff can create or delete mail items
+      allow create: if isStaff();
+      allow delete: if isStaff();
+
+      // Staff can read and write all mail
+      allow read, write: if isStaff();
     }
 
-    // mailRequests: authenticated customers can create requests
+    // ─────────────────────────────────────────────
+    // MAIL REQUESTS COLLECTION
+    // Customers submit post/shred/store requests;
+    // staff read and process them
+    // ─────────────────────────────────────────────
     match /mailRequests/{reqId} {
-      allow create: if request.auth != null
-        && request.resource.data.customerId == request.auth.uid;
-      allow read: if request.auth != null
-        && resource.data.customerId == request.auth.uid;
+      // Customer can create a request for their own mail
+      allow create: if isAuth() && ownedByMe();
+
+      // Customer can read their own requests
+      allow read: if isAuth() && resource.data.customerId == request.auth.uid;
+
+      // Staff can read all requests and update them (mark processed, etc.)
+      allow read, write: if isStaff();
     }
 
-    // contactRequests: authenticated users can create
+    // ─────────────────────────────────────────────
+    // CONTACT REQUESTS COLLECTION
+    // Customers submit support messages
+    // ─────────────────────────────────────────────
     match /contactRequests/{docId} {
-      allow create: if request.auth != null;
+      // Any authenticated customer can create a contact request
+      allow create: if isAuth();
+
+      // Customer can read their own contact requests
+      allow read: if isAuth() && resource.data.customerId == request.auth.uid;
+
+      // Staff can read and update all contact requests
+      allow read, write: if isStaff();
     }
 
-    // Staff-only collections: no customer access
+    // ─────────────────────────────────────────────
+    // STAFF NOTIFICATIONS COLLECTION
+    // Written by the fmm-app when customers take actions;
+    // read and managed by staff
+    // ─────────────────────────────────────────────
+    match /staff_notifications/{notifId} {
+      // Any authenticated customer can create a notification
+      allow create: if isAuth();
+
+      // Staff can read, update and delete notifications
+      allow read, write: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // DENY EVERYTHING ELSE
+    // ─────────────────────────────────────────────
     match /{document=**} {
       allow read, write: if false;
     }
+
   }
 }
