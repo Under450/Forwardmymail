@@ -1,0 +1,44 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ─────────────────────────────────────────────
+    // HELPER: is the user a verified staff member?
+    // Checks for a doc in /staff/{uid} in Firestore
+    // ─────────────────────────────────────────────
+    function isStaff() {
+      return request.auth != null &&
+        firestore.exists(/databases/(default)/documents/staff/$(request.auth.uid));
+    }
+
+    // ─────────────────────────────────────────────
+    // MAIL SCANS (uploaded by staff portal)
+    // Path: mail-scans/{customerId}/{filename}
+    // ─────────────────────────────────────────────
+    match /mail-scans/{customerId}/{fileName} {
+      // Customer can only read their own scans
+      allow read: if request.auth != null && request.auth.uid == customerId;
+      // Staff can read and write all scans
+      allow read, write: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // SCANS (newer path used by fmm-app)
+    // Path: scans/{customerId}/{filename}
+    // ─────────────────────────────────────────────
+    match /scans/{customerId}/{fileName} {
+      // Customer can only read their own scans
+      allow read: if request.auth != null && request.auth.uid == customerId;
+      // Staff can read and write all scans
+      allow read, write: if isStaff();
+    }
+
+    // ─────────────────────────────────────────────
+    // DENY EVERYTHING ELSE
+    // ─────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+  }
+}
