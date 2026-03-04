@@ -177,7 +177,7 @@ html, body {
 /* ===== PIN LOGIN SCREEN ===== */
 #screen-pin {
   background: var(--brand);
-  padding: calc(var(--safe-top) + 40px) 28px calc(var(--safe-bottom) + 24px);
+  padding: calc(var(--safe-top) + 40px) 24px calc(var(--safe-bottom) + 24px);
   align-items: center;
   justify-content: space-between;
 }
@@ -195,11 +195,11 @@ html, body {
 .pin-dot.error { background: var(--red); border-color: var(--red); animation: shake 0.4s ease; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-5px)} 40%,80%{transform:translateX(5px)} }
 
-.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; width: 100%; max-width: 280px; }
+.numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 360px; }
 .numpad-key {
   aspect-ratio: 1; border-radius: 50%; border: none;
   background: rgba(255,255,255,0.1); color: #fff;
-  font-size: 22px; font-weight: 500; font-family: 'Jost', sans-serif;
+  font-size: 26px; font-weight: 500; font-family: 'Jost', sans-serif;
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: background 0.1s, transform 0.1s;
   user-select: none;
@@ -633,7 +633,7 @@ html, body {
       <div class="pin-dot"></div><div class="pin-dot"></div>
     </div>
   </div>
-  <div style="text-align:center;">
+  <div style="text-align:center;width:100%;padding:0 20px;box-sizing:border-box;">
     <div class="numpad" style="margin:0 auto 16px;">
       <button class="numpad-key" data-pin="1">1</button>
       <button class="numpad-key" data-pin="2">2</button>
