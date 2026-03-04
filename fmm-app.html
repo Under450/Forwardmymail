@@ -434,8 +434,8 @@ html, body {
 .sheet-overlay.visible { opacity: 1; }
 .sheet {
   background: var(--card); border-radius: 24px 24px 0 0;
-  padding: 20px 20px calc(var(--safe-bottom) + 24px);
-  width: 100%; max-height: 80vh; overflow-y: auto;
+  padding: 20px 20px calc(var(--safe-bottom) + 80px);
+  width: 100%; max-height: 85vh; overflow-y: auto;
   transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
 .sheet-overlay.visible .sheet { transform: translateY(0); }
@@ -470,8 +470,17 @@ html, body {
 /* ===== MAIL DETAIL SHEET ===== */
 .detail-hero-card {
   background: var(--brand); border-radius: 18px; padding: 20px; text-align: center;
-  margin-bottom: 14px;
+  margin-bottom: 14px; cursor: pointer; position: relative;
+  transition: opacity 0.15s;
 }
+.detail-hero-card:active { opacity: 0.85; }
+.dhc-scan-hint {
+  display: none; margin-top: 10px;
+  background: rgba(255,255,255,0.12); border-radius: 20px; padding: 5px 14px;
+  font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+}
+.dhc-scan-hint.visible { display: inline-block; }
 .dhc-emoji { font-size: 36px; margin-bottom: 10px; }
 .dhc-from { font-size: 15px; font-weight: 700; color: #fff; }
 .dhc-type { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 2px; }
@@ -898,11 +907,12 @@ html, body {
 <div class="sheet-overlay" id="detail-sheet">
   <div class="sheet">
     <div class="sheet-handle"></div>
-    <div class="detail-hero-card">
+    <div class="detail-hero-card" id="detail-hero-card" onclick="heroCardClick()">
       <div class="dhc-emoji" id="detail-emoji"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
       <div class="dhc-from" id="detail-from">—</div>
       <div class="dhc-type" id="detail-type">—</div>
       <div class="dhc-date" id="detail-date">—</div>
+      <div class="dhc-scan-hint" id="dhc-scan-hint">👁 Tap to view scan</div>
     </div>
     <div class="timeline" id="detail-timeline">
       <div class="tl-step active"><div class="tl-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-label">Received</div><div class="tl-val" id="tl-received">—</div></div>
@@ -1360,6 +1370,18 @@ window.openDetail = function(id) {
   const m = mailCache.find(item => item.id === id);
   if (!m) return;
 
+  // Store scanUrl for hero card click
+  window._currentDetailScanUrl = m.scanUrl || null;
+  window._currentDetailSender = m.sender || 'Scan';
+
+  // Show/hide scan hint on hero card
+  const hint = document.getElementById('dhc-scan-hint');
+  if (m.scanUrl) {
+    hint.classList.add('visible');
+  } else {
+    hint.classList.remove('visible');
+  }
+
   document.getElementById('detail-emoji').innerHTML = getEmoji(m.sender);
   document.getElementById('detail-from').textContent = m.sender || 'Unknown';
   document.getElementById('detail-type').textContent = (m.type || 'Letter') + (m.pages ? ' · ' + m.pages + ' pages' : '');
@@ -1395,6 +1417,12 @@ window.openDetail = function(id) {
 
   document.getElementById('detail-actions').innerHTML = actionsHtml;
   openSheet('detail-sheet');
+};
+
+window.heroCardClick = function() {
+  if (window._currentDetailScanUrl) {
+    openScanModal(window._currentDetailScanUrl, window._currentDetailSender);
+  }
 };
 
 // ===== SHEETS =====
@@ -1434,6 +1462,7 @@ window.closeScanModal = function() {
 // ===== REQUEST ACTION (Post / Store / Shred) =====
 window.requestAction = async function(mailId, action) {
   const labels = { post: 'Post to Me', store: 'Keep & Store', shred: 'Secure Shred' };
+  const actionMap = { post: 'post', store: 'keep', shred: 'shred' };
   const newStatuses = { post: 'posted', store: 'stored', shred: 'shredded' };
   const label = labels[action];
   if (!confirm(`Request "${label}" for this item?`)) return;
@@ -1441,30 +1470,26 @@ window.requestAction = async function(mailId, action) {
   const uid = currentUser?.uid;
   if (!uid) { toast('Not logged in', 'error'); return; }
 
+  const mailItem = mailCache.find(m => m.id === mailId);
+
   try {
-    // Write the request into the customer's own subcollection (always permitted)
-    await addDoc(collection(db, 'customers', uid, 'requests'), {
-      type: action,
+    // Write to root mailRequests collection — matches exactly what the staff portal reads
+    await addDoc(collection(db, 'mailRequests'), {
+      action: actionMap[action],
       mailId: mailId,
       customerId: uid,
-      customerName: (currentCustomer?.firstName || '') + ' ' + (currentCustomer?.lastName || ''),
+      customerEmail: currentUser.email || '',
+      customerName: ((currentCustomer?.firstName || '') + ' ' + (currentCustomer?.lastName || '')).trim() || currentUser.email,
       customerRef: currentCustomer?.ref || currentCustomer?.referenceNumber || '',
-      requestedAt: new Date(),
+      mailboxId: currentCustomer?.mailboxId || currentCustomer?.virtualAddress || '',
+      forwardingAddress: currentCustomer?.forwardingAddress || '',
+      mailSender: mailItem?.sender || '',
+      mailType: mailItem?.type || 'Letter',
+      mailPages: mailItem?.pages || 1,
+      createdAt: new Date(),
       status: 'pending',
       label: label
     });
-
-    // Also try to update the mail doc status (may be permitted depending on rules)
-    try {
-      await updateDoc(doc(db, 'mail', mailId), {
-        status: newStatuses[action],
-        [`${action}RequestedAt`]: new Date(),
-        actionRequestedBy: uid
-      });
-    } catch (e) {
-      // Rules may not allow customer to write mail docs — that's fine, the request record is enough
-      console.warn('Could not update mail status (rules):', e.message);
-    }
 
     // Update local cache optimistically and re-render
     const idx = mailCache.findIndex(m => m.id === mailId);
