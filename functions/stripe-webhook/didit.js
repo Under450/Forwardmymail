@@ -9,8 +9,8 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 const DIDIT_API_KEY = process.env.DIDIT_API_KEY;
-const DIDIT_APP_ID = '3938689d-7100-4e30-bd8a-7247b7d7a573';
-const DIDIT_WORKFLOW_ID = '55b2af26-9854-4e58-afb5-b8694183ca3a';
+const DIDIT_APP_ID = process.env.DIDIT_APP_ID;
+const DIDIT_WORKFLOW_ID = process.env.DIDIT_WORKFLOW_ID;
 const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
 
 const nodemailer = require('nodemailer');
