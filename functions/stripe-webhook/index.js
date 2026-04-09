@@ -13,7 +13,7 @@ const { google } = require('googleapis');
 // ─────────────────────────────────────────────────────────────────────────────
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
-const EMAIL_PASS     = process.env.EMAIL_PASS || 'Av@8@XzC235!';
+const EMAIL_PASS     = process.env.SMTP_PASS;
 
 admin.initializeApp();
 const db = admin.firestore();
