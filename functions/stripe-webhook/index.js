@@ -945,57 +945,61 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
       const days = daysSince(mailData.arrivedAt);
       if (days === null) continue;
 
-      if (days === 25) {
-        // Storage warning
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: customerData.email,
-          subject: '📦 Mail storage reminder — 35 days remaining',
-          html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days)
-        });
-        console.log(`Storage warning (day 25) sent to ${customerData.email} for mail ${mailDoc.id}`);
-
-      } else if (days === 55) {
-        // Final shred warning
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: customerData.email,
-          subject: '🚨 Final notice: Mail will be shredded in 5 days',
-          html: buildShredWarningEmail(customerData.name || 'there', mailData)
-        });
-        console.log(`Shred warning (day 55) sent to ${customerData.email} for mail ${mailDoc.id}`);
-
-      } else if (days >= 60) {
-        // Auto-shred: archive to Drive first, then mark shredded
-        try {
-          await archiveMailToDrive(mailData, customerData);
-        } catch (archiveErr) {
-          console.error(`Drive archive failed for ${mailDoc.id}:`, archiveErr);
-          // Continue with shred even if archive fails — log it for manual recovery
-          await db.collection('shredArchiveErrors').add({
-            customerId: customerDoc.id,
-            customerEmail: customerData.email,
-            mailId: mailDoc.id,
-            error: archiveErr.message,
-            timestamp: admin.firestore.FieldValue.serverTimestamp()
+      try {
+        if (days === 25) {
+          // Storage warning
+          await transporter.sendMail({
+            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+            to: customerData.email,
+            subject: '📦 Mail storage reminder — 35 days remaining',
+            html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days)
           });
+          console.log(`Storage warning (day 25) sent to ${customerData.email} for mail ${mailDoc.id}`);
+
+        } else if (days === 55) {
+          // Final shred warning
+          await transporter.sendMail({
+            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+            to: customerData.email,
+            subject: '🚨 Final notice: Mail will be shredded in 5 days',
+            html: buildShredWarningEmail(customerData.name || 'there', mailData)
+          });
+          console.log(`Shred warning (day 55) sent to ${customerData.email} for mail ${mailDoc.id}`);
+
+        } else if (days >= 60) {
+          // Auto-shred: archive to Drive first
+          try {
+            await archiveMailToDrive(mailData, customerData);
+          } catch (archiveErr) {
+            console.error(`Drive archive failed for ${mailDoc.id}:`, archiveErr);
+            await db.collection('shredArchiveErrors').add({
+              customerId: customerDoc.id,
+              customerEmail: customerData.email,
+              mailId: mailDoc.id,
+              error: archiveErr.message,
+              timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+          }
+
+          // Send notification BEFORE shredding — only shred if email succeeds
+          await transporter.sendMail({
+            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+            to: customerData.email,
+            subject: '🗑️ Mail item has been shredded',
+            html: buildAutoShredEmail(customerData.name || 'there', mailData)
+          });
+
+          await mailDoc.ref.update({
+            status: 'shredded',
+            shreddedAt: admin.firestore.FieldValue.serverTimestamp(),
+            shredReason: 'auto-60-days',
+            driveArchived: true
+          });
+
+          console.log(`Auto-shredded mail ${mailDoc.id} for ${customerData.email} after ${days} days`);
         }
-
-        await mailDoc.ref.update({
-          status: 'shredded',
-          shreddedAt: admin.firestore.FieldValue.serverTimestamp(),
-          shredReason: 'auto-60-days',
-          driveArchived: true
-        });
-
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: customerData.email,
-          subject: '🗑️ Mail item has been shredded',
-          html: buildAutoShredEmail(customerData.name || 'there', mailData)
-        });
-
-        console.log(`Auto-shredded mail ${mailDoc.id} for ${customerData.email} after ${days} days`);
+      } catch (emailErr) {
+        console.error(`checkMailStorage: failed for mail ${mailDoc.id}:`, emailErr);
       }
     }
   }
