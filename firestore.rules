@@ -49,9 +49,13 @@ service cloud.firestore {
       // Customer can create their own doc (signup flow)
       allow create: if isOwner(userId);
 
-      // Customer can update limited fields on their own doc
-      // (forwardingAddress, etc.) — staff can update anything
-      allow update: if isOwner(userId) || isStaff();
+      // Customer can only update these specific fields
+      allow update: if isOwner(userId) &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['forwardingAddress', 'forwardingFrequency', 'notificationPrefs']);
+
+      // Staff can update anything
+      allow update: if isStaff();
 
       // Only staff can delete customer docs
       allow delete: if isStaff();
