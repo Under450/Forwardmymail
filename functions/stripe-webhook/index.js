@@ -545,7 +545,7 @@ exports.diditWebhook = onRequest(async (req, res) => {
     }
 
     const payload = req.body;
-    console.log('Didit webhook received:', JSON.stringify(payload));
+    console.log('Didit webhook received:', payload?.type, payload?.status);
 
     // Extract key fields
     const sessionId   = payload.session_id;
