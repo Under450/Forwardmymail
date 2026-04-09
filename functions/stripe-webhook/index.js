@@ -703,22 +703,26 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
     const name = data.name || 'there';
     const email = data.email;
 
-    if (days === 3) {
-      await transporter.sendMail({
-        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-        to: email,
-        subject: 'Reminder: Please complete your identity verification',
-        html: buildIdReminderEmail(name, 3)
-      });
-      console.log(`ID day-3 reminder sent to ${email}`);
-    } else if (days === 7) {
-      await transporter.sendMail({
-        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-        to: email,
-        subject: 'Final reminder: Identity verification required',
-        html: buildIdFinalWarningEmail(name)
-      });
-      console.log(`ID day-7 final warning sent to ${email}`);
+    try {
+      if (days === 3) {
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: 'Reminder: Please complete your identity verification',
+          html: buildIdReminderEmail(name, 3)
+        });
+        console.log(`ID day-3 reminder sent to ${email}`);
+      } else if (days === 7) {
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: 'Final reminder: Identity verification required',
+          html: buildIdFinalWarningEmail(name)
+        });
+        console.log(`ID day-7 final warning sent to ${email}`);
+      }
+    } catch (emailErr) {
+      console.error(`checkIdReminders: failed to send email to ${email}:`, emailErr);
     }
   }
 });
