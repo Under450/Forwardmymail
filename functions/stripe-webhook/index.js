@@ -796,15 +796,19 @@ exports.checkLowCredits = onSchedule('every day 09:00', async () => {
     // Don't spam — only send if we haven't sent one in the last 7 days
     if (data.lowCreditEmailSent && data.lowCreditEmailSent.toDate() > sevenDaysAgo) continue;
 
-    await transporter.sendMail({
-      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-      to: data.email,
-      subject: '⚠️ Your Forward My Mail credits are running low',
-      html: buildLowCreditsEmail(data.name || 'there', credits)
-    });
+    try {
+      await transporter.sendMail({
+        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+        to: data.email,
+        subject: '⚠️ Your Forward My Mail credits are running low',
+        html: buildLowCreditsEmail(data.name || 'there', credits)
+      });
 
-    await doc.ref.update({ lowCreditEmailSent: admin.firestore.FieldValue.serverTimestamp() });
-    console.log(`Low credits warning sent to ${data.email} (balance: £${credits})`);
+      await doc.ref.update({ lowCreditEmailSent: admin.firestore.FieldValue.serverTimestamp() });
+      console.log(`Low credits warning sent to ${data.email} (balance: £${credits})`);
+    } catch (emailErr) {
+      console.error(`checkLowCredits: failed to send email to ${data.email}:`, emailErr);
+    }
   }
 });
 
