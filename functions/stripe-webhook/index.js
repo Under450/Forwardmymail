@@ -545,7 +545,7 @@ exports.diditWebhook = onRequest(async (req, res) => {
     }
 
     const payload = req.body;
-    console.log('Didit webhook received:', JSON.stringify(payload));
+    console.log('Didit webhook received:', payload?.type, payload?.status);
 
     // Extract key fields
     const sessionId   = payload.session_id;
@@ -703,22 +703,26 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
     const name = data.name || 'there';
     const email = data.email;
 
-    if (days === 3) {
-      await transporter.sendMail({
-        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-        to: email,
-        subject: 'Reminder: Please complete your identity verification',
-        html: buildIdReminderEmail(name, 3)
-      });
-      console.log(`ID day-3 reminder sent to ${email}`);
-    } else if (days === 7) {
-      await transporter.sendMail({
-        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-        to: email,
-        subject: 'Final reminder: Identity verification required',
-        html: buildIdFinalWarningEmail(name)
-      });
-      console.log(`ID day-7 final warning sent to ${email}`);
+    try {
+      if (days === 3) {
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: 'Reminder: Please complete your identity verification',
+          html: buildIdReminderEmail(name, 3)
+        });
+        console.log(`ID day-3 reminder sent to ${email}`);
+      } else if (days === 7) {
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: 'Final reminder: Identity verification required',
+          html: buildIdFinalWarningEmail(name)
+        });
+        console.log(`ID day-7 final warning sent to ${email}`);
+      }
+    } catch (emailErr) {
+      console.error(`checkIdReminders: failed to send email to ${email}:`, emailErr);
     }
   }
 });
@@ -792,15 +796,19 @@ exports.checkLowCredits = onSchedule('every day 09:00', async () => {
     // Don't spam — only send if we haven't sent one in the last 7 days
     if (data.lowCreditEmailSent && data.lowCreditEmailSent.toDate() > sevenDaysAgo) continue;
 
-    await transporter.sendMail({
-      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-      to: data.email,
-      subject: '⚠️ Your Forward My Mail credits are running low',
-      html: buildLowCreditsEmail(data.name || 'there', credits)
-    });
+    try {
+      await transporter.sendMail({
+        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+        to: data.email,
+        subject: '⚠️ Your Forward My Mail credits are running low',
+        html: buildLowCreditsEmail(data.name || 'there', credits)
+      });
 
-    await doc.ref.update({ lowCreditEmailSent: admin.firestore.FieldValue.serverTimestamp() });
-    console.log(`Low credits warning sent to ${data.email} (balance: £${credits})`);
+      await doc.ref.update({ lowCreditEmailSent: admin.firestore.FieldValue.serverTimestamp() });
+      console.log(`Low credits warning sent to ${data.email} (balance: £${credits})`);
+    } catch (emailErr) {
+      console.error(`checkLowCredits: failed to send email to ${data.email}:`, emailErr);
+    }
   }
 });
 
@@ -937,57 +945,61 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
       const days = daysSince(mailData.arrivedAt);
       if (days === null) continue;
 
-      if (days === 25) {
-        // Storage warning
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: customerData.email,
-          subject: '📦 Mail storage reminder — 35 days remaining',
-          html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days)
-        });
-        console.log(`Storage warning (day 25) sent to ${customerData.email} for mail ${mailDoc.id}`);
-
-      } else if (days === 55) {
-        // Final shred warning
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: customerData.email,
-          subject: '🚨 Final notice: Mail will be shredded in 5 days',
-          html: buildShredWarningEmail(customerData.name || 'there', mailData)
-        });
-        console.log(`Shred warning (day 55) sent to ${customerData.email} for mail ${mailDoc.id}`);
-
-      } else if (days >= 60) {
-        // Auto-shred: archive to Drive first, then mark shredded
-        try {
-          await archiveMailToDrive(mailData, customerData);
-        } catch (archiveErr) {
-          console.error(`Drive archive failed for ${mailDoc.id}:`, archiveErr);
-          // Continue with shred even if archive fails — log it for manual recovery
-          await db.collection('shredArchiveErrors').add({
-            customerId: customerDoc.id,
-            customerEmail: customerData.email,
-            mailId: mailDoc.id,
-            error: archiveErr.message,
-            timestamp: admin.firestore.FieldValue.serverTimestamp()
+      try {
+        if (days === 25) {
+          // Storage warning
+          await transporter.sendMail({
+            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+            to: customerData.email,
+            subject: '📦 Mail storage reminder — 35 days remaining',
+            html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days)
           });
+          console.log(`Storage warning (day 25) sent to ${customerData.email} for mail ${mailDoc.id}`);
+
+        } else if (days === 55) {
+          // Final shred warning
+          await transporter.sendMail({
+            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+            to: customerData.email,
+            subject: '🚨 Final notice: Mail will be shredded in 5 days',
+            html: buildShredWarningEmail(customerData.name || 'there', mailData)
+          });
+          console.log(`Shred warning (day 55) sent to ${customerData.email} for mail ${mailDoc.id}`);
+
+        } else if (days >= 60) {
+          // Auto-shred: archive to Drive first
+          try {
+            await archiveMailToDrive(mailData, customerData);
+          } catch (archiveErr) {
+            console.error(`Drive archive failed for ${mailDoc.id}:`, archiveErr);
+            await db.collection('shredArchiveErrors').add({
+              customerId: customerDoc.id,
+              customerEmail: customerData.email,
+              mailId: mailDoc.id,
+              error: archiveErr.message,
+              timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+          }
+
+          // Send notification BEFORE shredding — only shred if email succeeds
+          await transporter.sendMail({
+            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+            to: customerData.email,
+            subject: '🗑️ Mail item has been shredded',
+            html: buildAutoShredEmail(customerData.name || 'there', mailData)
+          });
+
+          await mailDoc.ref.update({
+            status: 'shredded',
+            shreddedAt: admin.firestore.FieldValue.serverTimestamp(),
+            shredReason: 'auto-60-days',
+            driveArchived: true
+          });
+
+          console.log(`Auto-shredded mail ${mailDoc.id} for ${customerData.email} after ${days} days`);
         }
-
-        await mailDoc.ref.update({
-          status: 'shredded',
-          shreddedAt: admin.firestore.FieldValue.serverTimestamp(),
-          shredReason: 'auto-60-days',
-          driveArchived: true
-        });
-
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: customerData.email,
-          subject: '🗑️ Mail item has been shredded',
-          html: buildAutoShredEmail(customerData.name || 'there', mailData)
-        });
-
-        console.log(`Auto-shredded mail ${mailDoc.id} for ${customerData.email} after ${days} days`);
+      } catch (emailErr) {
+        console.error(`checkMailStorage: failed for mail ${mailDoc.id}:`, emailErr);
       }
     }
   }
