@@ -1,23 +1,23 @@
 {
-  "last_updated": "2025-12-27",
+  "last_updated": "2026-04-10",
   "currency": "GBP",
 
   "personal_mailbox": {
     "name": "Personal Mailbox",
     "billing": "annual",
-    "price": 99.00
+    "price": 125.00
   },
 
   "business": {
     "business_address": {
       "name": "Business Address",
       "billing": "annual",
-      "price": 149.00
+      "price": 175.00
     },
     "registered_office": {
       "name": "Registered Office",
       "billing": "annual",
-      "price": 189.00
+      "price": 225.00
     },
     "full_virtual_office": {
       "name": "Full Virtual Office",
