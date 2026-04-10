@@ -451,11 +451,22 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
 // Called by customer portal when customer clicks "Complete Your ID Verification"
 // Creates a Didit verification session and returns the session URL
 exports.createDiditSession = onRequest(async (req, res) => {
-  // CORS
-  res.set('Access-Control-Allow-Origin', '*');
+  // CORS — restrict to forwardmymail.co.uk
+  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+  const origin = req.headers.origin;
+  if (req.method === 'OPTIONS') {
+    if (allowedOrigins.includes(origin)) {
+      res.set('Access-Control-Allow-Origin', origin);
+      res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.set('Access-Control-Allow-Headers', 'Content-Type');
+      return res.status(204).send('');
+    }
+    return res.status(403).send('Forbidden');
+  }
+  if (!allowedOrigins.includes(origin)) return res.status(403).send('Forbidden');
+  res.set('Access-Control-Allow-Origin', origin);
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type');
-  if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   const DIDIT_API_KEY = process.env.DIDIT_API_KEY;
