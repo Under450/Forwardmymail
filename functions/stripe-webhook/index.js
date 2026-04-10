@@ -1314,6 +1314,20 @@ exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (
     await transporter.sendMail(mailOptions);
     console.log(`Mail request notification sent for ${req.action} — ${req.mailboxId}`);
     await event.data.ref.update({ emailSent: true });
+
+    // Write staff notification for portal real-time display
+    await db.collection('staff_notifications').add({
+      type: 'mail_action_request',
+      action: req.action || 'unknown',
+      customerId: req.customerId || '',
+      customerEmail: req.customerEmail || '',
+      customerName: req.customerName || '',
+      mailId: req.mailId || '',
+      mailRef: req.mailboxId || '',
+      status: 'unread',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      message: `${req.customerName || req.customerEmail} requested ${req.action} of item ${req.mailboxId || req.mailId}`
+    });
   } catch(err) {
     console.error('Failed to send mail request email:', err);
     await event.data.ref.update({ emailSent: false, emailError: err.message });
