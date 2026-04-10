@@ -1411,7 +1411,7 @@ function renderMailTab(filter) {
     if (m.status === 'received' || m.status === 'new') {
       const freeTag = isFree
         ? '<div class="mc-action free">✓ Free (Official)</div>'
-        : '<div class="mc-action" onclick="event.stopPropagation()">Shred</div>';
+        : '<div class="mc-action" onclick="requestAction(\x27' + m.id + '\x27,\x27shred\x27);event.stopPropagation()">Shred</div>';
       actions = '<div class="mc-action primary" onclick="openDetail(\'' + m.id + '\');event.stopPropagation()">View</div>'
         + freeTag;
     } else if (m.status === 'scanned') {
@@ -1573,14 +1573,7 @@ window.requestAction = async function(mailId, action) {
   const newStatus = newStatuses[action];
 
   try {
-    // 1. Write status directly to the mail doc so it persists on refresh/re-login
-    await updateDoc(doc(db, 'mail', mailId), {
-      status: newStatus,
-      actionRequestedAt: new Date(),
-      actionRequestedBy: uid
-    });
-
-    // 2. Write mailRequest so staff are notified
+    // 1. Write mailRequest FIRST so staff are notified
     await addDoc(collection(db, 'mailRequests'), {
       action: actionMap[action],
       mailId: mailId,
@@ -1596,6 +1589,13 @@ window.requestAction = async function(mailId, action) {
       createdAt: new Date(),
       status: 'pending',
       label: label
+    });
+
+    // 2. Only update mail status AFTER mailRequests write succeeds
+    await updateDoc(doc(db, 'mail', mailId), {
+      status: newStatus,
+      actionRequestedAt: new Date(),
+      actionRequestedBy: uid
     });
 
     // 3. Update local cache immediately (onSnapshot will also confirm shortly after)
