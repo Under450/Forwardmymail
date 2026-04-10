@@ -1051,7 +1051,7 @@ function toast(msg, type = '') {
 // ===== SPLASH =====
 // Splash → Login (always go to login first, PIN check happens after auth)
 setTimeout(() => {
-  const savedPin = localStorage.getItem('fmm_pin');
+  const savedPin = sessionStorage.getItem('fmm_pin');
   const savedName = localStorage.getItem('fmm_name');
   if (savedPin && savedName) {
     document.getElementById('pin-user-name').textContent = savedName;
@@ -1095,7 +1095,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
     btn.disabled = false;
 
     // Check if PIN is set
-    const savedPin = localStorage.getItem('fmm_pin');
+    const savedPin = sessionStorage.getItem('fmm_pin');
     if (!savedPin) {
       showScreen('screen-pin-setup');
     } else {
@@ -1143,7 +1143,7 @@ function setupPinInput(val) {
       setTimeout(() => {}, 300);
     } else {
       if (pinBuffer === setupPinFirst) {
-        localStorage.setItem('fmm_pin', pinBuffer);
+        sessionStorage.setItem('fmm_pin', pinBuffer);
         toast('PIN set successfully!', 'success');
         setTimeout(() => goToApp(), 400);
       } else {
@@ -1205,7 +1205,7 @@ document.querySelectorAll('#screen-pin .numpad-key[data-pin]').forEach(k => {
       pinEntry += k.dataset.pin;
       updatePinDots(pinEntry);
       if (pinEntry.length === 4) {
-        const saved = localStorage.getItem('fmm_pin');
+        const saved = sessionStorage.getItem('fmm_pin');
         if (pinEntry === saved) {
           // Load user session if needed
           onAuthStateChanged(auth, async (user) => {
