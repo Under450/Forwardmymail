@@ -23,6 +23,15 @@ service cloud.firestore {
         exists(/databases/$(database)/documents/staff/$(request.auth.uid));
     }
 
+    // Is the signed-in user an admin?
+    // Admin is defined by custom claim OR hardcoded UID
+    function isAdmin() {
+      return isAuth() && (
+        request.auth.token.admin == true ||
+        request.auth.uid == '1k8MzhKRfbZSAoBWKR7apEom0S83'
+      );
+    }
+
     // Does the incoming data claim to belong to the signed-in user?
     function ownedByMe() {
       return isAuth() &&
@@ -36,7 +45,7 @@ service cloud.firestore {
     // ─────────────────────────────────────────────
     match /staff/{staffId} {
       allow read: if isOwner(staffId) || isStaff();
-      allow write: if isStaff();
+      allow write: if isAdmin();
     }
 
     // ─────────────────────────────────────────────
