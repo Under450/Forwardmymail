@@ -144,6 +144,25 @@
         <div id="successMessage" class="success-message"></div>
 
         <!-- Customer selector -->
+        <!-- ===== Staff Notifications Panel ===== -->
+        <div class="panel" id="notificationsPanel" style="margin-bottom:20px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h3 style="margin:0;font-size:16px;font-weight:700;color:#1e3c72;">
+              Notifications
+              <span id="notifBadge" style="display:none;background:#e53e3e;color:white;font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle;"></span>
+            </h3>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:12px;color:#666;cursor:pointer;">
+                <input type="checkbox" id="showAllNotifs" style="margin-right:4px;" /> Show read
+              </label>
+              <button onclick="markAllNotifsRead()" style="font-size:12px;padding:4px 10px;background:#e2e8f0;border:none;border-radius:6px;cursor:pointer;color:#475569;">Mark all read</button>
+            </div>
+          </div>
+          <div id="notifList" style="max-height:300px;overflow-y:auto;">
+            <p style="color:#999;font-size:13px;text-align:center;padding:20px 0;">Loading...</p>
+          </div>
+        </div>
+
         <div class="customer-selector panel">
           <h3 style="margin-bottom:15px;">Select Customer</h3>
           <select id="customerSelect"><option value="">-- Select a customer --</option></select>
@@ -397,6 +416,7 @@ const storage = getStorage(app);
           }
 
           await loadCustomers();
+          initNotifications();
           loginSection.classList.remove('active');
           portalSection.classList.add('active');
         } catch (err) {
@@ -1008,6 +1028,91 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         alert('Failed to update request. Please try again.');
       }
     };
-  </script>
+  
+
+    // ===== Staff Notifications =====
+    let notifUnsubscribe = null;
+
+    function initNotifications() {
+      const showAll = document.getElementById('showAllNotifs');
+      if (showAll) showAll.addEventListener('change', () => loadNotifications());
+      loadNotifications();
+    }
+
+    function loadNotifications() {
+      if (notifUnsubscribe) notifUnsubscribe();
+
+      const showAll = document.getElementById('showAllNotifs')?.checked;
+      let q;
+      if (showAll) {
+        q = query(collection(db, 'staff_notifications'), orderBy('createdAt', 'desc'), limit(50));
+      } else {
+        q = query(collection(db, 'staff_notifications'), where('status', '==', 'unread'), orderBy('createdAt', 'desc'), limit(50));
+      }
+
+      notifUnsubscribe = onSnapshot(q, (snapshot) => {
+        const notifs = [];
+        snapshot.forEach(d => notifs.push({ id: d.id, ...d.data() }));
+
+        // Update badge
+        const unreadCount = notifs.filter(n => n.status === 'unread').length;
+        const badge = document.getElementById('notifBadge');
+        if (badge) {
+          if (unreadCount > 0) {
+            badge.textContent = unreadCount;
+            badge.style.display = 'inline';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+
+        const list = document.getElementById('notifList');
+        if (!list) return;
+
+        if (notifs.length === 0) {
+          list.innerHTML = '<p style="color:#999;font-size:13px;text-align:center;padding:20px 0;">No notifications</p>';
+          return;
+        }
+
+        const icons = { shred: '\u{1F5D1}', post: '\u{1F4E6}', keep: '\u{1F4C1}', scan: '\u{1F50D}', forward: '\u{1F4E8}' };
+        list.innerHTML = notifs.map(n => {
+          const icon = icons[n.action] || '\u{1F4EC}';
+          const isUnread = n.status === 'unread';
+          const ts = n.createdAt?.toDate ? n.createdAt.toDate().toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+          const bg = isUnread ? '#eff6ff' : '#fff';
+          const border = isUnread ? '#bfdbfe' : '#e2e8f0';
+          const weight = isUnread ? '600' : '400';
+          return '<div onclick="markNotifRead(\'' + n.id + '\')" style="padding:10px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;margin-bottom:6px;cursor:pointer;transition:background .2s;">'
+            + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+            + '<div style="font-size:13px;font-weight:' + weight + ';color:#1a1a1a;">' + icon + ' ' + (n.message || n.action + ' request') + '</div>'
+            + '<div style="font-size:11px;color:#94a3b8;white-space:nowrap;margin-left:10px;">' + ts + '</div>'
+            + '</div>'
+            + '<div style="font-size:11px;color:#64748b;margin-top:3px;">' + (n.customerEmail || '') + (n.mailRef ? ' &middot; ' + n.mailRef : '') + '</div>'
+            + '</div>';
+        }).join('');
+      });
+    }
+
+    window.markNotifRead = async function(notifId) {
+      try {
+        await updateDoc(doc(db, 'staff_notifications', notifId), { status: 'read' });
+      } catch(e) {
+        console.error('Failed to mark notification read:', e);
+      }
+    };
+
+    window.markAllNotifsRead = async function() {
+      try {
+        const q2 = query(collection(db, 'staff_notifications'), where('status', '==', 'unread'));
+        const snap = await getDocs(q2);
+        const promises = [];
+        snap.forEach(d => promises.push(updateDoc(d.ref, { status: 'read' })));
+        await Promise.all(promises);
+      } catch(e) {
+        console.error('Failed to mark all read:', e);
+      }
+    };
+
+    </script>
 </body>
 </html>
