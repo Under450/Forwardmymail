@@ -242,7 +242,7 @@
               <div class="credit-pack" data-amount="25"><div class="pack-amount">£25</div></div>
               <div class="credit-pack" data-amount="30"><div class="pack-amount">£30</div></div>
               <div class="credit-pack" data-amount="50"><div class="pack-amount">£50</div></div>
-            <div class="credit-pack" data-amount="0.30" id="testPack" style="display: none;">
+            <div class="credit-pack" data-amount="0.30" id="testPack" style="display: none !important;">
                 <div class="pack-amount">TEST</div>
                 <div style="font-size: 12px;">£0.30</div>
               </div>
@@ -782,7 +782,9 @@ function applyGateUI(data) {
   // Show test pack when pressing 'T' key
     document.addEventListener('keydown', (e) => {
       if (e.key === 't' || e.key === 'T') {
-        document.getElementById('testPack').style.display = 'block';
+        const tp = document.getElementById('testPack');
+        const isHidden = tp.style.getPropertyValue('display') === 'none';
+        tp.style.setProperty('display', isHidden ? 'block' : 'none', 'important');
       }
     });
   </script>
