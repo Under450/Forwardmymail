@@ -1,7 +1,7 @@
 const stream = require('stream');
 const functions = require('firebase-functions');
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
-const { onDocumentCreated, onDocumentDeleted } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
@@ -697,13 +697,19 @@ function daysSince(firestoreTimestamp) {
 //    Day 3: gentle reminder | Day 7: final warning
 // ─────────────────────────────────────────────────────────────────────────────
 exports.checkIdReminders = onSchedule('every day 09:00', async () => {
-  const snapshot = await db.collection('customers')
-    .where('idStatus', '==', 'pending')
-    .get();
+  // Catch both not_started (never clicked verify) and pending (started but not completed)
+  const [notStartedSnap, pendingSnap] = await Promise.all([
+    db.collection('customers').where('idStatus', '==', 'not_started').get(),
+    db.collection('customers').where('idStatus', '==', 'pending').get(),
+  ]);
 
-  for (const doc of snapshot.docs) {
+  const allDocs = [...notStartedSnap.docs, ...pendingSnap.docs];
+
+  for (const doc of allDocs) {
     const data = doc.data();
-    const days = daysSince(data.created);
+    if (data.accountStatus === 'id_suspended') continue;
+
+    const days = daysSince(data.createdAt || data.created);
     if (days === null) continue;
 
     const name = data.name || 'there';
@@ -715,7 +721,7 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
           from: '"Forward My Mail" <info@forwardmymail.co.uk>',
           to: email,
           subject: 'Reminder: Please complete your identity verification',
-          html: buildIdReminderEmail(name, 3)
+          html: buildIdReminderEmail(name)
         });
         console.log(`ID day-3 reminder sent to ${email}`);
       } else if (days === 7) {
@@ -726,9 +732,21 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
           html: buildIdFinalWarningEmail(name)
         });
         console.log(`ID day-7 final warning sent to ${email}`);
+      } else if (days >= 10) {
+        await doc.ref.update({
+          accountStatus: 'id_suspended',
+          accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: 'Your Forward My Mail account has been suspended',
+          html: buildIdSuspendedEmail(name)
+        });
+        console.log(`Account suspended (no ID) for ${email} after ${days} days`);
       }
     } catch (emailErr) {
-      console.error(`checkIdReminders: failed to send email to ${email}:`, emailErr);
+      console.error(`checkIdReminders: failed for ${email}:`, emailErr);
     }
   }
 });
@@ -1274,6 +1292,252 @@ Archive created: ${new Date().toLocaleString('en-GB')}
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIL REQUEST NOTIFICATION — fires when customer submits Post/Keep/Shred
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── buildIdSuspendedEmail ─────────────────────────────────────────────────────
+function buildIdSuspendedEmail(name) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#7c2d12,#9a3412);padding:40px 30px;text-align:center;color:white}
+    .header h1{font-size:24px;margin:10px 0 6px}
+    .content{padding:36px 30px}
+    .danger-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin:20px 0}
+    .danger-box p{color:#7f1d1d;font-size:15px;line-height:1.6;margin:0}
+    .cta-btn{display:block;background:#dc2626;color:white;text-decoration:none;text-align:center;padding:16px 30px;border-radius:10px;font-size:16px;font-weight:700;margin:24px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 30px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>🔒 Account Suspended</h1><p>Identity verification not completed</p></div>
+    <div class="content">
+      <p style="font-size:16px;color:#334155">Hi <strong>${name}</strong>,</p>
+      <p style="color:#475569;line-height:1.7">Your Forward My Mail account has been suspended because identity verification was not completed within 10 days of signup. This is required by UK anti-money laundering regulations.</p>
+      <div class="danger-box"><p>🔒 <strong>Your account is suspended.</strong> Your address is still reserved for you — complete your verification now to reactivate it immediately.</p></div>
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Reactivate My Account →</a>
+      <p style="color:#64748b;font-size:14px">Need help? Contact us at <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a></p>
+    </div>
+    <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
+  </div></body></html>`;
+}
+
+// ── buildRenewalReminderEmail ──────────────────────────────────────────────────
+function buildRenewalReminderEmail(name, daysLeft) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#1e3a8a,#1e40af);padding:40px 30px;text-align:center;color:white}
+    .header h1{font-size:24px;margin:10px 0 6px}
+    .content{padding:36px 30px}
+    .warning-box{background:#fefce8;border:2px solid #fbbf24;border-radius:12px;padding:20px;margin:20px 0}
+    .warning-box p{color:#78350f;font-size:15px;line-height:1.6;margin:0}
+    .cta-btn{display:block;background:#1e3a8a;color:white;text-decoration:none;text-align:center;padding:16px 30px;border-radius:10px;font-size:16px;font-weight:700;margin:24px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 30px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>📅 Subscription Renewal Reminder</h1><p>Your mailbox subscription is expiring soon</p></div>
+    <div class="content">
+      <p style="font-size:16px;color:#334155">Hi <strong>${name}</strong>,</p>
+      <p style="color:#475569;line-height:1.7">Your Forward My Mail mailbox subscription expires in <strong>${daysLeft} days</strong>. Renew now to keep your UK business address active without interruption.</p>
+      <div class="warning-box"><p>⚠️ If your subscription lapses, your mailbox address may be reassigned and mail handling will stop.</p></div>
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Renew My Subscription →</a>
+    </div>
+    <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
+  </div></body></html>`;
+}
+
+// ── buildRenewalExpiredEmail ───────────────────────────────────────────────────
+function buildRenewalExpiredEmail(name) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#991b1b,#b91c1c);padding:40px 30px;text-align:center;color:white}
+    .header h1{font-size:24px;margin:10px 0 6px}
+    .content{padding:36px 30px}
+    .danger-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin:20px 0}
+    .danger-box p{color:#7f1d1d;font-size:15px;line-height:1.6;margin:0}
+    .cta-btn{display:block;background:#dc2626;color:white;text-decoration:none;text-align:center;padding:16px 30px;border-radius:10px;font-size:16px;font-weight:700;margin:24px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 30px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>⚠️ Subscription Expired</h1><p>Your mailbox subscription has lapsed</p></div>
+    <div class="content">
+      <p style="font-size:16px;color:#334155">Hi <strong>${name}</strong>,</p>
+      <p style="color:#475569;line-height:1.7">Your Forward My Mail mailbox subscription has expired. Your address is currently on hold.</p>
+      <div class="danger-box"><p>🔒 <strong>Mail handling has been paused.</strong> Renew your subscription immediately to reactivate your address and resume mail services.</p></div>
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Renew Now →</a>
+      <p style="color:#64748b;font-size:14px">Questions? Email us at <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a></p>
+    </div>
+    <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
+  </div></body></html>`;
+}
+
+// ── Sheets colour helper ───────────────────────────────────────────────────────
+// Colours: white=active, yellow=id_pending, orange=id_suspended,
+//          lightred=no_credits, pink=renewal_due, grey=inactive, darkgrey=DELETED
+const STATUS_COLOURS = {
+  active:       { red: 1,    green: 1,    blue: 1    },  // white
+  id_pending:   { red: 1,    green: 0.95, blue: 0.6  },  // yellow
+  id_suspended: { red: 1,    green: 0.8,  blue: 0.4  },  // orange
+  no_credits:   { red: 1,    green: 0.8,  blue: 0.8  },  // light red
+  renewal_due:  { red: 1,    green: 0.85, blue: 0.9  },  // pink
+  inactive:     { red: 0.85, green: 0.85, blue: 0.85 },  // grey
+};
+
+async function colourSheetRow(email, accountStatus, noteText) {
+  try {
+    const sheetAuth = new google.auth.GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheetsClient = google.sheets({ version: 'v4', auth: sheetAuth });
+    const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
+
+    // Find row by email (column B)
+    const res = await sheetsClient.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: 'Sheet1!B:B',
+    });
+    const emails = (res.data.values || []);
+    let rowIndex = -1;
+    for (let i = 0; i < emails.length; i++) {
+      if (emails[i][0] === email) { rowIndex = i; break; }
+    }
+    if (rowIndex < 0) { console.log(`colourSheetRow: email not found: ${email}`); return; }
+
+    const row = rowIndex + 1; // 1-indexed
+    const colour = STATUS_COLOURS[accountStatus] || STATUS_COLOURS.active;
+
+    await sheetsClient.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      resource: {
+        requests: [{
+          repeatCell: {
+            range: { sheetId: 0, startRowIndex: rowIndex, endRowIndex: row, startColumnIndex: 0, endColumnIndex: 12 },
+            cell: { userEnteredFormat: { backgroundColor: colour } },
+            fields: 'userEnteredFormat.backgroundColor'
+          }
+        }]
+      }
+    });
+
+    // Write status to Notes column (L)
+    if (noteText) {
+      await sheetsClient.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `Sheet1!L${row}`,
+        valueInputOption: 'RAW',
+        resource: { values: [[noteText]] },
+      });
+    }
+    console.log(`Sheet row coloured for ${email}: ${accountStatus}`);
+  } catch (err) {
+    console.error('colourSheetRow error:', err.message);
+  }
+}
+
+// ── onCustomerStatusChanged — colours sheet when accountStatus changes ─────────
+exports.onCustomerStatusChanged = onDocumentUpdated('customers/{customerId}', async (event) => {
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+
+  if (before.accountStatus === after.accountStatus) return; // no change
+
+  const email = after.email;
+  const status = after.accountStatus;
+  const name = after.name || 'Customer';
+
+  const noteMap = {
+    id_pending:   'Signed up — ID not completed',
+    id_suspended: `Suspended — no ID after 10 days (${new Date().toLocaleDateString('en-GB')})`,
+    no_credits:   `No credits — warned (${new Date().toLocaleDateString('en-GB')})`,
+    renewal_due:  `Renewal overdue (${new Date().toLocaleDateString('en-GB')})`,
+    inactive:     `Inactive 90+ days (${new Date().toLocaleDateString('en-GB')})`,
+    active:       'Active',
+  };
+
+  await colourSheetRow(email, status, noteMap[status] || status);
+});
+
+// ── checkRenewals — daily: warn 14 days before expiry, suspend on expiry ──────
+exports.checkRenewals = onSchedule('every day 09:00', async () => {
+  const snapshot = await db.collection('customers')
+    .where('idStatus', '==', 'approved')
+    .get();
+
+  const now = new Date();
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    if (!data.renewalDate) continue;
+    if (data.accountStatus === 'renewal_due') continue; // already flagged
+
+    const renewal = data.renewalDate.toDate ? data.renewalDate.toDate() : new Date(data.renewalDate);
+    const daysLeft = Math.round((renewal - now) / (1000 * 60 * 60 * 24));
+
+    const name = data.name || 'there';
+    const email = data.email;
+
+    try {
+      if (daysLeft === 14 || daysLeft === 7) {
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: `Your Forward My Mail subscription expires in ${daysLeft} days`,
+          html: buildRenewalReminderEmail(name, daysLeft)
+        });
+        console.log(`Renewal reminder (${daysLeft} days) sent to ${email}`);
+      } else if (daysLeft <= 0) {
+        await doc.ref.update({
+          accountStatus: 'renewal_due',
+          accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        await transporter.sendMail({
+          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+          to: email,
+          subject: 'Your Forward My Mail subscription has expired',
+          html: buildRenewalExpiredEmail(name)
+        });
+        console.log(`Renewal expired — account flagged for ${email}`);
+      }
+    } catch (err) {
+      console.error(`checkRenewals: failed for ${email}:`, err);
+    }
+  }
+});
+
+// ── checkInactivity — daily: flag accounts with 90 days no purchase + no mail ─
+exports.checkInactivity = onSchedule('every day 09:00', async () => {
+  const snapshot = await db.collection('customers')
+    .where('idStatus', '==', 'approved')
+    .get();
+
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    if (data.accountStatus === 'inactive') continue;
+
+    // Check last purchase date
+    const lastPurchase = data.lastPurchaseDate
+      ? (data.lastPurchaseDate.toDate ? data.lastPurchaseDate.toDate() : new Date(data.lastPurchaseDate))
+      : null;
+
+    // Check last mail item
+    const mailSnap = await db.collection('mail')
+      .where('customerId', '==', doc.id)
+      .orderBy('processedAt', 'desc')
+      .limit(1)
+      .get();
+
+    const lastMailDate = mailSnap.empty ? null : (mailSnap.docs[0].data().processedAt?.toDate() || null);
+
+    const lastActivity = [lastPurchase, lastMailDate].filter(Boolean).sort((a,b) => b-a)[0];
+
+    if (!lastActivity || lastActivity < ninetyDaysAgo) {
+      await doc.ref.update({
+        accountStatus: 'inactive',
+        accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      console.log(`Marked inactive: ${data.email} (last activity: ${lastActivity ? lastActivity.toLocaleDateString('en-GB') : 'never'})`);
+    }
+  }
+});
+
 exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (event) => {
   const req = event.data.data();
   if (!req) return;
