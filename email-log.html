@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Log — Forward My Mail Staff</title>
+<link rel="icon" href="https://www.forwardmymail.co.uk/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0d1b2e;
+    --navy2: #162236;
+    --gold: #c9972a;
+    --gold2: #e8b84b;
+    --cream: #faf8f4;
+    --white: #fff;
+    --text: #1a2332;
+    --muted: #718096;
+    --border: #e2ddd6;
+    --green: #16a34a;
+    --red: #dc2626;
+    --sent-bg: #f0fdf4;
+    --sent-border: #86efac;
+    --fail-bg: #fef2f2;
+    --fail-border: #fca5a5;
+  }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; background: var(--navy);
+  }
+  .login-box {
+    background: white; border-radius: 16px; padding: 48px 40px;
+    width: 100%; max-width: 380px; text-align: center;
+  }
+  .login-box img { height: 40px; margin-bottom: 24px; }
+  .login-box h2 { font-size: 20px; margin-bottom: 6px; }
+  .login-box p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .login-box input {
+    width: 100%; padding: 12px 16px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 15px; margin-bottom: 12px; outline: none;
+    font-family: 'DM Mono', monospace;
+  }
+  .login-box input:focus { border-color: var(--navy); }
+  .login-box button {
+    width: 100%; padding: 13px; background: var(--navy); color: white;
+    border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .login-box button:hover { background: var(--navy2); }
+  .login-err { color: var(--red); font-size: 13px; margin-top: 8px; display: none; }
+
+  /* ── APP ── */
+  #app { display: none; }
+
+  /* Nav */
+  nav {
+    background: var(--navy); padding: 0 32px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .nav-logo img { height: 32px; }
+  .nav-logo span { color: rgba(255,255,255,0.5); font-size: 13px; }
+  .nav-logo strong { color: var(--gold2); font-size: 13px; }
+  .nav-right { display: flex; align-items: center; gap: 16px; }
+  #setup-btn {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.7); font-size: 12px; padding: 6px 14px;
+    border-radius: 6px; cursor: pointer; transition: all 0.2s;
+  }
+  #setup-btn:hover { background: rgba(255,255,255,0.2); color: white; }
+  #logout-btn {
+    color: rgba(255,255,255,0.5); font-size: 13px; cursor: pointer;
+    background: none; border: none; transition: color 0.2s;
+  }
+  #logout-btn:hover { color: white; }
+
+  /* Controls bar */
+  .controls {
+    background: white; border-bottom: 1px solid var(--border);
+    padding: 16px 32px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .controls input, .controls select {
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none;
+    transition: border-color 0.15s; background: white;
+  }
+  .controls input { flex: 1; min-width: 200px; }
+  .controls input:focus, .controls select:focus { border-color: var(--navy); }
+  .controls select { cursor: pointer; }
+  .refresh-btn {
+    background: var(--navy); color: white; border: none; padding: 9px 20px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background 0.2s; white-space: nowrap;
+  }
+  .refresh-btn:hover { background: var(--navy2); }
+  .count-badge {
+    background: var(--gold); color: var(--navy); font-size: 12px; font-weight: 700;
+    padding: 4px 12px; border-radius: 20px; white-space: nowrap;
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    padding: 20px 32px; background: var(--cream);
+  }
+  .stat-card {
+    background: white; border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px;
+  }
+  .stat-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 6px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; color: var(--text); }
+  .stat-card .value.green { color: var(--green); }
+  .stat-card .value.red { color: var(--red); }
+  .stat-card .value.gold { color: var(--gold); }
+
+  /* Table */
+  .table-wrap { padding: 0 32px 40px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-top: 20px; }
+  thead { background: var(--navy); }
+  thead th { color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; padding: 12px 16px; text-align: left; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--cream); }
+  tbody td { padding: 11px 16px; font-size: 13px; color: var(--text); vertical-align: middle; }
+
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+  }
+  .status-sent { background: var(--sent-bg); border: 1px solid var(--sent-border); color: var(--green); }
+  .status-failed { background: var(--fail-bg); border: 1px solid var(--fail-border); color: var(--red); }
+
+  .template-chip {
+    background: #f0ede8; border: 1px solid var(--border);
+    color: var(--text); font-size: 11px; font-weight: 500;
+    padding: 2px 10px; border-radius: 20px; font-family: 'DM Mono', monospace;
+    white-space: nowrap;
+  }
+  .email-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .subject-cell { max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+  .error-cell { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--red); font-size: 12px; font-family: 'DM Mono', monospace; }
+  .time-cell { white-space: nowrap; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
+
+  /* Loading / empty */
+  .loading { padding: 60px; text-align: center; color: var(--muted); font-size: 15px; }
+  .loading .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { padding: 60px; text-align: center; color: var(--muted); }
+  .empty .icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* Toast */
+  #toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--navy);
+    color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px;
+    transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  @media (max-width: 768px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .table-wrap { padding: 0 16px 40px; }
+    .controls { padding: 12px 16px; }
+    nav { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
+    <h2>Email Log Viewer</h2>
+    <p>Staff access only</p>
+    <input type="password" id="pw-input" placeholder="Staff password" autocomplete="current-password">
+    <button onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Incorrect password</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <nav>
+    <div class="nav-logo">
+      <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
+      <span>Staff Portal /</span>
+      <strong>Email Log</strong>
+    </div>
+    <div class="nav-right">
+      <button id="setup-btn" onclick="createSheet()">Create Sheet Tab</button>
+      <button id="logout-btn" onclick="logout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="🔍  Search email, template, customer ID…" oninput="filterLogs()">
+    <select id="status-filter" onchange="loadLogs()">
+      <option value="">All statuses</option>
+      <option value="sent">Sent</option>
+      <option value="failed">Failed</option>
+    </select>
+    <select id="template-filter" onchange="loadLogs()">
+      <option value="">All templates</option>
+      <option value="welcome">welcome</option>
+      <option value="purchase_credit_pack">purchase_credit_pack</option>
+      <option value="purchase_package">purchase_package</option>
+      <option value="admin_new_purchase">admin_new_purchase</option>
+      <option value="admin_new_signup">admin_new_signup</option>
+      <option value="verification_approved">verification_approved</option>
+      <option value="verification_declined">verification_declined</option>
+      <option value="id_reminder_day3">id_reminder_day3</option>
+      <option value="id_reminder_day7">id_reminder_day7</option>
+      <option value="id_suspended">id_suspended</option>
+      <option value="low_credits">low_credits</option>
+      <option value="storage_warning_day25">storage_warning_day25</option>
+      <option value="shred_warning_day55">shred_warning_day55</option>
+      <option value="auto_shredded">auto_shredded</option>
+      <option value="renewal_expired">renewal_expired</option>
+      <option value="mail_request_post">mail_request_post</option>
+      <option value="mail_request_keep">mail_request_keep</option>
+      <option value="mail_request_shred">mail_request_shred</option>
+    </select>
+    <select id="limit-select" onchange="loadLogs()">
+      <option value="100">Last 100</option>
+      <option value="200" selected>Last 200</option>
+      <option value="500">Last 500</option>
+    </select>
+    <button class="refresh-btn" onclick="loadLogs()">↻ Refresh</button>
+    <span class="count-badge" id="count-badge">— emails</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="label">Total Logged</div>
+      <div class="value" id="stat-total">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Sent</div>
+      <div class="value green" id="stat-sent">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Failed</div>
+      <div class="value red" id="stat-failed">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Delivery Rate</div>
+      <div class="value gold" id="stat-rate">—</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <div id="log-container" class="loading">
+      <div class="spinner"></div>
+      Loading email logs…
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const FUNCTION_URL = 'https://us-central1-forward-my-mail.cloudfunctions.net/getEmailLogs';
+  const SETUP_URL    = 'https://us-central1-forward-my-mail.cloudfunctions.net/createEmailLogSheet';
+  let staffPassword  = '';
+  let allLogs        = [];
+
+  // ── Login ──
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+  async function doLogin() {
+    const pw = document.getElementById('pw-input').value.trim();
+    if (!pw) return;
+    staffPassword = pw;
+    document.getElementById('login-err').style.display = 'none';
+    await loadLogs();
+  }
+
+  function logout() {
+    staffPassword = '';
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('pw-input').value = '';
+  }
+
+  // ── Load logs ──
+  async function loadLogs() {
+    document.getElementById('log-container').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+
+    const statusFilter   = document.getElementById('status-filter').value;
+    const templateFilter = document.getElementById('template-filter').value;
+    const limit          = document.getElementById('limit-select').value;
+    const search         = document.getElementById('search').value;
+
+    try {
+      const resp = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: staffPassword, limit, statusFilter, templateFilter, search })
+      });
+
+      if (resp.status === 401) {
+        document.getElementById('login-err').style.display = 'block';
+        document.getElementById('log-container').innerHTML = '';
+        return;
+      }
+
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+
+      allLogs = data.logs || [];
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+
+      renderLogs(allLogs);
+      updateStats(allLogs);
+      toast(`Loaded ${allLogs.length} records`);
+
+    } catch (err) {
+      document.getElementById('log-container').innerHTML = `<div class="empty"><div class="icon">⚠️</div><p>${err.message}</p></div>`;
+    }
+  }
+
+  function filterLogs() {
+    const s = document.getElementById('search').value.toLowerCase();
+    const filtered = allLogs.filter(l =>
+      l.customerEmail.toLowerCase().includes(s) ||
+      l.template.toLowerCase().includes(s) ||
+      l.subject.toLowerCase().includes(s) ||
+      l.customerId.toLowerCase().includes(s)
+    );
+    renderLogs(filtered);
+    updateStats(filtered);
+  }
+
+  function renderLogs(logs) {
+    document.getElementById('count-badge').textContent = `${logs.length} email${logs.length !== 1 ? 's' : ''}`;
+
+    if (logs.length === 0) {
+      document.getElementById('log-container').innerHTML = '<div class="empty"><div class="icon">📭</div><p>No emails found</p></div>';
+      return;
+    }
+
+    const rows = logs.map(l => {
+      const ts = l.timestamp ? new Date(l.timestamp) : null;
+      const date = ts ? ts.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+      const time = ts ? ts.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
+      const pill = l.status === 'sent'
+        ? '<span class="status-pill status-sent">✓ sent</span>'
+        : '<span class="status-pill status-failed">✗ failed</span>';
+      return `<tr>
+        <td class="time-cell">${date}<br>${time}</td>
+        <td><span class="template-chip">${l.template || '—'}</span></td>
+        <td class="email-cell" title="${l.customerEmail}">${l.customerEmail || '—'}</td>
+        <td class="subject-cell" title="${l.subject}">${l.subject || '—'}</td>
+        <td>${pill}</td>
+        <td class="error-cell" title="${l.error}">${l.error || ''}</td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('log-container').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Template</th>
+            <th>Recipient</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function updateStats(logs) {
+    const sent   = logs.filter(l => l.status === 'sent').length;
+    const failed = logs.filter(l => l.status === 'failed').length;
+    const rate   = logs.length > 0 ? Math.round((sent / logs.length) * 100) : 0;
+    document.getElementById('stat-total').textContent  = logs.length;
+    document.getElementById('stat-sent').textContent   = sent;
+    document.getElementById('stat-failed').textContent = failed;
+    document.getElementById('stat-rate').textContent   = `${rate}%`;
+  }
+
+  async function createSheet() {
+    document.getElementById('setup-btn').textContent = 'Creating…';
+    try {
+      const resp = await fetch(SETUP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: staffPassword })
+      });
+      const data = await resp.json();
+      toast(data.message || 'Done');
+    } catch (err) {
+      toast('Error: ' + err.message);
+    }
+    document.getElementById('setup-btn').textContent = 'Create Sheet Tab';
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Auto-refresh every 60 seconds when logged in
+  setInterval(() => {
+    if (staffPassword && document.getElementById('app').style.display !== 'none') {
+      loadLogs();
+    }
+  }, 60000);
+</script>
+</body>
+</html>
