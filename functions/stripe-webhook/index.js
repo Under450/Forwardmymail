@@ -52,9 +52,10 @@ async function syncCustomerToSheet(customerId, customerData) {
     });
 
     const emailsList = response.data.values || [];
-    const rowIndex = emailsList.findIndex(row => row[0] === customerData.email);
+    // Skip row 0 (headers). rowIndex is 0-based so actual sheet row = rowIndex + 2
+    const rowIndex = emailsList.findIndex((row, i) => i > 0 && row[0] === customerData.email);
 
-    if (rowIndex >= 0) {
+    if (rowIndex >= 1) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
         range: `Sheet1!A${rowIndex + 2}:L${rowIndex + 2}`,
@@ -1623,11 +1624,15 @@ exports.getEmailLogs = onRequest(async (req, res) => {
   }
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
-  const { password, limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
+  const { limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
 
-  // Validate staff password
-  const STAFF_PASS = process.env.STAFF_PASSWORD || 'fmm-staff-2025';
-  if (password !== STAFF_PASS) {
+  // Validate via Firebase ID token
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch {
     return res.status(401).json({ error: 'Unauthorised' });
   }
 
@@ -1676,9 +1681,10 @@ exports.createEmailLogSheet = onRequest(async (req, res) => {
   const origin = req.headers.origin;
   if (allowedOrigins.includes(origin)) res.set('Access-Control-Allow-Origin', origin);
 
-  const { password } = req.body || {};
-  const STAFF_PASS = process.env.STAFF_PASSWORD || 'fmm-staff-2025';
-  if (password !== STAFF_PASS) return res.status(401).json({ error: 'Unauthorised' });
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
+  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
 
   try {
     const sheetAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
@@ -1715,3 +1721,69 @@ exports.createEmailLogSheet = onRequest(async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+// ── onCustomerUpdated — re-sync to Google Sheet on any customer doc change ───
+// Fires whenever a customer document is updated in Firestore
+exports.onCustomerUpdated = onDocumentUpdated('customers/{customerId}', async (event) => {
+  const before = event.data.before.data();
+  const after  = event.data.after.data();
+
+  // Only sync if relevant fields actually changed — avoids infinite loops
+  const watchedFields = [
+    'name','email','company','phone','mailboxId','package',
+    'credits','totalSpent','lastPurchaseDate','idStatus','accountStatus'
+  ];
+  const changed = watchedFields.some(f => JSON.stringify(before[f]) !== JSON.stringify(after[f]));
+  if (!changed) return;
+
+  try {
+    await syncCustomerToSheet(event.params.customerId, after);
+    console.log(`Sheet re-synced for customer: ${after.email}`);
+  } catch (err) {
+    console.error('onCustomerUpdated sheet sync failed:', err.message);
+  }
+});
+
+// ── syncAllCustomersToSheet — HTTP endpoint to do a full bulk re-sync ─────────
+// Call once manually to backfill all existing customers into the sheet
+exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
+  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) res.set('Access-Control-Allow-Origin', origin);
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  // Verify Firebase ID token — must be a signed-in staff user
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'No auth token' });
+
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+
+  try {
+    const snapshot = await db.collection('customers').get();
+    let synced = 0, failed = 0;
+
+    for (const doc of snapshot.docs) {
+      try {
+        await syncCustomerToSheet(doc.id, doc.data());
+        synced++;
+      } catch (e) {
+        console.error(`Bulk sync failed for ${doc.id}:`, e.message);
+        failed++;
+      }
+    }
+
+    console.log(`Bulk sync complete: ${synced} synced, ${failed} failed`);
+    return res.status(200).json({ ok: true, synced, failed, total: snapshot.size });
+  } catch (err) {
+    console.error('syncAllCustomersToSheet error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ── getEmailLogs — update to use Firebase ID token auth ──────────────────────
+// (replaces the hardcoded password version — existing function updated below)
