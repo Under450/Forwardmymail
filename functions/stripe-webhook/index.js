@@ -1676,9 +1676,10 @@ exports.getEmailLogs = onRequest(async (req, res) => {
 // ── createEmailLogSheet ───────────────────────────────────────────────────────
 // One-time callable: creates the Email Log tab with headers in your Google Sheet
 exports.createEmailLogSheet = onRequest(async (req, res) => {
-  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) res.set('Access-Control-Allow-Origin', origin);
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
 
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
@@ -1746,9 +1747,10 @@ exports.onCustomerUpdated = onDocumentUpdated('customers/{customerId}', async (e
 // ── syncAllCustomersToSheet — HTTP endpoint to do a full bulk re-sync ─────────
 // Call once manually to backfill all existing customers into the sheet
 exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
-  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) res.set('Access-Control-Allow-Origin', origin);
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   // Verify Firebase ID token — must be a signed-in staff user
