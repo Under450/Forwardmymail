@@ -1602,3 +1602,116 @@ exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (
     await event.data.ref.update({ emailSent: false, emailError: err.message });
   }
 });
+
+// ── getEmailLogs ──────────────────────────────────────────────────────────────
+// Returns email_logs from Firestore — used by the staff email log viewer page
+// Secured by staff password check against Firestore config doc
+exports.getEmailLogs = onRequest(async (req, res) => {
+  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+  const origin = req.headers.origin;
+  if (req.method === 'OPTIONS') {
+    if (allowedOrigins.includes(origin)) {
+      res.set('Access-Control-Allow-Origin', origin);
+      res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.set('Access-Control-Allow-Headers', 'Content-Type');
+      return res.status(204).send('');
+    }
+    return res.status(403).send('Forbidden');
+  }
+  if (allowedOrigins.includes(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+  }
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  const { password, limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
+
+  // Validate staff password
+  const STAFF_PASS = process.env.STAFF_PASSWORD || 'fmm-staff-2025';
+  if (password !== STAFF_PASS) {
+    return res.status(401).json({ error: 'Unauthorised' });
+  }
+
+  try {
+    let query = db.collection('email_logs').orderBy('timestamp', 'desc').limit(Number(reqLimit) || 200);
+    if (templateFilter) query = query.where('template', '==', templateFilter);
+    if (statusFilter)   query = query.where('status', '==', statusFilter);
+
+    const snap = await query.get();
+    let logs = snap.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id,
+        timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : null,
+        customerId: data.customerId || '',
+        customerEmail: data.customerEmail || '',
+        template: data.template || '',
+        subject: data.subject || '',
+        status: data.status || '',
+        error: data.error || '',
+      };
+    });
+
+    // Client-side search filter
+    if (search) {
+      const s = search.toLowerCase();
+      logs = logs.filter(l =>
+        l.customerEmail.toLowerCase().includes(s) ||
+        l.template.toLowerCase().includes(s) ||
+        l.subject.toLowerCase().includes(s) ||
+        l.customerId.toLowerCase().includes(s)
+      );
+    }
+
+    return res.status(200).json({ logs });
+  } catch (err) {
+    console.error('getEmailLogs error:', err);
+    return res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+});
+
+// ── createEmailLogSheet ───────────────────────────────────────────────────────
+// One-time callable: creates the Email Log tab with headers in your Google Sheet
+exports.createEmailLogSheet = onRequest(async (req, res) => {
+  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) res.set('Access-Control-Allow-Origin', origin);
+
+  const { password } = req.body || {};
+  const STAFF_PASS = process.env.STAFF_PASSWORD || 'fmm-staff-2025';
+  if (password !== STAFF_PASS) return res.status(401).json({ error: 'Unauthorised' });
+
+  try {
+    const sheetAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
+    const sheetsClient = google.sheets({ version: 'v4', auth: sheetAuth });
+    const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
+
+    // Add the Email Log sheet tab
+    await sheetsClient.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      resource: {
+        requests: [{
+          addSheet: {
+            properties: { title: 'Email Log' }
+          }
+        }]
+      }
+    });
+
+    // Write headers
+    await sheetsClient.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: 'Email Log!A1:G1',
+      valueInputOption: 'RAW',
+      resource: { values: [['Timestamp', 'Customer ID', 'Customer Email', 'Template', 'Subject', 'Status', 'Error']] },
+    });
+
+    return res.status(200).json({ ok: true, message: 'Email Log tab created with headers' });
+  } catch (err) {
+    // Tab may already exist
+    if (err.message && err.message.includes('already exists')) {
+      return res.status(200).json({ ok: true, message: 'Tab already exists' });
+    }
+    console.error('createEmailLogSheet error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
