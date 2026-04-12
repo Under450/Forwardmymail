@@ -98,16 +98,92 @@ function buildPackageEmail(name, company, packageType, amount) {
 async function sendWelcomeEmail(email, name, mailboxId, company) {
   const html = buildWelcomeEmail(name, company || '');
   try {
-    await transporter.sendMail({
-      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-      to: email,
-      subject: 'Welcome to Forward My Mail — Your Mailbox is Ready',
-      html
-    });
-    console.log(`Welcome email sent to ${email}`);
+    await sendMailLogged({ to: email, subject: 'Welcome to Forward My Mail — Your Mailbox is Ready', html, template: 'welcome', customerEmail: email });
   } catch (error) {
     console.error('Error sending welcome email:', error);
     throw error;
+  }
+}
+
+
+// ── Email logging helper ──────────────────────────────────────────────────────
+// Writes every sent/failed email to Firestore email_logs + Google Sheet row
+const EMAIL_LOG_SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
+
+async function logEmail({ customerId = '', customerEmail = '', template, subject, status, error = '' }) {
+  const timestamp = new Date();
+  const logEntry = {
+    customerId,
+    customerEmail,
+    template,
+    subject,
+    status,          // 'sent' | 'failed'
+    error,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  // 1. Write to Firestore email_logs
+  try {
+    await db.collection('email_logs').add(logEntry);
+  } catch (e) {
+    console.error('email_logs Firestore write failed:', e.message);
+  }
+
+  // 2. Append row to Google Sheet (Email Log tab, or Sheet1 if tab missing)
+  try {
+    const sheetAuth = new google.auth.GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheetsClient = google.sheets({ version: 'v4', auth: sheetAuth });
+
+    const row = [[
+      timestamp.toLocaleString('en-GB'),
+      customerId,
+      customerEmail,
+      template,
+      subject,
+      status,
+      error
+    ]];
+
+    // Try Email Log tab first, fall back to Sheet1
+    let range = 'Email Log!A:G';
+    try {
+      await sheetsClient.spreadsheets.values.append({
+        spreadsheetId: EMAIL_LOG_SHEET_ID,
+        range,
+        valueInputOption: 'RAW',
+        resource: { values: row },
+      });
+    } catch {
+      await sheetsClient.spreadsheets.values.append({
+        spreadsheetId: EMAIL_LOG_SHEET_ID,
+        range: 'Sheet1!A:G',
+        valueInputOption: 'RAW',
+        resource: { values: row },
+      });
+    }
+  } catch (e) {
+    console.error('email_logs Sheet append failed:', e.message);
+  }
+}
+
+// Wrapped sendMail — logs every send automatically
+async function sendMailLogged({ to, subject, html, template, customerId = '', customerEmail = '' }) {
+  const recipient = customerEmail || to;
+  try {
+    await transporter.sendMail({
+      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+      to,
+      subject,
+      html
+    });
+    console.log(`[EMAIL SENT] ${template} → ${to}`);
+    await logEmail({ customerId, customerEmail: recipient, template, subject, status: 'sent' });
+  } catch (err) {
+    console.error(`[EMAIL FAILED] ${template} → ${to}:`, err.message);
+    await logEmail({ customerId, customerEmail: recipient, template, subject, status: 'failed', error: err.message });
+    throw err;
   }
 }
 
@@ -297,23 +373,14 @@ exports.stripeWebhook = onRequest(async (req, res) => {
           emailHtml = buildPackageEmail(emailName, emailCompany, packageType, amount);
         }
 
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: finalCustomerData.email,
-          subject: emailSubject,
-          html: emailHtml
-        });
-        console.log(`Purchase confirmation email (${creditsToAdd > 0 ? 'credit pack' : 'package'}) sent to ${finalCustomerData.email}`);
+        await sendMailLogged({ to: finalCustomerData.email, subject: emailSubject, html: emailHtml, template: creditsToAdd > 0 ? 'purchase_credit_pack' : 'purchase_package', customerId, customerEmail: finalCustomerData.email });
       } catch (emailError) {
         console.error('Failed to send customer email:', emailError);
       }
 
       // Admin notification
       try {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: 'info@forwardmymail.co.uk',
-          subject: `New Purchase: £${amount} - ${finalCustomerData.name}`,
+        await sendMailLogged({ to: 'info@forwardmymail.co.uk', subject: `New Purchase: £${amount} - ${finalCustomerData.name}`, template: 'admin_new_purchase', customerId, customerEmail: finalCustomerData.email,
           html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f5f5f5"><div style="background:white;padding:30px;border-radius:10px;border-left:4px solid #4CAF50"><h2 style="color:#4CAF50;margin-top:0">New Purchase Received</h2><table style="width:100%;border-collapse:collapse;margin:20px 0"><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Customer:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">${finalCustomerData.name}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Email:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><a href="mailto:${finalCustomerData.email}">${finalCustomerData.email}</a></td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Amount:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd;color:#4CAF50;font-size:18px;font-weight:bold">£${amount}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>New Balance:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">£${newCredits}</td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Mailbox ID:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><span style="background:#1e3c72;color:white;padding:4px 8px;border-radius:4px;font-weight:bold">${finalCustomerData.mailboxId || 'Not assigned'}</span></td></tr></table><div style="background:#f0f0f0;padding:15px;border-radius:5px;margin-top:20px"><p style="margin:0;font-size:12px;color:#666"><strong>Stripe Session:</strong><br>${session.id}</p></div></div></div>`
         });
         console.log('Admin notification sent');
@@ -363,10 +430,7 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
 
     const companyName = customerData.company || customerData.name;
 
-    await transporter.sendMail({
-      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-      to: 'info@forwardmymail.co.uk',
-      subject: `New Account: ${companyName}`,
+    await sendMailLogged({ to: 'info@forwardmymail.co.uk', subject: `New Account: ${companyName}`, template: 'admin_new_signup', customerEmail: customerData.email,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f5f5f5"><div style="background:white;padding:30px;border-radius:10px;border-left:4px solid #1e3c72"><div style="display:flex;align-items:center;margin-bottom:20px"><img src="https://forwardmymail.co.uk/logo.png" style="max-width:150px;height:auto;margin-right:15px" alt="Forward My Mail"><h2 style="color:#1e3c72;margin:0;font-size:18px">NEW ACCOUNT: ${companyName.toUpperCase()}</h2></div><table style="width:100%;border-collapse:collapse;margin:20px 0"><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Name:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">${customerData.name}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Email:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><a href="mailto:${customerData.email}">${customerData.email}</a></td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Company:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">${customerData.company || 'N/A'}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Credits:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">£${customerData.credits || 0}</td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Mailbox ID:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><span style="background:#1e3c72;color:white;padding:4px 8px;border-radius:4px;font-weight:bold">${mailboxId || 'Pending'}</span></td></tr></table><p style="margin-top:20px;padding:15px;background:#fff3cd;border-left:4px solid #ffc107;border-radius:4px"><strong>Action Required:</strong> Customer has signed up but has not purchased credits yet.</p></div></div>`
     });
 
@@ -670,13 +734,7 @@ async function sendVerificationEmail(email, name, result) {
     </body></html>
   `;
 
-  await transporter.sendMail({
-    from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-    to: email,
-    subject,
-    html
-  });
-  console.log(`Verification email (${result}) sent to ${email}`);
+  await sendMailLogged({ to: email, subject, html, template: `verification_${result}`, customerEmail: email });
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -717,33 +775,15 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
 
     try {
       if (days === 3) {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: 'Reminder: Please complete your identity verification',
-          html: buildIdReminderEmail(name)
-        });
-        console.log(`ID day-3 reminder sent to ${email}`);
+        await sendMailLogged({ to: email, subject: 'Reminder: Please complete your identity verification', html: buildIdReminderEmail(name), template: 'id_reminder_day3', customerEmail: email });
       } else if (days === 7) {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: 'Final reminder: Identity verification required',
-          html: buildIdFinalWarningEmail(name)
-        });
-        console.log(`ID day-7 final warning sent to ${email}`);
+        await sendMailLogged({ to: email, subject: 'Final reminder: Identity verification required', html: buildIdFinalWarningEmail(name), template: 'id_reminder_day7', customerEmail: email });
       } else if (days >= 10) {
         await doc.ref.update({
           accountStatus: 'id_suspended',
           accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: 'Your Forward My Mail account has been suspended',
-          html: buildIdSuspendedEmail(name)
-        });
-        console.log(`Account suspended (no ID) for ${email} after ${days} days`);
+        await sendMailLogged({ to: email, subject: 'Your Forward My Mail account has been suspended', html: buildIdSuspendedEmail(name), template: 'id_suspended', customerEmail: email });
       }
     } catch (emailErr) {
       console.error(`checkIdReminders: failed for ${email}:`, emailErr);
@@ -821,12 +861,7 @@ exports.checkLowCredits = onSchedule('every day 09:00', async () => {
     if (data.lowCreditEmailSent && data.lowCreditEmailSent.toDate() > sevenDaysAgo) continue;
 
     try {
-      await transporter.sendMail({
-        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-        to: data.email,
-        subject: '⚠️ Your Forward My Mail credits are running low',
-        html: buildLowCreditsEmail(data.name || 'there', credits)
-      });
+      await sendMailLogged({ to: data.email, subject: '⚠️ Your Forward My Mail credits are running low', html: buildLowCreditsEmail(data.name || 'there', credits), template: 'low_credits', customerEmail: data.email });
 
       await doc.ref.update({ lowCreditEmailSent: admin.firestore.FieldValue.serverTimestamp() });
       console.log(`Low credits warning sent to ${data.email} (balance: £${credits})`);
@@ -972,23 +1007,11 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
       try {
         if (days === 25) {
           // Storage warning
-          await transporter.sendMail({
-            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-            to: customerData.email,
-            subject: '📦 Mail storage reminder — 35 days remaining',
-            html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days)
-          });
-          console.log(`Storage warning (day 25) sent to ${customerData.email} for mail ${mailDoc.id}`);
+          await sendMailLogged({ to: customerData.email, subject: '📦 Mail storage reminder — 35 days remaining', html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days), template: 'storage_warning_day25', customerEmail: customerData.email });
 
         } else if (days === 55) {
           // Final shred warning
-          await transporter.sendMail({
-            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-            to: customerData.email,
-            subject: '🚨 Final notice: Mail will be shredded in 5 days',
-            html: buildShredWarningEmail(customerData.name || 'there', mailData)
-          });
-          console.log(`Shred warning (day 55) sent to ${customerData.email} for mail ${mailDoc.id}`);
+          await sendMailLogged({ to: customerData.email, subject: '🚨 Final notice: Mail will be shredded in 5 days', html: buildShredWarningEmail(customerData.name || 'there', mailData), template: 'shred_warning_day55', customerEmail: customerData.email });
 
         } else if (days >= 60) {
           // Auto-shred: archive to Drive first
@@ -1006,12 +1029,7 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
           }
 
           // Send notification BEFORE shredding — only shred if email succeeds
-          await transporter.sendMail({
-            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-            to: customerData.email,
-            subject: '🗑️ Mail item has been shredded',
-            html: buildAutoShredEmail(customerData.name || 'there', mailData)
-          });
+          await sendMailLogged({ to: customerData.email, subject: '🗑️ Mail item has been shredded', html: buildAutoShredEmail(customerData.name || 'there', mailData), template: 'auto_shredded', customerEmail: customerData.email });
 
           await mailDoc.ref.update({
             status: 'shredded',
@@ -1474,25 +1492,13 @@ exports.checkRenewals = onSchedule('every day 09:00', async () => {
 
     try {
       if (daysLeft === 14 || daysLeft === 7) {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: `Your Forward My Mail subscription expires in ${daysLeft} days`,
-          html: buildRenewalReminderEmail(name, daysLeft)
-        });
-        console.log(`Renewal reminder (${daysLeft} days) sent to ${email}`);
+        await sendMailLogged({ to: email, subject: `Your Forward My Mail subscription expires in ${daysLeft} days`, html: buildRenewalReminderEmail(name, daysLeft), template: `renewal_reminder_${daysLeft}days`, customerEmail: email });
       } else if (daysLeft <= 0) {
         await doc.ref.update({
           accountStatus: 'renewal_due',
           accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: 'Your Forward My Mail subscription has expired',
-          html: buildRenewalExpiredEmail(name)
-        });
-        console.log(`Renewal expired — account flagged for ${email}`);
+        await sendMailLogged({ to: email, subject: 'Your Forward My Mail subscription has expired', html: buildRenewalExpiredEmail(name), template: 'renewal_expired', customerEmail: email });
       }
     } catch (err) {
       console.error(`checkRenewals: failed for ${email}:`, err);
@@ -1575,8 +1581,7 @@ exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Mail request notification sent for ${req.action} — ${req.mailboxId}`);
+    await sendMailLogged({ to: 'info@forwardmymail.co.uk', subject: mailOptions.subject, html: mailOptions.html, template: `mail_request_${req.action}`, customerEmail: req.customerEmail || '' });
     await event.data.ref.update({ emailSent: true });
 
     // Write staff notification for portal real-time display
