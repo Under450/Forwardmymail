@@ -518,7 +518,7 @@ exports.createDiditSession = onRequest(async (req, res) => {
     if (allowedOrigins.includes(origin)) {
       res.set('Access-Control-Allow-Origin', origin);
       res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-      res.set('Access-Control-Allow-Headers', 'Content-Type');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       return res.status(204).send('');
     }
     return res.status(403).send('Forbidden');
@@ -526,7 +526,7 @@ exports.createDiditSession = onRequest(async (req, res) => {
   if (!allowedOrigins.includes(origin)) return res.status(403).send('Forbidden');
   res.set('Access-Control-Allow-Origin', origin);
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   const DIDIT_API_KEY = process.env.DIDIT_API_KEY;
@@ -1614,14 +1614,13 @@ exports.getEmailLogs = onRequest(async (req, res) => {
     if (allowedOrigins.includes(origin)) {
       res.set('Access-Control-Allow-Origin', origin);
       res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-      res.set('Access-Control-Allow-Headers', 'Content-Type');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
       return res.status(204).send('');
     }
     return res.status(403).send('Forbidden');
   }
-  if (allowedOrigins.includes(origin)) {
-    res.set('Access-Control-Allow-Origin', origin);
-  }
+  res.set('Access-Control-Allow-Origin', origin || '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   const { limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
