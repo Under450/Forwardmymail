@@ -1,7 +1,7 @@
 const stream = require('stream');
 const functions = require('firebase-functions');
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
-const { onDocumentCreated, onDocumentDeleted } = require('firebase-functions/v2/firestore');
+const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
@@ -52,9 +52,10 @@ async function syncCustomerToSheet(customerId, customerData) {
     });
 
     const emailsList = response.data.values || [];
-    const rowIndex = emailsList.findIndex(row => row[0] === customerData.email);
+    // Skip row 0 (headers). rowIndex is 0-based so actual sheet row = rowIndex + 2
+    const rowIndex = emailsList.findIndex((row, i) => i > 0 && row[0] === customerData.email);
 
-    if (rowIndex >= 0) {
+    if (rowIndex >= 1) {
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
         range: `Sheet1!A${rowIndex + 2}:L${rowIndex + 2}`,
@@ -98,16 +99,92 @@ function buildPackageEmail(name, company, packageType, amount) {
 async function sendWelcomeEmail(email, name, mailboxId, company) {
   const html = buildWelcomeEmail(name, company || '');
   try {
-    await transporter.sendMail({
-      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-      to: email,
-      subject: 'Welcome to Forward My Mail — Your Mailbox is Ready',
-      html
-    });
-    console.log(`Welcome email sent to ${email}`);
+    await sendMailLogged({ to: email, subject: 'Welcome to Forward My Mail — Your Mailbox is Ready', html, template: 'welcome', customerEmail: email });
   } catch (error) {
     console.error('Error sending welcome email:', error);
     throw error;
+  }
+}
+
+
+// ── Email logging helper ──────────────────────────────────────────────────────
+// Writes every sent/failed email to Firestore email_logs + Google Sheet row
+const EMAIL_LOG_SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
+
+async function logEmail({ customerId = '', customerEmail = '', template, subject, status, error = '' }) {
+  const timestamp = new Date();
+  const logEntry = {
+    customerId,
+    customerEmail,
+    template,
+    subject,
+    status,          // 'sent' | 'failed'
+    error,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  // 1. Write to Firestore email_logs
+  try {
+    await db.collection('email_logs').add(logEntry);
+  } catch (e) {
+    console.error('email_logs Firestore write failed:', e.message);
+  }
+
+  // 2. Append row to Google Sheet (Email Log tab, or Sheet1 if tab missing)
+  try {
+    const sheetAuth = new google.auth.GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheetsClient = google.sheets({ version: 'v4', auth: sheetAuth });
+
+    const row = [[
+      timestamp.toLocaleString('en-GB'),
+      customerId,
+      customerEmail,
+      template,
+      subject,
+      status,
+      error
+    ]];
+
+    // Try Email Log tab first, fall back to Sheet1
+    let range = 'Email Log!A:G';
+    try {
+      await sheetsClient.spreadsheets.values.append({
+        spreadsheetId: EMAIL_LOG_SHEET_ID,
+        range,
+        valueInputOption: 'RAW',
+        resource: { values: row },
+      });
+    } catch {
+      await sheetsClient.spreadsheets.values.append({
+        spreadsheetId: EMAIL_LOG_SHEET_ID,
+        range: 'Sheet1!A:G',
+        valueInputOption: 'RAW',
+        resource: { values: row },
+      });
+    }
+  } catch (e) {
+    console.error('email_logs Sheet append failed:', e.message);
+  }
+}
+
+// Wrapped sendMail — logs every send automatically
+async function sendMailLogged({ to, subject, html, template, customerId = '', customerEmail = '' }) {
+  const recipient = customerEmail || to;
+  try {
+    await transporter.sendMail({
+      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
+      to,
+      subject,
+      html
+    });
+    console.log(`[EMAIL SENT] ${template} → ${to}`);
+    await logEmail({ customerId, customerEmail: recipient, template, subject, status: 'sent' });
+  } catch (err) {
+    console.error(`[EMAIL FAILED] ${template} → ${to}:`, err.message);
+    await logEmail({ customerId, customerEmail: recipient, template, subject, status: 'failed', error: err.message });
+    throw err;
   }
 }
 
@@ -297,23 +374,14 @@ exports.stripeWebhook = onRequest(async (req, res) => {
           emailHtml = buildPackageEmail(emailName, emailCompany, packageType, amount);
         }
 
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: finalCustomerData.email,
-          subject: emailSubject,
-          html: emailHtml
-        });
-        console.log(`Purchase confirmation email (${creditsToAdd > 0 ? 'credit pack' : 'package'}) sent to ${finalCustomerData.email}`);
+        await sendMailLogged({ to: finalCustomerData.email, subject: emailSubject, html: emailHtml, template: creditsToAdd > 0 ? 'purchase_credit_pack' : 'purchase_package', customerId, customerEmail: finalCustomerData.email });
       } catch (emailError) {
         console.error('Failed to send customer email:', emailError);
       }
 
       // Admin notification
       try {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: 'info@forwardmymail.co.uk',
-          subject: `New Purchase: £${amount} - ${finalCustomerData.name}`,
+        await sendMailLogged({ to: 'info@forwardmymail.co.uk', subject: `New Purchase: £${amount} - ${finalCustomerData.name}`, template: 'admin_new_purchase', customerId, customerEmail: finalCustomerData.email,
           html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f5f5f5"><div style="background:white;padding:30px;border-radius:10px;border-left:4px solid #4CAF50"><h2 style="color:#4CAF50;margin-top:0">New Purchase Received</h2><table style="width:100%;border-collapse:collapse;margin:20px 0"><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Customer:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">${finalCustomerData.name}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Email:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><a href="mailto:${finalCustomerData.email}">${finalCustomerData.email}</a></td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Amount:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd;color:#4CAF50;font-size:18px;font-weight:bold">£${amount}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>New Balance:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">£${newCredits}</td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Mailbox ID:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><span style="background:#1e3c72;color:white;padding:4px 8px;border-radius:4px;font-weight:bold">${finalCustomerData.mailboxId || 'Not assigned'}</span></td></tr></table><div style="background:#f0f0f0;padding:15px;border-radius:5px;margin-top:20px"><p style="margin:0;font-size:12px;color:#666"><strong>Stripe Session:</strong><br>${session.id}</p></div></div></div>`
         });
         console.log('Admin notification sent');
@@ -363,10 +431,7 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
 
     const companyName = customerData.company || customerData.name;
 
-    await transporter.sendMail({
-      from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-      to: 'info@forwardmymail.co.uk',
-      subject: `New Account: ${companyName}`,
+    await sendMailLogged({ to: 'info@forwardmymail.co.uk', subject: `New Account: ${companyName}`, template: 'admin_new_signup', customerEmail: customerData.email,
       html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f5f5f5"><div style="background:white;padding:30px;border-radius:10px;border-left:4px solid #1e3c72"><div style="display:flex;align-items:center;margin-bottom:20px"><img src="https://forwardmymail.co.uk/logo.png" style="max-width:150px;height:auto;margin-right:15px" alt="Forward My Mail"><h2 style="color:#1e3c72;margin:0;font-size:18px">NEW ACCOUNT: ${companyName.toUpperCase()}</h2></div><table style="width:100%;border-collapse:collapse;margin:20px 0"><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Name:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">${customerData.name}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Email:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><a href="mailto:${customerData.email}">${customerData.email}</a></td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Company:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">${customerData.company || 'N/A'}</td></tr><tr><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Credits:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd">£${customerData.credits || 0}</td></tr><tr style="background:#f9f9f9"><td style="padding:12px;border-bottom:1px solid #ddd"><strong>Mailbox ID:</strong></td><td style="padding:12px;border-bottom:1px solid #ddd"><span style="background:#1e3c72;color:white;padding:4px 8px;border-radius:4px;font-weight:bold">${mailboxId || 'Pending'}</span></td></tr></table><p style="margin-top:20px;padding:15px;background:#fff3cd;border-left:4px solid #ffc107;border-radius:4px"><strong>Action Required:</strong> Customer has signed up but has not purchased credits yet.</p></div></div>`
     });
 
@@ -446,22 +511,10 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
 // Called by customer portal when customer clicks "Complete Your ID Verification"
 // Creates a Didit verification session and returns the session URL
 exports.createDiditSession = onRequest(async (req, res) => {
-  // CORS — restrict to forwardmymail.co.uk
-  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
-  const origin = req.headers.origin;
-  if (req.method === 'OPTIONS') {
-    if (allowedOrigins.includes(origin)) {
-      res.set('Access-Control-Allow-Origin', origin);
-      res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-      res.set('Access-Control-Allow-Headers', 'Content-Type');
-      return res.status(204).send('');
-    }
-    return res.status(403).send('Forbidden');
-  }
-  if (!allowedOrigins.includes(origin)) return res.status(403).send('Forbidden');
-  res.set('Access-Control-Allow-Origin', origin);
+  res.set('Access-Control-Allow-Origin', '*');
   res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   const DIDIT_API_KEY = process.env.DIDIT_API_KEY;
@@ -670,13 +723,7 @@ async function sendVerificationEmail(email, name, result) {
     </body></html>
   `;
 
-  await transporter.sendMail({
-    from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-    to: email,
-    subject,
-    html
-  });
-  console.log(`Verification email (${result}) sent to ${email}`);
+  await sendMailLogged({ to: email, subject, html, template: `verification_${result}`, customerEmail: email });
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -697,13 +744,19 @@ function daysSince(firestoreTimestamp) {
 //    Day 3: gentle reminder | Day 7: final warning
 // ─────────────────────────────────────────────────────────────────────────────
 exports.checkIdReminders = onSchedule('every day 09:00', async () => {
-  const snapshot = await db.collection('customers')
-    .where('idStatus', '==', 'pending')
-    .get();
+  // Catch both not_started (never clicked verify) and pending (started but not completed)
+  const [notStartedSnap, pendingSnap] = await Promise.all([
+    db.collection('customers').where('idStatus', '==', 'not_started').get(),
+    db.collection('customers').where('idStatus', '==', 'pending').get(),
+  ]);
 
-  for (const doc of snapshot.docs) {
+  const allDocs = [...notStartedSnap.docs, ...pendingSnap.docs];
+
+  for (const doc of allDocs) {
     const data = doc.data();
-    const days = daysSince(data.created);
+    if (data.accountStatus === 'id_suspended') continue;
+
+    const days = daysSince(data.createdAt || data.created);
     if (days === null) continue;
 
     const name = data.name || 'there';
@@ -711,24 +764,18 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
 
     try {
       if (days === 3) {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: 'Reminder: Please complete your identity verification',
-          html: buildIdReminderEmail(name, 3)
-        });
-        console.log(`ID day-3 reminder sent to ${email}`);
+        await sendMailLogged({ to: email, subject: 'Reminder: Please complete your identity verification', html: buildIdReminderEmail(name), template: 'id_reminder_day3', customerEmail: email });
       } else if (days === 7) {
-        await transporter.sendMail({
-          from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-          to: email,
-          subject: 'Final reminder: Identity verification required',
-          html: buildIdFinalWarningEmail(name)
+        await sendMailLogged({ to: email, subject: 'Final reminder: Identity verification required', html: buildIdFinalWarningEmail(name), template: 'id_reminder_day7', customerEmail: email });
+      } else if (days >= 10) {
+        await doc.ref.update({
+          accountStatus: 'id_suspended',
+          accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
         });
-        console.log(`ID day-7 final warning sent to ${email}`);
+        await sendMailLogged({ to: email, subject: 'Your Forward My Mail account has been suspended', html: buildIdSuspendedEmail(name), template: 'id_suspended', customerEmail: email });
       }
     } catch (emailErr) {
-      console.error(`checkIdReminders: failed to send email to ${email}:`, emailErr);
+      console.error(`checkIdReminders: failed for ${email}:`, emailErr);
     }
   }
 });
@@ -803,12 +850,7 @@ exports.checkLowCredits = onSchedule('every day 09:00', async () => {
     if (data.lowCreditEmailSent && data.lowCreditEmailSent.toDate() > sevenDaysAgo) continue;
 
     try {
-      await transporter.sendMail({
-        from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-        to: data.email,
-        subject: '⚠️ Your Forward My Mail credits are running low',
-        html: buildLowCreditsEmail(data.name || 'there', credits)
-      });
+      await sendMailLogged({ to: data.email, subject: '⚠️ Your Forward My Mail credits are running low', html: buildLowCreditsEmail(data.name || 'there', credits), template: 'low_credits', customerEmail: data.email });
 
       await doc.ref.update({ lowCreditEmailSent: admin.firestore.FieldValue.serverTimestamp() });
       console.log(`Low credits warning sent to ${data.email} (balance: £${credits})`);
@@ -954,23 +996,11 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
       try {
         if (days === 25) {
           // Storage warning
-          await transporter.sendMail({
-            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-            to: customerData.email,
-            subject: '📦 Mail storage reminder — 35 days remaining',
-            html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days)
-          });
-          console.log(`Storage warning (day 25) sent to ${customerData.email} for mail ${mailDoc.id}`);
+          await sendMailLogged({ to: customerData.email, subject: '📦 Mail storage reminder — 35 days remaining', html: buildStorageWarningEmail(customerData.name || 'there', mailData, days, 60 - days), template: 'storage_warning_day25', customerEmail: customerData.email });
 
         } else if (days === 55) {
           // Final shred warning
-          await transporter.sendMail({
-            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-            to: customerData.email,
-            subject: '🚨 Final notice: Mail will be shredded in 5 days',
-            html: buildShredWarningEmail(customerData.name || 'there', mailData)
-          });
-          console.log(`Shred warning (day 55) sent to ${customerData.email} for mail ${mailDoc.id}`);
+          await sendMailLogged({ to: customerData.email, subject: '🚨 Final notice: Mail will be shredded in 5 days', html: buildShredWarningEmail(customerData.name || 'there', mailData), template: 'shred_warning_day55', customerEmail: customerData.email });
 
         } else if (days >= 60) {
           // Auto-shred: archive to Drive first
@@ -988,12 +1018,7 @@ exports.checkMailStorage = onSchedule('every day 09:00', async () => {
           }
 
           // Send notification BEFORE shredding — only shred if email succeeds
-          await transporter.sendMail({
-            from: '"Forward My Mail" <info@forwardmymail.co.uk>',
-            to: customerData.email,
-            subject: '🗑️ Mail item has been shredded',
-            html: buildAutoShredEmail(customerData.name || 'there', mailData)
-          });
+          await sendMailLogged({ to: customerData.email, subject: '🗑️ Mail item has been shredded', html: buildAutoShredEmail(customerData.name || 'there', mailData), template: 'auto_shredded', customerEmail: customerData.email });
 
           await mailDoc.ref.update({
             status: 'shredded',
@@ -1274,6 +1299,240 @@ Archive created: ${new Date().toLocaleString('en-GB')}
 // ─────────────────────────────────────────────────────────────────────────────
 // MAIL REQUEST NOTIFICATION — fires when customer submits Post/Keep/Shred
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── buildIdSuspendedEmail ─────────────────────────────────────────────────────
+function buildIdSuspendedEmail(name) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#7c2d12,#9a3412);padding:40px 30px;text-align:center;color:white}
+    .header h1{font-size:24px;margin:10px 0 6px}
+    .content{padding:36px 30px}
+    .danger-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin:20px 0}
+    .danger-box p{color:#7f1d1d;font-size:15px;line-height:1.6;margin:0}
+    .cta-btn{display:block;background:#dc2626;color:white;text-decoration:none;text-align:center;padding:16px 30px;border-radius:10px;font-size:16px;font-weight:700;margin:24px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 30px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>🔒 Account Suspended</h1><p>Identity verification not completed</p></div>
+    <div class="content">
+      <p style="font-size:16px;color:#334155">Hi <strong>${name}</strong>,</p>
+      <p style="color:#475569;line-height:1.7">Your Forward My Mail account has been suspended because identity verification was not completed within 10 days of signup. This is required by UK anti-money laundering regulations.</p>
+      <div class="danger-box"><p>🔒 <strong>Your account is suspended.</strong> Your address is still reserved for you — complete your verification now to reactivate it immediately.</p></div>
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Reactivate My Account →</a>
+      <p style="color:#64748b;font-size:14px">Need help? Contact us at <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a></p>
+    </div>
+    <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
+  </div></body></html>`;
+}
+
+// ── buildRenewalReminderEmail ──────────────────────────────────────────────────
+function buildRenewalReminderEmail(name, daysLeft) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#1e3a8a,#1e40af);padding:40px 30px;text-align:center;color:white}
+    .header h1{font-size:24px;margin:10px 0 6px}
+    .content{padding:36px 30px}
+    .warning-box{background:#fefce8;border:2px solid #fbbf24;border-radius:12px;padding:20px;margin:20px 0}
+    .warning-box p{color:#78350f;font-size:15px;line-height:1.6;margin:0}
+    .cta-btn{display:block;background:#1e3a8a;color:white;text-decoration:none;text-align:center;padding:16px 30px;border-radius:10px;font-size:16px;font-weight:700;margin:24px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 30px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>📅 Subscription Renewal Reminder</h1><p>Your mailbox subscription is expiring soon</p></div>
+    <div class="content">
+      <p style="font-size:16px;color:#334155">Hi <strong>${name}</strong>,</p>
+      <p style="color:#475569;line-height:1.7">Your Forward My Mail mailbox subscription expires in <strong>${daysLeft} days</strong>. Renew now to keep your UK business address active without interruption.</p>
+      <div class="warning-box"><p>⚠️ If your subscription lapses, your mailbox address may be reassigned and mail handling will stop.</p></div>
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Renew My Subscription →</a>
+    </div>
+    <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
+  </div></body></html>`;
+}
+
+// ── buildRenewalExpiredEmail ───────────────────────────────────────────────────
+function buildRenewalExpiredEmail(name) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#991b1b,#b91c1c);padding:40px 30px;text-align:center;color:white}
+    .header h1{font-size:24px;margin:10px 0 6px}
+    .content{padding:36px 30px}
+    .danger-box{background:#fef2f2;border:2px solid #fca5a5;border-radius:12px;padding:20px;margin:20px 0}
+    .danger-box p{color:#7f1d1d;font-size:15px;line-height:1.6;margin:0}
+    .cta-btn{display:block;background:#dc2626;color:white;text-decoration:none;text-align:center;padding:16px 30px;border-radius:10px;font-size:16px;font-weight:700;margin:24px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:24px 30px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>⚠️ Subscription Expired</h1><p>Your mailbox subscription has lapsed</p></div>
+    <div class="content">
+      <p style="font-size:16px;color:#334155">Hi <strong>${name}</strong>,</p>
+      <p style="color:#475569;line-height:1.7">Your Forward My Mail mailbox subscription has expired. Your address is currently on hold.</p>
+      <div class="danger-box"><p>🔒 <strong>Mail handling has been paused.</strong> Renew your subscription immediately to reactivate your address and resume mail services.</p></div>
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="cta-btn">Renew Now →</a>
+      <p style="color:#64748b;font-size:14px">Questions? Email us at <a href="mailto:info@forwardmymail.co.uk">info@forwardmymail.co.uk</a></p>
+    </div>
+    <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
+  </div></body></html>`;
+}
+
+// ── Sheets colour helper ───────────────────────────────────────────────────────
+// Colours: white=active, yellow=id_pending, orange=id_suspended,
+//          lightred=no_credits, pink=renewal_due, grey=inactive, darkgrey=DELETED
+const STATUS_COLOURS = {
+  active:       { red: 1,    green: 1,    blue: 1    },  // white
+  id_pending:   { red: 1,    green: 0.95, blue: 0.6  },  // yellow
+  id_suspended: { red: 1,    green: 0.8,  blue: 0.4  },  // orange
+  no_credits:   { red: 1,    green: 0.8,  blue: 0.8  },  // light red
+  renewal_due:  { red: 1,    green: 0.85, blue: 0.9  },  // pink
+  inactive:     { red: 0.85, green: 0.85, blue: 0.85 },  // grey
+};
+
+async function colourSheetRow(email, accountStatus, noteText) {
+  try {
+    const sheetAuth = new google.auth.GoogleAuth({
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheetsClient = google.sheets({ version: 'v4', auth: sheetAuth });
+    const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
+
+    // Find row by email (column B)
+    const res = await sheetsClient.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: 'Sheet1!B:B',
+    });
+    const emails = (res.data.values || []);
+    let rowIndex = -1;
+    for (let i = 0; i < emails.length; i++) {
+      if (emails[i][0] === email) { rowIndex = i; break; }
+    }
+    if (rowIndex < 0) { console.log(`colourSheetRow: email not found: ${email}`); return; }
+
+    const row = rowIndex + 1; // 1-indexed
+    const colour = STATUS_COLOURS[accountStatus] || STATUS_COLOURS.active;
+
+    await sheetsClient.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      resource: {
+        requests: [{
+          repeatCell: {
+            range: { sheetId: 0, startRowIndex: rowIndex, endRowIndex: row, startColumnIndex: 0, endColumnIndex: 12 },
+            cell: { userEnteredFormat: { backgroundColor: colour } },
+            fields: 'userEnteredFormat.backgroundColor'
+          }
+        }]
+      }
+    });
+
+    // Write status to Notes column (L)
+    if (noteText) {
+      await sheetsClient.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `Sheet1!L${row}`,
+        valueInputOption: 'RAW',
+        resource: { values: [[noteText]] },
+      });
+    }
+    console.log(`Sheet row coloured for ${email}: ${accountStatus}`);
+  } catch (err) {
+    console.error('colourSheetRow error:', err.message);
+  }
+}
+
+// ── onCustomerStatusChanged — colours sheet when accountStatus changes ─────────
+exports.onCustomerStatusChanged = onDocumentUpdated('customers/{customerId}', async (event) => {
+  const before = event.data.before.data();
+  const after = event.data.after.data();
+
+  if (before.accountStatus === after.accountStatus) return; // no change
+
+  const email = after.email;
+  const status = after.accountStatus;
+  const name = after.name || 'Customer';
+
+  const noteMap = {
+    id_pending:   'Signed up — ID not completed',
+    id_suspended: `Suspended — no ID after 10 days (${new Date().toLocaleDateString('en-GB')})`,
+    no_credits:   `No credits — warned (${new Date().toLocaleDateString('en-GB')})`,
+    renewal_due:  `Renewal overdue (${new Date().toLocaleDateString('en-GB')})`,
+    inactive:     `Inactive 90+ days (${new Date().toLocaleDateString('en-GB')})`,
+    active:       'Active',
+  };
+
+  await colourSheetRow(email, status, noteMap[status] || status);
+});
+
+// ── checkRenewals — daily: warn 14 days before expiry, suspend on expiry ──────
+exports.checkRenewals = onSchedule('every day 09:00', async () => {
+  const snapshot = await db.collection('customers')
+    .where('idStatus', '==', 'approved')
+    .get();
+
+  const now = new Date();
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    if (!data.renewalDate) continue;
+    if (data.accountStatus === 'renewal_due') continue; // already flagged
+
+    const renewal = data.renewalDate.toDate ? data.renewalDate.toDate() : new Date(data.renewalDate);
+    const daysLeft = Math.round((renewal - now) / (1000 * 60 * 60 * 24));
+
+    const name = data.name || 'there';
+    const email = data.email;
+
+    try {
+      if (daysLeft === 14 || daysLeft === 7) {
+        await sendMailLogged({ to: email, subject: `Your Forward My Mail subscription expires in ${daysLeft} days`, html: buildRenewalReminderEmail(name, daysLeft), template: `renewal_reminder_${daysLeft}days`, customerEmail: email });
+      } else if (daysLeft <= 0) {
+        await doc.ref.update({
+          accountStatus: 'renewal_due',
+          accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+        await sendMailLogged({ to: email, subject: 'Your Forward My Mail subscription has expired', html: buildRenewalExpiredEmail(name), template: 'renewal_expired', customerEmail: email });
+      }
+    } catch (err) {
+      console.error(`checkRenewals: failed for ${email}:`, err);
+    }
+  }
+});
+
+// ── checkInactivity — daily: flag accounts with 90 days no purchase + no mail ─
+exports.checkInactivity = onSchedule('every day 09:00', async () => {
+  const snapshot = await db.collection('customers')
+    .where('idStatus', '==', 'approved')
+    .get();
+
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    if (data.accountStatus === 'inactive') continue;
+
+    // Check last purchase date
+    const lastPurchase = data.lastPurchaseDate
+      ? (data.lastPurchaseDate.toDate ? data.lastPurchaseDate.toDate() : new Date(data.lastPurchaseDate))
+      : null;
+
+    // Check last mail item
+    const mailSnap = await db.collection('mail')
+      .where('customerId', '==', doc.id)
+      .orderBy('processedAt', 'desc')
+      .limit(1)
+      .get();
+
+    const lastMailDate = mailSnap.empty ? null : (mailSnap.docs[0].data().processedAt?.toDate() || null);
+
+    const lastActivity = [lastPurchase, lastMailDate].filter(Boolean).sort((a,b) => b-a)[0];
+
+    if (!lastActivity || lastActivity < ninetyDaysAgo) {
+      await doc.ref.update({
+        accountStatus: 'inactive',
+        accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      console.log(`Marked inactive: ${data.email} (last activity: ${lastActivity ? lastActivity.toLocaleDateString('en-GB') : 'never'})`);
+    }
+  }
+});
+
 exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (event) => {
   const req = event.data.data();
   if (!req) return;
@@ -1311,8 +1570,7 @@ exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Mail request notification sent for ${req.action} — ${req.mailboxId}`);
+    await sendMailLogged({ to: 'info@forwardmymail.co.uk', subject: mailOptions.subject, html: mailOptions.html, template: `mail_request_${req.action}`, customerEmail: req.customerEmail || '' });
     await event.data.ref.update({ emailSent: true });
 
     // Write staff notification for portal real-time display
@@ -1333,3 +1591,188 @@ exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (
     await event.data.ref.update({ emailSent: false, emailError: err.message });
   }
 });
+
+// ── getEmailLogs ──────────────────────────────────────────────────────────────
+// Returns email_logs from Firestore — used by the staff email log viewer page
+// Secured by staff password check against Firestore config doc
+exports.getEmailLogs = onRequest(async (req, res) => {
+  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+  const origin = req.headers.origin;
+  if (req.method === 'OPTIONS') {
+    if (allowedOrigins.includes(origin)) {
+      res.set('Access-Control-Allow-Origin', origin);
+      res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      return res.status(204).send('');
+    }
+    return res.status(403).send('Forbidden');
+  }
+  res.set('Access-Control-Allow-Origin', origin || '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  const { limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
+
+  // Validate via Firebase ID token
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch {
+    return res.status(401).json({ error: 'Unauthorised' });
+  }
+
+  try {
+    let query = db.collection('email_logs').orderBy('timestamp', 'desc').limit(Number(reqLimit) || 200);
+    if (templateFilter) query = query.where('template', '==', templateFilter);
+    if (statusFilter)   query = query.where('status', '==', statusFilter);
+
+    const snap = await query.get();
+    let logs = snap.docs.map(d => {
+      const data = d.data();
+      return {
+        id: d.id,
+        timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : null,
+        customerId: data.customerId || '',
+        customerEmail: data.customerEmail || '',
+        template: data.template || '',
+        subject: data.subject || '',
+        status: data.status || '',
+        error: data.error || '',
+      };
+    });
+
+    // Client-side search filter
+    if (search) {
+      const s = search.toLowerCase();
+      logs = logs.filter(l =>
+        l.customerEmail.toLowerCase().includes(s) ||
+        l.template.toLowerCase().includes(s) ||
+        l.subject.toLowerCase().includes(s) ||
+        l.customerId.toLowerCase().includes(s)
+      );
+    }
+
+    return res.status(200).json({ logs });
+  } catch (err) {
+    console.error('getEmailLogs error:', err);
+    return res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+});
+
+// ── createEmailLogSheet ───────────────────────────────────────────────────────
+// One-time callable: creates the Email Log tab with headers in your Google Sheet
+exports.createEmailLogSheet = onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
+  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
+
+  try {
+    const sheetAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
+    const sheetsClient = google.sheets({ version: 'v4', auth: sheetAuth });
+    const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
+
+    // Add the Email Log sheet tab
+    await sheetsClient.spreadsheets.batchUpdate({
+      spreadsheetId: SHEET_ID,
+      resource: {
+        requests: [{
+          addSheet: {
+            properties: { title: 'Email Log' }
+          }
+        }]
+      }
+    });
+
+    // Write headers
+    await sheetsClient.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: 'Email Log!A1:G1',
+      valueInputOption: 'RAW',
+      resource: { values: [['Timestamp', 'Customer ID', 'Customer Email', 'Template', 'Subject', 'Status', 'Error']] },
+    });
+
+    return res.status(200).json({ ok: true, message: 'Email Log tab created with headers' });
+  } catch (err) {
+    // Tab may already exist
+    if (err.message && err.message.includes('already exists')) {
+      return res.status(200).json({ ok: true, message: 'Tab already exists' });
+    }
+    console.error('createEmailLogSheet error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ── onCustomerUpdated — re-sync to Google Sheet on any customer doc change ───
+// Fires whenever a customer document is updated in Firestore
+exports.onCustomerUpdated = onDocumentUpdated('customers/{customerId}', async (event) => {
+  const before = event.data.before.data();
+  const after  = event.data.after.data();
+
+  // Only sync if relevant fields actually changed — avoids infinite loops
+  const watchedFields = [
+    'name','email','company','phone','mailboxId','package',
+    'credits','totalSpent','lastPurchaseDate','idStatus','accountStatus'
+  ];
+  const changed = watchedFields.some(f => JSON.stringify(before[f]) !== JSON.stringify(after[f]));
+  if (!changed) return;
+
+  try {
+    await syncCustomerToSheet(event.params.customerId, after);
+    console.log(`Sheet re-synced for customer: ${after.email}`);
+  } catch (err) {
+    console.error('onCustomerUpdated sheet sync failed:', err.message);
+  }
+});
+
+// ── syncAllCustomersToSheet — HTTP endpoint to do a full bulk re-sync ─────────
+// Call once manually to backfill all existing customers into the sheet
+exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  // Verify Firebase ID token — must be a signed-in staff user
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'No auth token' });
+
+  try {
+    await admin.auth().verifyIdToken(idToken);
+  } catch {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+
+  try {
+    const snapshot = await db.collection('customers').get();
+    let synced = 0, failed = 0;
+
+    for (const doc of snapshot.docs) {
+      try {
+        await syncCustomerToSheet(doc.id, doc.data());
+        synced++;
+      } catch (e) {
+        console.error(`Bulk sync failed for ${doc.id}:`, e.message);
+        failed++;
+      }
+    }
+
+    console.log(`Bulk sync complete: ${synced} synced, ${failed} failed`);
+    return res.status(200).json({ ok: true, synced, failed, total: snapshot.size });
+  } catch (err) {
+    console.error('syncAllCustomersToSheet error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// ── getEmailLogs — update to use Firebase ID token auth ──────────────────────
+// (replaces the hardcoded password version — existing function updated below)

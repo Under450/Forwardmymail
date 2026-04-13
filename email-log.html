@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Log — Forward My Mail Staff</title>
+<link rel="icon" href="https://www.forwardmymail.co.uk/logo.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0d1b2e; --navy2: #162236; --gold: #c9972a; --gold2: #e8b84b;
+    --cream: #faf8f4; --text: #1a2332; --muted: #718096; --border: #e2ddd6;
+    --green: #16a34a; --red: #dc2626;
+    --sent-bg: #f0fdf4; --sent-border: #86efac;
+    --fail-bg: #fef2f2; --fail-border: #fca5a5;
+  }
+  html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); -webkit-font-smoothing: antialiased; }
+  #login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--navy); }
+  .login-box { background: white; border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 380px; text-align: center; }
+  .login-box img { height: 40px; margin-bottom: 24px; }
+  .login-box h2 { font-size: 20px; margin-bottom: 6px; }
+  .login-box p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+  .login-box input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; margin-bottom: 10px; outline: none; font-family: 'DM Sans', sans-serif; }
+  .login-box input:focus { border-color: var(--navy); }
+  .login-btn { width: 100%; padding: 13px; background: var(--navy); color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  .login-err { color: var(--red); font-size: 13px; margin-top: 10px; display: none; }
+  #app { display: none; }
+  nav { background: var(--navy); padding: 0 32px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .nav-logo { display: flex; align-items: center; gap: 12px; }
+  .nav-logo img { height: 32px; }
+  .nav-logo span { color: rgba(255,255,255,0.5); font-size: 13px; }
+  .nav-logo strong { color: var(--gold2); font-size: 13px; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.75); font-size: 12px; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .nav-btn.gold { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 600; }
+  .controls { background: white; border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .controls input, .controls select { padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; background: white; }
+  .controls input { flex: 1; min-width: 200px; }
+  .refresh-btn { background: var(--navy); color: white; border: none; padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .count-badge { background: var(--gold); color: var(--navy); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px 32px; }
+  .stat-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+  .stat-card .label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 6px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; }
+  .stat-card .value.green { color: var(--green); }
+  .stat-card .value.red { color: var(--red); }
+  .stat-card .value.gold { color: var(--gold); }
+  .table-wrap { padding: 0 32px 60px; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-top: 20px; }
+  thead { background: var(--navy); }
+  thead th { color: white; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; padding: 12px 16px; text-align: left; white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: var(--cream); }
+  tbody td { padding: 11px 16px; font-size: 13px; vertical-align: middle; }
+  .status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .status-sent { background: var(--sent-bg); border: 1px solid var(--sent-border); color: var(--green); }
+  .status-failed { background: var(--fail-bg); border: 1px solid var(--fail-border); color: var(--red); }
+  .template-chip { background: #f0ede8; border: 1px solid var(--border); font-size: 11px; font-weight: 500; padding: 2px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; white-space: nowrap; }
+  .email-cell, .subject-cell { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .subject-cell { color: var(--muted); }
+  .error-cell { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--red); font-size: 12px; font-family: 'DM Mono', monospace; }
+  .time-cell { white-space: nowrap; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
+  .loading { padding: 60px; text-align: center; color: var(--muted); }
+  .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--navy); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .empty { padding: 60px; text-align: center; color: var(--muted); }
+  #toast { position: fixed; bottom: 24px; right: 24px; background: var(--navy); color: white; padding: 12px 20px; border-radius: 8px; font-size: 14px; transform: translateY(80px); opacity: 0; transition: all 0.3s; z-index: 999; }
+  #toast.show { transform: translateY(0); opacity: 1; }
+  #toast.success { background: var(--green); }
+  #toast.error-t { background: var(--red); }
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
+    <h2>Email Log Viewer</h2>
+    <p>Sign in with your staff account</p>
+    <input type="email" id="email-input" placeholder="Email address" autocomplete="email">
+    <input type="password" id="pw-input" placeholder="Password" autocomplete="current-password">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-err" id="login-err">Invalid email or password</div>
+  </div>
+</div>
+
+<div id="app">
+  <nav>
+    <div class="nav-logo">
+      <img src="https://www.forwardmymail.co.uk/logo.png" alt="">
+      <span>Staff /</span><strong>Email Log</strong>
+    </div>
+    <div class="nav-right">
+      <button class="nav-btn" onclick="createSheetTab()">📋 Create Sheet Tab</button>
+      <button class="nav-btn gold" onclick="bulkSync()">🔄 Sync All Customers</button>
+      <button class="nav-btn" onclick="doLogout()">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="🔍  Search by email, template, customer ID…" oninput="filterLogs()">
+    <select id="status-filter" onchange="loadLogs()">
+      <option value="">All statuses</option>
+      <option value="sent">Sent</option>
+      <option value="failed">Failed</option>
+    </select>
+    <select id="template-filter" onchange="loadLogs()">
+      <option value="">All templates</option>
+      <option value="welcome">welcome</option>
+      <option value="purchase_credit_pack">purchase_credit_pack</option>
+      <option value="purchase_package">purchase_package</option>
+      <option value="admin_new_purchase">admin_new_purchase</option>
+      <option value="admin_new_signup">admin_new_signup</option>
+      <option value="verification_approved">verification_approved</option>
+      <option value="verification_declined">verification_declined</option>
+      <option value="id_reminder_day3">id_reminder_day3</option>
+      <option value="id_reminder_day7">id_reminder_day7</option>
+      <option value="id_suspended">id_suspended</option>
+      <option value="low_credits">low_credits</option>
+      <option value="storage_warning_day25">storage_warning_day25</option>
+      <option value="shred_warning_day55">shred_warning_day55</option>
+      <option value="auto_shredded">auto_shredded</option>
+      <option value="renewal_expired">renewal_expired</option>
+      <option value="mail_request_post">mail_request_post</option>
+      <option value="mail_request_keep">mail_request_keep</option>
+      <option value="mail_request_shred">mail_request_shred</option>
+    </select>
+    <select id="limit-select" onchange="loadLogs()">
+      <option value="100">Last 100</option>
+      <option value="200" selected>Last 200</option>
+      <option value="500">Last 500</option>
+    </select>
+    <button class="refresh-btn" onclick="loadLogs()">↻ Refresh</button>
+    <span class="count-badge" id="count-badge">— emails</span>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="label">Total Logged</div><div class="value" id="stat-total">—</div></div>
+    <div class="stat-card"><div class="label">Sent</div><div class="value green" id="stat-sent">—</div></div>
+    <div class="stat-card"><div class="label">Failed</div><div class="value red" id="stat-failed">—</div></div>
+    <div class="stat-card"><div class="label">Delivery Rate</div><div class="value gold" id="stat-rate">—</div></div>
+  </div>
+
+  <div class="table-wrap">
+    <div id="log-container" class="loading"><div class="spinner"></div>Loading email logs…</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+  const app  = initializeApp({ apiKey:"AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU", authDomain:"forward-my-mail.firebaseapp.com", projectId:"forward-my-mail", storageBucket:"forward-my-mail.firebasestorage.app", messagingSenderId:"933044287958", appId:"1:933044287958:web:fa3a707dbec62b24e74c77" });
+  const auth = getAuth(app);
+
+  const LOGS_URL = 'https://getemaillogs-yr34k57gsq-uc.a.run.app/getEmailLogs';
+  const SHEET_URL = 'https://createemaillogsheet-yr34k57gsq-uc.a.run.app/createEmailLogSheet';
+  const BULK_URL = 'https://syncallcustomerstosheet-yr34k57gsq-uc.a.run.app/syncAllCustomersToSheet';
+
+  let allLogs = [];
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+      loadLogs();
+    } else {
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app').style.display = 'none';
+    }
+  });
+
+  document.getElementById('pw-input').addEventListener('keydown', e => { if (e.key==='Enter') doLogin(); });
+  document.getElementById('email-input').addEventListener('keydown', e => { if (e.key==='Enter') document.getElementById('pw-input').focus(); });
+
+  window.doLogin = async () => {
+    const email = document.getElementById('email-input').value.trim();
+    const pw    = document.getElementById('pw-input').value;
+    const btn   = document.getElementById('login-btn');
+    const err   = document.getElementById('login-err');
+    err.style.display = 'none';
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try { await signInWithEmailAndPassword(auth, email, pw); }
+    catch { err.style.display = 'block'; btn.disabled = false; btn.textContent = 'Sign In'; }
+  };
+
+  window.doLogout = async () => signOut(auth);
+
+  async function token() {
+    if (!auth.currentUser) throw new Error('Not signed in');
+    return auth.currentUser.getIdToken();
+  }
+
+  window.loadLogs = async () => {
+    document.getElementById('log-container').innerHTML = '<div class="loading"><div class="spinner"></div>Loading…</div>';
+    try {
+      const t = await token();
+      const resp = await fetch(LOGS_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},
+        body: JSON.stringify({
+          limit: document.getElementById('limit-select').value,
+          statusFilter: document.getElementById('status-filter').value,
+          templateFilter: document.getElementById('template-filter').value,
+          search: document.getElementById('search').value
+        })
+      });
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      allLogs = data.logs || [];
+      renderLogs(allLogs); updateStats(allLogs);
+      toast('Loaded ' + allLogs.length + ' records');
+    } catch(e) {
+      document.getElementById('log-container').innerHTML = '<div class="empty"><div style="font-size:48px">⚠️</div><p>'+e.message+'</p></div>';
+    }
+  };
+
+  window.filterLogs = () => {
+    const s = document.getElementById('search').value.toLowerCase();
+    const f = allLogs.filter(l =>
+      (l.customerEmail||'').toLowerCase().includes(s) ||
+      (l.template||'').toLowerCase().includes(s) ||
+      (l.subject||'').toLowerCase().includes(s) ||
+      (l.customerId||'').toLowerCase().includes(s)
+    );
+    renderLogs(f); updateStats(f);
+  };
+
+  function renderLogs(logs) {
+    document.getElementById('count-badge').textContent = logs.length + ' email' + (logs.length!==1?'s':'');
+    if (!logs.length) { document.getElementById('log-container').innerHTML='<div class="empty"><div style="font-size:48px">📭</div><p>No emails found</p></div>'; return; }
+    const rows = logs.map(l => {
+      const ts = l.timestamp ? new Date(l.timestamp) : null;
+      const d  = ts ? ts.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      const ti = ts ? ts.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
+      const pill = l.status==='sent' ? '<span class="status-pill status-sent">✓ sent</span>' : '<span class="status-pill status-failed">✗ failed</span>';
+      return `<tr><td class="time-cell">${d}<br>${ti}</td><td><span class="template-chip">${l.template||'—'}</span></td><td class="email-cell" title="${l.customerEmail}">${l.customerEmail||'—'}</td><td class="subject-cell" title="${l.subject}">${l.subject||'—'}</td><td>${pill}</td><td class="error-cell" title="${l.error}">${l.error||''}</td></tr>`;
+    }).join('');
+    document.getElementById('log-container').innerHTML = '<table><thead><tr><th>Time</th><th>Template</th><th>Recipient</th><th>Subject</th><th>Status</th><th>Error</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  }
+
+  function updateStats(logs) {
+    const sent=logs.filter(l=>l.status==='sent').length, failed=logs.filter(l=>l.status==='failed').length;
+    document.getElementById('stat-total').textContent  = logs.length;
+    document.getElementById('stat-sent').textContent   = sent;
+    document.getElementById('stat-failed').textContent = failed;
+    document.getElementById('stat-rate').textContent   = logs.length ? Math.round(sent/logs.length*100)+'%' : '—';
+  }
+
+  window.createSheetTab = async () => {
+    try { const t=await token(); const r=await fetch(SHEET_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:'{}'}); const d=await r.json(); toast(d.message||'Done','success'); }
+    catch(e) { toast('Error: '+e.message,'error-t'); }
+  };
+
+  window.bulkSync = async () => {
+    toast('Syncing all customers…');
+    try { const t=await token(); const r=await fetch(BULK_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+t},body:'{}'}); const d=await r.json(); if(d.error) throw new Error(d.error); toast('✓ Synced '+d.synced+' customers ('+d.failed+' failed)','success'); }
+    catch(e) { toast('Sync failed: '+e.message,'error-t'); }
+  };
+
+  function toast(msg,cls='') { const t=document.getElementById('toast'); t.textContent=msg; t.className='show'+(cls?' '+cls:''); setTimeout(()=>t.className='',3000); }
+  setInterval(()=>{ if(auth.currentUser) loadLogs(); },60000);
+</script>
+</body>
+</html>

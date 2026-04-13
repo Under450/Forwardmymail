@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Can I Use a Virtual Address as My Registered Office? — Forwardmymail</title>
+<meta name="description" content="Since October 2023, Companies House requires all UK limited companies to have a registered office at an 'appropriate address.' Here's what that means and how a virtual address qualifies.">
+<link rel="icon" href="https://www.forwardmymail.co.uk/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:        #0d1b2e;
+    --navy-mid:    #162236;
+    --gold:        #c9972a;
+    --gold-light:  #e8b84b;
+    --cream:       #faf8f4;
+    --white:       #ffffff;
+    --text:        #1a2332;
+    --text-light:  #4a5568;
+    --muted:       #718096;
+    --border:      #e2ddd6;
+    --border-light:#eeebe5;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--navy);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .nav-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .nav-logo img { height: 36px; display: block; }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex: 1;
+    justify-content: center;
+  }
+  .nav-links a {
+    color: rgba(255,255,255,0.72);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: white; }
+  .nav-links a.active { color: var(--gold-light); font-weight: 500; }
+  .nav-actions { display: flex; align-items: center; gap: 12px; }
+  .nav-login {
+    color: rgba(255,255,255,0.72);
+    font-size: 13px;
+    text-decoration: none;
+    padding: 7px 14px;
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 6px;
+    transition: all 0.2s;
+  }
+  .nav-login:hover { border-color: rgba(255,255,255,0.4); color: white; }
+  .nav-cta {
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--gold-light); }
+
+  /* ── ARTICLE HERO ── */
+  .article-hero {
+    background: var(--navy);
+    padding: 56px 32px 52px;
+    position: relative;
+    overflow: hidden;
+  }
+  .article-hero::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -80px;
+    width: 500px; height: 300px;
+    background: radial-gradient(ellipse, rgba(201,151,42,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .article-hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201,151,42,0.25), transparent);
+  }
+  .article-hero-inner {
+    max-width: 760px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+  }
+  .breadcrumb a {
+    color: rgba(255,255,255,0.5);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .breadcrumb a:hover { color: var(--gold-light); }
+  .breadcrumb span { color: rgba(255,255,255,0.3); }
+  .breadcrumb-current { color: rgba(255,255,255,0.7); }
+  .article-tag-pill {
+    display: inline-block;
+    background: rgba(201,151,42,0.15);
+    border: 1px solid rgba(201,151,42,0.3);
+    color: var(--gold-light);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+  .article-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    color: white;
+    line-height: 1.18;
+    letter-spacing: -0.3px;
+    margin-bottom: 18px;
+  }
+  .article-hero-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+  .meta-item strong { color: rgba(255,255,255,0.75); }
+
+  /* ── ARTICLE LAYOUT ── */
+  .article-wrap {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 52px 32px 80px;
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 52px;
+    align-items: start;
+  }
+
+  /* ── ARTICLE BODY ── */
+  .article-body {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 48px 52px;
+  }
+
+  /* Lead paragraph */
+  .article-body .lead {
+    font-family: 'Source Serif 4', serif;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text-light);
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  /* Body copy */
+  .article-body h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 36px 0 14px;
+    line-height: 1.3;
+  }
+  .article-body h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 24px 0 10px;
+  }
+  .article-body p {
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px;
+    line-height: 1.78;
+    color: var(--text-light);
+    margin-bottom: 18px;
+  }
+  .article-body ul, .article-body ol {
+    margin: 0 0 18px 20px;
+  }
+  .article-body li {
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--text-light);
+    margin-bottom: 6px;
+  }
+  .article-body strong { color: var(--text); font-weight: 600; }
+
+  /* Callout box */
+  .callout {
+    background: #f0f7ff;
+    border-left: 4px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 18px 22px;
+    margin: 28px 0;
+  }
+  .callout p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    margin: 0;
+  }
+  .callout strong { color: var(--navy); }
+
+  /* Warning box */
+  .warning {
+    background: #fff8ed;
+    border-left: 4px solid #f59e0b;
+    border-radius: 0 8px 8px 0;
+    padding: 18px 22px;
+    margin: 28px 0;
+  }
+  .warning p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: #7c4a00;
+    margin: 0;
+  }
+
+  /* Summary table */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .summary-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .summary-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-light);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text-light);
+    vertical-align: top;
+  }
+  .summary-table tr:nth-child(even) td { background: var(--cream); }
+  .tick { color: #16a34a; font-weight: 700; }
+  .cross { color: #dc2626; font-weight: 700; }
+
+  /* Article CTA */
+  .article-cta {
+    background: var(--navy);
+    border-radius: 12px;
+    padding: 32px 36px;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .article-cta-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: white;
+    margin-bottom: 6px;
+  }
+  .article-cta-text p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    color: rgba(255,255,255,0.58);
+    line-height: 1.5;
+    margin: 0;
+  }
+  .article-cta-btn {
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .article-cta-btn:hover { background: var(--gold-light); }
+
+  /* Tags footer */
+  .article-tags {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .article-tags span { font-size: 13px; color: var(--muted); }
+  .article-tag-chip {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    color: var(--text-light);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .article-tag-chip:hover {
+    background: var(--navy);
+    color: white;
+    border-color: var(--navy);
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar { position: sticky; top: 88px; }
+
+  /* Table of contents */
+  .toc {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .toc-head {
+    background: var(--navy);
+    padding: 13px 20px;
+  }
+  .toc-head h3 { color: white; font-size: 13px; font-weight: 600; }
+  .toc-body { padding: 12px 0; }
+  .toc-body a {
+    display: block;
+    padding: 7px 20px;
+    font-size: 13px;
+    color: var(--text-light);
+    text-decoration: none;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+  }
+  .toc-body a:hover {
+    color: var(--navy);
+    background: var(--cream);
+    border-left-color: var(--gold);
+  }
+  .toc-body a.active {
+    color: var(--navy);
+    font-weight: 500;
+    border-left-color: var(--gold);
+  }
+
+  /* Related articles */
+  .widget {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .widget-head {
+    background: var(--navy);
+    padding: 13px 20px;
+  }
+  .widget-head h3 { color: white; font-size: 13px; font-weight: 600; }
+  .related-item {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border-light);
+    text-decoration: none;
+    display: block;
+    transition: background 0.15s;
+  }
+  .related-item:last-child { border-bottom: none; }
+  .related-item:hover { background: var(--cream); }
+  .related-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .related-item h4 {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--text);
+  }
+
+  /* Side CTA */
+  .side-cta {
+    background: var(--navy);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .side-cta h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .side-cta p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .side-cta-btn {
+    display: block;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 11px;
+    border-radius: 7px;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .side-cta-btn:hover { background: var(--gold-light); }
+  .side-cta-note { margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.3); }
+
+  /* ── RELATED POSTS SECTION ── */
+  .related-section {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+  .related-section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: var(--text);
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .related-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block;
+  }
+  .related-card:hover {
+    box-shadow: 0 8px 28px rgba(13,27,46,0.1);
+    transform: translateY(-2px);
+  }
+  .related-card-img {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+  }
+  .rc-1 { background: linear-gradient(135deg, #0d1b2e 0%, #1e3a6e 100%); }
+  .rc-2 { background: linear-gradient(135deg, #0f3d2e 0%, #1a5c42 100%); }
+  .rc-3 { background: linear-gradient(135deg, #2d1452 0%, #4a2080 100%); }
+  .related-card-body { padding: 16px 18px; }
+  .related-card-tag {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--gold);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .related-card-body h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.38;
+    color: var(--text);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.55);
+    padding: 48px 32px 32px;
+  }
+  .footer-inner { max-width: 1160px; margin: 0 auto; }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  .footer-brand img { height: 32px; margin-bottom: 14px; }
+  .footer-brand p { font-size: 13px; line-height: 1.65; max-width: 240px; }
+  .footer-col h4 { color: white; font-size: 13px; font-weight: 600; margin-bottom: 14px; }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 8px; }
+  .footer-col a { color: rgba(255,255,255,0.5); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-col a:hover { color: white; }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .article-wrap { grid-template-columns: 1fr; padding: 32px 20px 60px; gap: 28px; }
+    .sidebar { position: static; }
+    .article-body { padding: 28px 24px; }
+    .article-hero { padding: 40px 20px; }
+    .article-cta { flex-direction: column; text-align: center; }
+    .related-grid { grid-template-columns: 1fr; }
+    .related-section { padding: 0 20px 60px; }
+    .nav-links { display: none; }
+    .nav-inner { padding: 0 20px; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="https://www.forwardmymail.co.uk/">
+      <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
+    </a>
+    <div class="nav-links">
+      <a href="https://www.forwardmymail.co.uk/#how-it-works">How It Works</a>
+      <a href="https://www.forwardmymail.co.uk/#services">Services</a>
+      <a href="https://www.forwardmymail.co.uk/#pricing">Pricing</a>
+      <a href="blog.html" class="active">Blog & Guides</a>
+      <a href="https://www.forwardmymail.co.uk/#faqs">FAQs</a>
+      <a href="https://www.forwardmymail.co.uk/#contact">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="nav-login">Client Login</a>
+      <a href="https://www.forwardmymail.co.uk/#pricing" class="nav-cta">Get Started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ARTICLE HERO -->
+<section class="article-hero">
+  <div class="article-hero-inner">
+    <div class="breadcrumb">
+      <a href="https://www.forwardmymail.co.uk/">Home</a>
+      <span>›</span>
+      <a href="blog.html">Blog & Guides</a>
+      <span>›</span>
+      <span class="breadcrumb-current">Registered Office</span>
+    </div>
+    <div class="article-tag-pill">Registered Office</div>
+    <h1>Can I Use a Virtual Address as My Registered Office?</h1>
+    <div class="article-hero-meta">
+      <div class="meta-item">📅 <strong>8 April 2026</strong></div>
+      <div class="meta-item">⏱ <strong>6 min read</strong></div>
+      <div class="meta-item">✍️ <strong>Forwardmymail Team</strong></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTICLE CONTENT -->
+<div class="article-wrap">
+
+  <article class="article-body">
+
+    <p class="lead">
+      Since October 2023, Companies House rules require every UK limited company to have a registered office at an "appropriate address." A virtual address can qualify — but only if it's set up correctly. Here's exactly what the rules mean, what qualifies, and what to watch out for.
+    </p>
+
+    <h2 id="what-is">What Is a Registered Office?</h2>
+    <p>Your registered office is the official legal address of your UK limited company. It's the address that appears on the public Companies House register, where government bodies like HMRC and the courts will send statutory mail, and where legal notices can be served.</p>
+    <p>Every UK limited company must have one. It cannot be a PO box (on its own), and it must be in the same country as your company's registration — so an England & Wales company needs an England or Wales address.</p>
+
+    <div class="callout">
+      <p><strong>Key point:</strong> Your registered office doesn't need to be where you actually work. Most directors use a service address or virtual address for this purpose, especially to keep their home address private.</p>
+    </div>
+
+    <h2 id="appropriate">What Does "Appropriate Address" Mean?</h2>
+    <p>This is the change that came into force in October 2023 under the Economic Crime and Corporate Transparency Act 2023. Previously the rules were vague; now Companies House is explicit.</p>
+    <p>An appropriate address means one where:</p>
+    <ul>
+      <li>A document delivered to it would be expected to come to the attention of a person acting on behalf of the company</li>
+      <li>The delivery of documents can be recorded by obtaining an acknowledgement of delivery</li>
+    </ul>
+    <p>In plain English: <strong>someone at that address must actually receive your post and get it to you.</strong> A dead letterbox or unmanned address does not qualify.</p>
+
+    <div class="warning">
+      <p>⚠️ <strong>Important:</strong> If Companies House determines your registered office does not meet the "appropriate address" standard, they can change it to a default address — which will appear on the public register and may affect your company's standing.</p>
+    </div>
+
+    <h2 id="virtual-qualify">Does a Virtual Address Qualify?</h2>
+    <p>Yes — provided the virtual address provider actually receives your mail and forwards or scans it to you. That's the key requirement. A professional service like Forwardmymail satisfies this because:</p>
+    <ul>
+      <li>We physically receive mail at our Lichfield address</li>
+      <li>Official government mail (HMRC, Companies House, courts) is scanned and sent to you digitally</li>
+      <li>Delivery is recorded and can be confirmed</li>
+      <li>We are a named, staffed UK business centre — not a PO box</li>
+    </ul>
+
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>Address Type</th>
+          <th>Qualifies as Registered Office?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Professional virtual address (like Forwardmymail)</td><td><span class="tick">✓ Yes</span></td></tr>
+        <tr><td>Your home address</td><td><span class="tick">✓ Yes</span> (but becomes public)</td></tr>
+        <tr><td>Your accountant or solicitor's address</td><td><span class="tick">✓ Yes</span> (with their permission)</td></tr>
+        <tr><td>Unmanned PO box (standalone)</td><td><span class="cross">✗ No</span></td></tr>
+        <tr><td>Foreign address</td><td><span class="cross">✗ No</span> (must match country of registration)</td></tr>
+        <tr><td>Address where mail is never collected</td><td><span class="cross">✗ No</span></td></tr>
+      </tbody>
+    </table>
+
+    <h2 id="registered-vs-service">Registered Office vs Service Address — What's the Difference?</h2>
+    <p>These are two separate things, though both can use the same virtual address:</p>
+    <ul>
+      <li><strong>Registered office</strong> — the company's official address. Receives statutory mail addressed to the company.</li>
+      <li><strong>Director's service address</strong> — each director can have a separate service address, which appears on the public register instead of their home address. Receives correspondence addressed to that director personally.</li>
+    </ul>
+    <p>Our Registered Office plan covers both — the company registered office address and service address for one director.</p>
+
+    <h2 id="what-mail">What Mail Will Come to My Registered Office?</h2>
+    <p>You can expect to receive:</p>
+    <ul>
+      <li>Companies House — confirmation statement reminders, filing reminders, correspondence</li>
+      <li>HMRC — corporation tax notices, VAT correspondence, PAYE communications</li>
+      <li>Courts and legal notices</li>
+      <li>Any mail addressed to the company at its registered address</li>
+    </ul>
+    <p>With Forwardmymail, all official government mail is scanned and delivered free as part of the Registered Office plan.</p>
+
+    <h2 id="how-to-set-up">How to Set Up a Virtual Registered Office</h2>
+    <p>The process is straightforward:</p>
+    <ol>
+      <li><strong>Choose a registered office plan</strong> — our Registered Office plan at £225/year includes the address, official mail handling, and director service address.</li>
+      <li><strong>Complete ID verification</strong> — required under UK AML regulations. This takes a few minutes online.</li>
+      <li><strong>Update Companies House</strong> — log in to Companies House WebFiling and update your registered office address. This takes effect immediately.</li>
+      <li><strong>Notify HMRC</strong> — update your registered address with HMRC separately via your business tax account.</li>
+    </ol>
+
+    <div class="article-cta">
+      <div class="article-cta-text">
+        <h3>Ready to Get Your Registered Office Address?</h3>
+        <p>From £225/year. Includes official mail handling, director service address, and same-day setup.</p>
+      </div>
+      <a href="https://www.forwardmymail.co.uk/#pricing" class="article-cta-btn">View Plans →</a>
+    </div>
+
+    <div class="article-tags">
+      <span>Tagged:</span>
+      <a class="article-tag-chip" href="blog.html">Registered Office</a>
+      <a class="article-tag-chip" href="blog.html">Companies House</a>
+      <a class="article-tag-chip" href="blog.html">Virtual Address</a>
+      <a class="article-tag-chip" href="blog.html">UK Ltd Company</a>
+    </div>
+
+  </article>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <!-- Table of contents -->
+    <div class="toc">
+      <div class="toc-head"><h3>In this article</h3></div>
+      <div class="toc-body">
+        <a href="#what-is">What is a registered office?</a>
+        <a href="#appropriate">What does "appropriate address" mean?</a>
+        <a href="#virtual-qualify">Does a virtual address qualify?</a>
+        <a href="#registered-vs-service">Registered office vs service address</a>
+        <a href="#what-mail">What mail will come to my address?</a>
+        <a href="#how-to-set-up">How to set up a virtual registered office</a>
+      </div>
+    </div>
+
+    <!-- Side CTA -->
+    <div class="side-cta">
+      <h3>Get Your UK Business Address</h3>
+      <p>Professional address, registered office, and director privacy — from £9.99/month.</p>
+      <a href="https://www.forwardmymail.co.uk/#pricing" class="side-cta-btn">View Plans</a>
+      <div class="side-cta-note">No setup fee · Cancel anytime</div>
+    </div>
+
+    <!-- Related articles -->
+    <div class="widget">
+      <div class="widget-head"><h3>Related Guides</h3></div>
+      <a class="related-item" href="blog.html">
+        <div class="related-tag">Privacy</div>
+        <h4>How to Keep Your Home Address Off Companies House</h4>
+      </a>
+      <a class="related-item" href="blog.html">
+        <div class="related-tag">Companies House</div>
+        <h4>Virtual Address vs Registered Office: What's the Difference?</h4>
+      </a>
+      <a class="related-item" href="blog.html">
+        <div class="related-tag">HMRC</div>
+        <h4>Will HMRC Write to My Virtual Address?</h4>
+      </a>
+    </div>
+
+  </aside>
+</div>
+
+<!-- RELATED POSTS -->
+<div class="related-section">
+  <h2>More Guides</h2>
+  <div class="related-grid">
+    <a class="related-card" href="blog.html">
+      <div class="related-card-img rc-1">🔒</div>
+      <div class="related-card-body">
+        <span class="related-card-tag">Privacy</span>
+        <h3>How to Keep Your Home Address Off Companies House</h3>
+      </div>
+    </a>
+    <a class="related-card" href="blog.html">
+      <div class="related-card-img rc-2">📋</div>
+      <div class="related-card-body">
+        <span class="related-card-tag">Sole Traders</span>
+        <h3>Do Sole Traders Need a Business Address?</h3>
+      </div>
+    </a>
+    <a class="related-card" href="blog.html">
+      <div class="related-card-img rc-3">✉️</div>
+      <div class="related-card-body">
+        <span class="related-card-tag">HMRC</span>
+        <h3>Will HMRC Write to My Virtual Address?</h3>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
+        <p>Premium mail handling and virtual office services for businesses worldwide.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <ul>
+          <li><a href="https://www.forwardmymail.co.uk/#services">Mail Forwarding</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/#services">Digital Mailroom</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/#services">Registered Office</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/#services">Company Formation</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="https://www.forwardmymail.co.uk/#about">About Us</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/#pricing">Pricing</a></li>
+          <li><a href="blog.html">Blog & Guides</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="https://www.forwardmymail.co.uk/">Privacy Policy</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/">Terms & Conditions</a></li>
+          <li><a href="https://www.forwardmymail.co.uk/">Cookie Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Forwardmymail Ltd. Registered in England & Wales. Company No. 16912540</span>
+      <span>8a Bore Street, Lichfield, Staffordshire, WS13 6LL</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Highlight active TOC item on scroll
+  const sections = document.querySelectorAll('h2[id]');
+  const tocLinks = document.querySelectorAll('.toc-body a');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    tocLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+</script>
+</body>
+</html>
