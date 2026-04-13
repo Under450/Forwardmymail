@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forward My Mail — Hero Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #d8dce8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; font-family: 'Manrope', sans-serif; }
+.hero { background: #e8ecf5; padding: 56px 52px; border-radius: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 52px; align-items: center; max-width: 1100px; width: 100%; box-shadow: 0 30px 80px rgba(20,35,80,0.15); }
+.badge { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #3a4a6b; margin-bottom: 22px; }
+.badge-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; flex-shrink: 0; }
+h1 { font-size: 38px; font-weight: 800; color: #1e2d50; line-height: 1.13; margin: 0 0 18px; letter-spacing: -0.6px; }
+.intro { font-size: 15px; color: #4a5a7a; line-height: 1.75; margin: 0 0 18px; }
+.lichfield-para { font-size: 14px; color: #4a5a7a; line-height: 1.8; margin: 0 0 30px; padding: 15px 18px; border-left: 3px solid #5b7ec4; background: rgba(91,126,196,0.08); border-radius: 0 8px 8px 0; }
+.lichfield-para strong { color: #1e2d50; font-weight: 700; }
+.btns { display: flex; gap: 12px; margin-bottom: 26px; }
+.btn-p { background: #1e2d50; color: white; border: none; padding: 14px 26px; border-radius: 50px; font-size: 14px; font-weight: 600; font-family: 'Manrope', sans-serif; cursor: pointer; }
+.btn-o { background: transparent; color: #1e2d50; border: 1.5px solid #1e2d50; padding: 13px 26px; border-radius: 50px; font-size: 14px; font-weight: 600; font-family: 'Manrope', sans-serif; cursor: pointer; }
+.fns { display: flex; gap: 28px; }
+.fn { font-size: 13px; color: #4a5a7a; }
+.fn strong { color: #1e2d50; }
+.img-wrap { position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(20,35,80,0.22); height: 380px; }
+.img-wrap img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; display: block; filter: saturate(0.5) brightness(0.82) sepia(0.18) hue-rotate(195deg) contrast(1.08); }
+.img-overlay { position: absolute; inset: 0; background: linear-gradient(170deg, rgba(20,40,90,0.28) 0%, rgba(10,20,60,0.04) 50%, rgba(5,15,45,0.65) 100%); }
+.img-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 22px 24px; }
+.cap-title { font-size: 15px; font-weight: 700; color: white; margin: 0 0 4px; }
+.cap-sub { font-size: 12.5px; color: rgba(255,255,255,0.72); margin: 0; }
+.mockup-label { text-align: center; margin-top: 20px; font-size: 12px; color: #8a9ab8; letter-spacing: 0.05em; }
+</style>
+</head>
+<body>
+
+<div>
+  <div class="hero">
+    <div>
+      <div class="badge"><span class="badge-dot"></span> The UK's Trusted Virtual Address Service</div>
+      <h1>A Prestigious UK Business Address Wherever You Are.</h1>
+      <p class="intro">Secure mail forwarding, digital scanning, and official registered office services. Establish a professional presence at our UK business centre while we handle your incoming post.</p>
+      <div class="lichfield-para">
+        Our address is based in <strong>Lichfield, Staffordshire</strong> — one of England's oldest cities, with roots stretching back over <strong>1,300 years</strong> to 700 AD. Home to the magnificent three-spired Lichfield Cathedral, known as the "Ladies of the Vale", it is a thriving historic market city with outstanding transport links — giving your company a distinguished and credible UK address.
+      </div>
+      <div class="btns">
+        <button class="btn-p">Get Your Address</button>
+        <button class="btn-o">View Services</button>
+      </div>
+      <div class="fns">
+        <span class="fn"><strong>UK-based support</strong> during business hours</span>
+        <span class="fn"><strong>No hidden fees</strong>, clear pricing</span>
+      </div>
+    </div>
+    <div class="img-wrap">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Lichfield_Cathedral_Exterior_from_NE%2C_Staffordshire%2C_UK_-_Diliff.jpg/800px-Lichfield_Cathedral_Exterior_from_NE%2C_Staffordshire%2C_UK_-_Diliff.jpg"
+        alt="Lichfield Cathedral, Staffordshire"
+      />
+      <div class="img-overlay"></div>
+      <div class="img-caption">
+        <p class="cap-title">Lichfield Cathedral, Staffordshire</p>
+        <p class="cap-sub">Secure &amp; Confidential — Your prestigious UK business address</p>
+      </div>
+    </div>
+  </div>
+  <p class="mockup-label">MOCKUP — Forward My Mail hero section concept</p>
+</div>
+
+</body>
+</html>
