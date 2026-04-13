@@ -1,880 +1,1201 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Blog & Guides — Forwardmymail</title>
-<meta name="description" content="Expert guides on UK virtual addresses, registered office requirements, Companies House compliance and mail forwarding for directors, sole traders and entrepreneurs.">
-<link rel="icon" href="https://www.forwardmymail.co.uk/logo.png" type="image/png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:wght@300;400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  :root {
-    --navy:        #0d1b2e;
-    --navy-mid:    #162236;
-    --navy-light:  #1e3250;
-    --gold:        #c9972a;
-    --gold-light:  #e8b84b;
-    --gold-pale:   #fdf3dc;
-    --cream:       #faf8f4;
-    --white:       #ffffff;
-    --text:        #1a2332;
-    --text-light:  #4a5568;
-    --muted:       #718096;
-    --border:      #e2ddd6;
-    --border-light:#eeebe5;
-  }
+  <!-- ═══════════════════════════════════════════════════
+       SEO: Title & Meta
+  ═══════════════════════════════════════════════════ -->
+  <title>Leasehold Guides & Block Management News | Bergason Block Management</title>
+  <meta name="description" content="Plain-English guides on service charges, leasehold reform, Right to Manage, and reserve funds — plus live industry news. Written by the Bergason block management team, Lichfield.">
+  <meta name="keywords" content="block management, leasehold reform, service charges, right to manage, reserve fund, leaseholder rights, commonhold, Bergason, Lichfield, Midlands">
+  <meta name="author" content="Bergason Block Management">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="https://www.bergasonblockmanagement.co.uk/blog.html">
 
-  html { scroll-behavior: smooth; }
+  <!-- ═══════════════════════════════════════════════════
+       Open Graph (Facebook, LinkedIn, WhatsApp)
+  ═══════════════════════════════════════════════════ -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Leasehold Guides & Block Management News | Bergason">
+  <meta property="og:description" content="Plain-English guides on service charges, leasehold reform, Right to Manage, and reserve funds — plus live industry news from the Bergason team.">
+  <meta property="og:url" content="https://www.bergasonblockmanagement.co.uk/blog.html">
+  <meta property="og:site_name" content="Bergason Block Management">
+  <meta property="og:locale" content="en_GB">
+  <meta property="og:image" content="https://www.bergasonblockmanagement.co.uk/og-blog.jpg">
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--text);
-    -webkit-font-smoothing: antialiased;
-  }
+  <!-- ═══════════════════════════════════════════════════
+       Twitter / X Card
+  ═══════════════════════════════════════════════════ -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Leasehold Guides & Block Management News | Bergason">
+  <meta name="twitter:description" content="Plain-English guides on leasehold reform, service charges, Right to Manage and more. Live news from the block management sector.">
+  <meta name="twitter:image" content="https://www.bergasonblockmanagement.co.uk/og-blog.jpg">
 
-  /* ── NAV — matches live site exactly ── */
-  nav {
-    background: var(--navy);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-  }
-  .nav-inner {
-    max-width: 1160px;
-    margin: 0 auto;
-    padding: 0 32px;
-    height: 68px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-  }
-  .nav-logo img { height: 36px; display: block; }
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    flex: 1;
-    justify-content: center;
-  }
-  .nav-links a {
-    color: rgba(255,255,255,0.72);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 400;
-    transition: color 0.2s;
-    white-space: nowrap;
-  }
-  .nav-links a:hover { color: white; }
-  .nav-links a.active { color: var(--gold-light); font-weight: 500; }
-  .nav-actions { display: flex; align-items: center; gap: 12px; }
-  .nav-login {
-    color: rgba(255,255,255,0.72);
-    font-size: 13px;
-    text-decoration: none;
-    padding: 7px 14px;
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 6px;
-    transition: all 0.2s;
-  }
-  .nav-login:hover { border-color: rgba(255,255,255,0.4); color: white; }
-  .nav-cta {
-    background: var(--gold);
-    color: var(--navy);
-    font-size: 13px;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 6px;
-    text-decoration: none;
-    transition: background 0.2s;
-    white-space: nowrap;
-  }
-  .nav-cta:hover { background: var(--gold-light); }
+  <!-- ═══════════════════════════════════════════════════
+       RSS Discovery (AI crawlers + feed readers)
+  ═══════════════════════════════════════════════════ -->
+  <link rel="alternate" type="application/rss+xml" title="Bergason Block Management – Insights" href="https://www.bergasonblockmanagement.co.uk/feed.xml">
 
-  /* ── HERO ── */
-  .hero {
-    background: var(--navy);
-    padding: 72px 32px 64px;
-    position: relative;
-    overflow: hidden;
+  <!-- ═══════════════════════════════════════════════════
+       JSON-LD STRUCTURED DATA (@graph — single block)
+       Types: Organization · LocalBusiness · CollectionPage
+              BreadcrumbList · ItemList · FAQPage
+  ═══════════════════════════════════════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": ["Organization","LocalBusiness"],
+        "@id": "https://www.bergasonblockmanagement.co.uk/#organization",
+        "name": "Bergason Block Management",
+        "url": "https://www.bergasonblockmanagement.co.uk",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.bergasonblockmanagement.co.uk/logo.png"
+        },
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "8a Bore Street",
+          "addressLocality": "Lichfield",
+          "addressRegion": "Staffordshire",
+          "postalCode": "WS13 6LL",
+          "addressCountry": "GB"
+        },
+        "areaServed": "Midlands, UK",
+        "description": "Bergason Block Management provides residential block and estate management services across the Midlands, including service charge administration, major works, leaseholder communications, and compliance."
+      },
+      {
+        "@type": "CollectionPage",
+        "@id": "https://www.bergasonblockmanagement.co.uk/blog.html#collectionpage",
+        "url": "https://www.bergasonblockmanagement.co.uk/blog.html",
+        "name": "Leasehold Guides & Block Management News",
+        "description": "Plain-English guides on service charges, leasehold reform, Right to Manage, reserve funds and leaseholder rights — written by the Bergason block management team.",
+        "inLanguage": "en-GB",
+        "publisher": {
+          "@id": "https://www.bergasonblockmanagement.co.uk/#organization"
+        },
+        "breadcrumb": {
+          "@id": "https://www.bergasonblockmanagement.co.uk/blog.html#breadcrumb"
+        },
+        "mainEntity": {
+          "@id": "https://www.bergasonblockmanagement.co.uk/blog.html#itemlist"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://www.bergasonblockmanagement.co.uk/blog.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.bergasonblockmanagement.co.uk"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Insights & Guides",
+            "item": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          }
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "@id": "https://www.bergasonblockmanagement.co.uk/blog.html#itemlist",
+        "name": "Leasehold Guides by Bergason",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "The 2026 Commonhold Bill: What Every Leaseholder Needs to Know",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "How to Challenge a Service Charge You Think Is Unreasonable",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Ground Rent Caps Are Coming — Here's Where You Stand Right Now",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "RTM in 2026: Mixed-Use Buildings Now Qualify",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 5,
+            "name": "Your Reserve Fund Belongs to You — Not Your Managing Agent",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 6,
+            "name": "Section 20: Your Right to Be Consulted Before Major Works Start",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 7,
+            "name": "Buildings Insurance Transparency: New Rights to See What You're Paying For",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 8,
+            "name": "Buying a New Flat in 2026: The Day-One Rights That Did Not Exist Before",
+            "url": "https://www.bergasonblockmanagement.co.uk/blog.html"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://www.bergasonblockmanagement.co.uk/blog.html#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Can I challenge a service charge I think is too high?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Every variable service charge must be reasonably incurred. If you believe a cost is excessive, unjustified, or for substandard work, you can apply to the First-tier Tribunal (Property Chamber) for a formal determination. You should pay under protest first rather than simply withhold payment."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Commonhold and Leasehold Reform Bill 2026?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Draft Commonhold and Leasehold Reform Bill was published on 27 January 2026. It proposes to cap ground rents at £250 per year (falling to zero after 40 years), ban leasehold for new flats, and make commonhold the default ownership structure for new developments. The Bill is currently under pre-legislative scrutiny in Parliament."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the Right to Manage and who qualifies in 2026?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The Right to Manage (RTM) allows leaseholders to take over management of their building without buying the freehold. Since March 2025, leaseholders in thousands more mixed-use buildings qualify, and they are no longer required to pay the freeholder's legal costs when making a claim."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does my managing agent have to consult me before major works?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Under Section 20 of the Landlord and Tenant Act 1985, if any qualifying works contract would require you to contribute more than £250, your managing agent must consult you before signing that contract. This includes the right to nominate contractors for invitation to tender. If consultation is bypassed, the managing agent cannot recover more than £250 per leaseholder for those works."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is a reserve fund and who does the money belong to?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A reserve fund (also called a sinking fund) is built from regular leaseholder contributions to pay for major future expenditure such as roof replacement or lift refurbishment. The money is held on trust for leaseholders collectively — it does not belong to the managing agent. When a managing agent changes, the reserve fund balance must be transferred in full."
+            }
+          }
+        ]
+      }
+    ]
   }
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: -60px; left: 50%;
-    transform: translateX(-50%);
-    width: 700px; height: 400px;
-    background: radial-gradient(ellipse, rgba(201,151,42,0.13) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(201,151,42,0.3), transparent);
-  }
-  .hero-inner {
-    max-width: 680px;
-    margin: 0 auto;
-    text-align: center;
-    position: relative;
-  }
-  .hero-eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(201,151,42,0.12);
-    border: 1px solid rgba(201,151,42,0.25);
-    color: var(--gold-light);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-    padding: 5px 14px;
-    border-radius: 20px;
-    margin-bottom: 24px;
-  }
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 5vw, 52px);
-    font-weight: 700;
-    color: white;
-    line-height: 1.12;
-    letter-spacing: -0.5px;
-    margin-bottom: 18px;
-  }
-  .hero h1 em {
-    font-style: italic;
-    color: var(--gold-light);
-  }
-  .hero p {
-    color: rgba(255,255,255,0.58);
-    font-size: 17px;
-    line-height: 1.65;
-    max-width: 520px;
-    margin: 0 auto;
-  }
+  </script>
 
-  /* ── LAYOUT ── */
-  .page {
-    max-width: 1160px;
-    margin: 0 auto;
-    padding: 56px 32px 80px;
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 52px;
-    align-items: start;
-  }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
 
-  /* ── FILTER BAR ── */
-  .filter-bar {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 40px;
-    flex-wrap: wrap;
-  }
-  .chip {
-    padding: 7px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid var(--border);
-    background: white;
-    color: var(--muted);
-    transition: all 0.15s;
-    user-select: none;
-  }
-  .chip.active {
-    background: var(--navy);
-    color: white;
-    border-color: var(--navy);
-  }
-  .chip:hover:not(.active) {
-    border-color: var(--navy);
-    color: var(--navy);
-  }
+  <style>
+    /* ═══════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Source Sans 3', sans-serif;
+      background: #f9f7f3;
+      color: #2a2318;
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: inherit; }
 
-  /* ── FEATURED ── */
-  .featured {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    overflow: hidden;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    margin-bottom: 32px;
-    transition: box-shadow 0.2s;
-  }
-  .featured:hover {
-    box-shadow: 0 12px 40px rgba(13,27,46,0.1);
-  }
-  .featured-visual {
-    background: linear-gradient(140deg, var(--navy) 0%, #1e3a5f 50%, var(--navy-light) 100%);
-    min-height: 280px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    padding: 32px;
-  }
-  .featured-badge {
-    position: absolute;
-    top: 20px; left: 20px;
-    background: var(--gold);
-    color: var(--navy);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 4px;
-  }
-  .featured-icon {
-    font-size: 72px;
-    opacity: 0.18;
-    filter: grayscale(1) brightness(3);
-  }
-  .featured-content {
-    padding: 40px 36px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  .article-meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .tag {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.7px;
-    text-transform: uppercase;
-    color: var(--gold);
-  }
-  .meta-dot { color: var(--border); }
-  .meta-date { font-size: 12px; color: var(--muted); }
-  .featured-content h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    line-height: 1.28;
-    margin-bottom: 14px;
-    color: var(--text);
-  }
-  .featured-content p {
-    font-size: 14px;
-    color: var(--text-light);
-    line-height: 1.7;
-    margin-bottom: 24px;
-  }
-  .read-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--navy);
-    text-decoration: none;
-    border-bottom: 2px solid var(--gold);
-    padding-bottom: 1px;
-    transition: color 0.2s;
-  }
-  .read-link:hover { color: var(--gold); }
-  .read-link::after { content: '→'; }
+    /* ═══════════════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════════════ */
+    .nav {
+      background: #1a1408;
+      padding: 0 2rem;
+      height: 58px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      border-bottom: 1px solid rgba(217,164,100,0.2);
+    }
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      color: #d9a464;
+      text-decoration: none;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.8rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #a09070;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover,
+    .nav-links a[aria-current="page"] { color: #d9a464; }
+    .nav-cta {
+      background: #d9a464;
+      color: #1a1408 !important;
+      padding: 7px 16px;
+      font-weight: 600;
+    }
+    .nav-cta:hover { background: #c8924a; }
 
-  /* ── ARTICLE GRID ── */
-  .article-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-  .article-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: box-shadow 0.2s, transform 0.2s;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-  .article-card:hover {
-    box-shadow: 0 8px 28px rgba(13,27,46,0.1);
-    transform: translateY(-3px);
-  }
-  .card-visual {
-    height: 116px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 36px;
-  }
-  .cv-1 { background: linear-gradient(135deg, #0f3d2e 0%, #1a5c42 100%); }
-  .cv-2 { background: linear-gradient(135deg, #0d1b2e 0%, #1e3a6e 100%); }
-  .cv-3 { background: linear-gradient(135deg, #2d1452 0%, #4a2080 100%); }
-  .cv-4 { background: linear-gradient(135deg, #1a2e0d 0%, #2e5c1a 100%); }
-  .cv-5 { background: linear-gradient(135deg, #2e1a0d 0%, #5c3a1a 100%); }
-  .cv-6 { background: linear-gradient(135deg, #0d2a2e 0%, #1a5058 100%); }
-  .card-body { padding: 18px 18px 16px; }
-  .card-body .tag { display: block; margin-bottom: 7px; }
-  .card-body h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.38;
-    margin-bottom: 8px;
-    color: var(--text);
-  }
-  .card-body p {
-    font-size: 13px;
-    color: var(--text-light);
-    line-height: 1.6;
-    margin-bottom: 14px;
-  }
-  .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 10px;
-    border-top: 1px solid var(--border-light);
-    font-size: 11px;
-    color: var(--muted);
-  }
+    /* ═══════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════ */
+    .hero {
+      background: #1a1408;
+      padding: 56px 2rem 48px;
+      text-align: center;
+      border-bottom: 3px solid #d9a464;
+    }
+    .hero-breadcrumb {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #6a5a40;
+      margin-bottom: 20px;
+    }
+    .hero-breadcrumb a { color: #8a7a5a; text-decoration: none; }
+    .hero-breadcrumb a:hover { color: #d9a464; }
+    .hero-eyebrow {
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #d9a464;
+      margin-bottom: 14px;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(26px, 4vw, 42px);
+      color: #f5ece0;
+      font-weight: 600;
+      line-height: 1.2;
+      margin-bottom: 14px;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-sub {
+      font-size: 15px;
+      color: #7a6a54;
+      max-width: 540px;
+      margin: 0 auto 28px;
+    }
 
-  /* ── SIDEBAR ── */
-  .sidebar { position: sticky; top: 88px; }
+    /* Filter chips */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .chip {
+      padding: 6px 16px;
+      border-radius: 2px;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid rgba(217,164,100,0.3);
+      background: transparent;
+      color: #8a7a5a;
+      user-select: none;
+    }
+    .chip:hover { border-color: #d9a464; color: #d9a464; }
+    .chip.active { background: #d9a464; color: #1a1408; border-color: #d9a464; }
 
-  /* News feed */
-  .widget {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-  .widget-head {
-    background: var(--navy);
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .widget-head h3 {
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-  }
-  .live-badge {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 11px;
-    color: var(--gold-light);
-    font-weight: 500;
-  }
-  .live-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #4ade80;
-    animation: livepulse 2.2s ease-in-out infinite;
-  }
-  @keyframes livepulse {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.35; transform: scale(0.8); }
-  }
+    /* ═══════════════════════════════════════════════════
+       TWO-COLUMN LAYOUT
+    ═══════════════════════════════════════════════════ */
+    .layout {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 44px 2rem 60px;
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 48px;
+      align-items: start;
+    }
 
-  /* News items — JS populates these */
-  #news-feed { min-height: 200px; }
-  .news-item {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--border-light);
-    cursor: pointer;
-    transition: background 0.15s;
-    text-decoration: none;
-    display: block;
-    color: inherit;
-  }
-  .news-item:last-child { border-bottom: none; }
-  .news-item:hover { background: var(--cream); }
-  .news-source {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--gold);
-    margin-bottom: 4px;
-  }
-  .news-item h4 {
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.45;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .news-item time { font-size: 11px; color: var(--muted); }
-  .news-loading {
-    padding: 24px 20px;
-    text-align: center;
-    font-size: 13px;
-    color: var(--muted);
-  }
-  .news-error {
-    padding: 16px 20px;
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
+    /* ═══════════════════════════════════════════════════
+       FEATURED ARTICLE
+    ═══════════════════════════════════════════════════ */
+    .featured {
+      background: #fff;
+      border: 1px solid #e4d8c4;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      margin-bottom: 36px;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.2s;
+    }
+    .featured:hover { box-shadow: 0 4px 24px rgba(26,20,8,0.08); }
+    .featured-img {
+      background: #1a1408;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      position: relative;
+    }
+    .featured-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: #d9a464;
+      color: #1a1408;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      font-weight: 600;
+    }
+    .featured-img svg { opacity: 0.14; }
+    .featured-body { padding: 32px; }
+    .featured-tag {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #d9a464;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .featured-meta {
+      font-size: 11px;
+      color: #a09070;
+      margin-bottom: 12px;
+    }
+    .featured-body h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: #1a1408;
+      margin-bottom: 10px;
+    }
+    .featured-body > p {
+      font-size: 13px;
+      color: #6a5a44;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .inline-cta-box {
+      background: #faf5ec;
+      border-left: 3px solid #d9a464;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    .inline-cta-box p {
+      font-size: 13px;
+      color: #4a3a24;
+      margin-bottom: 10px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .btn-gold {
+      display: inline-block;
+      background: #d9a464;
+      color: #1a1408;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .btn-gold:hover { background: #c8924a; }
+    .read-link {
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #d9a464;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .read-link:hover { color: #c8924a; }
 
-  /* CTA widget */
-  .cta-widget {
-    background: var(--navy);
-    border-radius: 14px;
-    padding: 28px 24px;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .cta-widget h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 21px;
-    color: white;
-    line-height: 1.25;
-    margin-bottom: 10px;
-  }
-  .cta-widget p {
-    font-size: 13px;
-    color: rgba(255,255,255,0.58);
-    line-height: 1.65;
-    margin-bottom: 20px;
-  }
-  .cta-btn {
-    display: block;
-    background: var(--gold);
-    color: var(--navy);
-    text-align: center;
-    padding: 13px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    transition: background 0.2s;
-  }
-  .cta-btn:hover { background: var(--gold-light); }
-  .cta-note { margin-top: 10px; font-size: 12px; color: rgba(255,255,255,0.35); }
+    /* ═══════════════════════════════════════════════════
+       SECTION HEADING
+    ═══════════════════════════════════════════════════ */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-heading span {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #d9a464;
+      white-space: nowrap;
+    }
+    .section-heading-line { flex: 1; height: 1px; background: #e4d8c4; }
 
-  /* Topics */
-  .topics-body { padding: 16px 18px; display: flex; flex-wrap: wrap; gap: 8px; }
-  .topic {
-    background: var(--cream);
-    border: 1px solid var(--border);
-    color: var(--text-light);
-    font-size: 12px;
-    padding: 5px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .topic:hover { background: var(--navy); color: white; border-color: var(--navy); }
+    /* ═══════════════════════════════════════════════════
+       ARTICLE GRID
+    ═══════════════════════════════════════════════════ */
+    .articles-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: #e4d8c4;
+      margin-bottom: 36px;
+    }
+    .article-card {
+      background: #fff;
+      padding: 24px;
+      border-bottom: 3px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .article-card:hover {
+      background: #faf5ec;
+      border-bottom-color: #d9a464;
+    }
+    .article-tag {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #d9a464;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .article-meta {
+      font-size: 11px;
+      color: #a09070;
+      margin-bottom: 8px;
+    }
+    .article-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #1a1408;
+      margin-bottom: 8px;
+    }
+    .article-card > p {
+      font-size: 13px;
+      color: #6a5a44;
+      line-height: 1.65;
+      margin-bottom: 14px;
+    }
+    .article-inline-cta {
+      background: #faf5ec;
+      border-left: 2px solid #d9a464;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: #4a3a24;
+      line-height: 1.5;
+    }
+    .article-inline-cta a {
+      color: #d9a464;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .article-inline-cta a:hover { color: #c8924a; }
+    .article-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .article-read { font-size: 11px; color: #b0a080; }
 
-  /* ── FOOTER — matches live site ── */
-  footer {
-    background: var(--navy);
-    color: rgba(255,255,255,0.55);
-    padding: 48px 32px 32px;
-  }
-  .footer-inner {
-    max-width: 1160px;
-    margin: 0 auto;
-  }
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 40px;
-    margin-bottom: 40px;
-  }
-  .footer-brand img { height: 32px; margin-bottom: 14px; }
-  .footer-brand p { font-size: 13px; line-height: 1.65; max-width: 240px; }
-  .footer-col h4 {
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-    margin-bottom: 14px;
-  }
-  .footer-col ul { list-style: none; }
-  .footer-col li { margin-bottom: 8px; }
-  .footer-col a {
-    color: rgba(255,255,255,0.5);
-    text-decoration: none;
-    font-size: 13px;
-    transition: color 0.2s;
-  }
-  .footer-col a:hover { color: white; }
-  .footer-bottom {
-    border-top: 1px solid rgba(255,255,255,0.08);
-    padding-top: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-  }
+    /* ═══════════════════════════════════════════════════
+       FAQ SECTION (visible — also feeds structured data)
+    ═══════════════════════════════════════════════════ */
+    .faq-section {
+      background: #fff;
+      border: 1px solid #e4d8c4;
+      padding: 32px;
+      margin-bottom: 36px;
+    }
+    .faq-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      color: #1a1408;
+      margin-bottom: 24px;
+      font-weight: 600;
+    }
+    .faq-item { border-top: 1px solid #f0e8d8; padding: 16px 0; }
+    .faq-item:first-of-type { border-top: none; }
+    .faq-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1408;
+      margin-bottom: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      line-height: 1.4;
+    }
+    .faq-q::after {
+      content: '+';
+      font-size: 20px;
+      color: #d9a464;
+      flex-shrink: 0;
+      line-height: 1;
+      margin-top: 1px;
+    }
+    .faq-q.open::after { content: '−'; }
+    .faq-a {
+      font-size: 13px;
+      color: #6a5a44;
+      line-height: 1.7;
+      display: none;
+      padding-top: 4px;
+    }
+    .faq-a.open { display: block; }
 
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .page { grid-template-columns: 1fr; padding: 40px 20px 60px; }
-    .sidebar { position: static; }
-    .featured { grid-template-columns: 1fr; }
-    .featured-visual { min-height: 160px; }
-    .article-grid { grid-template-columns: 1fr; }
-    .nav-links { display: none; }
-    .nav-inner { padding: 0 20px; }
-    .hero { padding: 56px 20px 48px; }
-    .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px; }
-    .footer-inner { padding: 0; }
-  }
-  @media (max-width: 480px) {
-    .footer-grid { grid-template-columns: 1fr; }
-    .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
-  }
-</style>
+    /* ═══════════════════════════════════════════════════
+       CTA BANNER
+    ═══════════════════════════════════════════════════ */
+    .cta-banner {
+      background: #1a1408;
+      padding: 36px 32px;
+      margin-bottom: 36px;
+      border-left: 4px solid #d9a464;
+    }
+    .cta-banner-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #d9a464;
+      margin-bottom: 10px;
+    }
+    .cta-banner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: #f5ece0;
+      font-weight: 600;
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+    .cta-banner > p {
+      font-size: 13px;
+      color: #7a6a54;
+      margin-bottom: 20px;
+      max-width: 540px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════════════════════════ */
+    .sidebar-block {
+      background: #fff;
+      border: 1px solid #e4d8c4;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .sidebar-block-title {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #d9a464;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f0e8d8;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #c0392b;
+      display: inline-block;
+      flex-shrink: 0;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.25;} }
+
+    /* News items */
+    .news-item {
+      padding: 10px 0;
+      border-bottom: 1px solid #f5efe5;
+    }
+    .news-item:last-child { border-bottom: none; }
+    .news-item a {
+      font-size: 13px;
+      color: #2a2318;
+      text-decoration: none;
+      line-height: 1.4;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .news-item a:hover { color: #d9a464; }
+    .news-item-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .news-item-date { font-size: 11px; color: #a09070; }
+    .news-item-source {
+      font-size: 10px;
+      color: #d9a464;
+      letter-spacing: 0.05em;
+      background: #faf5ec;
+      padding: 1px 6px;
+    }
+    #news-loading { font-size: 13px; color: #a09070; text-align: center; padding: 16px 0; }
+    #news-error { font-size: 13px; color: #6a5a44; }
+    #news-error a { color: #d9a464; }
+
+    /* Sidebar CTA */
+    .sidebar-cta {
+      background: #d9a464;
+      padding: 22px;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .sidebar-cta h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1408;
+      margin-bottom: 6px;
+    }
+    .sidebar-cta p { font-size: 12px; color: #5a3a10; margin-bottom: 14px; line-height: 1.5; }
+    .sidebar-cta a {
+      display: block;
+      background: #1a1408;
+      color: #d9a464;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 11px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .sidebar-cta a:hover { background: #2a2010; }
+    .sidebar-cta-sub { font-size: 10px; color: #7a5820; margin-top: 8px; }
+
+    /* Topic tags */
+    .topic-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .topic-tag {
+      font-size: 11px;
+      color: #6a5a44;
+      background: #f5f0e8;
+      padding: 4px 10px;
+      border: 1px solid #e4d8c4;
+      cursor: default;
+    }
+    .topic-tag:hover { background: #d9a464; color: #1a1408; border-color: #d9a464; }
+
+    /* ═══════════════════════════════════════════════════
+       NEWSLETTER
+    ═══════════════════════════════════════════════════ */
+    .newsletter {
+      background: #1a1408;
+      padding: 52px 2rem;
+      text-align: center;
+    }
+    .newsletter-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: #d9a464;
+      margin-bottom: 12px;
+    }
+    .newsletter h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      color: #f5ece0;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .newsletter > p { font-size: 13px; color: #7a6a54; margin-bottom: 24px; }
+    .newsletter-form { display: flex; max-width: 420px; margin: 0 auto; }
+    .newsletter-input {
+      flex: 1;
+      padding: 13px 14px;
+      background: #2a1f0e;
+      border: 1px solid rgba(217,164,100,0.3);
+      border-right: none;
+      color: #f5ece0;
+      font-size: 13px;
+      font-family: 'Source Sans 3', sans-serif;
+      outline: none;
+    }
+    .newsletter-input::placeholder { color: #6a5a44; }
+    .newsletter-btn {
+      padding: 13px 22px;
+      background: #d9a464;
+      border: none;
+      color: #1a1408;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Source Sans 3', sans-serif;
+      transition: background 0.2s;
+    }
+    .newsletter-btn:hover { background: #c8924a; }
+
+    /* ═══════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════ */
+    footer {
+      background: #120e07;
+      padding: 24px 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      border-top: 1px solid rgba(217,164,100,0.15);
+    }
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 13px;
+      color: #d9a464;
+      text-decoration: none;
+    }
+    .footer-copy { font-size: 11px; color: #5a4a34; }
+    .footer-link { font-size: 11px; color: #6a5a44; text-decoration: none; }
+    .footer-link:hover { color: #d9a464; }
+
+    /* ═══════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { order: -1; }
+      .featured { grid-template-columns: 1fr; }
+      .articles-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero { padding: 40px 1.25rem 36px; }
+      .layout { padding: 28px 1.25rem 40px; }
+      .newsletter { padding: 40px 1.25rem; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-input { border-right: 1px solid rgba(217,164,100,0.3); border-bottom: none; }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- NAV -->
-<nav>
-  <div class="nav-inner">
-    <a class="nav-logo" href="https://www.forwardmymail.co.uk/">
-      <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
-    </a>
-    <div class="nav-links">
-      <a href="https://www.forwardmymail.co.uk/#how-it-works">How It Works</a>
-      <a href="https://www.forwardmymail.co.uk/#services">Services</a>
-      <a href="https://www.forwardmymail.co.uk/#pricing">Pricing</a>
-      <a href="blog.html" class="active">Blog & Guides</a>
-      <a href="https://www.forwardmymail.co.uk/#faqs">FAQs</a>
-      <a href="https://www.forwardmymail.co.uk/#contact">Contact</a>
+  <!-- ═══════════════════════════════════════════════
+       NAVIGATION
+  ═══════════════════════════════════════════════ -->
+  <nav class="nav" aria-label="Main navigation">
+    <a class="nav-logo" href="https://www.bergasonblockmanagement.co.uk" aria-label="Bergason Block Management home">Bergason Block Management</a>
+    <ul class="nav-links" role="list">
+      <li><a href="https://www.bergasonblockmanagement.co.uk">Home</a></li>
+      <li><a href="https://www.bergasonblockmanagement.co.uk/#services">Services</a></li>
+      <li><a href="https://www.bergasonblockmanagement.co.uk/#about">About</a></li>
+      <li><a href="https://www.bergasonblockmanagement.co.uk/blog.html" aria-current="page">Insights</a></li>
+      <li><a href="https://www.bergasonblockmanagement.co.uk/#contact" class="nav-cta">Contact Us</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════════════════════════════════════════════
+       HERO
+  ═══════════════════════════════════════════════ -->
+  <header class="hero">
+    <nav class="hero-breadcrumb" aria-label="Breadcrumb">
+      <a href="https://www.bergasonblockmanagement.co.uk">Home</a>
+      <span aria-hidden="true">›</span>
+      <span aria-current="page">Insights &amp; Guides</span>
+    </nav>
+    <p class="hero-eyebrow">Bergason Insights</p>
+    <h1>Guidance and updates for those who manage and live in leasehold properties.</h1>
+    <p class="hero-sub">Plain-English guides on service charges, leasehold reform, and your rights — plus live news from the block management sector.</p>
+    <div class="filter-bar" role="group" aria-label="Filter articles by topic">
+      <div class="chip active" data-cat="all" role="button" tabindex="0" aria-pressed="true">All</div>
+      <div class="chip" data-cat="reform" role="button" tabindex="0" aria-pressed="false">Leasehold Reform</div>
+      <div class="chip" data-cat="charges" role="button" tabindex="0" aria-pressed="false">Service Charges</div>
+      <div class="chip" data-cat="safety" role="button" tabindex="0" aria-pressed="false">Building Safety</div>
+      <div class="chip" data-cat="rtm" role="button" tabindex="0" aria-pressed="false">Right to Manage</div>
+      <div class="chip" data-cat="reserve" role="button" tabindex="0" aria-pressed="false">Reserve Funds</div>
+      <div class="chip" data-cat="guides" role="button" tabindex="0" aria-pressed="false">Leaseholder Guides</div>
     </div>
-    <div class="nav-actions">
-      <a href="https://www.forwardmymail.co.uk/customer-portal.html" class="nav-login">Client Login</a>
-      <a href="https://www.forwardmymail.co.uk/#pricing" class="nav-cta">Get Started</a>
-    </div>
-  </div>
-</nav>
+  </header>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="hero-eyebrow">📚 Knowledge Hub</div>
-    <h1>UK Business Address<br><em>Guides & News</em></h1>
-    <p>Practical, plain-English advice for directors, sole traders, and entrepreneurs on virtual addresses, Companies House compliance, and running a UK company from anywhere.</p>
-  </div>
-</section>
+  <!-- ═══════════════════════════════════════════════
+       TWO-COLUMN LAYOUT
+  ═══════════════════════════════════════════════ -->
+  <div class="layout">
+    <main id="main-content">
 
-<!-- MAIN CONTENT -->
-<div class="page">
-
-  <main>
-    <!-- Filter chips -->
-    <div class="filter-bar" id="filter-bar">
-      <div class="chip active" data-filter="all">All</div>
-      <div class="chip" data-filter="registered-office">Registered Office</div>
-      <div class="chip" data-filter="sole-traders">Sole Traders</div>
-      <div class="chip" data-filter="companies-house">Companies House</div>
-      <div class="chip" data-filter="privacy">Privacy</div>
-      <div class="chip" data-filter="hmrc">HMRC</div>
-    </div>
-
-    <!-- Featured article -->
-    <a class="featured" href="article.html" data-category="registered-office">
-      <div class="featured-visual">
-        <div class="featured-badge">⭐ Featured</div>
-        <div class="featured-icon">🏢</div>
-      </div>
-      <div class="featured-content">
-        <div class="article-meta">
-          <span class="tag">Registered Office</span>
-          <span class="meta-dot">·</span>
-          <span class="meta-date">8 April 2026</span>
-          <span class="meta-dot">·</span>
-          <span class="meta-date">6 min read</span>
+      <!-- FEATURED -->
+      <article class="featured" data-cat="reform" aria-label="Featured guide: The 2026 Commonhold Bill">
+        <div class="featured-img" aria-hidden="true">
+          <span class="featured-badge">Featured Guide</span>
+          <svg width="140" height="140" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+            <rect x="20" y="10" width="100" height="120" stroke="#d9a464" stroke-width="1.5"/>
+            <rect x="35" y="28" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="62" y="28" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="89" y="28" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="35" y="60" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="62" y="60" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="89" y="60" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="35" y="92" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="62" y="92" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+            <rect x="89" y="92" width="16" height="18" stroke="#d9a464" stroke-width="1"/>
+          </svg>
         </div>
-        <h2>Can I Use a Virtual Address as My Registered Office?</h2>
-        <p>Since October 2023, Companies House requires all UK limited companies to have a registered office at an "appropriate address." Here's exactly what that means and how a virtual address qualifies — and what happens if yours doesn't.</p>
-        <span class="read-link">Read article</span>
-      </div>
-    </a>
-
-    <!-- Article grid -->
-    <div class="article-grid" id="article-grid">
-
-      <a class="article-card" href="article.html" data-category="privacy">
-        <div class="card-visual cv-2">🔒</div>
-        <div class="card-body">
-          <span class="tag">Privacy</span>
-          <h3>How to Keep Your Home Address Off Companies House</h3>
-          <p>Director home addresses are public by default. Here's how to use a service address to legally protect your privacy.</p>
-          <div class="card-footer">
-            <span>2 Apr 2026</span>
-            <span>⏱ 4 min</span>
+        <div class="featured-body">
+          <span class="featured-tag">Leasehold Reform</span>
+          <p class="featured-meta">
+            <time datetime="2026-04-01">April 2026</time> · 8 min read · Bergason Team
+          </p>
+          <h2>The 2026 Commonhold Bill: What Every Leaseholder in a Managed Block Needs to Know</h2>
+          <p>The government's Draft Commonhold and Leasehold Reform Bill was published on 27 January 2026. Ground rent caps, commonhold as default tenure, and stronger service charge transparency are all on the table. Here is what is already in force and what is still coming.</p>
+          <div class="inline-cta-box">
+            <p>Is your block managed by Bergason? Your managing agent is monitoring every reform as it passes. Questions about how the new legislation affects your service charges or lease?</p>
+            <a href="https://www.bergasonblockmanagement.co.uk/#contact" class="btn-gold">Talk to Bergason →</a>
           </div>
+          <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read the full guide →</a>
         </div>
-      </a>
+      </article>
 
-      <a class="article-card" href="article.html" data-category="sole-traders">
-        <div class="card-visual cv-1">📋</div>
-        <div class="card-body">
-          <span class="tag">Sole Traders</span>
-          <h3>Do Sole Traders Need a Business Address?</h3>
-          <p>You're not legally required to have one — but here's why thousands of self-employed people get one anyway.</p>
-          <div class="card-footer">
-            <span>28 Mar 2026</span>
-            <span>⏱ 3 min</span>
+      <!-- ARTICLE GRID -->
+      <div class="section-heading">
+        <span>Guides &amp; Insights</span>
+        <div class="section-heading-line"></div>
+      </div>
+
+      <div class="articles-grid" id="articlesGrid">
+
+        <article class="article-card" data-cat="charges">
+          <span class="article-tag">Service Charges</span>
+          <p class="article-meta"><time datetime="2026-04-02">2 Apr 2026</time> · 5 min read · Bergason Team</p>
+          <h3>How to Challenge a Service Charge You Think Is Unreasonable</h3>
+          <p>Every variable service charge must be reasonably incurred. If you believe a cost is excessive, you can apply to the First-tier Tribunal — but there is a right way to go about it.</p>
+          <div class="article-inline-cta">Bergason provides full service charge transparency and itemised accounts to every leaseholder in our managed blocks. <a href="https://www.bergasonblockmanagement.co.uk/#services">See how we manage your building →</a></div>
+          <div class="article-footer">
+            <span class="article-read">5 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
           </div>
-        </div>
-      </a>
+        </article>
 
-      <a class="article-card" href="article.html" data-category="companies-house">
-        <div class="card-visual cv-3">🏛️</div>
-        <div class="card-body">
-          <span class="tag">Companies House</span>
-          <h3>Virtual Address vs Registered Office: What's the Difference?</h3>
-          <p>They sound similar but serve different legal purposes. This guide explains which one you actually need.</p>
-          <div class="card-footer">
-            <span>20 Mar 2026</span>
-            <span>⏱ 5 min</span>
+        <article class="article-card" data-cat="reform">
+          <span class="article-tag">Leasehold Reform</span>
+          <p class="article-meta"><time datetime="2026-03-28">28 Mar 2026</time> · 6 min read · Bergason Team</p>
+          <h3>Ground Rent Caps Are Coming — Here's Where You Stand Right Now</h3>
+          <p>The draft Bill proposes capping ground rents at £250/year outside London, falling to zero after 40 years. What existing leaseholders should do before the legislation is enacted.</p>
+          <div class="article-inline-cta">Not sure how the ground rent cap affects your specific lease? <a href="https://www.bergasonblockmanagement.co.uk/#contact">Ask the Bergason team →</a></div>
+          <div class="article-footer">
+            <span class="article-read">6 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
           </div>
-        </div>
-      </a>
+        </article>
 
-      <a class="article-card" href="article.html" data-category="hmrc">
-        <div class="card-visual cv-6">✉️</div>
-        <div class="card-body">
-          <span class="tag">HMRC</span>
-          <h3>Will HMRC Write to My Virtual Address?</h3>
-          <p>Yes — but only if set up correctly. Here's exactly what to tell HMRC and what mail to expect.</p>
-          <div class="card-footer">
-            <span>14 Mar 2026</span>
-            <span>⏱ 4 min</span>
+        <article class="article-card" data-cat="rtm">
+          <span class="article-tag">Right to Manage</span>
+          <p class="article-meta"><time datetime="2026-03-20">20 Mar 2026</time> · 7 min read · Bergason Team</p>
+          <h3>RTM in 2026: Mixed-Use Buildings Now Qualify and You Won't Pay the Freeholder's Legal Fees</h3>
+          <p>Since March 2025, thousands more mixed-use buildings qualify for the Right to Manage — without covering the freeholder's legal costs. A step-by-step guide to making a claim.</p>
+          <div class="article-inline-cta">Bergason supports RTM companies through management handovers. <a href="https://www.bergasonblockmanagement.co.uk/#contact">Talk to us about taking control of your block →</a></div>
+          <div class="article-footer">
+            <span class="article-read">7 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
           </div>
-        </div>
-      </a>
+        </article>
 
-      <a class="article-card" href="article.html" data-category="companies-house">
-        <div class="card-visual cv-4">📜</div>
-        <div class="card-body">
-          <span class="tag">Companies House</span>
-          <h3>The New Identity Verification Rules for UK Directors</h3>
-          <p>From 2025, all UK company directors must verify their identity with Companies House. Here's what you need to do.</p>
-          <div class="card-footer">
-            <span>5 Mar 2026</span>
-            <span>⏱ 5 min</span>
+        <article class="article-card" data-cat="reserve">
+          <span class="article-tag">Reserve Funds</span>
+          <p class="article-meta"><time datetime="2026-03-14">14 Mar 2026</time> · 4 min read · Bergason Team</p>
+          <h3>Your Reserve Fund Belongs to You — Not Your Managing Agent</h3>
+          <p>Reserve fund contributions are held on trust for leaseholders collectively. When a managing agent changes, that money must be transferred in full. Here is what to check and what to do if it is not.</p>
+          <div class="article-inline-cta">At Bergason, reserve funds are held in separate designated client accounts. <a href="https://www.bergasonblockmanagement.co.uk/#services">Read about our financial management →</a></div>
+          <div class="article-footer">
+            <span class="article-read">4 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
           </div>
-        </div>
-      </a>
+        </article>
 
-      <a class="article-card" href="article.html" data-category="sole-traders">
-        <div class="card-visual cv-5">💼</div>
-        <div class="card-body">
-          <span class="tag">Sole Traders</span>
-          <h3>Setting Up a UK Business as a Non-Resident: A Complete Guide</h3>
-          <p>You don't need to live in the UK to run a UK limited company. Here's the full process from start to finish.</p>
-          <div class="card-footer">
-            <span>18 Feb 2026</span>
-            <span>⏱ 8 min</span>
+        <article class="article-card" data-cat="safety">
+          <span class="article-tag">Building Safety</span>
+          <p class="article-meta"><time datetime="2026-03-05">5 Mar 2026</time> · 5 min read · Bergason Team</p>
+          <h3>The New RICS Service Charge Code: What It Now Requires of Your Managing Agent</h3>
+          <p>RICS has published an updated residential management code covering budgeting, complaints, fire safety, and Building Safety Act compliance. What the new standards require — and what to ask your agent.</p>
+          <div class="article-inline-cta">Bergason operates in full compliance with the RICS residential management code. <a href="https://www.bergasonblockmanagement.co.uk/#contact">Request a compliance overview →</a></div>
+          <div class="article-footer">
+            <span class="article-read">5 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
           </div>
+        </article>
+
+        <article class="article-card" data-cat="guides">
+          <span class="article-tag">Leaseholder Guides</span>
+          <p class="article-meta"><time datetime="2026-02-18">18 Feb 2026</time> · 6 min read · Bergason Team</p>
+          <h3>Section 20: Your Right to Be Consulted Before Major Works Start</h3>
+          <p>If qualifying works would cost you more than £250, your managing agent must consult you before signing any contract. How the process works, how to nominate contractors, and what to do if it is bypassed.</p>
+          <div class="article-inline-cta">Bergason follows full S.20 consultation on all qualifying works at every managed block. <a href="https://www.bergasonblockmanagement.co.uk/#services">See how we manage major works →</a></div>
+          <div class="article-footer">
+            <span class="article-read">6 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-cat="charges">
+          <span class="article-tag">Service Charges</span>
+          <p class="article-meta"><time datetime="2026-02-10">10 Feb 2026</time> · 4 min read · Bergason Team</p>
+          <h3>Buildings Insurance Transparency: New Rights to See Exactly What You're Paying For</h3>
+          <p>The 2024 Reform Act significantly strengthened leaseholders' rights to full insurance details — including any commissions paid. How to request the information and what to look for.</p>
+          <div class="article-inline-cta">Bergason does not accept insurance commissions. All premiums are passed to leaseholders at cost. <a href="https://www.bergasonblockmanagement.co.uk/#contact">Request your policy details →</a></div>
+          <div class="article-footer">
+            <span class="article-read">4 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-cat="guides">
+          <span class="article-tag">Leaseholder Guides</span>
+          <p class="article-meta"><time datetime="2026-01-28">28 Jan 2026</time> · 5 min read · Bergason Team</p>
+          <h3>Buying a New Flat in 2026: The Day-One Rights That Did Not Exist Before</h3>
+          <p>The two-year wait before extending your lease has been abolished. From day one of ownership you can exercise your statutory right to extend or buy the freehold. What changed and what your solicitor needs to know.</p>
+          <div class="article-inline-cta">Moving into a Bergason-managed block? <a href="https://www.bergasonblockmanagement.co.uk/#contact">Introduce yourself and get set up with the team →</a></div>
+          <div class="article-footer">
+            <span class="article-read">5 min read</span>
+            <a class="read-link" href="https://www.bergasonblockmanagement.co.uk/#contact">Read →</a>
+          </div>
+        </article>
+
+      </div><!-- /articles-grid -->
+
+      <!-- FAQ — visible on page AND powers FAQPage schema -->
+      <section class="faq-section" aria-labelledby="faq-heading">
+        <h2 id="faq-heading">Common Questions from Leaseholders</h2>
+        <div class="faq-item">
+          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">Can I challenge a service charge I think is too high?</div>
+          <div class="faq-a">Every variable service charge must be reasonably incurred. If you believe a cost is excessive, unjustified, or for substandard work, you can apply to the First-tier Tribunal (Property Chamber) for a formal determination. You should pay under protest first rather than simply withhold payment.</div>
         </div>
-      </a>
+        <div class="faq-item">
+          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">What is the Commonhold and Leasehold Reform Bill 2026?</div>
+          <div class="faq-a">The Draft Commonhold and Leasehold Reform Bill was published on 27 January 2026. It proposes to cap ground rents at £250 per year (falling to zero after 40 years), ban leasehold for new flats, and make commonhold the default ownership structure for new developments. It is currently under pre-legislative scrutiny in Parliament.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">What is the Right to Manage and who qualifies in 2026?</div>
+          <div class="faq-a">The Right to Manage allows leaseholders to take over management of their building without buying the freehold. Since March 2025, leaseholders in thousands more mixed-use buildings qualify, and they are no longer required to pay the freeholder's legal costs when making a claim.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">Does my managing agent have to consult me before major works?</div>
+          <div class="faq-a">Yes. Under Section 20 of the Landlord and Tenant Act 1985, if any qualifying works contract would require you to contribute more than £250, your managing agent must consult you before signing that contract. If consultation is bypassed, the managing agent cannot recover more than £250 per leaseholder for those works.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" role="button" tabindex="0" aria-expanded="false">Who does the reserve fund belong to?</div>
+          <div class="faq-a">A reserve fund is held on trust for leaseholders collectively — it does not belong to the managing agent. When a managing agent changes, the reserve fund balance must be transferred in full to the new agent or the residents' management company.</div>
+        </div>
+      </section>
 
-    </div>
-  </main>
+      <!-- CTA BANNER -->
+      <div class="cta-banner">
+        <p class="cta-banner-eyebrow">For Leaseholders &amp; Freeholders</p>
+        <h2>Not sure where you stand?<br>We will give you a straight answer.</h2>
+        <p>Bergason manages residential blocks across the Midlands. If you have a question about your lease, service charges, or your rights under the new legislation — speak directly to the team.</p>
+        <a href="https://www.bergasonblockmanagement.co.uk/#contact" class="btn-gold">Contact Bergason →</a>
+      </div>
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+    </main>
 
-    <!-- CTA -->
-    <div class="cta-widget">
-      <h3>Need a UK Business Address?</h3>
-      <p>Professional address, registered office, and director privacy — from £9.99/month. No setup fees.</p>
-      <a href="https://www.forwardmymail.co.uk/#pricing" class="cta-btn">View Plans</a>
-      <div class="cta-note">Cancel anytime · VAT invoice provided</div>
-    </div>
+    <!-- ═══════════════════════════════════════════════
+         SIDEBAR
+    ═══════════════════════════════════════════════ -->
+    <aside aria-label="Sidebar">
 
-    <!-- Live news feed -->
-    <div class="widget">
-      <div class="widget-head">
-        <h3>UK Business News</h3>
-        <div class="live-badge">
-          <div class="live-dot"></div>
-          Live
+      <div class="sidebar-cta">
+        <h3>Need a Block Manager?</h3>
+        <p>Professional, transparent block management for residential leasehold properties across the Midlands.</p>
+        <a href="https://www.bergasonblockmanagement.co.uk/#contact">Get a Quote</a>
+        <p class="sidebar-cta-sub">No obligation · Midlands-based team</p>
+      </div>
+
+      <div class="sidebar-block">
+        <div class="sidebar-block-title"><span class="live-dot" aria-label="Live feed indicator"></span> Live Industry News</div>
+        <div id="news-feed" aria-live="polite" aria-label="Live leasehold news">
+          <p id="news-loading">Loading latest news…</p>
         </div>
       </div>
-      <div id="news-feed">
-        <div class="news-loading">Loading latest news…</div>
+
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">Browse Topics</div>
+        <div class="topic-tags" role="list">
+          <span class="topic-tag" role="listitem">Leasehold Reform</span>
+          <span class="topic-tag" role="listitem">Service Charges</span>
+          <span class="topic-tag" role="listitem">Right to Manage</span>
+          <span class="topic-tag" role="listitem">Reserve Funds</span>
+          <span class="topic-tag" role="listitem">Building Safety</span>
+          <span class="topic-tag" role="listitem">S.20 Consultation</span>
+          <span class="topic-tag" role="listitem">Commonhold</span>
+          <span class="topic-tag" role="listitem">Ground Rent</span>
+          <span class="topic-tag" role="listitem">Enfranchisement</span>
+          <span class="topic-tag" role="listitem">Managing Agents</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Topics -->
-    <div class="widget">
-      <div class="widget-head"><h3>Browse Topics</h3></div>
-      <div class="topics-body">
-        <div class="topic">Registered Office</div>
-        <div class="topic">Virtual Address</div>
-        <div class="topic">Companies House</div>
-        <div class="topic">HMRC</div>
-        <div class="topic">Sole Traders</div>
-        <div class="topic">Privacy</div>
-        <div class="topic">Ltd Company</div>
-        <div class="topic">Compliance</div>
-        <div class="topic">Mail Forwarding</div>
-        <div class="topic">Company Formation</div>
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">About Bergason</div>
+        <p style="font-size:13px;color:#6a5a44;line-height:1.65;margin-bottom:12px;">Bergason Block Management provides residential block and estate management services across the Midlands, including service charge administration, leaseholder communications, major works oversight, and full statutory compliance.</p>
+        <p style="font-size:12px;color:#a09070;">8a Bore Street, Lichfield, WS13 6LL</p>
+        <a href="https://www.bergasonblockmanagement.co.uk" style="display:inline-block;margin-top:12px;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#d9a464;text-decoration:none;font-weight:600;">Visit the main site →</a>
       </div>
-    </div>
 
-  </aside>
-</div>
+    </aside>
+  </div><!-- /layout -->
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <img src="https://www.forwardmymail.co.uk/logo.png" alt="Forward My Mail">
-        <p>Premium mail handling and virtual office services for businesses worldwide.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Services</h4>
-        <ul>
-          <li><a href="https://www.forwardmymail.co.uk/#services">Mail Forwarding</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/#services">Digital Mailroom</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/#services">Registered Office</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/#services">Company Formation</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Company</h4>
-        <ul>
-          <li><a href="https://www.forwardmymail.co.uk/#about">About Us</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/#pricing">Pricing</a></li>
-          <li><a href="blog.html">Blog & Guides</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/#contact">Contact</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Legal</h4>
-        <ul>
-          <li><a href="https://www.forwardmymail.co.uk/">Privacy Policy</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/">Terms & Conditions</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/">Cookie Policy</a></li>
-          <li><a href="https://www.forwardmymail.co.uk/">Acceptable Use</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Forwardmymail Ltd. Registered in England & Wales. Company No. 16912540</span>
-      <span>8a Bore Street, Lichfield, Staffordshire, WS13 6LL</span>
-    </div>
-  </div>
-</footer>
+  <!-- ═══════════════════════════════════════════════
+       NEWSLETTER
+  ═══════════════════════════════════════════════ -->
+  <section class="newsletter" aria-labelledby="newsletter-heading">
+    <p class="newsletter-eyebrow">Stay Informed</p>
+    <h2 id="newsletter-heading">Reform updates, when they matter.</h2>
+    <p>No filler. One email when something changes that affects your block or lease.</p>
+    <form class="newsletter-form" action="https://formsubmit.co/info@bergason.co.uk" method="POST" aria-label="Newsletter signup">
+      <input type="hidden" name="_subject" value="New blog subscriber — Bergason Insights">
+      <input type="hidden" name="_next" value="https://www.bergasonblockmanagement.co.uk/blog.html">
+      <input type="hidden" name="_captcha" value="false">
+      <label for="nl-email" class="sr-only">Email address</label>
+      <input type="email" id="nl-email" name="email" class="newsletter-input" placeholder="your@email.com" required aria-required="true">
+      <button type="submit" class="newsletter-btn">Subscribe</button>
+    </form>
+  </section>
 
-<script>
-  // ── Filter chips ──
-  document.querySelectorAll('.chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      const filter = chip.dataset.filter;
-      document.querySelectorAll('.article-card, .featured').forEach(card => {
-        if (filter === 'all' || card.dataset.category === filter) {
-          card.style.display = '';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-  });
+  <!-- ═══════════════════════════════════════════════
+       FOOTER
+  ═══════════════════════════════════════════════ -->
+  <footer>
+    <a class="footer-logo" href="https://www.bergasonblockmanagement.co.uk">Bergason Block Management</a>
+    <p class="footer-copy">© 2026 Bergason Block Management · 8a Bore Street, Lichfield WS13 6LL</p>
+    <a href="https://www.bergasonblockmanagement.co.uk" class="footer-link">bergasonblockmanagement.co.uk</a>
+  </footer>
 
-  // ── News feed via RSS2JSON (free, no key needed for public feeds) ──
-  async function loadNews() {
-    const feeds = [
-      { url: 'https://companieshouse.blog.gov.uk/feed/', label: 'Companies House' },
-      { url: 'https://www.gov.uk/search/news-and-communications.atom?organisations%5B%5D=hm-revenue-customs', label: 'HMRC' }
-    ];
-
-    const proxy = 'https://api.rss2json.com/v1/api.json?rss_url=';
-    const container = document.getElementById('news-feed');
-
-    try {
-      const results = await Promise.all(
-        feeds.map(f =>
-          fetch(proxy + encodeURIComponent(f.url))
-            .then(r => r.json())
-            .then(d => ({ label: f.label, items: d.items || [] }))
-            .catch(() => ({ label: f.label, items: [] }))
-        )
-      );
-
-      // Merge, sort by date, take top 6
-      let allItems = [];
-      results.forEach(r => {
-        r.items.slice(0, 4).forEach(item => {
-          allItems.push({ ...item, source: r.label });
+  <!-- ═══════════════════════════════════════════════
+       JAVASCRIPT
+  ═══════════════════════════════════════════════ -->
+  <style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}</style>
+  <script>
+    // ── Filter chips ──────────────────────────────────
+    const chips = document.querySelectorAll('.chip');
+    chips.forEach(chip => {
+      function activateChip() {
+        chips.forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed','false'); });
+        chip.classList.add('active');
+        chip.setAttribute('aria-pressed','true');
+        const cat = chip.dataset.cat;
+        document.querySelectorAll('.article-card').forEach(card => {
+          card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
         });
-      });
+      }
+      chip.addEventListener('click', activateChip);
+      chip.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activateChip(); }});
+    });
 
-      allItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-      allItems = allItems.slice(0, 6);
+    // ── FAQ accordion ─────────────────────────────────
+    document.querySelectorAll('.faq-q').forEach(q => {
+      function toggle() {
+        const isOpen = q.classList.contains('open');
+        // Close all
+        document.querySelectorAll('.faq-q').forEach(x => {
+          x.classList.remove('open');
+          x.setAttribute('aria-expanded','false');
+          x.nextElementSibling.classList.remove('open');
+        });
+        if (!isOpen) {
+          q.classList.add('open');
+          q.setAttribute('aria-expanded','true');
+          q.nextElementSibling.classList.add('open');
+        }
+      }
+      q.addEventListener('click', toggle);
+      q.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(); }});
+    });
 
-      if (allItems.length === 0) throw new Error('No items');
-
-      container.innerHTML = allItems.map(item => {
-        const date = new Date(item.pubDate);
-        const ago = timeAgo(date);
-        return `
-          <a class="news-item" href="${item.link}" target="_blank" rel="noopener">
-            <div class="news-source">${item.source}</div>
-            <h4>${item.title}</h4>
-            <time>${ago}</time>
-          </a>`;
-      }).join('');
-
-    } catch (e) {
-      // Fallback to static items if RSS fails
-      container.innerHTML = `
-        <a class="news-item" href="https://companieshouse.blog.gov.uk" target="_blank" rel="noopener">
-          <div class="news-source">Companies House</div>
-          <h4>New registered office rules: what small businesses need to know</h4>
-          <time>companieshouse.blog.gov.uk</time>
-        </a>
-        <a class="news-item" href="https://www.gov.uk/government/organisations/hm-revenue-customs" target="_blank" rel="noopener">
-          <div class="news-source">HMRC</div>
-          <h4>Making Tax Digital: latest updates for small businesses</h4>
-          <time>gov.uk/hmrc</time>
-        </a>
-        <a class="news-item" href="https://companieshouse.blog.gov.uk" target="_blank" rel="noopener">
-          <div class="news-source">Companies House</div>
-          <h4>Identity verification for directors — what you need to do</h4>
-          <time>companieshouse.blog.gov.uk</time>
-        </a>`;
+    // ── Live RSS news feed ────────────────────────────
+    // Uses rss2json.com — same service already on the main Bergason site
+    async function loadNews() {
+      const feedEl = document.getElementById('news-feed');
+      const RSS_FEEDS = [
+        { url: 'https://www.leaseholdknowledge.com/feed', label: 'LKP' },
+        { url: 'https://www.property118.com/feed',        label: 'Property118' }
+      ];
+      let items = [];
+      for (const feed of RSS_FEEDS) {
+        try {
+          const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feed.url)}&count=6`;
+          const res = await fetch(apiUrl);
+          if (!res.ok) continue;
+          const data = await res.json();
+          if (data.status === 'ok' && Array.isArray(data.items)) {
+            data.items.forEach(item => {
+              items.push({
+                title: item.title || '',
+                link:  item.link  || '#',
+                date:  item.pubDate ? item.pubDate.substring(0, 10) : '',
+                label: feed.label
+              });
+            });
+          }
+        } catch(e) { /* silent fail */ }
+      }
+      if (!items.length) {
+        feedEl.innerHTML = '<p id="news-error">Unable to load live feed. Visit <a href="https://www.leaseholdknowledge.com" target="_blank" rel="noopener">leaseholdknowledge.com</a> for the latest news.</p>';
+        return;
+      }
+      // Sort newest first, take top 8
+      items.sort((a, b) => b.date.localeCompare(a.date));
+      items = items.slice(0, 8);
+      feedEl.innerHTML = items.map(item => `
+        <div class="news-item">
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
+          <div class="news-item-footer">
+            ${item.date ? `<span class="news-item-date">${item.date}</span>` : ''}
+            ${item.label ? `<span class="news-item-source">${item.label}</span>` : ''}
+          </div>
+        </div>
+      `).join('');
     }
-  }
+    loadNews();
+  </script>
 
-  function timeAgo(date) {
-    const diff = Math.floor((Date.now() - date) / 1000);
-    if (diff < 3600) return Math.floor(diff / 60) + ' minutes ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + ' hours ago';
-    if (diff < 604800) return Math.floor(diff / 86400) + ' days ago';
-    return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  }
-
-  loadNews();
-</script>
 </body>
 </html>
