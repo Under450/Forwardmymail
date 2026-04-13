@@ -157,9 +157,9 @@
   const app  = initializeApp({ apiKey:"AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU", authDomain:"forward-my-mail.firebaseapp.com", projectId:"forward-my-mail", storageBucket:"forward-my-mail.firebasestorage.app", messagingSenderId:"933044287958", appId:"1:933044287958:web:fa3a707dbec62b24e74c77" });
   const auth = getAuth(app);
 
-  const LOGS_URL = 'https://getemaillogs-yr34k57gsq-uc.a.run.app/getEmailLogs';
-  const SHEET_URL = 'https://createemaillogsheet-yr34k57gsq-uc.a.run.app/createEmailLogSheet';
-  const BULK_URL = 'https://syncallcustomerstosheet-yr34k57gsq-uc.a.run.app/syncAllCustomersToSheet';
+  const LOGS_URL = 'https://us-central1-forward-my-mail.cloudfunctions.net/getEmailLogs';
+  const SHEET_URL = 'https://us-central1-forward-my-mail.cloudfunctions.net/createEmailLogSheet';
+  const BULK_URL = 'https://us-central1-forward-my-mail.cloudfunctions.net/syncAllCustomersToSheet';
 
   let allLogs = [];
 
