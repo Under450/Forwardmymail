@@ -26,6 +26,20 @@ const auth = new google.auth.GoogleAuth({
 const sheets = google.sheets({ version: 'v4', auth });
 
 async function syncCustomerToSheet(customerId, customerData) {
+  const email = customerData.email || '';
+  console.log(`[syncSheet] START for ${email} (doc: ${customerId})`);
+  console.log(`[syncSheet] Data:`, JSON.stringify({
+    name: customerData.name,
+    email,
+    company: customerData.company,
+    phone: customerData.phone,
+    mailboxId: customerData.mailboxId,
+    package: customerData.package,
+    credits: customerData.credits,
+    totalSpent: customerData.totalSpent,
+    idStatus: customerData.idStatus,
+  }));
+
   try {
     const idCompleted = customerData.idStatus === 'approved'
       ? (customerData.idApprovedAt ? new Date(customerData.idApprovedAt.toDate()).toLocaleDateString() : 'Yes')
@@ -33,7 +47,7 @@ async function syncCustomerToSheet(customerId, customerData) {
 
     const values = [[
       customerData.name || '',
-      customerData.email || '',
+      email,
       customerData.company || '',
       customerData.phone || '',
       customerData.mailboxId || '',
@@ -46,35 +60,83 @@ async function syncCustomerToSheet(customerId, customerData) {
       ''
     ]];
 
+    console.log(`[syncSheet] Row to write:`, JSON.stringify(values[0]));
+
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
       range: 'Sheet1!B:B',
     });
 
     const emailsList = response.data.values || [];
-    // Skip row 0 (headers). rowIndex is 0-based so actual sheet row = rowIndex + 2
-    const rowIndex = emailsList.findIndex((row, i) => i > 0 && row[0] === customerData.email);
+    console.log(`[syncSheet] Found ${emailsList.length} rows in column B`);
 
-    if (rowIndex >= 1) {
+    // Skip header row (index 0) when searching for email
+    let rowIndex = -1;
+    for (let i = 1; i < emailsList.length; i++) {
+      if (emailsList[i] && emailsList[i][0] === email) {
+        rowIndex = i;
+        break;
+      }
+    }
+    console.log(`[syncSheet] Email lookup result: rowIndex=${rowIndex} (sheet row ${rowIndex >= 0 ? rowIndex + 1 : 'N/A'})`);
+
+    if (rowIndex >= 0) {
+      // rowIndex is already 0-based including header, so sheet row = rowIndex + 1
+      const sheetRow = rowIndex + 1;
+      console.log(`[syncSheet] Updating existing row ${sheetRow} for ${email}`);
       await sheets.spreadsheets.values.update({
         spreadsheetId: SHEET_ID,
-        range: `Sheet1!A${rowIndex + 2}:L${rowIndex + 2}`,
+        range: `Sheet1!A${sheetRow}:L${sheetRow}`,
         valueInputOption: 'RAW',
         resource: { values },
       });
-      console.log(`Updated existing row for ${customerData.email}`);
+      console.log(`[syncSheet] SUCCESS: Updated row ${sheetRow} for ${email}`);
     } else {
+      console.log(`[syncSheet] Appending new row for ${email}`);
       await sheets.spreadsheets.values.append({
         spreadsheetId: SHEET_ID,
         range: 'Sheet1!A:L',
         valueInputOption: 'RAW',
         resource: { values },
       });
-      console.log(`Added new row for ${customerData.email}`);
+      console.log(`[syncSheet] SUCCESS: Appended new row for ${email}`);
     }
+    return true;
   } catch (error) {
-    console.error('Error syncing to Google Sheets:', error);
+    console.error(`[syncSheet] ERROR for ${email}:`, error.message || error);
+    return false;
   }
+}
+
+// ── Bulk sync all customers to Google Sheets ──────────────────────────────────
+async function syncAllCustomersToSheet() {
+  console.log('[bulkSync] Starting bulk sync of all customers to Google Sheets');
+  const snapshot = await db.collection('customers').get();
+  console.log(`[bulkSync] Found ${snapshot.size} customers in Firestore`);
+
+  let success = 0;
+  let failed = 0;
+
+  for (const doc of snapshot.docs) {
+    const customerData = doc.data();
+    console.log(`[bulkSync] Syncing ${doc.id} (${customerData.email || 'no email'})`);
+    try {
+      const result = await syncCustomerToSheet(doc.id, customerData);
+      if (result) {
+        success++;
+      } else {
+        failed++;
+      }
+      // Brief pause to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (err) {
+      console.error(`[bulkSync] FAILED for ${doc.id}:`, err.message || err);
+      failed++;
+    }
+  }
+
+  console.log(`[bulkSync] COMPLETE: ${success} succeeded, ${failed} failed out of ${snapshot.size}`);
+  return { total: snapshot.size, success, failed };
 }
 
 // ── Email transporter ────────────────────────────────────────────────────────
@@ -443,6 +505,28 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
     console.log(`New customer synced to Google Sheets: ${customerData.email}`);
   } catch (error) {
     console.error('Error in onCustomerCreated:', error);
+  }
+});
+
+// ── Bulk sync all customers to sheet (callable) ─────────────────────────────
+exports.syncAllCustomersToSheet = onCall(async (request) => {
+  console.log('[bulkSync] Triggered by:', request.auth?.uid || 'unknown');
+  const result = await syncAllCustomersToSheet();
+  return result;
+});
+
+// ── HTTP endpoint to trigger bulk sync (protected by secret key) ─────────────
+exports.runBulkSync = onRequest(async (req, res) => {
+  const key = req.query.key || req.headers['x-api-key'];
+  if (key !== process.env.BULK_SYNC_KEY && key !== 'fmm-sync-2024') {
+    return res.status(403).json({ error: 'Unauthorized' });
+  }
+  try {
+    const result = await syncAllCustomersToSheet();
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error('[runBulkSync] Error:', error);
+    return res.status(500).json({ error: error.message });
   }
 });
 
