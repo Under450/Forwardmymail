@@ -1,8 +1,14 @@
 const stream = require('stream');
 const functions = require('firebase-functions');
+const { setGlobalOptions } = require('firebase-functions/v2/options');
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
 const { onDocumentCreated, onDocumentDeleted, onDocumentUpdated } = require('firebase-functions/v2/firestore');
 const admin = require('firebase-admin');
+
+// Attach all secrets to every function so process.env works
+setGlobalOptions({
+  secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SMTP_PASS', 'DIDIT_API_KEY', 'DIDIT_WEBHOOK_SECRET'],
+});
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
@@ -530,8 +536,8 @@ exports.runBulkSync = onRequest(async (req, res) => {
   }
 });
 
-// ── Backfill email logs for existing customers ───────────────────────────────
-exports.backfillEmailLogs = onRequest(async (req, res) => {
+// ── Backfill email logs for existing customers (v2 - with Stripe lookup) ─────
+exports.backfillEmailLogs = onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
   const key = req.query.key || req.headers['x-api-key'];
   if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
 
@@ -554,11 +560,29 @@ exports.backfillEmailLogs = onRequest(async (req, res) => {
     }
     console.log(`[backfill] Purged ${existing.size} old email_logs`);
 
+    // Build package map from Stripe payment history
+    const packageMap = {};
+    const stripeSessions = await stripe.checkout.sessions.list({ limit: 100, status: 'complete' });
+    for (const s of stripeSessions.data) {
+      const sEmail = (s.customer_email || s.customer_details?.email || '').toLowerCase();
+      const amount = s.amount_total / 100;
+      let pkg = 'Credit Pack';
+      if (amount === 125) pkg = 'Personal Mailbox';
+      else if (amount === 175) pkg = 'Business Address';
+      else if (amount === 225) pkg = 'Registered Office';
+      else if (amount === 299) pkg = 'Full Virtual Office';
+      // Keep most recent package per email
+      if (!packageMap[sEmail] || s.created > packageMap[sEmail].created) {
+        packageMap[sEmail] = { package: pkg, amount, created: s.created };
+      }
+    }
+    console.log(`[backfill] Built package map from ${stripeSessions.data.length} Stripe sessions`);
+
     const snapshot = await db.collection('customers').get();
     let created = 0;
 
     // Skip test accounts
-    const testEmails = ['test@', 'staff@forwardmymail', 'sparetemp@'];
+    const testEmails = ['test@', 'staff@forwardmymail', 'sparetemp@', 'info@forwardmymail', 'caj@me'];
 
     for (const doc of snapshot.docs) {
       const c = doc.data();
@@ -572,29 +596,37 @@ exports.backfillEmailLogs = onRequest(async (req, res) => {
       }
 
       const createdAt = c.created ? c.created.toDate() : new Date();
+      const stripeInfo = packageMap[email.toLowerCase()];
+      const pkg = c.package || (stripeInfo ? stripeInfo.package : '');
+
+      // Update customer doc with package from Stripe if missing
+      if (!c.package && stripeInfo) {
+        await db.collection('customers').doc(doc.id).update({ package: stripeInfo.package });
+        console.log(`[backfill] Updated ${email} package to ${stripeInfo.package} from Stripe`);
+      }
 
       // Log a welcome/signup entry for each customer
       await db.collection('email_logs').add({
         customerId: doc.id,
         customerEmail: email,
         template: 'admin_new_signup',
-        subject: `New Account: ${c.company || name}`,
+        subject: c.company || name,
         status: 'sent',
         error: '',
-        package: c.package || 'None',
+        package: pkg,
         timestamp: createdAt,
       });
 
-      // If they have credits/totalSpent, they made a purchase
-      if (c.totalSpent > 0 || c.credits > 0) {
+      // If they have credits/totalSpent or Stripe payment, they made a purchase
+      if (c.totalSpent > 0 || c.credits > 0 || stripeInfo) {
         await db.collection('email_logs').add({
           customerId: doc.id,
           customerEmail: email,
-          template: 'purchase_credit_pack',
+          template: stripeInfo && stripeInfo.amount >= 125 ? 'purchase_package' : 'purchase_credit_pack',
           subject: `Purchase confirmation — Forward My Mail`,
           status: 'sent',
           error: '',
-          package: c.package || 'None',
+          package: pkg,
           timestamp: c.lastPurchaseDate ? c.lastPurchaseDate.toDate() : createdAt,
         });
       }
@@ -608,7 +640,7 @@ exports.backfillEmailLogs = onRequest(async (req, res) => {
           subject: 'Your Identity Has Been Verified — Forward My Mail',
           status: 'sent',
           error: '',
-          package: c.package || 'None',
+          package: pkg,
           timestamp: c.idApprovedAt ? c.idApprovedAt.toDate() : createdAt,
         });
       } else if (c.idStatus === 'declined') {
@@ -619,7 +651,7 @@ exports.backfillEmailLogs = onRequest(async (req, res) => {
           subject: 'Identity Verification Unsuccessful — Forward My Mail',
           status: 'sent',
           error: '',
-          package: c.package || 'None',
+          package: pkg,
           timestamp: c.idStatusUpdatedAt ? c.idStatusUpdatedAt.toDate() : createdAt,
         });
       }
@@ -725,19 +757,18 @@ exports.createDiditSession = onRequest(async (req, res) => {
     const customerDoc = await db.collection('customers').doc(customerId).get();
     const customerName = customerDoc.exists ? (customerDoc.data().name || customerEmail) : customerEmail;
 
-    // Create Didit session
-    const diditResponse = await fetch('https://apx.didit.me/v2/session/', {
+    // Create Didit session (v3 API)
+    const diditResponse = await fetch('https://verification.didit.me/v3/session/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DIDIT_API_KEY}`
+        'x-api-key': DIDIT_API_KEY
       },
       body: JSON.stringify({
-        app_id: DIDIT_APP_ID,
         workflow_id: DIDIT_WORKFLOW_ID,
-        vendor_data: customerId,  // pass Firebase UID so webhook can identify customer
-        redirect_url: 'https://www.forwardmymail.co.uk/customer-portal.html',
-        callback_url: 'https://us-central1-forward-my-mail.cloudfunctions.net/diditWebhook'
+        vendor_data: customerId,
+        callback: 'https://www.forwardmymail.co.uk/customer-portal.html',
+        contact_details: { email: customerEmail }
       })
     });
 
