@@ -530,6 +530,83 @@ exports.runBulkSync = onRequest(async (req, res) => {
   }
 });
 
+// ── Backfill email logs for existing customers ───────────────────────────────
+exports.backfillEmailLogs = onRequest(async (req, res) => {
+  const key = req.query.key || req.headers['x-api-key'];
+  if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
+
+  try {
+    const snapshot = await db.collection('customers').get();
+    let created = 0;
+
+    for (const doc of snapshot.docs) {
+      const c = doc.data();
+      const email = c.email || '';
+      const name = c.name || '';
+      const createdAt = c.created ? c.created.toDate() : new Date();
+
+      // Log a welcome/signup entry for each customer
+      await db.collection('email_logs').add({
+        customerId: doc.id,
+        customerEmail: email,
+        template: 'admin_new_signup',
+        subject: `New Account: ${c.company || name}`,
+        status: 'sent',
+        error: '',
+        package: c.package || 'None',
+        timestamp: createdAt,
+      });
+
+      // If they have credits/totalSpent, they made a purchase
+      if (c.totalSpent > 0 || c.credits > 0) {
+        await db.collection('email_logs').add({
+          customerId: doc.id,
+          customerEmail: email,
+          template: 'purchase_credit_pack',
+          subject: `Purchase confirmation — Forward My Mail`,
+          status: 'sent',
+          error: '',
+          package: c.package || 'None',
+          timestamp: c.lastPurchaseDate ? c.lastPurchaseDate.toDate() : createdAt,
+        });
+      }
+
+      // If ID verified
+      if (c.idStatus === 'approved') {
+        await db.collection('email_logs').add({
+          customerId: doc.id,
+          customerEmail: email,
+          template: 'verification_approved',
+          subject: 'Your Identity Has Been Verified — Forward My Mail',
+          status: 'sent',
+          error: '',
+          package: c.package || 'None',
+          timestamp: c.idApprovedAt ? c.idApprovedAt.toDate() : createdAt,
+        });
+      } else if (c.idStatus === 'declined') {
+        await db.collection('email_logs').add({
+          customerId: doc.id,
+          customerEmail: email,
+          template: 'verification_declined',
+          subject: 'Identity Verification Unsuccessful — Forward My Mail',
+          status: 'sent',
+          error: '',
+          package: c.package || 'None',
+          timestamp: c.idStatusUpdatedAt ? c.idStatusUpdatedAt.toDate() : createdAt,
+        });
+      }
+
+      created++;
+      await new Promise(r => setTimeout(r, 200));
+    }
+
+    return res.status(200).json({ total: snapshot.size, logsCreated: created });
+  } catch (err) {
+    console.error('backfillEmailLogs error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 // ── greyOutDeletedCustomer (Sheets housekeeping) ─────────────────────────────
 exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', async (event) => {
   try {
@@ -1724,6 +1801,7 @@ exports.getEmailLogs = onRequest(async (req, res) => {
         subject: data.subject || '',
         status: data.status || '',
         error: data.error || '',
+        package: data.package || '',
       };
     });
 

@@ -238,9 +238,9 @@
       const d  = ts ? ts.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
       const ti = ts ? ts.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}) : '';
       const pill = l.status==='sent' ? '<span class="status-pill status-sent">✓ sent</span>' : '<span class="status-pill status-failed">✗ failed</span>';
-      return `<tr><td class="time-cell">${d}<br>${ti}</td><td><span class="template-chip">${l.template||'—'}</span></td><td class="email-cell" title="${l.customerEmail}">${l.customerEmail||'—'}</td><td class="subject-cell" title="${l.subject}">${l.subject||'—'}</td><td>${pill}</td><td class="error-cell" title="${l.error}">${l.error||''}</td></tr>`;
+      return `<tr><td class="time-cell">${d}<br>${ti}</td><td><span class="template-chip">${l.template||'—'}</span></td><td class="email-cell" title="${l.customerEmail}">${l.customerEmail||'—'}</td><td>${l.package||'—'}</td><td class="subject-cell" title="${l.subject}">${l.subject||'—'}</td><td>${pill}</td><td class="error-cell" title="${l.error}">${l.error||''}</td></tr>`;
     }).join('');
-    document.getElementById('log-container').innerHTML = '<table><thead><tr><th>Time</th><th>Template</th><th>Recipient</th><th>Subject</th><th>Status</th><th>Error</th></tr></thead><tbody>'+rows+'</tbody></table>';
+    document.getElementById('log-container').innerHTML = '<table><thead><tr><th>Time</th><th>Template</th><th>Recipient</th><th>Package</th><th>Subject</th><th>Status</th><th>Error</th></tr></thead><tbody>'+rows+'</tbody></table>';
   }
 
   function updateStats(logs) {
