@@ -536,13 +536,41 @@ exports.backfillEmailLogs = onRequest(async (req, res) => {
   if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
 
   try {
+    // Purge all existing email_logs first
+    const existing = await db.collection('email_logs').get();
+    const batch = db.batch();
+    let batchCount = 0;
+    for (const d of existing.docs) {
+      batch.delete(d.ref);
+      batchCount++;
+      if (batchCount >= 400) break; // Firestore batch limit is 500
+    }
+    if (batchCount > 0) await batch.commit();
+    // Handle remaining if > 400
+    if (existing.size > 400) {
+      const batch2 = db.batch();
+      existing.docs.slice(400).forEach(d => batch2.delete(d.ref));
+      await batch2.commit();
+    }
+    console.log(`[backfill] Purged ${existing.size} old email_logs`);
+
     const snapshot = await db.collection('customers').get();
     let created = 0;
+
+    // Skip test accounts
+    const testEmails = ['test@', 'staff@forwardmymail', 'sparetemp@'];
 
     for (const doc of snapshot.docs) {
       const c = doc.data();
       const email = c.email || '';
       const name = c.name || '';
+
+      // Skip test/staff accounts
+      if (!email || testEmails.some(t => email.toLowerCase().startsWith(t))) {
+        console.log(`[backfill] Skipping test account: ${email}`);
+        continue;
+      }
+
       const createdAt = c.created ? c.created.toDate() : new Date();
 
       // Log a welcome/signup entry for each customer
