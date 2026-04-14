@@ -287,9 +287,68 @@
     border-bottom: 2px solid var(--gold);
     padding-bottom: 1px;
     transition: color 0.2s;
+    cursor: pointer;
   }
   .read-link:hover { color: var(--gold); }
   .read-link::after { content: '→'; }
+
+  /* Expandable article content */
+  .expand-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.22,1,0.36,1), opacity 0.3s;
+    opacity: 0;
+  }
+  .expand-body.open {
+    max-height: 3000px;
+    opacity: 1;
+  }
+  .expand-inner {
+    padding: 24px 0 8px;
+    border-top: 1px solid var(--border-light);
+    margin-top: 16px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text-light);
+  }
+  .expand-inner h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 20px 0 8px;
+  }
+  .expand-inner h4:first-child { margin-top: 0; }
+  .expand-inner p { margin-bottom: 12px; }
+  .expand-inner ul { margin: 0 0 14px 18px; }
+  .expand-inner li { margin-bottom: 4px; }
+  .expand-inner strong { color: var(--text); font-weight: 600; }
+  .expand-inner .callout {
+    background: #f0f7ff;
+    border-left: 4px solid var(--gold);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 18px 0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .expand-cta {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 10px 22px;
+    border-radius: 7px;
+    text-decoration: none;
+    margin-top: 12px;
+    transition: background 0.2s;
+  }
+  .expand-cta:hover { background: var(--gold-light); }
 
   /* ── ARTICLE GRID ── */
   .article-grid {
@@ -593,105 +652,261 @@
     </div>
 
     <!-- Featured article -->
-    <a class="featured" href="article.html" data-category="registered-office">
+    <div class="featured" data-category="registered-office">
       <div class="featured-visual">
-        <div class="featured-badge">⭐ Featured</div>
-        <div class="featured-icon">🏢</div>
+        <div class="featured-badge">Featured</div>
+        <div class="featured-icon"></div>
       </div>
       <div class="featured-content">
         <div class="article-meta">
           <span class="tag">Registered Office</span>
-          <span class="meta-dot">·</span>
+          <span class="meta-dot">&middot;</span>
           <span class="meta-date">8 April 2026</span>
-          <span class="meta-dot">·</span>
+          <span class="meta-dot">&middot;</span>
           <span class="meta-date">6 min read</span>
         </div>
         <h2>Can I Use a Virtual Address as My Registered Office?</h2>
         <p>Since October 2023, Companies House requires all UK limited companies to have a registered office at an "appropriate address." Here's exactly what that means and how a virtual address qualifies — and what happens if yours doesn't.</p>
-        <span class="read-link">Read article</span>
+        <span class="read-link" data-toggle="expand">Read article</span>
+        <div class="expand-body">
+          <div class="expand-inner">
+            <h4>What Is a Registered Office?</h4>
+            <p>Your registered office is the official legal address of your UK limited company. It appears on the public Companies House register, where HMRC and courts send statutory mail, and where legal notices can be served. Every UK limited company must have one.</p>
+
+            <h4>What Does "Appropriate Address" Mean?</h4>
+            <p>Since October 2023 under the Economic Crime and Corporate Transparency Act, Companies House requires an "appropriate address" — one where a document would be expected to come to the attention of a person acting on behalf of the company, and delivery can be recorded. In plain English: <strong>someone must actually receive your post and get it to you.</strong></p>
+
+            <div class="callout"><strong>Important:</strong> If Companies House determines your registered office does not meet the standard, they can change it to a default address on the public register.</div>
+
+            <h4>Does a Virtual Address Qualify?</h4>
+            <p>Yes — provided the provider actually receives your mail and forwards or scans it to you. Forward My Mail satisfies this because we physically receive mail at our Lichfield address, scan official government mail, record delivery, and operate a staffed UK business centre.</p>
+
+            <h4>Registered Office vs Service Address</h4>
+            <ul>
+              <li><strong>Registered office</strong> — the company's official address for statutory mail</li>
+              <li><strong>Director's service address</strong> — appears on the register instead of your home address</li>
+            </ul>
+            <p>Our Registered Office plan covers both.</p>
+
+            <h4>What Mail Will Come to My Registered Office?</h4>
+            <ul>
+              <li>Companies House — confirmation statements, filing reminders</li>
+              <li>HMRC — corporation tax, VAT, PAYE correspondence</li>
+              <li>Courts and legal notices</li>
+            </ul>
+            <p>With Forward My Mail, all official government mail is scanned and delivered free as part of the Registered Office plan.</p>
+
+            <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">View Plans &rarr;</a>
+          </div>
+        </div>
       </div>
-    </a>
+    </div>
 
     <!-- Article grid -->
     <div class="article-grid" id="article-grid">
 
-      <a class="article-card" href="article.html" data-category="privacy">
-        <div class="card-visual cv-2">🔒</div>
+      <div class="article-card" data-category="privacy">
+        <div class="card-visual cv-2"></div>
         <div class="card-body">
           <span class="tag">Privacy</span>
           <h3>How to Keep Your Home Address Off Companies House</h3>
           <p>Director home addresses are public by default. Here's how to use a service address to legally protect your privacy.</p>
+          <span class="read-link" data-toggle="expand">Read</span>
+          <div class="expand-body">
+            <div class="expand-inner">
+              <h4>The Problem: Your Home Address Is Public</h4>
+              <p>When you register a UK limited company, your residential address is filed as your service address and appears on the public Companies House register. Anyone can search for it — customers, competitors, or strangers.</p>
+
+              <h4>The Solution: A Service Address</h4>
+              <p>Under the Companies Act 2006, every director can use a "service address" — a separate correspondence address that appears on the public register instead of your home. This is completely legal and used by the majority of UK company directors.</p>
+
+              <h4>How to Change It</h4>
+              <ul>
+                <li>Log in to Companies House WebFiling</li>
+                <li>File a CH01 form to update your service address</li>
+                <li>Your home address remains on file privately but is no longer publicly searchable</li>
+              </ul>
+
+              <div class="callout"><strong>Note:</strong> Your home address is still held by Companies House — it is just not visible on the public register. Only credit reference agencies and specified authorities can access it.</div>
+
+              <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">Get a Service Address &rarr;</a>
+            </div>
+          </div>
           <div class="card-footer">
             <span>2 Apr 2026</span>
-            <span>⏱ 4 min</span>
+            <span>4 min</span>
           </div>
         </div>
-      </a>
+      </div>
 
-      <a class="article-card" href="article.html" data-category="sole-traders">
-        <div class="card-visual cv-1">📋</div>
+      <div class="article-card" data-category="sole-traders">
+        <div class="card-visual cv-1"></div>
         <div class="card-body">
           <span class="tag">Sole Traders</span>
           <h3>Do Sole Traders Need a Business Address?</h3>
           <p>You're not legally required to have one — but here's why thousands of self-employed people get one anyway.</p>
+          <span class="read-link" data-toggle="expand">Read</span>
+          <div class="expand-body">
+            <div class="expand-inner">
+              <h4>No Legal Requirement — But Strong Practical Reasons</h4>
+              <p>Unlike limited companies, sole traders are not required to register an official business address. However, HMRC correspondence, client invoices, and your website all need an address. Using your home address means it appears on every invoice, your website, and potentially on the ICO register if you handle personal data.</p>
+
+              <h4>Why Sole Traders Use a Virtual Address</h4>
+              <ul>
+                <li><strong>Privacy</strong> — keep your home address off invoices, your website, and the ICO register</li>
+                <li><strong>Professionalism</strong> — a business centre address carries more weight than a residential one</li>
+                <li><strong>Mail handling</strong> — have business post scanned and forwarded so it doesn't mix with personal mail</li>
+                <li><strong>HMRC correspondence</strong> — direct Self Assessment and VAT letters to your business address</li>
+              </ul>
+
+              <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">View Plans &rarr;</a>
+            </div>
+          </div>
           <div class="card-footer">
             <span>28 Mar 2026</span>
-            <span>⏱ 3 min</span>
+            <span>3 min</span>
           </div>
         </div>
-      </a>
+      </div>
 
-      <a class="article-card" href="article.html" data-category="companies-house">
-        <div class="card-visual cv-3">🏛️</div>
+      <div class="article-card" data-category="companies-house">
+        <div class="card-visual cv-3"></div>
         <div class="card-body">
           <span class="tag">Companies House</span>
           <h3>Virtual Address vs Registered Office: What's the Difference?</h3>
           <p>They sound similar but serve different legal purposes. This guide explains which one you actually need.</p>
+          <span class="read-link" data-toggle="expand">Read</span>
+          <div class="expand-body">
+            <div class="expand-inner">
+              <h4>Two Different Things</h4>
+              <p>A <strong>virtual address</strong> is a general business correspondence address — you use it on your website, invoices, business cards, and letterheads. A <strong>registered office</strong> is a specific legal requirement for UK limited companies: the official address filed with Companies House where statutory mail is delivered.</p>
+
+              <h4>Which Do You Need?</h4>
+              <ul>
+                <li><strong>Sole traders</strong> — a virtual address is usually sufficient. You have no Companies House filing requirement.</li>
+                <li><strong>Limited companies</strong> — you need a registered office (legally required). You may also want a virtual address if you want a different correspondence address on your website.</li>
+                <li><strong>Both</strong> — many directors use the same address for both, which simplifies everything.</li>
+              </ul>
+
+              <div class="callout"><strong>With Forward My Mail:</strong> Our Registered Office plan includes both the registered office address and a director service address. Our Virtual Address plan is ideal for sole traders or as a secondary correspondence address.</div>
+
+              <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">Compare Plans &rarr;</a>
+            </div>
+          </div>
           <div class="card-footer">
             <span>20 Mar 2026</span>
-            <span>⏱ 5 min</span>
+            <span>5 min</span>
           </div>
         </div>
-      </a>
+      </div>
 
-      <a class="article-card" href="article.html" data-category="hmrc">
-        <div class="card-visual cv-6">✉️</div>
+      <div class="article-card" data-category="hmrc">
+        <div class="card-visual cv-6"></div>
         <div class="card-body">
           <span class="tag">HMRC</span>
           <h3>Will HMRC Write to My Virtual Address?</h3>
           <p>Yes — but only if set up correctly. Here's exactly what to tell HMRC and what mail to expect.</p>
+          <span class="read-link" data-toggle="expand">Read</span>
+          <div class="expand-body">
+            <div class="expand-inner">
+              <h4>Yes — If You Update Your Records</h4>
+              <p>HMRC will send correspondence to whatever address you have registered with them. If you want tax letters to go to your virtual address, you need to update your business tax account. HMRC does not automatically use your Companies House registered office.</p>
+
+              <h4>What to Update</h4>
+              <ul>
+                <li><strong>Corporation Tax</strong> — update via your HMRC business tax account or by calling the CT helpline</li>
+                <li><strong>VAT</strong> — update your principal place of business in your VAT online account</li>
+                <li><strong>PAYE</strong> — update your employer address in your PAYE for employers account</li>
+                <li><strong>Self Assessment</strong> — update via your personal tax account (sole traders)</li>
+              </ul>
+
+              <h4>What Mail to Expect</h4>
+              <p>Corporation tax notices, VAT returns and reminders, PAYE coding notices, annual tax summaries, and any compliance correspondence. With Forward My Mail, all HMRC letters are scanned and sent to you digitally on the same day they arrive.</p>
+
+              <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">View Plans &rarr;</a>
+            </div>
+          </div>
           <div class="card-footer">
             <span>14 Mar 2026</span>
-            <span>⏱ 4 min</span>
+            <span>4 min</span>
           </div>
         </div>
-      </a>
+      </div>
 
-      <a class="article-card" href="article.html" data-category="companies-house">
-        <div class="card-visual cv-4">📜</div>
+      <div class="article-card" data-category="companies-house">
+        <div class="card-visual cv-4"></div>
         <div class="card-body">
           <span class="tag">Companies House</span>
           <h3>The New Identity Verification Rules for UK Directors</h3>
           <p>From 2025, all UK company directors must verify their identity with Companies House. Here's what you need to do.</p>
+          <span class="read-link" data-toggle="expand">Read</span>
+          <div class="expand-body">
+            <div class="expand-inner">
+              <h4>What Changed</h4>
+              <p>The Economic Crime and Corporate Transparency Act 2023 introduced mandatory identity verification for all company directors, people with significant control (PSCs), and anyone filing on behalf of a company. This is being phased in from 2025.</p>
+
+              <h4>Who Needs to Verify</h4>
+              <ul>
+                <li>All new directors at the point of appointment</li>
+                <li>All existing directors — during a transition period</li>
+                <li>People with Significant Control (PSCs)</li>
+                <li>Anyone filing documents with Companies House</li>
+              </ul>
+
+              <h4>How It Works</h4>
+              <p>You can verify directly with Companies House online using a UK passport or driving licence, or through an authorised Corporate Service Provider (ACSP). The process takes a few minutes and only needs to be done once.</p>
+
+              <div class="callout"><strong>Forward My Mail customers:</strong> Identity verification for Companies House is separate from the ID check we carry out when you sign up. You will still need to verify with Companies House directly or via an ACSP.</div>
+
+              <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">View Plans &rarr;</a>
+            </div>
+          </div>
           <div class="card-footer">
             <span>5 Mar 2026</span>
-            <span>⏱ 5 min</span>
+            <span>5 min</span>
           </div>
         </div>
-      </a>
+      </div>
 
-      <a class="article-card" href="article.html" data-category="sole-traders">
-        <div class="card-visual cv-5">💼</div>
+      <div class="article-card" data-category="sole-traders">
+        <div class="card-visual cv-5"></div>
         <div class="card-body">
           <span class="tag">Sole Traders</span>
           <h3>Setting Up a UK Business as a Non-Resident: A Complete Guide</h3>
           <p>You don't need to live in the UK to run a UK limited company. Here's the full process from start to finish.</p>
+          <span class="read-link" data-toggle="expand">Read</span>
+          <div class="expand-body">
+            <div class="expand-inner">
+              <h4>Non-Residents Can Form UK Companies</h4>
+              <p>There is no requirement for a UK company director to be a UK resident. Thousands of overseas entrepreneurs register UK limited companies each year. You do not need a UK visa, work permit, or National Insurance number to be a director.</p>
+
+              <h4>What You Do Need</h4>
+              <ul>
+                <li><strong>A UK registered office address</strong> — required by law; must be a physical address in England, Wales, Scotland, or Northern Ireland</li>
+                <li><strong>A UK director service address</strong> — to keep your overseas home address off the public register</li>
+                <li><strong>Identity verification</strong> — now mandatory under the 2023 Act</li>
+                <li><strong>A UK business bank account</strong> — some banks require a UK address; a virtual address can help with this</li>
+              </ul>
+
+              <h4>The Process</h4>
+              <ul>
+                <li>Choose a registered office address (Forward My Mail provides this)</li>
+                <li>Incorporate your company via Companies House or a formation agent</li>
+                <li>Register for Corporation Tax with HMRC within 3 months</li>
+                <li>Open a UK business bank account</li>
+              </ul>
+
+              <div class="callout"><strong>Forward My Mail handles your UK mail:</strong> All government correspondence is scanned and sent to you digitally — wherever you are in the world.</div>
+
+              <a href="https://www.forwardmymail.co.uk/#pricing" class="expand-cta">Get Started &rarr;</a>
+            </div>
+          </div>
           <div class="card-footer">
             <span>18 Feb 2026</span>
-            <span>⏱ 8 min</span>
+            <span>8 min</span>
           </div>
         </div>
-      </a>
+      </div>
 
     </div>
   </main>
@@ -798,6 +1013,27 @@
           card.style.display = 'none';
         }
       });
+    });
+  });
+
+  // ── Expand/collapse articles inline ──
+  document.querySelectorAll('[data-toggle="expand"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const body = link.nextElementSibling;
+      if (!body || !body.classList.contains('expand-body')) return;
+      const isOpen = body.classList.contains('open');
+      // Close all others
+      document.querySelectorAll('.expand-body.open').forEach(el => {
+        el.classList.remove('open');
+        const prev = el.previousElementSibling;
+        if (prev && prev.dataset.toggle === 'expand') prev.textContent = 'Read';
+      });
+      if (!isOpen) {
+        body.classList.add('open');
+        link.textContent = 'Close';
+      }
     });
   });
 
