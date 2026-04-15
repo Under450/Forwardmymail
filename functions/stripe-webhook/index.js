@@ -768,6 +768,7 @@ exports.createDiditSession = onRequest(async (req, res) => {
         workflow_id: DIDIT_WORKFLOW_ID,
         vendor_data: customerId,
         callback: 'https://www.forwardmymail.co.uk/customer-portal.html',
+        webhook_url: 'https://us-central1-forward-my-mail.cloudfunctions.net/diditWebhook',
         contact_details: { email: customerEmail }
       })
     });
@@ -868,6 +869,27 @@ exports.diditWebhook = onRequest(async (req, res) => {
       } else if (idStatus === 'declined') {
         await sendVerificationEmail(customer.email, customer.name || 'Customer', 'declined');
       }
+
+      // Notify admin
+      const statusLabel = idStatus === 'approved' ? '✅ APPROVED' : idStatus === 'declined' ? '❌ DECLINED' : '⏳ PENDING';
+      const mailbox = customer.mailboxId || 'N/A';
+      const company = customer.company || '';
+      await sendMailLogged({
+        to: 'info@forwardmymail.co.uk',
+        subject: `ID Verification ${statusLabel} — ${customer.name || 'Customer'}${company ? ' / ' + company : ''}`,
+        html: `<p>A customer has completed identity verification.</p>
+               <table style="border-collapse:collapse;font-family:Arial,sans-serif;font-size:14px;">
+                 <tr><td style="padding:6px 12px;font-weight:bold;">Name</td><td style="padding:6px 12px;">${customer.name || 'N/A'}</td></tr>
+                 <tr style="background:#f5f5f5;"><td style="padding:6px 12px;font-weight:bold;">Company</td><td style="padding:6px 12px;">${company || 'N/A'}</td></tr>
+                 <tr><td style="padding:6px 12px;font-weight:bold;">Email</td><td style="padding:6px 12px;">${customer.email || 'N/A'}</td></tr>
+                 <tr style="background:#f5f5f5;"><td style="padding:6px 12px;font-weight:bold;">Mailbox</td><td style="padding:6px 12px;">${mailbox}</td></tr>
+                 <tr><td style="padding:6px 12px;font-weight:bold;">Status</td><td style="padding:6px 12px;font-size:16px;">${statusLabel}</td></tr>
+                 <tr style="background:#f5f5f5;"><td style="padding:6px 12px;font-weight:bold;">Package</td><td style="padding:6px 12px;">${customer.package || 'N/A'}</td></tr>
+               </table>
+               ${idStatus === 'approved' ? '<p style="margin-top:16px;"><strong>Action required:</strong> Log into the staff portal and mark this customer as verified and OK to receive mail.</p><p><a href="https://under450.github.io/cj-portal/" style="background:#1e3a8a;color:white;padding:10px 20px;text-decoration:none;border-radius:6px;display:inline-block;">Open Staff Portal →</a></p>' : ''}`,
+        template: 'admin_id_verification',
+        customerEmail: customer.email || ''
+      });
     }
 
     return res.status(200).json({ received: true });
