@@ -474,11 +474,11 @@ exports.sendWelcomeEmail = onCall(async (request) => {
   const data = request.data;
   const { email, name, mailboxId } = data;
 
-  if (!email || !name || !mailboxId) {
+  if (!email || !name) {
     throw new HttpsError('invalid-argument', 'Missing required fields');
   }
 
-  await sendWelcomeEmail(email, name, mailboxId);
+  await sendWelcomeEmail(email, name, mailboxId || '');
   return { success: true };
 });
 
@@ -504,6 +504,14 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
     });
 
     console.log(`Signup notification sent for ${customerData.email}`);
+
+    // Send welcome email to the customer
+    try {
+      await sendWelcomeEmail(customerData.email, customerData.name, mailboxId || '');
+      console.log(`Welcome email sent to ${customerData.email}`);
+    } catch (welcomeErr) {
+      console.error('Welcome email failed:', welcomeErr);
+    }
 
     // Sync new customer to Google Sheets
     const finalData = { ...customerData, mailboxId };
