@@ -574,13 +574,19 @@ function applyGateUI(data) {
     function refreshBanner(data) {
       const credits = Number(data.credits || 0);
       const free = Number(data.freeScansRemaining || 0);
+      const idStatus = (data.idStatus || 'not_started').toLowerCase();
+      const isVerified = idStatus === 'approved';
 
       lowBalanceWarning.classList.remove('show');
       lowBalanceWarning.className = 'low-balance-warning';
 
+      // Don't show credit warnings to new unverified customers
+      // The ID verification banner above is already their primary call to action
+      if (!isVerified) return;
+
       if (credits <= 0 && free <= 0) {
         lowBalanceWarning.className = 'critical-credit-warning show';
-        lowBalanceWarning.innerHTML = '⛔ <strong>CRITICAL:</strong> You have no credits and no free scans. Please purchase credits.';
+        lowBalanceWarning.innerHTML = '⛔ <strong>CRITICAL:</strong> You have no credits and no free scans. Please purchase credits to start receiving mail scans.';
       } else if (free > 0) {
         lowBalanceWarning.className = 'low-balance-warning show';
         lowBalanceWarning.innerHTML = `✅ <strong>Free scans available:</strong> ${free} left this month. We’ll use these before your paid credits.`;
