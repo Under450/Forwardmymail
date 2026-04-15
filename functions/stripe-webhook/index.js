@@ -513,6 +513,51 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
       console.error('Welcome email failed:', welcomeErr);
     }
 
+    // Send terms acceptance record to admin
+    try {
+      const termsVersion = customerData.termsAcceptance?.version || '2025-12-19';
+      const termsTimestamp = customerData.termsAcceptance?.timestamp || customerData.termsAcceptedAt?.toDate?.()?.toISOString() || 'Unknown';
+      const termsUserAgent = customerData.termsAcceptance?.userAgent || 'Unknown';
+      const termsIp = customerData.termsAcceptance?.ipAddress || 'pending';
+      const acceptedAt = new Date(termsTimestamp).toLocaleString('en-GB', { timeZone: 'Europe/London', dateStyle: 'full', timeStyle: 'long' });
+
+      await sendMailLogged({
+        to: 'info@forwardmymail.co.uk',
+        subject: `Terms Acceptance Record — ${customerData.name}${customerData.company ? ' / ' + customerData.company : ''}`,
+        template: 'admin_terms_acceptance',
+        customerEmail: customerData.email || '',
+        html: `<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px;background:#f5f5f5;">
+<div style="background:white;padding:30px;border-radius:10px;border-left:4px solid #1e3c72;">
+  <h2 style="color:#1e3c72;margin-top:0;">📋 Terms &amp; Conditions — Acceptance Record</h2>
+  <p style="color:#666;font-size:13px;margin-bottom:24px;">This email confirms that the following customer has read and agreed to the Forward My Mail Terms &amp; Conditions. Keep this for your records.</p>
+
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+    <tr style="background:#f0f4ff;"><td style="padding:10px 14px;font-weight:bold;width:40%;border-bottom:1px solid #ddd;">Full Name</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${customerData.name || 'N/A'}</td></tr>
+    <tr><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">Company</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${customerData.company || 'N/A'}</td></tr>
+    <tr style="background:#f0f4ff;"><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">Email Address</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${customerData.email || 'N/A'}</td></tr>
+    <tr><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">Mailbox ID</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${mailboxId || 'N/A'}</td></tr>
+    <tr style="background:#f0f4ff;"><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">Accepted At</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${acceptedAt}</td></tr>
+    <tr><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">IP Address</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${termsIp}</td></tr>
+    <tr style="background:#f0f4ff;"><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">Terms Version</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;">${termsVersion}</td></tr>
+    <tr><td style="padding:10px 14px;font-weight:bold;border-bottom:1px solid #ddd;">Device / Browser</td><td style="padding:10px 14px;border-bottom:1px solid #ddd;font-size:12px;color:#666;">${termsUserAgent}</td></tr>
+  </table>
+
+  <div style="background:#e8f4e8;border:1px solid #4caf50;border-radius:8px;padding:16px;margin-bottom:24px;">
+    <p style="margin:0;color:#2e7d32;font-weight:bold;">✅ Customer confirmed acceptance by checking the Terms &amp; Conditions checkbox on the signup page.</p>
+  </div>
+
+  <p style="margin-bottom:8px;"><strong>Terms agreed to:</strong></p>
+  <a href="https://www.forwardmymail.co.uk/terms.html" style="display:inline-block;background:#1e3c72;color:white;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold;">View Full Terms (v${termsVersion}) →</a>
+
+  <p style="margin-top:24px;font-size:11px;color:#999;">This is an automated record generated at time of account creation. Reference ID: ${event.params.customerId}</p>
+</div>
+</body></html>`
+      });
+      console.log(`Terms acceptance record sent for ${customerData.email}`);
+    } catch (termsErr) {
+      console.error('Terms acceptance email failed:', termsErr);
+    }
+
     // Sync new customer to Google Sheets
     const finalData = { ...customerData, mailboxId };
     await syncCustomerToSheet(event.params.customerId, finalData);
