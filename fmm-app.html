@@ -788,6 +788,10 @@ html, body {
           <div class="settings-label">My Account Details</div>
           <div class="settings-group">
             <div class="settings-row" style="cursor:default;">
+              <div class="sr-icon navy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1e2b3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+              <div class="sr-body"><div class="sr-title">Package</div><div class="sr-sub" id="acct-package">—</div></div>
+            </div>
+            <div class="settings-row" style="cursor:default;">
               <div class="sr-icon navy"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#1e2b3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
               <div class="sr-body"><div class="sr-title">Mailbox ID</div><div class="sr-sub" id="acct-mailbox-id">—</div></div>
             </div>
@@ -1307,7 +1311,9 @@ function populateApp() {
   document.getElementById('acct-avatar').textContent = initials;
   document.getElementById('acct-address').textContent = currentCustomer.forwardingAddress || 'Not set';
 
-  // Mailbox ID, free scans, ID status
+  // Package, Mailbox ID, free scans, ID status
+  const packageEl = document.getElementById('acct-package');
+  if (packageEl) packageEl.textContent = currentCustomer.package || 'Not set';
   const mailboxEl = document.getElementById('acct-mailbox-id');
   if (mailboxEl) mailboxEl.textContent = currentCustomer.mailboxId || 'Not assigned';
   const freeScansEl = document.getElementById('acct-free-scans');

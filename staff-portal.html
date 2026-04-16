@@ -258,6 +258,24 @@
             <div id="letterTypeHelp" style="font-size:13px;color:#666;margin-top:6px;"></div>
           </div>
 
+          <!-- Gov mail type — only shown for Registered Office / Full Virtual Office -->
+          <div class="form-group" id="govMailTypeGroup" style="display:none;">
+            <label>Mail Category</label>
+            <div style="display:flex;gap:20px;margin-top:8px;">
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:#064e3b;">
+                <input type="radio" name="govMailType" value="government" id="govMailTypeGovt" checked style="width:18px;height:18px;accent-color:#064e3b;"/>
+                🏛️ Government / Official
+              </label>
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-weight:600;color:#92400e;">
+                <input type="radio" name="govMailType" value="non-government" id="govMailTypeNonGovt" style="width:18px;height:18px;accent-color:#92400e;"/>
+                📦 Non-Government
+              </label>
+            </div>
+            <div id="govMailTypeHelp" style="font-size:13px;margin-top:8px;padding:10px;border-radius:6px;background:#fefce8;border:1px solid #fbbf24;color:#78350f;display:none;">
+              ⚠️ Non-government mail for this package: scan will be uploaded but <strong>customer will be asked to add credits to view it</strong>.
+            </div>
+          </div>
+
           <div class="form-group"><label for="pages">Number of Pages</label><input type="number" id="pages" min="1" value="1"/></div>
           <div class="form-group"><label for="notes">Notes (Optional)</label><textarea id="notes" rows="3" placeholder="Add any notes about this scan..."></textarea></div>
 
@@ -471,6 +489,16 @@ const storage = getStorage(app);
       const pkg = packageType || 'PERSONAL MAILBOX';
       const unavailable = Array.from(letterType.options).filter(o=>o.disabled).map(o=>o.textContent).join(', ');
       letterTypeHelp.textContent = unavailable ? `Package: ${pkg}. Unavailable types (greyed out): ${unavailable}. Use "Override" only with approval.` : `Package: ${pkg}.`;
+      // Show gov/non-gov selector for Registered Office and Full Virtual Office
+      const pkgUp = pkg.toUpperCase();
+      const govGroup = document.getElementById('govMailTypeGroup');
+      if (pkgUp.includes('REGISTERED') || pkgUp.includes('FULL VIRTUAL')) {
+        govGroup.style.display = 'block';
+        document.getElementById('govMailTypeGovt').checked = true;
+        document.getElementById('govMailTypeHelp').style.display = 'none';
+      } else {
+        govGroup.style.display = 'none';
+      }
     }
 
     customerSelect.addEventListener('change', async (e)=>{
@@ -520,7 +548,8 @@ const storage = getStorage(app);
       document.getElementById('customerCompany').textContent = cust.company || '-';
       document.getElementById('customerEmail').textContent = cust.email || '-';
       customerMailboxIdEl.textContent = cust.mailboxId || '-';
-      customerPackageEl.textContent = (cust.packageType || 'Not set').toString();
+      const pkg = (cust.package || cust.packageType || '').toString();
+      customerPackageEl.textContent = pkg || 'Not set';
       document.getElementById('customerForwardingAddress').textContent = cust.forwardingAddress || 'Not set';
 
       const credits = Number(cust.credits || 0);
@@ -533,9 +562,25 @@ const storage = getStorage(app);
 
       if (customerFreeScansEl) customerFreeScansEl.textContent = String(freeScans);
 
+      const pkgUpper = pkg.toUpperCase();
+      const isPersonal = pkgUpper.includes('PERSONAL');
+      const isBusiness = pkgUpper.includes('BUSINESS');
+      const isRegOrFull = pkgUpper.includes('REGISTERED') || pkgUpper.includes('FULL VIRTUAL');
+
       if (credits < 0.50 && freeScans <= 0){
-        lowCreditWarning.className='critical-credit-warning';
-        lowCreditWarning.innerHTML='⛔ <strong>CRITICAL:</strong> Insufficient credits and no free scans.';
+        if (isPersonal) {
+          lowCreditWarning.className='critical-credit-warning';
+          lowCreditWarning.innerHTML='⛔ <strong>CRITICAL:</strong> Personal package — 5 free scans exhausted and no credits. Customer must top up to receive scans.';
+        } else if (isBusiness) {
+          lowCreditWarning.className='critical-credit-warning';
+          lowCreditWarning.innerHTML='⛔ <strong>CRITICAL:</strong> Business Address — no credits. Customer must top up to receive any scans.';
+        } else if (isRegOrFull) {
+          lowCreditWarning.className='critical-credit-warning';
+          lowCreditWarning.innerHTML='⛔ <strong>CRITICAL:</strong> Government mail is free. Non-government scans are blocked — customer must add credits to view.';
+        } else {
+          lowCreditWarning.className='critical-credit-warning';
+          lowCreditWarning.innerHTML='⛔ <strong>CRITICAL:</strong> Insufficient credits and no free scans.';
+        }
         lowCreditWarning.style.display='block';
       } else if (freeScans > 0){
         lowCreditWarning.className='low-credit-warning';
@@ -553,7 +598,7 @@ const storage = getStorage(app);
       autoRenewFreeScansInput.checked = Boolean(cust.autoRenewFreeScans);
       resetModeSelect.value = (cust.resetMode || 'reset').toLowerCase();
 
-      refreshLetterTypeOptions(cust.packageType || 'PERSONAL MAILBOX');
+      refreshLetterTypeOptions(pkg || 'PERSONAL MAILBOX');
       customerInfo.style.display='grid';
 
       // ID panel values
@@ -672,6 +717,14 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
       costAmount.textContent = cost.toFixed(2);
     });
 
+    // Gov/non-gov radio — show warning hint when non-govt selected
+    document.querySelectorAll('input[name="govMailType"]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const helpEl = document.getElementById('govMailTypeHelp');
+        if (helpEl) helpEl.style.display = radio.value === 'non-government' && radio.checked ? 'block' : 'none';
+      });
+    });
+
     // File status preview
     scanFilesInput.addEventListener('change',(e)=>{
       const files = Array.from(e.target.files || []);
@@ -747,16 +800,67 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         if (!confirm('Use Override for this scan?')) return;
       }
 
-      // STEP 4: Credits check
+      // Determine package class
+      const custPkg = (currentCustomer.package || currentCustomer.packageType || '').toUpperCase();
+      const isPersonal   = custPkg.includes('PERSONAL');
+      const isBusiness   = custPkg.includes('BUSINESS');
+      const isRegOrFull  = custPkg.includes('REGISTERED') || custPkg.includes('FULL VIRTUAL');
+
+      // Gov mail type selection (only relevant for Reg Office / Full Virtual)
+      let isNonGovt = false;
+      if (isRegOrFull) {
+        const govSelected = document.querySelector('input[name="govMailType"]:checked');
+        isNonGovt = govSelected ? govSelected.value === 'non-government' : false;
+      }
+
+      // STEP 4: Credits / free scan check — package-aware
       const freeScans = Number(currentCustomer.freeScansRemaining || 0);
+      const credits   = Number(currentCustomer.credits || 0);
       let usedFreeScan = false;
       let payable = baseCost;
-      if (freeScans > 0) {
-        usedFreeScan = true;
-        payable = 0;
-      } else if ((currentCustomer.credits || 0) < baseCost) {
-        showScanError(`ERROR: Insufficient credits. Customer has £${(currentCustomer.credits||0).toFixed(2)} but needs £${baseCost.toFixed(2)}. Top up required.`);
-        return;
+      let blockedNonGovt = false; // scan uploaded but customer notified to add credits
+
+      if (isPersonal) {
+        // Personal: 5 free scans/month, then needs credits
+        if (freeScans > 0) {
+          usedFreeScan = true;
+          payable = 0;
+        } else if (credits < baseCost) {
+          showScanError(`ERROR: Personal package — free scans exhausted. Credits: £${credits.toFixed(2)}, needs £${baseCost.toFixed(2)}. Customer must top up.`);
+          return;
+        }
+      } else if (isBusiness) {
+        // Business Address: no free scans, always needs credits
+        if (credits < baseCost) {
+          showScanError(`ERROR: Business Address — no free scans included. Credits: £${credits.toFixed(2)}, needs £${baseCost.toFixed(2)}. Customer must top up.`);
+          return;
+        }
+      } else if (isRegOrFull) {
+        // Registered Office / Full Virtual: govt mail is free, non-govt needs credits
+        if (isNonGovt) {
+          if (credits < baseCost) {
+            // Upload scan but block it — customer gets email to add credits
+            blockedNonGovt = true;
+            payable = 0; // no deduction yet, blocked
+          }
+          // If they have credits, charge normally
+          else {
+            payable = baseCost;
+          }
+        } else {
+          // Government mail — free, no charge
+          usedFreeScan = false;
+          payable = 0;
+        }
+      } else {
+        // Fallback: treat like personal
+        if (freeScans > 0) {
+          usedFreeScan = true;
+          payable = 0;
+        } else if (credits < baseCost) {
+          showScanError(`ERROR: Insufficient credits. Customer has £${credits.toFixed(2)} but needs £${baseCost.toFixed(2)}.`);
+          return;
+        }
       }
 
       processScanBtn.disabled = true;
@@ -793,8 +897,10 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           cost: payable,
           notes: notes,
           files: uploadedFiles,
-          status: 'scanned',
+          status: blockedNonGovt ? 'blocked_no_credits' : 'scanned',
           freeScanUsed: usedFreeScan,
+          govtMailCategory: isRegOrFull ? (isNonGovt ? 'non-government' : 'government') : null,
+          blockedNonGovt: blockedNonGovt,
           receivedAt: serverTimestamp(),
           scannedAt: serverTimestamp(),
           processedAt: serverTimestamp(),
@@ -811,21 +917,47 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
 
       // STEP 7: Deduct credits or free scan
       try {
-        if (usedFreeScan) {
+        if (blockedNonGovt) {
+          // No deduction — scan is blocked, customer must add credits to view
+          // Notify via Cloud Function (fire-and-forget)
+          try {
+            await fetch(`https://us-central1-forward-my-mail.cloudfunctions.net/notifyNonGovtScanBlocked`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                customerId: currentCustomer.id,
+                customerEmail: currentCustomer.email,
+                customerName: currentCustomer.name || 'Customer',
+                pages: pages,
+                cost: baseCost
+              })
+            });
+          } catch(notifyErr) {
+            console.warn('Non-govt blocked notification failed (non-critical):', notifyErr);
+          }
+        } else if (usedFreeScan) {
           await updateDoc(doc(db, 'customers', currentCustomer.id), { freeScansRemaining: increment(-1) });
           currentCustomer.freeScansRemaining = Math.max((currentCustomer.freeScansRemaining || 0) - 1, 0);
-        } else {
-          const newCredits = (currentCustomer.credits || 0) - baseCost;
+        } else if (payable > 0) {
+          const newCredits = (currentCustomer.credits || 0) - payable;
           await updateDoc(doc(db, 'customers', currentCustomer.id), { credits: newCredits });
           currentCustomer.credits = newCredits;
         }
+        // payable === 0 and not blocked = govt mail free, no deduction needed
       } catch (creditErr) {
         showScanError('WARNING: Scan saved but credit deduction failed: ' + (creditErr?.message || String(creditErr)));
       }
 
       // STEP 8: Reset form and refresh
       renderCustomer(currentCustomer);
-      showSuccess(`Scan processed: ${pages} page(s) — ${usedFreeScan ? 'FREE scan used' : '£' + baseCost.toFixed(2) + ' deducted'}.`);
+      const resultMsg = blockedNonGovt
+        ? `Scan uploaded (BLOCKED — customer notified to add credits to view).`
+        : usedFreeScan
+        ? `Scan processed: ${pages} page(s) — FREE scan used.`
+        : payable === 0
+        ? `Scan processed: ${pages} page(s) — Government mail, no charge.`
+        : `Scan processed: ${pages} page(s) — £${payable.toFixed(2)} deducted.`;
+      showSuccess(resultMsg);
       pagesInput.value = 1;
       document.getElementById('notes').value = '';
       scanFilesInput.value = '';

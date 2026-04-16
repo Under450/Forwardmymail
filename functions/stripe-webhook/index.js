@@ -919,6 +919,18 @@ exports.diditWebhook = onRequest(async (req, res) => {
       const customer = customerDoc.data();
       if (idStatus === 'approved') {
         await sendVerificationEmail(customer.email, customer.name || 'Customer', 'approved');
+        // Business Address: no free scans — prompt to add credits immediately after approval
+        const custPkg = (customer.package || '').toUpperCase();
+        if (custPkg.includes('BUSINESS')) {
+          await sendMailLogged({
+            to: customer.email,
+            subject: 'Your identity is verified — add credits to start receiving mail',
+            html: buildNoCreditBusinessEmail(customer.name || 'Customer'),
+            template: 'id_approved_business_no_credits',
+            customerId,
+            customerEmail: customer.email
+          });
+        }
       } else if (idStatus === 'declined') {
         await sendVerificationEmail(customer.email, customer.name || 'Customer', 'declined');
       }
@@ -949,6 +961,60 @@ exports.diditWebhook = onRequest(async (req, res) => {
 
   } catch (err) {
     console.error('diditWebhook error:', err);
+    return res.status(500).send('Internal error');
+  }
+});
+
+// ── buildNoCreditBusinessEmail ────────────────────────────────────────────────
+function buildNoCreditBusinessEmail(name) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}.wrapper{max-width:600px;margin:0 auto;background:#fff}.header{background:linear-gradient(135deg,#1e3a8a,#1e40af);padding:36px 30px;text-align:center;color:#fff}.header h1{margin:0;font-size:24px}.body{padding:36px 30px}.greeting{font-size:16px;color:#334155;line-height:1.7}.box{background:#fefce8;border:2px solid #fbbf24;border-radius:10px;padding:20px;margin:24px 0;color:#78350f;font-size:15px}.cta{display:block;background:#1e3a8a;color:#fff;text-decoration:none;padding:15px 30px;border-radius:8px;text-align:center;font-weight:700;font-size:15px;margin:24px 0}.footer{background:#f8fafc;padding:20px 30px;text-align:center;font-size:12px;color:#94a3b8}</style></head><body>
+<div class="wrapper">
+<div class="header"><h1>Identity Verified ✅</h1><p style="color:rgba(255,255,255,0.8);margin:8px 0 0">Your Business Address is ready — one step to go</p></div>
+<div class="body">
+<p class="greeting">Hi <strong>${name}</strong>,</p>
+<p class="greeting">Your identity has been verified and your UK business address is now active. Your Business Address package does not include free scans, so to start receiving and viewing your mail you will need to add some credits to your account.</p>
+<div class="box"><strong>⚠️ Action required:</strong> Add credits to your portal now so that when mail arrives we can scan and share it with you. Without credits, we cannot process your mail.</div>
+<a href="https://www.forwardmymail.co.uk/customer-portal.html#credits" class="cta">Add Credits Now →</a>
+<p style="font-size:14px;color:#64748b">Scans cost from £0.50 per item. Credits never expire and can be topped up at any time from your portal.</p>
+</div>
+<div class="footer"><strong>Forward My Mail Ltd</strong><br>8a Bore Street, Lichfield, Staffordshire, WS13 6LL<br>Company No. 16912540<br><a href="mailto:info@forwardmymail.co.uk" style="color:#1e3a8a">info@forwardmymail.co.uk</a></div>
+</div></body></html>`;
+}
+
+// ── buildNonGovtBlockedEmail ───────────────────────────────────────────────────
+function buildNonGovtBlockedEmail(name, pages, cost) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}.wrapper{max-width:600px;margin:0 auto;background:#fff}.header{background:linear-gradient(135deg,#1e3a8a,#1e40af);padding:36px 30px;text-align:center;color:#fff}.header h1{margin:0;font-size:24px}.body{padding:36px 30px}.greeting{font-size:16px;color:#334155;line-height:1.7}.box{background:#fee2e2;border:2px solid #fca5a5;border-radius:10px;padding:20px;margin:24px 0;color:#7f1d1d;font-size:15px}.cta{display:block;background:#1e3a8a;color:#fff;text-decoration:none;padding:15px 30px;border-radius:8px;text-align:center;font-weight:700;font-size:15px;margin:24px 0}.footer{background:#f8fafc;padding:20px 30px;text-align:center;font-size:12px;color:#94a3b8}</style></head><body>
+<div class="wrapper">
+<div class="header"><h1>New Mail Arrived 📬</h1><p style="color:rgba(255,255,255,0.8);margin:8px 0 0">Credits required to view this scan</p></div>
+<div class="body">
+<p class="greeting">Hi <strong>${name}</strong>,</p>
+<p class="greeting">We've received and scanned a non-government mail item for you (${pages} page${pages > 1 ? 's' : ''}). Your Registered Office package covers government mail for free, but viewing non-government correspondence requires credits.</p>
+<div class="box"><strong>🔒 Your scan is ready but locked.</strong> Add £${Number(cost).toFixed(2)} or more in credits to unlock and view this item. The scan will remain available in your portal once credits are added.</div>
+<a href="https://www.forwardmymail.co.uk/customer-portal.html#credits" class="cta">Add Credits to View →</a>
+<p style="font-size:14px;color:#64748b">Credits never expire. Once added, your scan will unlock automatically in your portal.</p>
+</div>
+<div class="footer"><strong>Forward My Mail Ltd</strong><br>8a Bore Street, Lichfield, Staffordshire, WS13 6LL<br>Company No. 16912540<br><a href="mailto:info@forwardmymail.co.uk" style="color:#1e3a8a">info@forwardmymail.co.uk</a></div>
+</div></body></html>`;
+}
+
+// ── notifyNonGovtScanBlocked ─────────────────────────────────────────────────
+// Called by staff portal when a non-govt scan is uploaded but customer has no credits
+exports.notifyNonGovtScanBlocked = onRequest(async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  try {
+    const { customerId, customerEmail, customerName, pages, cost } = req.body;
+    if (!customerEmail) return res.status(400).json({ error: 'Missing customerEmail' });
+    await sendMailLogged({
+      to: customerEmail,
+      subject: 'New mail arrived — add credits to view your scan',
+      html: buildNonGovtBlockedEmail(customerName || 'Customer', pages || 1, cost || 0.50),
+      template: 'non_govt_scan_blocked',
+      customerId: customerId || '',
+      customerEmail
+    });
+    return res.status(200).json({ sent: true });
+  } catch (err) {
+    console.error('notifyNonGovtScanBlocked error:', err);
     return res.status(500).send('Internal error');
   }
 });
@@ -1139,6 +1205,41 @@ exports.checkLowCredits = onSchedule('every day 09:00', async () => {
   for (const doc of snapshot.docs) {
     const data = doc.data();
     const credits = data.credits || 0;
+    const pkg = (data.package || '').toUpperCase();
+    const isPersonal  = pkg.includes('PERSONAL');
+    const isBusiness  = pkg.includes('BUSINESS');
+    const isRegOrFull = pkg.includes('REGISTERED') || pkg.includes('FULL VIRTUAL');
+
+    // Personal: only warn if free scans are also exhausted (5 free/month)
+    // Reset free scans monthly if autoRenew is set
+    if (isPersonal) {
+      const freeScans = Number(data.freeScansRemaining ?? data.monthlyFreeAllowance ?? 0);
+      const monthlyAllowance = Number(data.monthlyFreeAllowance ?? 5);
+      // Check if we need to reset free scans (new month)
+      const lastReset = data.lastFreeScanReset ? data.lastFreeScanReset.toDate() : null;
+      const now = new Date();
+      const needsReset = !lastReset ||
+        (lastReset.getFullYear() < now.getFullYear()) ||
+        (lastReset.getMonth() < now.getMonth());
+      if (needsReset && monthlyAllowance > 0) {
+        try {
+          await doc.ref.update({
+            freeScansRemaining: monthlyAllowance,
+            lastFreeScanReset: admin.firestore.FieldValue.serverTimestamp()
+          });
+          console.log(`Reset free scans for Personal customer ${data.email} to ${monthlyAllowance}`);
+          continue; // No credit warning this cycle — they just got free scans back
+        } catch (resetErr) {
+          console.error(`Failed to reset free scans for ${data.email}:`, resetErr);
+        }
+      }
+      // Only warn if free scans are also gone
+      if (freeScans > 0) continue;
+    }
+
+    // Business Address: warn if any credits low (no free scans ever)
+    // Registered/Full Virtual: gov mail is free so low credits only matter for non-govt
+    // For all: skip if credits still healthy
     if (credits > 5) continue;
 
     // Don't spam — only send if we haven't sent one in the last 7 days
