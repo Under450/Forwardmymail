@@ -604,6 +604,53 @@ exports.syncAllCustomersToSheet = onCall(async (request) => {
 });
 
 // ── HTTP endpoint to trigger bulk sync (protected by secret key) ─────────────
+// ── backfillTermsAcceptances (CJ-only callable) ──────────────────────────────
+exports.backfillTermsAcceptances = onCall(async (request) => {
+  const user = request.auth;
+  if (!user || user.token.email !== 'caj@me.com') {
+    throw new HttpsError('permission-denied', 'CJ access only');
+  }
+
+  const custSnap = await db.collection('customers').get();
+  const results = [];
+
+  for (const docSnap of custSnap.docs) {
+    const c = docSnap.data();
+    // Skip test accounts
+    if (['caj@me.com','sparetemp@gmail.com','staff@forwardmymail.co.uk','test@forwardmymail.co.uk'].includes(c.email)) continue;
+    // Skip if already has a TCA record
+    const existing = await db.collection('termsAcceptances').where('customerId','==',docSnap.id).limit(1).get();
+    if (!existing.empty) { results.push(`SKIP ${c.email} — already exists`); continue; }
+
+    const tcaCounterRef = db.collection('_counters').doc('termsAcceptances');
+    const refId = await db.runTransaction(async (tx) => {
+      const counterSnap = await tx.get(tcaCounterRef);
+      const next = (counterSnap.exists ? counterSnap.data().count : 0) + 1;
+      tx.set(tcaCounterRef, { count: next }, { merge: true });
+      const ref = `TCA-${String(next).padStart(5, '0')}`;
+      const tcaDocRef = db.collection('termsAcceptances').doc(ref);
+      tx.set(tcaDocRef, {
+        refId: ref,
+        customerId: docSnap.id,
+        name: c.name || '',
+        email: c.email || '',
+        company: c.company || '',
+        mailboxId: c.mailboxId || '',
+        termsVersion: c.termsAcceptance?.version || '2025-12-19',
+        acceptedAt: c.termsAcceptance?.timestamp || c.termsAcceptedAt?.toDate?.()?.toISOString() || c.created?.toDate?.()?.toISOString() || new Date().toISOString(),
+        ipAddress: c.termsAcceptance?.ipAddress || 'pre-system',
+        userAgent: c.termsAcceptance?.userAgent || '',
+        createdAt: new Date(),
+        backfilled: true
+      });
+      return ref;
+    });
+    results.push(`OK ${c.email} → ${refId}`);
+  }
+
+  return { results };
+});
+
 exports.runBulkSync = onRequest(async (req, res) => {
   const key = req.query.key || req.headers['x-api-key'];
   if (key !== process.env.BULK_SYNC_KEY && key !== 'fmm-sync-2024') {
