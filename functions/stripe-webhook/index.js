@@ -558,6 +558,35 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
       console.error('Terms acceptance email failed:', termsErr);
     }
 
+    // Write to termsAcceptances collection with short TCA ref
+    try {
+      const tcaCounterRef = db.collection('_counters').doc('termsAcceptances');
+      const tcaRef = await db.runTransaction(async (tx) => {
+        const counterSnap = await tx.get(tcaCounterRef);
+        const next = (counterSnap.exists ? counterSnap.data().count : 0) + 1;
+        tx.set(tcaCounterRef, { count: next }, { merge: true });
+        const refId = `TCA-${String(next).padStart(5, '0')}`;
+        const tcaDocRef = db.collection('termsAcceptances').doc(refId);
+        tx.set(tcaDocRef, {
+          refId,
+          customerId: event.params.customerId,
+          name: customerData.name || '',
+          email: customerData.email || '',
+          company: customerData.company || '',
+          mailboxId: mailboxId || '',
+          termsVersion: customerData.termsAcceptance?.version || '2025-12-19',
+          acceptedAt: customerData.termsAcceptance?.timestamp || new Date().toISOString(),
+          ipAddress: customerData.termsAcceptance?.ipAddress || 'pending',
+          userAgent: customerData.termsAcceptance?.userAgent || '',
+          createdAt: new Date()
+        });
+        return refId;
+      });
+      console.log(`Terms acceptance written: ${tcaRef} for ${customerData.email}`);
+    } catch (tcaErr) {
+      console.error('termsAcceptances write failed:', tcaErr);
+    }
+
     // Sync new customer to Google Sheets
     const finalData = { ...customerData, mailboxId };
     await syncCustomerToSheet(event.params.customerId, finalData);
@@ -1991,6 +2020,58 @@ exports.onMailRequestCreated = onDocumentCreated('mailRequests/{reqId}', async (
 // ── getEmailLogs ──────────────────────────────────────────────────────────────
 // Returns email_logs from Firestore — used by the staff email log viewer page
 // Secured by staff password check against Firestore config doc
+// ── getCJData (CJ-only callable) ─────────────────────────────────────────────
+exports.getCJData = onCall(async (request) => {
+  const user = request.auth;
+  if (!user || user.token.email !== 'caj@me.com') {
+    throw new HttpsError('permission-denied', 'CJ access only');
+  }
+
+  // Terms acceptances
+  const tcaSnap = await db.collection('termsAcceptances').orderBy('createdAt', 'desc').limit(200).get();
+  const terms = tcaSnap.docs.map(d => d.data());
+
+  // Customers with packages
+  const custSnap = await db.collection('customers').get();
+  const customers = custSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  // Package breakdown
+  const packageMap = {};
+  customers.forEach(c => {
+    const pkg = c.package || 'No Package';
+    if (!packageMap[pkg]) packageMap[pkg] = { count: 0, customers: [] };
+    packageMap[pkg].count++;
+    packageMap[pkg].customers.push({ name: c.name, email: c.email, mailboxId: c.mailboxId || '' });
+  });
+
+  // Stripe balance
+  let stripeBalance = null;
+  let recentPayments = [];
+  try {
+    const balance = await stripe.balance.retrieve();
+    stripeBalance = {
+      available: balance.available.map(b => ({ amount: (b.amount / 100).toFixed(2), currency: b.currency })),
+      pending: balance.pending.map(b => ({ amount: (b.amount / 100).toFixed(2), currency: b.currency }))
+    };
+
+    // Last 50 payments
+    const charges = await stripe.charges.list({ limit: 50 });
+    recentPayments = charges.data
+      .filter(c => c.paid && !c.refunded)
+      .map(c => ({
+        amount: (c.amount / 100).toFixed(2),
+        currency: c.currency,
+        email: c.billing_details?.email || c.receipt_email || '',
+        description: c.description || '',
+        date: new Date(c.created * 1000).toISOString()
+      }));
+  } catch (stripeErr) {
+    console.error('Stripe fetch failed:', stripeErr.message);
+  }
+
+  return { terms, packageMap, stripeBalance, recentPayments };
+});
+
 exports.getEmailLogs = onRequest(async (req, res) => {
   const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
   const origin = req.headers.origin;
@@ -2170,10 +2251,6 @@ exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
-
-// ── CJ Control Panel API ─────────────────────────────────────────────────────
-const panelApi = require('./panel-api');
-Object.assign(exports, panelApi);
 
 // ── getEmailLogs — update to use Firebase ID token auth ──────────────────────
 // (replaces the hardcoded password version — existing function updated below)
