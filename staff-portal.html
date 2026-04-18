@@ -163,7 +163,32 @@
           </div>
         </div>
 
-        <div class="customer-selector panel">
+        <!-- ===== CJ Owner Panels (caj@me.com only) ===== -->
+        <div id="cjSection" style="display:none;">
+          <div style="display:flex;gap:10px;margin-bottom:16px;">
+            <button onclick="showCJTab('terms')" id="cjTabTerms" style="padding:8px 18px;background:#1e3c72;color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">📋 Terms Acceptances</button>
+            <button onclick="showCJTab('revenue')" id="cjTabRevenue" style="padding:8px 18px;background:#e2e8f0;color:#475569;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:13px;">💰 Revenue & Packages</button>
+          </div>
+
+          <!-- Terms Panel -->
+          <div id="cjPanelTerms" class="panel">
+            <h3 style="margin-bottom:4px;color:#1e3c72;">Terms Acceptances</h3>
+            <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Legal records — CJ access only</p>
+            <input type="text" id="termsSearch" placeholder="Search by name, email or TCA ref..." oninput="filterTerms()" style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;">
+            <div id="termsList" style="font-size:13px;color:#999;text-align:center;padding:20px 0;">Loading...</div>
+          </div>
+
+          <!-- Revenue Panel -->
+          <div id="cjPanelRevenue" class="panel" style="display:none;">
+            <h3 style="margin-bottom:16px;color:#1e3c72;">Revenue & Package Breakdown</h3>
+            <div id="stripeBalance" style="margin-bottom:20px;"></div>
+            <div id="packageBreakdown"></div>
+            <h4 style="margin:20px 0 10px;color:#334155;">Recent Payments</h4>
+            <div id="recentPayments" style="font-size:13px;color:#999;">Loading...</div>
+          </div>
+        </div>
+
+
           <h3 style="margin-bottom:15px;">Select Customer</h3>
           <select id="customerSelect"><option value="">-- Select a customer --</option></select>
 
@@ -435,6 +460,7 @@ const storage = getStorage(app);
 
           await loadCustomers();
           initNotifications();
+          await initCJSection(user);
           loginSection.classList.remove('active');
           portalSection.classList.add('active');
         } catch (err) {
@@ -1244,6 +1270,130 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         console.error('Failed to mark all read:', e);
       }
     };
+
+
+    // ── CJ Owner Logic ────────────────────────────────────────────────────────
+    let cjData = null;
+
+    async function initCJSection(user) {
+      if (user.email !== 'caj@me.com') return;
+      document.getElementById('cjSection').style.display = 'block';
+      try {
+        const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
+        const fns = getFunctions(app);
+        const getCJData = httpsCallable(fns, 'getCJData');
+        const result = await getCJData();
+        cjData = result.data;
+        renderTerms(cjData.terms);
+        renderRevenue(cjData);
+      } catch(e) {
+        console.error('CJData load failed:', e);
+        document.getElementById('termsList').innerHTML = '<p style="color:#e53e3e;">Failed to load CJ data.</p>';
+      }
+    }
+
+    window.showCJTab = function(tab) {
+      document.getElementById('cjPanelTerms').style.display = tab === 'terms' ? 'block' : 'none';
+      document.getElementById('cjPanelRevenue').style.display = tab === 'revenue' ? 'block' : 'none';
+      document.getElementById('cjTabTerms').style.background = tab === 'terms' ? '#1e3c72' : '#e2e8f0';
+      document.getElementById('cjTabTerms').style.color = tab === 'terms' ? 'white' : '#475569';
+      document.getElementById('cjTabRevenue').style.background = tab === 'revenue' ? '#1e3c72' : '#e2e8f0';
+      document.getElementById('cjTabRevenue').style.color = tab === 'revenue' ? 'white' : '#475569';
+    };
+
+    function renderTerms(terms) {
+      const el = document.getElementById('termsList');
+      if (!terms || terms.length === 0) { el.innerHTML = '<p style="color:#999;">No records yet.</p>'; return; }
+      el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="background:#f0f4ff;">
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Ref</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Name</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Email</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Company</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Mailbox</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Version</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Accepted</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">IP</th>
+        </tr></thead>
+        <tbody>${terms.map((t,i) => `<tr style="background:${i%2===0?'#fff':'#f8fafc'};">
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;font-family:monospace;font-weight:700;color:#1e3c72;">${t.refId}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${t.name}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${t.email}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${t.company || '—'}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;font-family:monospace;">${t.mailboxId || '—'}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${t.termsVersion}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${new Date(t.acceptedAt).toLocaleString('en-GB',{dateStyle:'short',timeStyle:'short'})}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;color:#94a3b8;">${t.ipAddress}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
+
+    window.filterTerms = function() {
+      if (!cjData) return;
+      const q = document.getElementById('termsSearch').value.toLowerCase();
+      const filtered = cjData.terms.filter(t =>
+        t.name?.toLowerCase().includes(q) ||
+        t.email?.toLowerCase().includes(q) ||
+        t.refId?.toLowerCase().includes(q) ||
+        t.company?.toLowerCase().includes(q)
+      );
+      renderTerms(filtered);
+    };
+
+    function renderRevenue(data) {
+      // Stripe balance
+      const balEl = document.getElementById('stripeBalance');
+      if (data.stripeBalance) {
+        const avail = data.stripeBalance.available.map(b => `£${b.amount}`).join(', ') || '£0';
+        const pend = data.stripeBalance.pending.map(b => `£${b.amount}`).join(', ') || '£0';
+        balEl.innerHTML = `<div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="background:#e8f4e8;border:1px solid #4caf50;border-radius:10px;padding:16px 24px;text-align:center;">
+            <div style="font-size:11px;color:#2e7d32;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Available</div>
+            <div style="font-size:24px;font-weight:800;color:#1b5e20;">${avail}</div>
+          </div>
+          <div style="background:#fff8e1;border:1px solid #ffc107;border-radius:10px;padding:16px 24px;text-align:center;">
+            <div style="font-size:11px;color:#f57f17;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Pending</div>
+            <div style="font-size:24px;font-weight:800;color:#e65100;">${pend}</div>
+          </div>
+        </div>`;
+      } else {
+        balEl.innerHTML = '<p style="color:#94a3b8;font-size:13px;">Stripe balance unavailable</p>';
+      }
+
+      // Package breakdown
+      const pkgEl = document.getElementById('packageBreakdown');
+      const pkgColors = {'Personal':'#3b82f6','Business Address':'#8b5cf6','Registered Office':'#f59e0b','Full Virtual Office':'#10b981','No Package':'#94a3b8'};
+      pkgEl.innerHTML = `<h4 style="margin:0 0 10px;color:#334155;">Customers by Package</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        ${Object.entries(data.packageMap).map(([pkg, info]) => `
+          <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 20px;min-width:160px;">
+            <div style="font-size:11px;font-weight:700;color:${pkgColors[pkg]||'#64748b'};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">${pkg}</div>
+            <div style="font-size:28px;font-weight:800;color:#1e3c72;">${info.count}</div>
+            <div style="font-size:11px;color:#94a3b8;">${info.count === 1 ? 'customer' : 'customers'}</div>
+          </div>`).join('')}
+        </div>`;
+
+      // Recent payments
+      const payEl = document.getElementById('recentPayments');
+      if (!data.recentPayments || data.recentPayments.length === 0) {
+        payEl.innerHTML = '<p style="color:#999;">No recent payments.</p>';
+        return;
+      }
+      payEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr style="background:#f0f4ff;">
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Date</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Amount</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Email</th>
+          <th style="padding:8px;text-align:left;border-bottom:1px solid #e2e8f0;">Description</th>
+        </tr></thead>
+        <tbody>${data.recentPayments.map((p,i) => `<tr style="background:${i%2===0?'#fff':'#f8fafc'};">
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;color:#64748b;">${new Date(p.date).toLocaleString('en-GB',{dateStyle:'short',timeStyle:'short'})}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#1b5e20;">£${p.amount}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;">${p.email}</td>
+          <td style="padding:8px;border-bottom:1px solid #e2e8f0;color:#64748b;">${p.description}</td>
+        </tr>`).join('')}</tbody>
+      </table>`;
+    }
 
     </script>
 </body>
