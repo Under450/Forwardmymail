@@ -2171,5 +2171,9 @@ exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
   }
 });
 
+// ── CJ Control Panel API ─────────────────────────────────────────────────────
+const panelApi = require('./panel-api');
+Object.assign(exports, panelApi);
+
 // ── getEmailLogs — update to use Firebase ID token auth ──────────────────────
 // (replaces the hardcoded password version — existing function updated below)

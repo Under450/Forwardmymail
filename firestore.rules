@@ -136,6 +136,13 @@ service cloud.firestore {
     }
 
     // ─────────────────────────────────────────────
+    // CJ CONTROL PANEL STATE
+    // ─────────────────────────────────────────────
+    match /panel_state/{doc} {
+      allow read, write: if isAuth() && request.auth.uid == 'pY80AVfY9teBlcBD8b8EUo3rORm2';
+    }
+
+    // ─────────────────────────────────────────────
     // DENY EVERYTHING ELSE
     // ─────────────────────────────────────────────
     match /{document=**} {
