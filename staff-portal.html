@@ -174,7 +174,10 @@
           <div id="cjPanelTerms" class="panel">
             <h3 style="margin-bottom:4px;color:#1e3c72;">Terms Acceptances</h3>
             <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">Legal records — CJ access only</p>
-            <input type="text" id="termsSearch" placeholder="Search by name, email or TCA ref..." oninput="filterTerms()" style="width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;margin-bottom:14px;box-sizing:border-box;">
+            <div style="display:flex;gap:10px;margin-bottom:14px;align-items:center;">
+              <input type="text" id="termsSearch" placeholder="Search by name, email or TCA ref..." oninput="filterTerms()" style="flex:1;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
+              <button onclick="runTermsBackfill()" style="padding:8px 14px;background:#f0f4ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:600;color:#1e3c72;cursor:pointer;white-space:nowrap;">↻ Backfill existing</button>
+            </div>
             <div id="termsList" style="font-size:13px;color:#999;text-align:center;padding:20px 0;">Loading...</div>
           </div>
 
@@ -1394,6 +1397,28 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         </tr>`).join('')}</tbody>
       </table>`;
     }
+
+    window.runTermsBackfill = async function() {
+      if (!confirm('Backfill TCA records for all existing customers?')) return;
+      const btn = document.querySelector('[onclick="runTermsBackfill()"]');
+      btn.textContent = 'Running...'; btn.disabled = true;
+      try {
+        const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
+        const fns = getFunctions(app);
+        const backfill = httpsCallable(fns, 'backfillTermsAcceptances');
+        const result = await backfill();
+        alert('Done:\n' + result.data.results.join('\n'));
+        // Reload CJ data
+        const getCJData = httpsCallable(fns, 'getCJData');
+        const fresh = await getCJData();
+        cjData = fresh.data;
+        renderTerms(cjData.terms);
+      } catch(e) {
+        alert('Backfill failed: ' + e.message);
+      } finally {
+        btn.textContent = '↻ Backfill existing'; btn.disabled = false;
+      }
+    };
 
     </script>
 </body>
