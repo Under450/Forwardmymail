@@ -234,22 +234,8 @@
 
         // Optional post-signup functions (your existing calls)
         try {
-          const functionsModule = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
-          const functions = functionsModule.getFunctions(app);
-
-          // Generate mailbox ID
-          const generateMailboxIdFunc = functionsModule.httpsCallable(functions, 'generateMailboxId');
-          const mailboxResult = await generateMailboxIdFunc();
-
-          // Send welcome email
-          const sendWelcomeEmailFunc = functionsModule.httpsCallable(functions, 'sendWelcomeEmail');
-          await sendWelcomeEmailFunc({
-            email: email,
-            name: name,
-            mailboxId: mailboxResult?.data?.mailboxId || ''
-          });
-
-          console.log('Welcome email sent successfully');
+          // Welcome email and mailboxId are handled by onCustomerCreated Cloud Function
+          console.log('Account created — welcome email will be sent automatically.');
         } catch (functionError) {
           console.error('Error in post-signup functions:', functionError);
         }
