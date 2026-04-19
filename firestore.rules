@@ -143,6 +143,21 @@ service cloud.firestore {
     }
 
     // ─────────────────────────────────────────────
+    // TERMS ACCEPTANCES COLLECTION
+    // CJ owner only — legal records
+    // ─────────────────────────────────────────────
+    match /termsAcceptances/{docId} {
+      allow read, write, delete: if isAuth() && request.auth.uid == 'pY80AVfY9teBlcBD8b8EUo3rORm2';
+    }
+
+    // ─────────────────────────────────────────────
+    // COUNTERS (used for TCA ref generation)
+    // ─────────────────────────────────────────────
+    match /_counters/{docId} {
+      allow read, write: if isAuth() && request.auth.uid == 'pY80AVfY9teBlcBD8b8EUo3rORm2';
+    }
+
+        // ─────────────────────────────────────────────
     // DENY EVERYTHING ELSE
     // ─────────────────────────────────────────────
     match /{document=**} {
