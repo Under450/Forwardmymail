@@ -34,6 +34,14 @@ service firebase.storage {
     }
 
     // ─────────────────────────────────────────────
+    // TCA CERTIFICATES (CJ owner only)
+    // Path: tca-certificates/{filename}
+    // ─────────────────────────────────────────────
+    match /tca-certificates/{fileName} {
+      allow read, write: if request.auth != null && request.auth.uid == 'pY80AVfY9teBlcBD8b8EUo3rORm2';
+    }
+
+        // ─────────────────────────────────────────────
     // DENY EVERYTHING ELSE
     // ─────────────────────────────────────────────
     match /{allPaths=**} {
