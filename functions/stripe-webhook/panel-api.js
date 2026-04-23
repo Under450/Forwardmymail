@@ -161,23 +161,63 @@ exports.panelGetAllCustomers = onCall(async (request) => {
 });
 
 // ── panelGetDiditQueue ───────────────────────────────────────────────────────
+// Returns ALL active-subscription customers grouped by ID verification status.
+// Active = customer has a paid subscription package (not Credit Pack, not empty).
 exports.panelGetDiditQueue = onCall(async (request) => {
   assertPanelAuth(request);
 
-  const snapshot = await db.collection('customers')
-    .where('idStatus', '==', 'pending')
-    .get();
+  const SUBSCRIPTION_PACKAGES = [
+    'Personal Mailbox',
+    'Business Address',
+    'Registered Office',
+    'Full Virtual Office'
+  ];
 
-  const customers = snapshot.docs.map(doc => {
+  const snapshot = await db.collection('customers').get();
+
+  const customers = [];
+  const counts = { all: 0, approved: 0, pending: 0, not_started: 0, declined: 0 };
+
+  snapshot.docs.forEach(doc => {
     const d = doc.data();
-    return {
+    const pkg = d.package || '';
+
+    // Filter: only active subscriptions
+    if (!SUBSCRIPTION_PACKAGES.includes(pkg)) return;
+
+    // Normalise status. Treat anything unknown / missing as 'not_started'.
+    let status = (d.idStatus || 'not_started').toLowerCase();
+    if (['rejected', 'expired'].includes(status)) status = 'declined';
+    if (!['approved', 'pending', 'not_started', 'declined'].includes(status)) {
+      status = 'not_started';
+    }
+
+    customers.push({
+      id: doc.id,
       name: d.name || '',
       email: d.email || '',
+      package: pkg,
+      idStatus: status,
       createdAt: d.created?.toDate()?.toISOString() || null,
-    };
+      idStatusUpdatedAt: d.idStatusUpdatedAt?.toDate()?.toISOString() || null,
+    });
+
+    counts.all += 1;
+    counts[status] += 1;
   });
 
-  return { customers, pendingCount: customers.length };
+  // Sort: pending first, then not_started, declined, approved.
+  // Within each group, most recent activity first.
+  const order = { pending: 0, not_started: 1, declined: 2, approved: 3 };
+  customers.sort((a, b) => {
+    const o = order[a.idStatus] - order[b.idStatus];
+    if (o !== 0) return o;
+    const at = a.idStatusUpdatedAt || a.createdAt || '';
+    const bt = b.idStatusUpdatedAt || b.createdAt || '';
+    return bt.localeCompare(at);
+  });
+
+  return { customers, counts, pendingCount: counts.pending };
 });
 
 // ── panelGetInbox ────────────────────────────────────────────────────────────
