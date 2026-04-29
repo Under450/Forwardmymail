@@ -515,7 +515,7 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
 
     // Send terms acceptance record to admin
     try {
-      const termsVersion = customerData.termsAcceptance?.version || '2025-12-19';
+      const termsVersion = customerData.termsAcceptance?.version || 'v2026-04-29';
       const termsTimestamp = customerData.termsAcceptance?.timestamp || customerData.termsAcceptedAt?.toDate?.()?.toISOString() || 'Unknown';
       const termsUserAgent = customerData.termsAcceptance?.userAgent || 'Unknown';
       const termsIp = customerData.termsAcceptance?.ipAddress || 'pending';
@@ -574,7 +574,7 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
           email: customerData.email || '',
           company: customerData.company || '',
           mailboxId: mailboxId || '',
-          termsVersion: customerData.termsAcceptance?.version || '2025-12-19',
+          termsVersion: customerData.termsAcceptance?.version || 'v2026-04-29',
           acceptedAt: customerData.termsAcceptance?.timestamp || new Date().toISOString(),
           ipAddress: customerData.termsAcceptance?.ipAddress || 'pending',
           userAgent: customerData.termsAcceptance?.userAgent || '',
@@ -636,7 +636,7 @@ exports.backfillTermsAcceptances = onCall(async (request) => {
         email: c.email || '',
         company: c.company || '',
         mailboxId: c.mailboxId || '',
-        termsVersion: c.termsAcceptance?.version || '2025-12-19',
+        termsVersion: c.termsAcceptance?.version || 'v2026-04-29',
         acceptedAt: c.termsAcceptance?.timestamp || c.termsAcceptedAt?.toDate?.()?.toISOString() || c.created?.toDate?.()?.toISOString() || new Date().toISOString(),
         ipAddress: c.termsAcceptance?.ipAddress || 'pre-system',
         userAgent: c.termsAcceptance?.userAgent || '',
