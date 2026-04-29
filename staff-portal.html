@@ -213,6 +213,7 @@
               <input type="text" id="termsSearch" placeholder="Search by name, email or TCA ref..." oninput="filterTerms()" style="flex:1;padding:8px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;box-sizing:border-box;">
               <button onclick="runTermsBackfill()" style="padding:8px 14px;background:#f0f4ff;border:1px solid #bfdbfe;border-radius:8px;font-size:12px;font-weight:600;color:#1e3c72;cursor:pointer;white-space:nowrap;">↻ Backfill existing</button>
               <button onclick="generateAllPDFs()" id="btnGenPDFs" style="padding:8px 14px;background:#1e3c72;border:none;border-radius:8px;font-size:12px;font-weight:600;color:white;cursor:pointer;white-space:nowrap;">⬇ Generate All PDFs</button>
+              <button onclick="regenerateAllPDFs()" id="btnRegenAll" style="padding:8px 14px;background:#92400e;border:none;border-radius:8px;font-size:12px;font-weight:600;color:white;cursor:pointer;white-space:nowrap;">↻ Regen All PDFs</button>
             </div>
             <div id="termsList" style="font-size:13px;color:#999;text-align:center;padding:20px 0;">Loading...</div>
           </div>
@@ -1368,7 +1369,7 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           <td style="padding:8px;border-bottom:1px solid #e2e8f0;"><button onclick="deleteTCA('${t.refId}')" style="padding:4px 10px;background:#fee2e2;border:1px solid #fca5a5;border-radius:6px;color:#b91c1c;font-size:11px;font-weight:600;cursor:pointer;">Delete</button></td>
           <td style="padding:8px;border-bottom:1px solid #e2e8f0;">
             ${t.pdfUrl
-              ? `<a href="${t.pdfUrl}" target="_blank" style="padding:4px 10px;background:#e8f4e8;border:1px solid #86efac;border-radius:6px;color:#166534;font-size:11px;font-weight:600;text-decoration:none;">View PDF</a>`
+              ? `<a href="${t.pdfUrl}" target="_blank" style="padding:4px 8px;background:#e8f4e8;border:1px solid #86efac;border-radius:6px;color:#166534;font-size:11px;font-weight:600;text-decoration:none;margin-right:4px;">View</a><button onclick="regenerateOnePDF('${t.refId}')" id="regenbtn-${t.refId}" style="padding:4px 8px;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;color:#92400e;font-size:11px;font-weight:600;cursor:pointer;">Regen</button>`
               : `<button onclick="generateOnePDF('${t.refId}')" id="genbtn-${t.refId}" style="padding:4px 10px;background:#f0f4ff;border:1px solid #bfdbfe;border-radius:6px;color:#1e3c72;font-size:11px;font-weight:600;cursor:pointer;">Generate</button>`
             }
           </td>
@@ -1892,7 +1893,7 @@ async function buildTCAPdf(tca, termsData) {
           btn.textContent = `Generating ${done}/${pending.length}...`;
           const gbtn = document.getElementById(`genbtn-${tca.refId}`);
           if (gbtn) {
-            gbtn.closest('td').innerHTML = `<a href="${url}" target="_blank" style="padding:4px 10px;background:#e8f4e8;border:1px solid #86efac;border-radius:6px;color:#166534;font-size:11px;font-weight:600;text-decoration:none;">View PDF</a>`;
+            gbtn.closest('td').innerHTML = `<a href="${url}" target="_blank" style="padding:4px 8px;background:#e8f4e8;border:1px solid #86efac;border-radius:6px;color:#166534;font-size:11px;font-weight:600;text-decoration:none;margin-right:4px;">View</a><button onclick="regenerateOnePDF('${tca.refId}')" id="regenbtn-${tca.refId}" style="padding:4px 8px;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;color:#92400e;font-size:11px;font-weight:600;cursor:pointer;">Regen</button>`;
           }
         } catch(e) {
           console.error(`Failed ${tca.refId}:`, e);
@@ -1900,6 +1901,66 @@ async function buildTCAPdf(tca, termsData) {
       }
       btn.textContent = `Done (${done}/${pending.length})`;
       setTimeout(() => { btn.textContent = 'Generate All PDFs'; btn.disabled = false; }, 3000);
+    };
+
+    // Regenerate a single PDF — overwrites existing storage object and Firestore url
+    window.regenerateOnePDF = async function(refId) {
+      const btn = document.getElementById(`regenbtn-${refId}`);
+      if (!btn) return;
+      btn.textContent = '...'; btn.disabled = true;
+      try {
+        const tca = cjData.terms.find(t => t.refId === refId);
+        if (!tca) throw new Error('TCA record not found');
+        const buf = await buildTCAPdf(tca, TERMS_DATA);
+        const url = await uploadTCAPdf(refId, buf);
+        tca.pdfUrl = url;
+        const cell = btn.closest('td');
+        cell.innerHTML = `<a href="${url}" target="_blank" style="padding:4px 8px;background:#e8f4e8;border:1px solid #86efac;border-radius:6px;color:#166534;font-size:11px;font-weight:600;text-decoration:none;margin-right:4px;">View</a><button onclick="regenerateOnePDF('${refId}')" id="regenbtn-${refId}" style="padding:4px 8px;background:#dcfce7;border:1px solid #86efac;border-radius:6px;color:#166534;font-size:11px;font-weight:600;cursor:pointer;">Re-gen ✓</button>`;
+        setTimeout(() => {
+          const newBtn = document.getElementById(`regenbtn-${refId}`);
+          if (newBtn) {
+            newBtn.style.background = '#fef3c7';
+            newBtn.style.borderColor = '#fcd34d';
+            newBtn.style.color = '#92400e';
+            newBtn.textContent = 'Regen';
+          }
+        }, 2500);
+      } catch(e) {
+        btn.textContent = 'Error'; btn.disabled = false;
+        alert('PDF regeneration failed: ' + e.message);
+      }
+    };
+
+    // Regenerate ALL existing PDFs — for when terms version changes
+    window.regenerateAllPDFs = async function() {
+      const all = cjData?.terms || [];
+      if (all.length === 0) { alert('No records to regenerate.'); return; }
+      const withPdf = all.filter(t => t.pdfUrl);
+      const msg = `Regenerate PDFs for ALL ${all.length} record(s)?\n\n` +
+                  `${withPdf.length} have existing PDFs (will be overwritten).\n` +
+                  `${all.length - withPdf.length} have no PDF yet (will be created).\n\n` +
+                  `Each PDF will use the customer's stored termsVersion. ` +
+                  `This rebuilds every certificate with the latest generator.`;
+      if (!confirm(msg)) return;
+      const btn = document.getElementById('btnRegenAll');
+      btn.textContent = `Regen 0/${all.length}...`; btn.disabled = true;
+      let done = 0, failed = 0;
+      for (const tca of all) {
+        try {
+          const buf = await buildTCAPdf(tca, TERMS_DATA);
+          const url = await uploadTCAPdf(tca.refId, buf);
+          tca.pdfUrl = url;
+          done++;
+        } catch(e) {
+          failed++;
+          console.error(`Failed ${tca.refId}:`, e);
+        }
+        btn.textContent = `Regen ${done}/${all.length}${failed?` (${failed} failed)`:''}...`;
+      }
+      btn.textContent = `Done (${done}/${all.length})${failed?` ${failed} failed`:''}`;
+      // Re-render the table to refresh PDF cells
+      renderTerms(cjData.terms);
+      setTimeout(() => { btn.textContent = 'Regen All PDFs'; btn.disabled = false; }, 4000);
     };
 
 
