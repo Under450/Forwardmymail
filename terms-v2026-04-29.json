@@ -1,0 +1,332 @@
+{
+  "version": "v2026-04-29",
+  "lastUpdated": "2026-04-29",
+  "title": "Forward My Mail Ltd — Terms & Conditions (UK)",
+  "company": {
+    "name": "Forward My Mail Ltd",
+    "address": "8a Bore Street, Lichfield, Staffordshire, WS13 6LL",
+    "country": "United Kingdom",
+    "companyNumber": "16912540",
+    "email": "info@forwardmymail.co.uk"
+  },
+  "preamble": "These Terms govern the provision of mail receiving, opening/scanning, storage and forwarding services, and (where purchased) company formation, registered office and director's service address services, by Forward My Mail Ltd (\"FMM\").",
+  "keyFacts": [
+    "Agency & opening/scanning: You appoint FMM as your agent to receive mail at our address and authorise opening/scanning for processing and forwarding, unless prohibited by law or issuer rules.",
+    "Sensitive items: Bank cards/PIN mailers are forwarded only with signed authorisation & KYC; tracked/signed-for by default unless you opt out in writing.",
+    "Risk & insurance: Risk passes on handover to the Carrier; items are not insured unless you purchase cover in writing before dispatch.",
+    "Fees & VAT: Prices exclude VAT and any carrier surcharges; postage is additional. Current fees are published at forwardmymail.co.uk/pricing.",
+    "Storage & disposal: Torts Act notice of intention to sell is issued before any sale/disposal of uncollected goods.",
+    "Liability (B2B): Cap = greater of £100 or 100% of fees for the service at issue. Consumers' CRA 2015 rights preserved.",
+    "Changes: Objective reasons only; 30-day notice & right to cancel if materially detrimental.",
+    "KYC/AML: Service activates after payment + checks; AML records kept 5-10 years.",
+    "ADR signposting: if a consumer complaint reaches deadlock, we will signpost a CTSI-approved ADR body (e.g., RetailADR or CEDR) and state whether we will participate.",
+    "Notices by email: permitted for contract notices (not for formal service of court proceedings unless rules/consent allow).",
+    "Electronic acceptance: Ticking the acceptance checkbox at registration constitutes your electronic signature and binds you to these Terms including all Schedules (see clause 20)."
+  ],
+  "sections": [
+    {
+      "number": 1,
+      "title": "Parties, Definitions and Interpretation",
+      "clauses": [
+        {"number": "1.1", "title": "Parties", "text": "\"FMM\", \"we\", \"us\" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom (Company No. 16912540). \"You\" means the customer named in the order or account. \"Consumer\" means an individual acting wholly or mainly outside of trade or profession; \"Business Customer\" means everyone else."},
+        {"number": "1.2", "title": "Interpretation", "text": "Headings are for convenience only. References to laws include amendments. Priority is given to mandatory law, then these Terms, then any schedule/policy."},
+        {"number": "1.3", "title": "Entire agreement", "text": "These Terms (including Schedules) form the entire agreement, replacing prior statements, unless expressly agreed in writing."}
+      ]
+    },
+    {
+      "number": 2,
+      "title": "Service Description",
+      "clauses": [
+        {"number": "2.1", "title": "Address use and agency", "text": "You may use an FMM-provided address for receiving mail and packages. You appoint FMM as your agent to receive mail on your behalf and authorise us to open and scan mail for processing and forwarding, except where prohibited by law or issuer rules."},
+        {"number": "2.2", "title": "Registered office / service address", "text": "Where purchased, we may provide a registered office address and/or director's service address. Use is limited to official purposes; not for trading premises, returns, DVLA/licensing, electoral registration, or Money Laundering Regulations registrations. We may report misuse and/or require removal from public records."},
+        {"number": "2.3", "title": "Company formation", "text": "Where you instruct us to incorporate a company, you are responsible for accuracy of information and regulatory compliance. We are not a law or tax firm. Immediate performance is requested when filings begin (see 15.3)."},
+        {"number": "2.4", "title": "No warehousing", "text": "We do not provide warehousing or long-term storage; see holding windows and storage fees in Schedule C."},
+        {"number": "2.5", "title": "Subcontracting", "text": "We may use subcontractors and Carriers; we remain responsible for our own obligations."},
+        {"number": "2.6", "title": "Not a residential redirection service", "text": "If you have changed residential address, you must arrange a Royal Mail Redirection; we do not provide a statutory residential redirection service."}
+      ]
+    },
+    {
+      "number": 3,
+      "title": "Your Obligations",
+      "clauses": [
+        {"number": "3.1", "title": "Lawful use", "text": "Do not send, receive or request handling of Prohibited Items or illegal content. Provide accurate recipient names and instructions."},
+        {"number": "3.2", "title": "Duties/taxes", "text": "You are responsible for customs declarations, duties and taxes."},
+        {"number": "3.3", "title": "Packaging & disclosure", "text": "Provide sufficient packaging and information for handling and customs."},
+        {"number": "3.4", "title": "Cooperation & verification", "text": "Provide identity and address documents when requested; see Clause 6."},
+        {"number": "3.5", "title": "Address limits", "text": "Do not display our address as a trading address or for advertising without prior written consent."}
+      ]
+    },
+    {
+      "number": 4,
+      "title": "Prohibited & Restricted Items",
+      "clauses": [
+        {"number": "4.1", "title": "Compliance with restrictions", "text": "You must comply with Carrier and legal restrictions (dangerous goods, weapons, controlled drugs, cash, perishable or illegal items). We may refuse, hold, return or dispose of items that breach this clause and may notify authorities."}
+      ]
+    },
+    {
+      "number": 5,
+      "title": "Inspections and Security",
+      "clauses": [
+        {"number": "5.1", "title": "Right to open and inspect", "text": "We may open items to identify the recipient, comply with law, meet Carrier/customs requirements, repack damaged parcels, or for safety/security. We take reasonable care during inspection."}
+      ]
+    },
+    {
+      "number": 6,
+      "title": "KYC/AML, Sanctions & Fraud Controls",
+      "clauses": [
+        {"number": "6.1", "title": "Verification", "text": "An account is not active and services are not provided until (a) payment is received and (b) all required KYC/AML checks are completed for every relevant person/name. We may use certified digital identity service providers."},
+        {"number": "6.2", "title": "Ongoing monitoring", "text": "We may monitor usage, suspend or terminate accounts, and report suspicious activity to authorities without notice where required by law."},
+        {"number": "6.3", "title": "Annual refresh & retention", "text": "We may carry out an annual ID refresh; you must provide updated documents to keep your account active. We may retain identity/verification records for at least 5 years and no longer than 10 years unless required longer by law."},
+        {"number": "6.4", "title": "Trusts", "text": "Before we provide any service to a trust, you must provide proof of registration with the HMRC Trust Registration Service (TRS)."}
+      ]
+    },
+    {
+      "number": 7,
+      "title": "Handling, Transit & Delivery",
+      "clauses": [
+        {"number": "7.1", "title": "Title and risk", "text": "Risk in items passes to you when items are delivered to the Carrier for forwarding to your chosen destination, or when collected by you/your agent, whichever occurs first."},
+        {"number": "7.2", "title": "Carrier terms & times", "text": "Carriage is subject to Carrier terms, including routing and transit times, which we do not control. Delivery dates are estimates."},
+        {"number": "7.3", "title": "Customs and delays", "text": "You are responsible for customs clearance and delays arising from inspections or documentation."},
+        {"number": "7.4", "title": "Sensitive financial items", "text": "Forwarding of Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens or card readers) is optional and provided only if: (a) you have completed the Client Authorisation in Schedule B; (b) all KYC/AML checks are satisfied; (c) we are satisfied the forwarding is lawful and permitted by the issuer; and (d) the destination address has been verified. Opening & scanning: our Service includes opening mail and scanning contents for you. For Sensitive Items we will follow your written instructions, except we will not scan where doing so would breach law or issuer rules (e.g., certain PIN mailers). Identifiable PIN mailers and security envelopes will not be opened unless you give us explicit written instructions and issuer rules permit. We may refuse or suspend forwarding/scanning of Sensitive Items where risk or compliance concerns arise."},
+        {"number": "7.4a", "title": "Electronic acceptance of Schedule B", "text": "By ticking the acceptance checkbox during account registration, you electronically accept and authorise Schedule B (Client Authorisation for Receipt & International Forwarding of Sensitive Mail) in its entirety. The tick of that checkbox, recorded together with your name, email, IP address and timestamp, constitutes your electronic signature for the purposes of Schedule B and is treated as having the same legal effect as a wet-ink signature on that Schedule. Your verification code, displayed on Page 1 of your Acceptance Certificate, evidences this electronic signature."},
+        {"number": "7.5", "title": "Default shipping method (safety first)", "text": "Unless you instruct otherwise in writing, we will use a tracked and/or signed-for method where available and commercially reasonable, having regard to the item value and destination. If you opt for an untracked or unsigned service, you acknowledge increased risk and agree that our liability remains limited under Clause 9."},
+        {"number": "7.6", "title": "Large parcels and limits", "text": "Please give 24 hours' notice for parcels exceeding 1,000 mm in any dimension. We may refuse items exceeding 2 m in any dimension or 25 kg in weight. We may charge handling and storage fees for large or bulky items."},
+        {"number": "7.7", "title": "Client-arranged courier", "text": "Where you pre-pay postage/courier directly, a handling fee per item may apply; see Schedule C (Fees)."},
+        {"number": "7.8", "title": "Retrieval of archived scans", "text": "Retrieval of previously scanned-and-archived items may attract a retrieval fee; see Schedule C (Fees)."}
+      ]
+    },
+    {
+      "number": 8,
+      "title": "Fees, Storage & Lien",
+      "clauses": [
+        {"number": "8.1", "title": "Fees & taxes", "text": "You agree to pay Service fees, shipping charges and surcharges as published or quoted. All fees are exclusive of VAT and any carrier surcharges unless stated otherwise. We may change fees on notice for future services. The current fees are published at forwardmymail.co.uk/pricing and are incorporated into these Terms by reference."},
+        {"number": "8.2", "title": "Storage and non-compliance", "text": "For inactive or non-compliant accounts (ID missing/fails, or unpaid invoices), we may hold mail for up to 14 days without charge to allow resolution. After that period items may be returned to sender, securely destroyed, disposed of, or stored for a fee. Parcels may accrue storage charges after 24 hours. Disposal/return fees may apply."},
+        {"number": "8.3", "title": "Lien", "text": "We have a general and particular lien over items for all amounts you owe. If unpaid after notice, we may sell or dispose of items and apply proceeds to your debt (accounting to you for any balance)."},
+        {"number": "8.4", "title": "Sale/disposal procedure (Torts Act)", "text": "Before any sale or disposal of uncollected goods we will give you a written notice of intention to sell allowing a reasonable collection period, under the Torts (Interference with Goods) Act 1977. We will account to you for any net proceeds after deducting sums properly due."},
+        {"number": "8.5", "title": "Insurance", "text": "Goods are not insured while on our premises or in transit unless you purchase optional cover from us in writing before dispatch. If you arrange your own courier, our insurance does not apply. You are responsible for declaring value and arranging appropriate cover."}
+      ]
+    },
+    {
+      "number": 9,
+      "title": "Liability, Limits and Exclusions (Protection of FMM and Director)",
+      "clauses": [
+        {"number": "9.0", "title": "Consumer carve-out", "text": "If you are a Consumer, nothing in these Terms limits your statutory rights, including our obligation to provide the Service with reasonable care and skill under the Consumer Rights Act 2015. Any limits/exclusions apply only to the extent permitted by law."},
+        {"number": "9.1", "title": "Exclusion of certain losses", "text": "To the maximum extent permitted by law, FMM and its Director(s), officers, employees and agents are not liable for indirect, consequential, exemplary or punitive damages; loss of profit, revenue, business, goodwill or anticipated savings; or losses arising from delay, missed delivery windows, customs seizures, or Carrier acts/omissions beyond our reasonable control."},
+        {"number": "9.2", "title": "Monetary cap", "text": "FMM's aggregate liability for all claims arising out of or relating to the Service in any 12-month period is limited to the greater of £100 or 100% of fees paid to FMM by you for the Service giving rise to the claim. Different mandatory caps may apply where law requires."},
+        {"number": "9.3", "title": "Non-excludable liabilities", "text": "Nothing excludes liability for death or personal injury caused by negligence, fraud, or any liability which cannot lawfully be excluded or limited."},
+        {"number": "9.4", "title": "Carriers", "text": "We are not liable for Carrier terms, delays or acts/omissions beyond our control; your remedies against Carriers are unaffected."},
+        {"number": "9.5", "title": "Third-party rights (Director protection)", "text": "The Director(s) of FMM may enforce this Clause 9 under the Contracts (Rights of Third Parties) Act 1999."},
+        {"number": "9.6", "title": "Time limits", "text": "Business Customers: you must notify us of loss or damage in writing within 7 days of delivery (or scheduled delivery) and bring any claim within 6 months thereafter; otherwise the claim is barred, except where mandatory law provides longer. Consumers: please notify issues within 30 days where reasonably possible; failure to do so does not affect your statutory rights or ability to bring a claim within the applicable statutory limitation period."}
+      ]
+    },
+    {
+      "number": 10,
+      "title": "Your Indemnities",
+      "clauses": [
+        {"number": "10.1", "title": "Business Customers", "text": "You shall indemnify and keep indemnified Forward My Mail Ltd and its Director(s), officers, employees and agents from and against all losses, liabilities, damages, claims, demands, actions, fines, penalties and costs and expenses (including reasonable legal and other professional costs and expenses) arising out of or in connection with:", "bullets": [
+          "(a) your breach of these Terms or of law;",
+          "(b) Prohibited or Restricted Items;",
+          "(c) inaccurate customs declarations or misstatements;",
+          "(d) breach of issuer or bank rules (including use of a mail-forwarding address contrary to issuer policy);",
+          "(e) misuse of our address (including at Companies House, DVLA or for MLR registrations);",
+          "(f) third-party claims relating to goods, content or instructions you send or ask us to handle;",
+          "(g) sanctions violations; or",
+          "(h) fraud or wilful misconduct by you or persons you authorise."
+        ]},
+        {"number": "10.2", "title": "Consumers", "text": "If you are a Consumer, this indemnity applies only to the extent that a loss is caused by your breach, misuse or unlawful conduct. It does not apply to losses caused by our own negligence or failure to perform with reasonable care and skill and does not reduce your statutory rights under the Consumer Rights Act 2015."},
+        {"number": "10.3", "title": "Legal fees and costs", "text": "The indemnity in this Clause includes the reasonable and properly incurred legal and other professional costs and expenses of investigating, defending and/or settling any third-party or regulatory claim, allegation or enquiry arising from the matters described in Clauses 10.1-10.2, whether such claim is made against us alone or against us together with you."},
+        {"number": "10.4", "title": "Conduct of claims", "text": "We will give you reasonable notice of any claim for which we seek indemnity. We may conduct the defence or settlement of the claim and you shall provide prompt cooperation, information and assistance (including documents, witness statements and access to systems) as reasonably requested. You must not admit liability, settle or compromise any claim that could reasonably be expected to give rise to indemnity without our prior written consent. Where a claim is solely and directly against you, you may assume conduct provided that doing so does not prejudice us."},
+        {"number": "10.5", "title": "Limits and fairness", "text": "Nothing in this Clause requires you to indemnify us for fines or penalties to the extent caused by our own breach of law, negligence or wilful misconduct, nor for indirect or consequential losses except to the extent payable to a third party under a settlement or judgment. We will take reasonable steps to mitigate any indemnified losses."},
+        {"number": "10.6", "title": "Advance on costs", "text": "Where a third-party or regulatory claim is reasonably expected to exceed routine small-claims costs, we may request a reasonable advance/retainer in respect of external legal or expert costs for the next phase (not more than the reasonably anticipated external costs for the next 60 days). We will keep records and reconcile any advance against actual costs."},
+        {"number": "10.7", "title": "Proportionality for micro-claims", "text": "For consumer disputes allocated to the small-claims track, nothing in this Clause requires the Consumer to pay our irrecoverable legal costs beyond what the court would ordinarily award, unless the court orders otherwise due to dishonesty, abuse of process or similar exceptional conduct."}
+      ]
+    },
+    {
+      "number": 11,
+      "title": "Data Protection (UK GDPR)",
+      "clauses": [
+        {"number": "11.1", "title": "Controller", "text": "FMM is a controller of personal data you provide. See our Privacy Notice for details."},
+        {"number": "11.2", "title": "Checks and sharing", "text": "You consent to our use of third-party verification and payment providers and to lawful disclosures to Carriers, customs and law enforcement where required. For formation/registered office, we may share details with Companies House, HMRC and banks at your request."},
+        {"number": "11.3", "title": "International transfers", "text": "Where data is transferred outside the UK/EEA, we will use appropriate safeguards as required by law."},
+        {"number": "11.4", "title": "AML/KYC records", "text": "We may retain identity and verification records for at least 5 years and no longer than 10 years unless a longer period is required by law (e.g., ongoing investigations or legal claims)."},
+        {"number": "11.5", "title": "Scan retention", "text": "Unless you ask us to keep items longer (or we must keep them for legal/compliance reasons), scanned images and related handling logs will be retained for 90 days and then deleted/archived in line with our policies."},
+        {"number": "11.6", "title": "Identity Verification Provider", "text": "FMM uses Didit (didit.me) to carry out KYC/AML identity and document verification. Didit hosts verification data on its platform. As a business customer of Didit, FMM can access the following categories of data via the Didit dashboard: full name, date of birth, nationality, document type, document number, document expiry, identity document image, proof of address document image, liveness/biometric data, and verification outcome. FMM does not download or store local copies of document images. Verification data is retained on the Didit platform for 5 years in line with FMM's AML obligations under the Money Laundering Regulations 2017. To exercise data subject rights in respect of data on the Didit platform, contact Didit at hello@didit.me or see didit.me/en/terms/privacy-policy. You may also contact FMM and we will assist in facilitating any request."}
+      ]
+    },
+    {
+      "number": 12,
+      "title": "Compliance & Sanctions",
+      "clauses": [
+        {"number": "12.1", "title": "Sanctions warranty", "text": "You warrant that you and your recipients are not subject to sanctions that would prohibit the Service. We may suspend where required to comply with law."}
+      ]
+    },
+    {
+      "number": 13,
+      "title": "Suspension & Termination",
+      "clauses": [
+        {"number": "13.0", "title": "Grounds", "text": "We may suspend or terminate the Service immediately if you breach these Terms; we suspect unlawful activity; verification requests are not satisfied; or any amount is overdue. You may terminate on notice for convenience, subject to payment of accrued charges. Clauses intended to survive termination do so."},
+        {"number": "13.1", "title": "Debt recovery & chargebacks", "text": "Overdue accounts may be referred to debt collection. You are liable for reasonable recovery costs and any statutory compensation/interest where applicable. If you initiate a payment chargeback, we may apply a reasonable administration fee (plus any third-party fees) and suspend services pending resolution. We may notify Companies House and other bodies and take steps to remove unauthorised use of our address where fees remain unpaid."}
+      ]
+    },
+    {
+      "number": 14,
+      "title": "Changes to the Service or Terms",
+      "clauses": [
+        {"number": "14.1", "title": "Variation", "text": "We may update the Service or these Terms from time to time for objective reasons, including legal or regulatory compliance, security, changes to service functionality, or changes in third-party costs (e.g., Carriers). Material changes will be notified via the website, in-app, or email and will take effect prospectively. If a change is likely to cause material detriment to you, we will give at least 30 days' notice and you may cancel before it takes effect. Continued use after changes take effect constitutes acceptance (this does not reduce consumer statutory rights)."}
+      ]
+    },
+    {
+      "number": 15,
+      "title": "Consumer & Business Information",
+      "clauses": [
+        {"number": "15.1", "title": "CRA 2015", "text": "For Consumers we will provide services with reasonable care and skill. Nothing in these Terms affects statutory rights."},
+        {"number": "15.2", "title": "CCR 2013 (cooling-off)", "text": "If you are a Consumer and purchased online or at a distance, you may have a 14-day cooling-off period. If you request immediate performance, you agree we may start before the end of that period; you pay for services performed, and once fully performed you lose the right to cancel."},
+        {"number": "15.3", "title": "Immediate performance acknowledgment", "text": "By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights."},
+        {"number": "15.4", "title": "Optional Director Identity Verification service", "text": "If you purchase a Companies House director identity verification service from us, the service fee is for processing/submission and is non-refundable once submitted, whether the check succeeds or fails. Additional verification may attract supplementary fees."}
+      ]
+    },
+    {
+      "number": 16,
+      "title": "Complaints",
+      "clauses": [
+        {"number": "16.1", "title": "Resolution and ADR", "text": "We aim to resolve complaints internally. If we cannot resolve a Consumer complaint, we will provide details of an approved Alternative Dispute Resolution (ADR) provider competent to handle your case and say whether we will take part. We do not currently subscribe to any ADR scheme. At deadlock we will signpost you to a Chartered Trading Standards Institute (CTSI)-approved ADR body (for example, RetailADR (CDRL) or CEDR) and state whether we agree to ADR for your case. If you purchased online, you may also use the EU Commission's ODR platform to route a complaint. This Clause does not affect your right to bring court proceedings."}
+      ]
+    },
+    {
+      "number": 17,
+      "title": "Governing Law & Jurisdiction",
+      "clauses": [
+        {"number": "17.1", "title": "Law and forum", "text": "These Terms and any dispute are governed by the law of England and Wales. Courts of England and Wales have jurisdiction. Consumers may benefit from mandatory protections of their local law."}
+      ]
+    },
+    {
+      "number": 18,
+      "title": "General",
+      "clauses": [
+        {"number": "18.1", "title": "Force majeure", "text": "We are not liable for failure or delay due to events beyond our reasonable control."},
+        {"number": "18.2", "title": "No waiver", "text": "Failure to enforce is not a waiver."},
+        {"number": "18.3", "title": "Severability", "text": "If any provision is unlawful or unenforceable, the remainder remains in effect."},
+        {"number": "18.4", "title": "Assignment", "text": "You may not assign without our consent; we may assign subject to law."},
+        {"number": "18.5", "title": "Notices", "text": "We may notify you via the Service, email or your account address. You agree that all notices and communications under these Terms may be served by email to the email address in your account and are deemed received at the earlier of (a) the time of transmission (UK time) if sent on a Working Day before 5pm, or (b) the next Working Day. You must keep your contact details current. You may send notices to us by email to info@forwardmymail.co.uk or by post to our registered address; legal notices are effective only when actually received by us. For the avoidance of doubt, this email-service clause does not apply to the formal service of court proceedings, which must comply with applicable procedural rules (e.g., the Civil Procedure Rules) or any separate written consent."},
+        {"number": "18.6", "title": "Third-party rights", "text": "Except as stated in Clause 9.5, no third party has rights to enforce these Terms."}
+      ]
+    },
+    {
+      "number": 19,
+      "title": "Contact Details",
+      "clauses": [
+        {"number": "19.1", "title": "Contact", "text": "Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom. Company No. 16912540. Email: info@forwardmymail.co.uk"}
+      ]
+    },
+    {
+      "number": 20,
+      "title": "Acknowledgement & Acceptance",
+      "clauses": [
+        {"number": "20.1", "title": "Acceptance methods", "text": "By creating an account, purchasing a plan, or instructing us to receive, open/scan, store or forward items, you accept these Terms."},
+        {"number": "20.2", "title": "Electronic acceptance and signature", "text": "Where you tick the acceptance checkbox during account registration, you confirm that you have read these Terms and all Schedules (A, B, C, D and E). The tick of that checkbox, recorded together with your name, email, IP address and timestamp, constitutes your electronic signature within the meaning of section 7 of the Electronic Communications Act 2000 and is treated as having the same legal effect as a wet-ink signature on these Terms and on any Schedule that requires the customer's signature, including Schedule B (Sensitive Mail Authorisation) and Schedule E (Customer Declarations & Consents). Your unique Verification Code, displayed on Page 1 of your Acceptance Certificate, evidences this signature."}
+      ]
+    }
+  ],
+  "schedules": [
+    {
+      "id": "A",
+      "title": "Schedule A — Company Formation, Registered Office & Director's Service Address",
+      "clauses": [
+        {"number": "A1", "title": "Scope", "text": "Applies where you purchase formation, registered office or director's service address services."},
+        {"number": "A2", "title": "No legal/tax advice", "text": "Information is general only; obtain your own advice."},
+        {"number": "A3", "title": "KYC/AML", "text": "We require identity and address verification for all beneficial owners (PSCs), directors and authorised users. We may refuse service or filings until verification is completed to our satisfaction."},
+        {"number": "A4", "title": "Filings and accuracy", "text": "You are responsible for incorporation data, consents and post-incorporation compliance (PSC registers, statutory books, confirmation statements, HMRC registrations). We are not responsible for rejected/delayed filings caused by your incorrect or incomplete information."},
+        {"number": "A5", "title": "Registered office mail", "text": "Official mail (Companies House, HMRC, courts/regulators) is included as stated in your plan and will be scanned and/or forwarded in accordance with your instructions and applicable fees. Non-official or marketing mail may be refused or charged additionally."},
+        {"number": "A6", "title": "Address display & misuse", "text": "The registered office or director address may not be used as a trading address or for public advertising without our prior written consent. You must not use our address for DVLA driving licence/vehicle registration, electoral registration, or MLR registrations. We may require removal of the address from websites or materials if misused."},
+        {"number": "A7", "title": "Unauthorised use & Companies House filings", "text": "If our address is used at Companies House without an active, paid service (per entity/name), you authorise us to file forms (including RP07 or equivalents) to remove or change the address. Fees apply per company and per officer/PSC using our address."},
+        {"number": "A8", "title": "Termination", "text": "On termination of address services you must promptly update Companies House and all records. We will refuse new mail from the termination date. Items received after termination will be handled as follows:", "bullets": [
+          "(a) Letters received within 14 calendar days after termination: one courtesy email notification; we will hold for up to 14 days, then Return to Sender where practicable; if no sender/return address is available, we will securely destroy after a further 14 days.",
+          "(b) Parcels received within 14 calendar days after termination: we will hold for up to 7 days; if uncollected/unspecified, we may issue a Torts Act s.12 notice allowing at least 14 days to collect or arrange forwarding on payment of all sums due; failing that, we may sell or dispose and account for any net proceeds.",
+          "(c) Any post received more than 14 days after termination will be refused or returned to sender on receipt, without notice."
+        ]},
+        {"number": "A9", "title": "Immediate performance", "text": "By instructing us to file an incorporation or activate an address, you request immediate performance and acknowledge the effect on your cancellation rights (see Clause 15.3)."},
+        {"number": "A10", "title": "Bank introductions", "text": "Where we provide bank or service introductions, these are without warranty; eligibility and onboarding decisions rest with the third party."}
+      ]
+    },
+    {
+      "id": "B",
+      "title": "Schedule B — Client Authorisation: Receipt & International Forwarding of Sensitive Mail",
+      "intro": "This authorisation supplements the Terms & Conditions and sets specific consent and risk allocation for Sensitive Items (e.g., bank/credit/debit cards, PIN letters, cheque books, security tokens/card readers).",
+      "clauses": [
+        {"number": "B1", "title": "Purpose", "text": "This authorisation confirms that the undersigned client authorises FMM to receive, open, scan, securely store and forward Sensitive Items on their behalf."},
+        {"number": "B2", "title": "Sensitive Items", "text": "\"Sensitive Items\" include: bank/credit/debit cards, PIN letters, cheque books, replacement security devices (e.g., card readers, tokens), and similar financial instruments. We may update this list from time to time."},
+        {"number": "B3", "title": "Preconditions", "text": "Sensitive Items will only be forwarded if: (a) the client has passed KYC/AML checks; (b) the issuer permits delivery to a mail-forwarding address; (c) the Authorised Forwarding Address has been verified; and (d) the client has accepted this Schedule (electronic acceptance via the registration checkbox is sufficient — see clause 20.2)."},
+        {"number": "B4", "title": "Method, opening & security", "text": "FMM will use tracked and/or signed-for services by default (unless you instruct otherwise in writing) and will record forwarding details internally. Our standard service includes opening mail and scanning contents; for Sensitive Items we will only scan with your explicit instruction and only where lawful and permitted by the issuer. We will not activate or test any card or device."},
+        {"number": "B5", "title": "Risk allocation", "text": "Once a Sensitive Item is handed to the Carrier for forwarding, risk passes to the client (see Clause 7.1). To the maximum extent permitted by law, FMM is not liable for delays, loss or misuse of Sensitive Items after dispatch, save where caused by FMM's negligence. The liability limits in Clause 9 apply. The client indemnifies FMM for losses arising from issuer-rule breach or misuse after dispatch."},
+        {"number": "B6", "title": "Refusal & compliance", "text": "FMM may refuse, suspend or cancel forwarding of any Sensitive Item if compliance or security concerns arise, or if issuer, Carrier or legal restrictions apply."},
+        {"number": "B7", "title": "Authorisation Statements", "text": "By accepting these Terms (electronically via the registration checkbox), the client confirms each of the following:", "bullets": [
+          "I authorise FMM to receive, open (where lawful/permitted) and securely store mail addressed to my company or to me as director/individual.",
+          "I authorise FMM to forward Sensitive Items internationally to my registered forwarding address, using tracked and/or signed-for methods by default, unless I opt out in writing.",
+          "I confirm that the destination address is under my control and suitable for receiving such items.",
+          "I acknowledge that my bank or issuer may prohibit delivery to mail-forwarding addresses and that I remain responsible for ensuring any issuer rules are met.",
+          "I understand FMM will not activate or test any card/device and treats identifiable PIN mailers as do-not-open by default unless I give explicit written instructions and issuer rules permit.",
+          "I understand risk passes when FMM hands items to the Carrier or when collected, and items are not insured unless I purchase optional cover in writing before dispatch.",
+          "I release FMM from liability for delay/loss/misuse after dispatch except where caused by FMM's negligence (subject to the liability limits in the Terms).",
+          "I confirm KYC/AML checks have been completed and I will supply updates on request."
+        ]}
+      ]
+    },
+    {
+      "id": "C",
+      "title": "Schedule C — Service Rules & Fees (Operational Policies)",
+      "intro": "This Schedule sets out operational rules and fees for our services. It is incorporated by reference into the Terms. We may update this Schedule with prospective effect by notice on our website/in-app/email.",
+      "clauses": [
+        {"number": "C1", "title": "Status and updates", "text": "This Schedule sets out operational rules and fees for our services. It is incorporated by reference into the Terms. We may update this Schedule with prospective effect by notice on our website/in-app/email."},
+        {"number": "C2", "title": "ID & activation", "text": "Proof of identity and address is required for all relevant persons. Accounts remain inactive until payment is received and KYC/AML checks are completed. Annual ID refresh may be required."},
+        {"number": "C3", "title": "Mail handling windows", "text": "Letters held without charge for 14 days; parcels may accrue storage after 24 hours. After holding windows expire, items may be returned/destroyed/disposed of or stored for a fee. Disposal/return fees may apply."},
+        {"number": "C4", "title": "Opening & inspection", "text": "We may open items to identify the recipient, comply with law, meet Carrier/customs requirements, repack damaged parcels, or for safety/security."},
+        {"number": "C5", "title": "Address restrictions", "text": "Do not use our address for DVLA driving licence/vehicle registration, electoral registration, or MLR registrations."},
+        {"number": "C6", "title": "Prohibited/restricted goods", "text": "You must comply with Carrier and law on dangerous goods (e.g., certain lithium batteries, aerosols, perfumes, controlled drugs). We may refuse or surrender items to authorities."},
+        {"number": "C7", "title": "Large parcels", "text": "Notify us 24 hours in advance for parcels over 1,000 mm in any dimension. We may refuse items over 2 m or 25 kg."},
+        {"number": "C8", "title": "Forwarding methods", "text": "Default to tracked/signed-for unless you opt out in writing. If you arrange your own courier, a handling fee per item may apply (see Fees)."},
+        {"number": "C9", "title": "Insurance", "text": "Goods are not insured on premises or in transit unless optional cover is purchased from us before dispatch. If you arrange your own courier, our insurance does not apply."},
+        {"number": "C10", "title": "Registered Office/Director's Address", "text": "Official mail is included as stated in your plan. Non-official mail requires an active Business Mailing Address plan. Unauthorised use at Companies House may be corrected by us via filings (including RP07). Fees apply per entity/name."},
+        {"number": "C11", "title": "Unclaimed/unknown mail", "text": "Items for unknown recipients may be held for up to 14 days then returned/destroyed/disposed of."},
+        {"number": "C12", "title": "Fees", "text": "All current fees, including subscription pricing and per-item operational charges (scanning, forwarding, postage handling, storage, retrieval, oversize/courier handling, disposal and return), are published at https://www.forwardmymail.co.uk/pricing and form part of these Terms by reference. Postage and carrier surcharges are additional. Fees may be updated in accordance with clause 14."},
+        {"number": "C12A", "title": "Operational logs", "text": "We maintain internal handling and forwarding logs (including tracking references where available). Unless required longer by law or for ongoing disputes, we retain such logs for at least 12 months."},
+        {"number": "C13", "title": "Post-termination letters", "text": "Letters received within 14 calendar days after termination will be held for up to 14 days following a single courtesy email to the account contact. Thereafter, letters will be returned to sender where practicable or securely destroyed after a further 14 days if no sender/return address is available."},
+        {"number": "C14", "title": "Post-termination parcels", "text": "Parcels received within 14 calendar days after termination will be held for up to 7 days. If not collected or instructed for forwarding with payment of all sums due, we may issue a Torts (Interference with Goods) Act 1977, s.12 notice allowing at least 14 days to collect or arrange forwarding, after which we may sell or dispose and account for any net proceeds after deducting sums properly due."},
+        {"number": "C15", "title": "Items received >14 days post-termination", "text": "Any postal items received more than 14 calendar days after termination will be refused on delivery or returned to sender on receipt, without notice."},
+        {"number": "C16", "title": "No ongoing agency", "text": "After termination we do not act as agent to notify correspondents or authorities of your new address; you are responsible for updating records."}
+      ]
+    },
+    {
+      "id": "D",
+      "title": "Schedule D — Torts (Interference with Goods) Act 1977 — Notice of Intention to Sell (Template)",
+      "intro": "This is a template notice used by FMM where uncollected goods need to be sold or disposed of. Reproduced for transparency; the live notice will be served on you separately if and when applicable.",
+      "clauses": [
+        {"number": "D1", "title": "Template notice", "text": "To: [Customer Name] - [Email] and [Postal Address]\n\nFrom: Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6LL, United Kingdom\n\nDate: [date]\n\nSubject: Notice of Intention to Sell Uncollected Goods - Torts (Interference with Goods) Act 1977, s.12\n\nWe write to give you notice that we hold the following goods/items belonging to you: [describe items]. The following sums are now due and payable in respect of services, storage and/or other charges: [£amount].\n\nUnless you (a) pay the sums due and (b) collect or arrange forwarding of the above items by [deadline date, e.g., 14 days from the date of this notice], we may sell or otherwise dispose of the goods under section 12 of the Torts (Interference with Goods) Act 1977. We will apply the proceeds of sale to the sums due (including our reasonable costs of sale/disposal) and will account to you for any balance. If the goods have no saleable value, we may dispose of them appropriately.\n\nPlease contact us at info@forwardmymail.co.uk to make arrangements. This notice is given without prejudice to our lien and other rights."}
+      ]
+    },
+    {
+      "id": "E",
+      "title": "Schedule E — Customer Declarations & Consents",
+      "intro": "These declarations supplement the Terms & Conditions and are designed to avoid misunderstandings about how the service operates. By ticking the acceptance checkbox at registration, you confirm each of the following declarations.",
+      "clauses": [
+        {"number": "E1", "title": "Declarations", "text": "By electronically accepting these Terms, you confirm each of the following:", "bullets": [
+          "Electronic service of notices: I agree that FMM may serve notices and legal communications by email to my account email; I will keep this address current.",
+          "Immediate performance (consumers only): If I am a consumer and I ask FMM to start work within 14 days (e.g., company filings/activation), I understand I'll pay for services performed and may lose the right to cancel once fully performed.",
+          "Authorised names list: I will keep FMM updated with all individuals/entities permitted to receive mail under my account (including directors/PSCs and trading names).",
+          "Address-use restrictions: I understand the FMM address must not be used for DVLA vehicle/licence records, electoral registration, or Money Laundering Regulations registrations.",
+          "Issuer/bank rules: I understand some issuers prohibit delivery to mail-forwarding addresses. I remain responsible for compliance with issuer rules.",
+          "Torts Act notices: I consent to receive Torts (Interference with Goods) Act s.12 notices and lien notifications by email (and, where provided, by post).",
+          "Sanctions/PEP: I confirm neither I nor my recipients are subject to sanctions that would prohibit the service; I will notify FMM if this changes.",
+          "Trusts: Where a trust is involved, I will provide HMRC Trust Registration Service (TRS) evidence before service.",
+          "Companies House misuse: I authorise FMM to file to correct unauthorised use of its address (e.g., RP07), and I will pay related fees as per the price list.",
+          "Data accuracy & KYC: I confirm information provided is true/accurate. I will promptly provide KYC updates on request.",
+          "ADR signposting: If a consumer complaint reaches deadlock, I acknowledge FMM will signpost an approved ADR body and state whether it will participate.",
+          "Sensitive Items (Schedule B): I accept Schedule B in full and authorise FMM to receive, open, scan, store and forward Sensitive Items in accordance with that Schedule."
+        ]},
+        {"number": "E2", "title": "Optional preferences", "text": "By default and unless you instruct otherwise in writing:", "bullets": [
+          "Tracked/signed-for forwarding for all items is the default method.",
+          "Identifiable PIN mailers are not opened unless you give explicit written instructions and issuer rules permit."
+        ]}
+      ]
+    }
+  ]
+}
