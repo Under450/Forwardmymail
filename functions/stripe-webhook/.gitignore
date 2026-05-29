@@ -1,9 +1,7 @@
-# Service account key — contains private credentials, NEVER commit this
-serviceAccountKey.json
-
-# Node dependencies
-node_modules/
-
-# Local env files
-.env
-.env.local
+﻿node_modules/
+firebase-debug.log
+package-lock.json
+deploy.log
+deploy.err
+.firebaserc
+firebase.json

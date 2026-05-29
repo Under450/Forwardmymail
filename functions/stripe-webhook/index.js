@@ -1181,7 +1181,8 @@ function daysSince(firestoreTimestamp) {
 //    Day 3: gentle reminder | Day 7: final warning
 // ─────────────────────────────────────────────────────────────────────────────
 exports.checkIdReminders = onSchedule('every day 09:00', async () => {
-  // Catch both not_started (never clicked verify) and pending (started but not completed)
+  // Catch not_started (never clicked verify), pending (started but not completed),
+  // AND already-suspended customers (we still nudge those for 30 days post-suspension)
   const [notStartedSnap, pendingSnap] = await Promise.all([
     db.collection('customers').where('idStatus', '==', 'not_started').get(),
     db.collection('customers').where('idStatus', '==', 'pending').get(),
@@ -1189,30 +1190,52 @@ exports.checkIdReminders = onSchedule('every day 09:00', async () => {
 
   const allDocs = [...notStartedSnap.docs, ...pendingSnap.docs];
 
+  // Escalating cadence with idempotent per-touchpoint flags.
+  // Each touchpoint fires AT OR AFTER its day threshold AND only if not previously sent
+  // (so a missed daily run doesn't permanently skip a customer).
+  const TOUCHPOINTS = [
+    { day: 1,  flag: 'idReminderDay1Sent',  template: 'id_reminder_day1',  subject: 'Quick reminder: complete your ID to activate your mailbox',                      build: buildIdReminderDay1Email },
+    { day: 3,  flag: 'idReminderDay3Sent',  template: 'id_reminder_day3',  subject: 'Reminder: Please complete your identity verification',                          build: buildIdReminderEmail },
+    { day: 5,  flag: 'idReminderDay5Sent',  template: 'id_reminder_day5',  subject: 'Your mailbox is waiting — please complete ID verification',                     build: buildIdReminderDay5Email },
+    { day: 7,  flag: 'idReminderDay7Sent',  template: 'id_reminder_day7',  subject: 'Final reminder: Identity verification required (3 days left)',                  build: buildIdFinalWarningEmail },
+    { day: 10, flag: 'idReminderDay10Sent', template: 'id_reminder_day10', subject: 'Last chance — your account will be suspended within 4 days unless you verify', build: buildIdReminderDay10Email },
+    { day: 14, flag: 'idSuspendedSent',     template: 'id_suspended',      subject: 'Your Forward My Mail account has been suspended',                                build: buildIdSuspendedEmail,        suspend: true },
+    { day: 21, flag: 'idPostSuspend21Sent', template: 'id_post_suspend_21', subject: 'Your mailbox is still on hold — verify to reactivate',                          build: buildIdPostSuspend21Email },
+    { day: 28, flag: 'idClosureWarnSent',   template: 'id_closure_warning', subject: 'Account closes in 2 days unless you verify your ID',                            build: buildIdClosureWarningEmail },
+    { day: 30, flag: 'idAccountClosedSent', template: 'id_account_closed', subject: 'We have closed your Forward My Mail account',                                   build: buildIdAccountClosedEmail,    close: true },
+  ];
+
   for (const doc of allDocs) {
     const data = doc.data();
-    if (data.accountStatus === 'id_suspended') continue;
-
     const days = daysSince(data.createdAt || data.created);
     if (days === null) continue;
 
     const name = data.name || 'there';
     const email = data.email;
+    if (!email) continue;
 
-    try {
-      if (days === 3) {
-        await sendMailLogged({ to: email, subject: 'Reminder: Please complete your identity verification', html: buildIdReminderEmail(name), template: 'id_reminder_day3', customerEmail: email });
-      } else if (days === 7) {
-        await sendMailLogged({ to: email, subject: 'Final reminder: Identity verification required', html: buildIdFinalWarningEmail(name), template: 'id_reminder_day7', customerEmail: email });
-      } else if (days >= 10) {
-        await doc.ref.update({
-          accountStatus: 'id_suspended',
-          accountStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp()
-        });
-        await sendMailLogged({ to: email, subject: 'Your Forward My Mail account has been suspended', html: buildIdSuspendedEmail(name), template: 'id_suspended', customerEmail: email });
+    // Find every touchpoint that's due (day <= today) AND not yet sent
+    const due = TOUCHPOINTS.filter(tp => days >= tp.day && !data[tp.flag]);
+
+    for (const tp of due) {
+      try {
+        await sendMailLogged({ to: email, subject: tp.subject, html: tp.build(name), template: tp.template, customerEmail: email });
+        const updates = { [tp.flag]: true, [`${tp.flag}At`]: admin.firestore.FieldValue.serverTimestamp() };
+        if (tp.suspend) {
+          updates.accountStatus = 'id_suspended';
+          updates.accountStatusUpdatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        if (tp.close) {
+          updates.accountStatus = 'id_closed';
+          updates.accountStatusUpdatedAt = admin.firestore.FieldValue.serverTimestamp();
+        }
+        await doc.ref.update(updates);
+        // Update local data so further iterations within this run see the flag
+        Object.assign(data, updates);
+      } catch (emailErr) {
+        console.error(`checkIdReminders: ${tp.template} failed for ${email}:`, emailErr);
+        break; // stop touching this customer if email pipeline broken — try again tomorrow
       }
-    } catch (emailErr) {
-      console.error(`checkIdReminders: failed for ${email}:`, emailErr);
     }
   }
 });
@@ -1240,6 +1263,103 @@ function buildIdReminderEmail(name) {
     </div>
     <div class="footer">Forward My Mail Ltd | 8a Bore Street, Lichfield, WS13 6LL</div>
   </div></body></html>`;
+}
+
+// ── Shared minimal email shell used by the new touchpoints ──
+function buildIdEmailShell({ name, headline, intro, calloutTitle, calloutBody, ctaText = 'Complete Verification Now →', ctaLink = 'https://www.forwardmymail.co.uk/customer-portal.html#verify', footerNote = '' }) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f4f8;margin:0;padding:0}
+    .wrapper{max-width:620px;margin:0 auto;background:white}
+    .header{background:linear-gradient(135deg,#1e3a8a,#1e40af);padding:36px 30px;text-align:center;color:white}
+    .header h1{font-size:22px;margin:6px 0}
+    .header p{color:rgba(255,255,255,.85);font-size:13px;margin:0}
+    .content{padding:32px 30px;color:#1e293b}
+    .content p{line-height:1.6;font-size:15px;margin:0 0 14px}
+    .callout{border-radius:12px;padding:18px 20px;margin:18px 0}
+    .callout-amber{background:#fefce8;border:2px solid #fbbf24;color:#78350f}
+    .callout-red{background:#fef2f2;border:2px solid #f87171;color:#7f1d1d}
+    .callout-grey{background:#f1f5f9;border:1px solid #cbd5e1;color:#475569}
+    .callout h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:0 0 8px}
+    .callout p{margin:0;font-size:14px}
+    .cta-btn{display:block;background:#d97706;color:white !important;text-decoration:none;text-align:center;padding:15px 28px;border-radius:10px;font-size:15px;font-weight:700;margin:22px 0}
+    .footer{background:#f8fafc;border-top:1px solid #e2e8f0;padding:22px 28px;text-align:center;font-size:12px;color:#94a3b8}
+  </style></head><body><div class="wrapper">
+    <div class="header"><h1>Forward My Mail</h1><p>${headline}</p></div>
+    <div class="content">
+      <p>Hi ${name},</p>
+      ${intro}
+      ${calloutTitle ? `<div class="callout ${calloutBody && calloutBody.includes('suspended') ? 'callout-red' : 'callout-amber'}"><h3>${calloutTitle}</h3><p>${calloutBody}</p></div>` : ''}
+      <a href="${ctaLink}" class="cta-btn">${ctaText}</a>
+      ${footerNote ? `<p style="color:#64748b;font-size:13px;margin-top:18px">${footerNote}</p>` : ''}
+    </div>
+    <div class="footer">Forward My Mail Ltd · 8a Bore Street · Lichfield · WS13 6LL<br>Need help? Reply to this email or call 01543 406028</div>
+  </div></body></html>`;
+}
+
+function buildIdReminderDay1Email(name) {
+  return buildIdEmailShell({
+    name,
+    headline: 'Your mailbox is waiting',
+    intro: `<p>Your Forward My Mail account is created — but it's not active yet. To start receiving post at your new UK address, we need to verify your identity. It takes about 2 minutes.</p>`,
+    calloutTitle: 'What you need',
+    calloutBody: 'A photo of your passport or driving licence + a quick selfie. Required by UK money laundering regulations.',
+    footerNote: 'If you got this email in spam, please add info@forwardmymail.co.uk to your contacts.'
+  });
+}
+
+function buildIdReminderDay5Email(name) {
+  return buildIdEmailShell({
+    name,
+    headline: 'Still waiting on your ID check',
+    intro: `<p>It's been 5 days since you opened your Forward My Mail account and we're still waiting on your identity verification. Any mail sent to your new address can't be processed until this is complete.</p>`,
+    calloutTitle: 'Heads up',
+    calloutBody: 'If you don\'t verify within the next 9 days, your account will be suspended. It only takes 2 minutes.'
+  });
+}
+
+function buildIdReminderDay10Email(name) {
+  return buildIdEmailShell({
+    name,
+    headline: 'Last chance before suspension',
+    intro: `<p>This is your final reminder. Your Forward My Mail account will be <strong>suspended in 4 days</strong> unless you complete identity verification.</p><p>Once suspended, any post received cannot be processed or forwarded.</p>`,
+    calloutTitle: 'Act now',
+    calloutBody: 'Complete the 2-minute verification to keep your account active.',
+    ctaText: 'Verify Now to Avoid Suspension →'
+  });
+}
+
+function buildIdPostSuspend21Email(name) {
+  return buildIdEmailShell({
+    name,
+    headline: 'Your account is suspended — reactivate anytime',
+    intro: `<p>Your Forward My Mail account is currently suspended because identity verification wasn't completed. Any post we receive for you is being held pending verification.</p><p>You can still reactivate at any time — just complete the ID check.</p>`,
+    calloutTitle: 'Reactivation',
+    calloutBody: 'Complete verification to restore your account. Mail currently held will be processed once reactivated.',
+    ctaText: 'Reactivate My Account →'
+  });
+}
+
+function buildIdClosureWarningEmail(name) {
+  return buildIdEmailShell({
+    name,
+    headline: 'Final notice: account closure in 2 days',
+    intro: `<p>This is the final notice. Your Forward My Mail account will be <strong>permanently closed in 2 days</strong> unless you complete identity verification.</p><p>Once closed, your mailbox reference will be released and any held post will be returned to sender or securely destroyed.</p>`,
+    calloutTitle: 'Critical',
+    calloutBody: 'After closure, we cannot retrieve your mailbox reference for you. You\'d need to sign up again.',
+    ctaText: 'Verify Now to Save My Account →'
+  });
+}
+
+function buildIdAccountClosedEmail(name) {
+  return buildIdEmailShell({
+    name,
+    headline: 'Your account has been closed',
+    intro: `<p>Following multiple reminders over the past 30 days without completing identity verification, your Forward My Mail account has now been permanently closed and your mailbox reference released.</p><p>Per the Terms you accepted at signup, the Activation Fee covering identity verification setup, address allocation and account onboarding has been retained. The Service Fee for the unused portion of the period will be refunded to your original payment method within 5 working days.</p>`,
+    calloutTitle: 'Want to come back?',
+    calloutBody: 'You\'re welcome to sign up again at any time. You\'ll receive a new mailbox reference.',
+    ctaText: 'Visit forwardmymail.co.uk →',
+    ctaLink: 'https://www.forwardmymail.co.uk'
+  });
 }
 
 function buildIdFinalWarningEmail(name) {
