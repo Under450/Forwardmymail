@@ -141,7 +141,7 @@
             <div class="perf-title">Immediate Performance Acknowledgment (required to activate)</div>
             <div class="checkbox-container">
               <input type="checkbox" id="immediatePerfCheckbox" disabled>
-              <label for="immediatePerfCheckbox">I expressly request that FMM begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge the Activation Fee <span id="actLabel">(see plan above)</span> is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee <span id="svcLabel"></span> remains refundable on a pro-rata basis for the unused portion of the current period.</label>
+              <label for="immediatePerfCheckbox" id="immediatePerfLabel">I expressly request that FMM begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge the Activation Fee <span id="actLabel">(see plan above)</span> is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee <span id="svcLabel"></span> remains refundable on a pro-rata basis for the unused portion of the current period.</label>
             </div>
           </div>
         </div>
@@ -215,6 +215,9 @@
           document.getElementById('planTotal').textContent = tot != null ? '£' + tot.toFixed(2) : 'TBC';
           if (act != null) document.getElementById('actLabel').textContent = '(£' + act.toFixed(2) + ')';
           if (svc != null) document.getElementById('svcLabel').textContent = '(£' + svc.toFixed(2) + ')';
+        } else {
+          // No plan selected (Create Account flow) - generic future-purchase wording
+          document.getElementById('immediatePerfLabel').innerHTML = 'I expressly request that, for any Forward My Mail plan I now or subsequently purchase, FMM may begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge that the Activation Fee for that plan will be fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee remains refundable on a pro-rata basis for the unused portion of the current period.';
         }
       } catch (e) {
         console.error('Failed to load pricing.json', e);
@@ -339,7 +342,7 @@
             termsAccepted: true,
             immediatePerformanceAcknowledged: true,
             termsCheckboxWording: 'I have read and agree to the Terms and Conditions',
-            immediatePerformanceCheckboxWording: 'I expressly request that FMM begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge the Activation Fee is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee remains refundable on a pro-rata basis for the unused portion of the current period.',
+            immediatePerformanceCheckboxWording: document.getElementById('immediatePerfLabel').textContent.trim(),
             selectedPlan: planKey || null,
             selectedPlanName: selectedPlan ? selectedPlan.name : null,
             activationFee: selectedPlan ? selectedPlan.activation_fee : null,
