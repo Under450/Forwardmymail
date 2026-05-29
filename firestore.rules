@@ -157,7 +157,25 @@ service cloud.firestore {
       allow read, write: if isAuth() && request.auth.uid == 'pY80AVfY9teBlcBD8b8EUo3rORm2';
     }
 
-        // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────
+    // CONSENTS COLLECTION
+    // Immutable audit log of consent events (terms acceptance, immediate-performance
+    // acknowledgment, etc.). Customers can create their own. Nobody can update or
+    // delete — staff can only read (for audit / dispute response).
+    // ─────────────────────────────────────────────
+    match /consents/{consentId} {
+      // Customer creates their own consent record on signup; payload must be tagged with their uid
+      allow create: if isAuth() && request.resource.data.uid == request.auth.uid;
+      // Customer can read their own records
+      allow read: if isAuth() && resource.data.uid == request.auth.uid;
+      // Staff can read all (audit/dispute defence)
+      allow read: if isStaff();
+      // Immutable — no updates, no deletes
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ─────────────────────────────────────────────
     // DENY EVERYTHING ELSE
     // ─────────────────────────────────────────────
     match /{document=**} {

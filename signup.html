@@ -159,7 +159,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const TERMS_VERSION = (window.TERMS_V4 && window.TERMS_V4.version) || 'v2026-05-29';
     // Inject full v4 terms into the scrollable box (always expanded - no collapsibles)
@@ -324,6 +324,31 @@
           idStatus: 'not_started',
           idStatusUpdatedAt: serverTimestamp()
         });
+
+        // Immutable audit-trail record in /consents (separate from the editable customers doc)
+        try {
+          await addDoc(collection(db, 'consents'), {
+            uid: user.uid,
+            email: email,
+            name: name,
+            recordedAt: serverTimestamp(),
+            timestamp: nowIso,
+            ipAddress: ipAddress,
+            userAgent: navigator.userAgent,
+            termsVersion: TERMS_VERSION,
+            termsAccepted: true,
+            immediatePerformanceAcknowledged: true,
+            termsCheckboxWording: 'I have read and agree to the Terms and Conditions',
+            immediatePerformanceCheckboxWording: 'I expressly request that FMM begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge the Activation Fee is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee remains refundable on a pro-rata basis for the unused portion of the current period.',
+            selectedPlan: planKey || null,
+            selectedPlanName: selectedPlan ? selectedPlan.name : null,
+            activationFee: selectedPlan ? selectedPlan.activation_fee : null,
+            serviceFee: selectedPlan ? selectedPlan.service_fee : null,
+            totalPrice: selectedPlan ? selectedPlan.price : null
+          });
+        } catch (consentErr) {
+          console.warn('Consent audit log write failed (signup proceeds regardless):', consentErr);
+        }
 
         showSuccess('Account created. Redirecting to payment...');
 
