@@ -666,9 +666,10 @@ exports.runBulkSync = onRequest(async (req, res) => {
 });
 
 // ── Backfill email logs for existing customers (v2 - with Stripe lookup) ─────
-// ─── Backfill package + price on customer docs from Stripe history ───
-// Admin-only. Query string: ?key=fmm-sync-2024[&dry=1]
-exports.backfillPackagePrice = onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
+// ─── Backfill package + price (REMOVED 2026-05-29 after one-off use) ───
+// Code retained below as exported for git history only; removed from deployment.
+// To re-enable: rename `_backfillPackagePrice_REMOVED` back to `exports.backfillPackagePrice` and redeploy.
+const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
   const key = req.query.key || req.headers['x-api-key'];
   if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
   const dryRun = req.query.dry === '1';
