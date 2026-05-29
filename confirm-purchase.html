@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Purchase - Forward My Mail</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+    }
+    .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 560px; width: 100%; overflow: hidden; }
+    .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 36px 30px; text-align: center; }
+    .header h1 { font-size: 26px; margin-bottom: 8px; }
+    .header p { font-size: 14px; opacity: 0.9; }
+    .content { padding: 36px 40px 40px; }
+    .error-message, .success-message, .info-message { padding: 14px; border-radius: 8px; margin-bottom: 20px; display: none; font-size: 14px; }
+    .error-message { background-color: #fee; color: #c33; border: 1px solid #fcc; }
+    .success-message { background-color: #efe; color: #3c3; border: 1px solid #cfc; }
+    .info-message { background-color: #f0f4fa; color: #1e3c72; border: 1px solid #d0dbef; display: block; }
+    .error-message.show, .success-message.show { display: block; }
+    .plan-summary { background: linear-gradient(135deg, #f5f9ff 0%, #eaf2ff 100%); border: 2px solid #1e3c72; border-radius: 10px; padding: 20px 22px; margin-bottom: 24px; }
+    .plan-summary h3 { font-size: 12px; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; }
+    .plan-name { font-size: 22px; font-weight: 700; color: #0c1e3c; margin-bottom: 12px; }
+    .fee-breakdown { display: flex; gap: 14px; flex-wrap: wrap; }
+    .fee-breakdown div { flex: 1; min-width: 140px; padding: 10px 12px; background: white; border-radius: 6px; border: 1px solid #d0dbef; }
+    .fee-label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: 600; margin-bottom: 4px; }
+    .fee-value { font-size: 17px; font-weight: 700; color: #0c1e3c; }
+    .fee-note { font-size: 11px; color: #888; margin-top: 3px; }
+    .fee-total { margin-top: 12px; font-size: 14px; color: #444; text-align: right; }
+    .ack-box { background: #fff8e1; border: 1px solid #ffd54f; border-radius: 8px; padding: 16px 18px; margin-bottom: 20px; }
+    .ack-title { font-size: 11px; font-weight: 700; color: #b07000; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+    .ack-row { display: flex; align-items: flex-start; gap: 10px; }
+    .ack-row input { width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; margin-top: 2px; }
+    .ack-row label { font-size: 13px; line-height: 1.55; color: #333; cursor: pointer; }
+    button {
+      width: 100%; padding: 15px; background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+    }
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+    .small-link { display: block; margin-top: 18px; text-align: center; font-size: 13px; color: #6b6455; text-decoration: none; }
+    .small-link a { color: #1e3c72; text-decoration: none; font-weight: 500; }
+    .signed-in { font-size: 12px; color: #666; text-align: center; margin-bottom: 20px; padding: 8px; background: #f5f7fb; border-radius: 6px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <img src="logo.png" alt="Forward My Mail" style="width:90px;height:auto;margin-bottom:10px;filter:brightness(0) invert(1);"/>
+      <h1>Confirm your purchase</h1>
+      <p>One last step before payment</p>
+    </div>
+    <div class="content">
+      <div id="errorMessage" class="error-message"></div>
+      <div id="successMessage" class="success-message"></div>
+      <div id="loadingMessage" class="info-message">Loading plan details...</div>
+
+      <div id="signedInLine" class="signed-in" style="display:none">Signed in as <strong id="userEmail"></strong></div>
+
+      <div id="planSummary" class="plan-summary" style="display:none">
+        <h3>Plan</h3>
+        <div class="plan-name" id="planName"></div>
+        <div class="fee-breakdown" id="feeBreakdown"></div>
+        <div class="fee-total">Total billed today: <strong id="planTotal"></strong></div>
+      </div>
+
+      <div id="ackContainer" class="ack-box" style="display:none">
+        <div class="ack-title">Immediate Performance Acknowledgment</div>
+        <div class="ack-row">
+          <input type="checkbox" id="ackCheckbox">
+          <label for="ackCheckbox" id="ackLabel"></label>
+        </div>
+      </div>
+
+      <button id="payBtn" disabled>Continue to Payment</button>
+
+      <a href="customer-portal.html" class="small-link">Cancel and return to my account</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getFirestore, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const TERMS_VERSION = (window.TERMS_V4 && window.TERMS_V4.version) || 'v2026-05-29';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
+      authDomain: "forward-my-mail.firebaseapp.com",
+      projectId: "forward-my-mail",
+      storageBucket: "forward-my-mail.firebasestorage.app",
+      messagingSenderId: "933044287958",
+      appId: "1:933044287958:web:fa3a707dbec62b24e74c77",
+      measurementId: "G-J8M65WQCGH"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    try { await setPersistence(auth, browserLocalPersistence); } catch {}
+
+    const params = new URLSearchParams(window.location.search);
+    const planKey = params.get('plan') || '';
+    const upgradeKey = params.get('upgrade') || '';
+    const purchaseKey = planKey || upgradeKey;
+    const purchaseKind = planKey ? 'plan' : (upgradeKey ? 'upgrade' : null);
+
+    const err = document.getElementById('errorMessage');
+    const loading = document.getElementById('loadingMessage');
+    const planSummary = document.getElementById('planSummary');
+    const feeBreakdown = document.getElementById('feeBreakdown');
+    const ackContainer = document.getElementById('ackContainer');
+    const ackCheckbox = document.getElementById('ackCheckbox');
+    const ackLabel = document.getElementById('ackLabel');
+    const payBtn = document.getElementById('payBtn');
+    const signedInLine = document.getElementById('signedInLine');
+    const userEmailEl = document.getElementById('userEmail');
+
+    function showError(msg) { err.textContent = msg; err.classList.add('show'); }
+    function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    let currentUser = null;
+    let purchaseItem = null;
+
+    async function getIp() {
+      try { const r = await fetch('https://api.ipify.org?format=json'); const j = await r.json(); return j.ip || 'unknown'; } catch { return 'unknown'; }
+    }
+
+    async function loadPricing() {
+      try {
+        const resp = await fetch('pricing.json', { cache: 'no-store' });
+        const data = await resp.json();
+        if (planKey) {
+          if (data[planKey]) purchaseItem = data[planKey];
+          else if (data.business && data.business[planKey]) purchaseItem = data.business[planKey];
+        } else if (upgradeKey) {
+          if (data.upgrades && data.upgrades[upgradeKey]) purchaseItem = data.upgrades[upgradeKey];
+        }
+        if (!purchaseItem) { showError('Plan not recognised: ' + purchaseKey); loading.style.display='none'; return; }
+        renderPlan();
+      } catch (e) {
+        showError('Could not load plan details: ' + e.message);
+        loading.style.display = 'none';
+      }
+    }
+
+    function renderPlan() {
+      loading.style.display = 'none';
+      document.getElementById('planName').textContent = purchaseItem.name;
+      const act = purchaseItem.activation_fee;
+      const svc = purchaseItem.service_fee;
+      const tot = purchaseItem.price;
+      let breakdownHtml = '';
+      if (svc != null && svc > 0) {
+        breakdownHtml = `
+          <div>
+            <div class="fee-label">Activation Fee</div>
+            <div class="fee-value">£${act.toFixed(2)}</div>
+            <div class="fee-note">non-refundable on completion</div>
+          </div>
+          <div>
+            <div class="fee-label">Service Fee (year)</div>
+            <div class="fee-value">£${svc.toFixed(2)}</div>
+            <div class="fee-note">pro-rata refundable</div>
+          </div>`;
+        ackLabel.textContent = `I expressly request that FMM begin the Activation Services for ${purchaseItem.name} immediately. I acknowledge the Activation Fee of £${act.toFixed(2)} is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee of £${svc.toFixed(2)} remains refundable on a pro-rata basis for the unused portion of the current period.`;
+      } else {
+        // Upgrade: whole fee is treated as Activation
+        breakdownHtml = `
+          <div>
+            <div class="fee-label">Upgrade Fee</div>
+            <div class="fee-value">£${act.toFixed(2)}</div>
+            <div class="fee-note">non-refundable on completion</div>
+          </div>`;
+        ackLabel.textContent = `I expressly request that FMM begin the upgrade services for ${purchaseItem.name} immediately. I acknowledge the Upgrade Fee of £${act.toFixed(2)} is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period.`;
+      }
+      feeBreakdown.innerHTML = breakdownHtml;
+      document.getElementById('planTotal').textContent = '£' + tot.toFixed(2);
+      planSummary.style.display = 'block';
+      ackContainer.style.display = 'block';
+    }
+
+    ackCheckbox.addEventListener('change', () => {
+      payBtn.disabled = !(ackCheckbox.checked && currentUser && purchaseItem);
+    });
+
+    payBtn.addEventListener('click', async () => {
+      if (!ackCheckbox.checked || !currentUser || !purchaseItem) return;
+      payBtn.disabled = true;
+      payBtn.textContent = 'Recording consent...';
+      try {
+        const ipAddress = await getIp();
+        const nowIso = new Date().toISOString();
+        await addDoc(collection(db, 'consents'), {
+          uid: currentUser.uid,
+          email: currentUser.email,
+          name: currentUser.displayName || '',
+          recordedAt: serverTimestamp(),
+          timestamp: nowIso,
+          ipAddress: ipAddress,
+          userAgent: navigator.userAgent,
+          termsVersion: TERMS_VERSION,
+          purchaseKind: purchaseKind,
+          purchaseKey: purchaseKey,
+          immediatePerformanceAcknowledged: true,
+          immediatePerformanceCheckboxWording: ackLabel.textContent.trim(),
+          selectedPlanName: purchaseItem.name,
+          activationFee: purchaseItem.activation_fee,
+          serviceFee: purchaseItem.service_fee,
+          totalPrice: purchaseItem.price
+        });
+        payBtn.textContent = 'Redirecting to Stripe...';
+        setTimeout(() => { window.location.href = purchaseItem.stripe_link; }, 600);
+      } catch (e) {
+        showError('Could not record consent: ' + e.message);
+        payBtn.disabled = false;
+        payBtn.textContent = 'Continue to Payment';
+      }
+    });
+
+    onAuthStateChanged(auth, user => {
+      if (!user) {
+        loading.style.display = 'none';
+        showError('You must be signed in to confirm a purchase. Redirecting to sign in...');
+        const target = 'signup.html' + (purchaseKey ? ('?' + purchaseKind + '=' + encodeURIComponent(purchaseKey)) : '');
+        setTimeout(() => { window.location.href = target; }, 1500);
+        return;
+      }
+      currentUser = user;
+      signedInLine.style.display = 'block';
+      userEmailEl.textContent = user.email;
+      loadPricing();
+    });
+  </script>
+</body>
+</html>

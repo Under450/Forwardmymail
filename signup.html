@@ -353,14 +353,14 @@
           console.warn('Consent audit log write failed (signup proceeds regardless):', consentErr);
         }
 
-        showSuccess('Account created. Redirecting to payment...');
+        showSuccess('Account created. Redirecting...');
 
-        // Redirect to matching Stripe Payment Link
-        const stripeLink = (selectedPlan && selectedPlan.stripe_link) || '';
-        if (stripeLink) {
-          setTimeout(() => { window.location.href = stripeLink; }, 1500);
+        // If a plan was selected, route through confirm-purchase for per-plan immediate-perf consent
+        // Otherwise land in the customer portal
+        if (planKey && selectedPlan) {
+          setTimeout(() => { window.location.href = 'confirm-purchase.html?plan=' + encodeURIComponent(planKey); }, 1200);
         } else {
-          setTimeout(() => { window.location.href = 'customer-portal.html'; }, 1500);
+          setTimeout(() => { window.location.href = 'customer-portal.html'; }, 1200);
         }
 
       } catch (error) {
