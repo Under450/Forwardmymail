@@ -666,6 +666,78 @@ exports.runBulkSync = onRequest(async (req, res) => {
 });
 
 // ── Backfill email logs for existing customers (v2 - with Stripe lookup) ─────
+// ─── Backfill package + price on customer docs from Stripe history ───
+// Admin-only. Query string: ?key=fmm-sync-2024[&dry=1]
+exports.backfillPackagePrice = onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
+  const key = req.query.key || req.headers['x-api-key'];
+  if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
+  const dryRun = req.query.dry === '1';
+
+  // Page through ALL completed Stripe Checkout Sessions
+  const allSessions = [];
+  let starting_after;
+  for (let i = 0; i < 30; i++) {
+    const opts = { limit: 100, status: 'complete' };
+    if (starting_after) opts.starting_after = starting_after;
+    const batch = await stripe.checkout.sessions.list(opts);
+    allSessions.push(...batch.data);
+    if (!batch.has_more) break;
+    starting_after = batch.data[batch.data.length - 1].id;
+  }
+
+  // Map email -> array of all payments (newest first)
+  const paymentsByEmail = {};
+  for (const s of allSessions) {
+    const email = (s.customer_email || s.customer_details?.email || '').toLowerCase();
+    if (!email || !s.amount_total) continue;
+    const amount = s.amount_total / 100;
+    let pkg = 'Credit Pack / Other';
+    if (amount === 125) pkg = 'Personal Mailbox';
+    else if (amount === 175) pkg = 'Business Address';
+    else if (amount === 225) pkg = 'Registered Office';
+    else if (amount === 299) pkg = 'Full Virtual Office';
+    else if (amount === 100) pkg = 'Upgrade: Personal -> Registered Office';
+    else if (amount === 50) pkg = 'Upgrade: Business -> Registered Office';
+    (paymentsByEmail[email] = paymentsByEmail[email] || []).push({ package: pkg, amount, created: s.created, sessionId: s.id });
+  }
+  Object.values(paymentsByEmail).forEach(arr => arr.sort((a, b) => b.created - a.created));
+
+  // Walk customer docs, populate missing fields from Stripe history
+  const customers = await db.collection('customers').get();
+  const results = [];
+  let updated = 0;
+  for (const doc of customers.docs) {
+    const c = doc.data();
+    const email = (c.email || '').toLowerCase();
+    if (!email) { results.push({ docId: doc.id, status: 'no_email' }); continue; }
+    const payments = paymentsByEmail[email] || [];
+    if (!payments.length) { results.push({ email, mailboxId: c.mailboxId, status: 'no_stripe_payment_found' }); continue; }
+
+    const latest = payments[0];
+    const total = payments.reduce((sum, p) => sum + p.amount, 0);
+
+    const updates = {};
+    if (!c.package) updates.package = latest.package;
+    if (c.lastPurchaseAmount == null) updates.lastPurchaseAmount = latest.amount;
+    if (!c.lastPurchaseDate) updates.lastPurchaseDate = new Date(latest.created * 1000);
+    if (c.totalSpent == null || c.totalSpent === 0) updates.totalSpent = total;
+    if (!c.lastStripeSessionId) updates.lastStripeSessionId = latest.sessionId;
+    if (payments.length > 1 && !c.purchaseCount) updates.purchaseCount = payments.length;
+
+    if (Object.keys(updates).length === 0) {
+      results.push({ email, mailboxId: c.mailboxId, status: 'already_complete' });
+      continue;
+    }
+    if (!dryRun) {
+      await doc.ref.update(updates);
+      updated++;
+    }
+    results.push({ email, mailboxId: c.mailboxId, status: dryRun ? 'would_update' : 'updated', updates });
+  }
+
+  res.json({ dryRun, customersTotal: customers.size, stripeSessions: allSessions.length, updated, results });
+});
+
 exports.backfillEmailLogs = onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
   const key = req.query.key || req.headers['x-api-key'];
   if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
