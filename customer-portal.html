@@ -530,14 +530,16 @@ function applyGateUI(data) {
   const status = (data.idStatus || 'not_started').toLowerCase();
   const idGate = Boolean(data.idRequired || data.idGate);
   const isVerified = status === 'verified' || status === 'approved';
-  const shouldGate = idGate && !isVerified;
-  
+  // Portal access requires BOTH DIDIT pass AND staff manual activation (idGate === false)
+  const shouldGate = idGate;
+
 
   // Set banner text
   if (shouldGate) {
     let msg = 'ID CHECK REQUIRED — Your account is temporarily limited until your ID is verified.';
     if (status === 'pending') msg = 'ID CHECK PENDING — We are reviewing your documents.';
-    if (status === 'failed')  msg = 'ID CHECK FAILED — Please re-submit your ID documents.';
+    if (status === 'failed' || status === 'declined') msg = 'ID CHECK FAILED — Please re-submit your ID documents.';
+    if (isVerified) msg = 'ID APPROVED — Your mailbox is being activated by our team. This usually completes within a few hours during business hours.';
     gateBanner.textContent = msg;
     gateBanner.classList.add('show');
     portalBody.classList.add('gated');
