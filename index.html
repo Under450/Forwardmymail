@@ -1260,6 +1260,15 @@ article.pricing-card ul.pricing-list{
 }
 
 
+</style>
+<style id="wa-fab-style">
+  .wa-fab__btn { position: fixed; right: 18px; bottom: 18px; width: 56px; height: 56px; border-radius: 999px; background: #25D366; box-shadow: 0 10px 24px rgba(0,0,0,0.18); display: inline-flex; align-items: center; justify-content: center; z-index: 9999; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; animation: waFabBounce 2.4s ease-in-out infinite; text-decoration: none; }
+  .wa-fab__btn:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 14px 30px rgba(0,0,0,0.22); }
+  .wa-fab__btn img { width: 28px !important; height: 28px !important; display: block !important; flex: none !important; }
+  @keyframes waFabBounce { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-4px);} }
+  @media (prefers-reduced-motion: reduce) { .wa-fab__btn { animation: none; } }
+</style>
+<style>
 /* AI Concierge nav button + stacked login button */
 .btn-login-stacked { display: inline-flex; flex-direction: column; line-height: 1.1; padding-top: 0.4rem; padding-bottom: 0.4rem; text-align: center; }
 .btn-login-stacked .btn-line-1 { font-size: 0.85em; font-weight: 600; }
