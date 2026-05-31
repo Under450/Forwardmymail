@@ -25,6 +25,17 @@ const EMAIL_PASS     = process.env.SMTP_PASS;
 admin.initializeApp();
 const db = admin.firestore();
 
+// ── Auth helpers ──────────────────────────────────────────────────────────────
+// Verify a Firebase ID token AND that the user has a doc in /staff/{uid}.
+// Returns the decoded token on success, throws Error on failure.
+async function verifyStaffToken(idToken) {
+  if (!idToken) throw new Error('No auth token');
+  const decoded = await admin.auth().verifyIdToken(idToken);
+  const staffDoc = await db.collection('staff').doc(decoded.uid).get();
+  if (!staffDoc.exists) throw new Error('Not a staff user');
+  return decoded;
+}
+
 // ── Google Sheets setup (uses Application Default Credentials on Cloud Run) ──
 const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
 const auth = new google.auth.GoogleAuth({
@@ -695,9 +706,13 @@ exports.backfillTermsAcceptances = onCall(async (request) => {
   return { results };
 });
 
-exports.runBulkSync = onRequest(async (req, res) => {
+exports.runBulkSync = onRequest({ secrets: ['BULK_SYNC_KEY'] }, async (req, res) => {
+  if (!process.env.BULK_SYNC_KEY) {
+    console.error('[runBulkSync] BULK_SYNC_KEY env var not set — refusing request');
+    return res.status(503).json({ error: 'Service misconfigured' });
+  }
   const key = req.query.key || req.headers['x-api-key'];
-  if (key !== process.env.BULK_SYNC_KEY && key !== 'fmm-sync-2024') {
+  if (key !== process.env.BULK_SYNC_KEY) {
     return res.status(403).json({ error: 'Unauthorized' });
   }
   try {
@@ -713,9 +728,12 @@ exports.runBulkSync = onRequest(async (req, res) => {
 // ─── Backfill package + price (REMOVED 2026-05-29 after one-off use) ───
 // Code retained below as exported for git history only; removed from deployment.
 // To re-enable: rename `_backfillPackagePrice_REMOVED` back to `exports.backfillPackagePrice` and redeploy.
-const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
+const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onRequest({ secrets: ['STRIPE_SECRET_KEY', 'BULK_SYNC_KEY'] }, async (req, res) => {
+  if (!process.env.BULK_SYNC_KEY) {
+    return res.status(503).json({ error: 'Service misconfigured' });
+  }
   const key = req.query.key || req.headers['x-api-key'];
-  if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
+  if (key !== process.env.BULK_SYNC_KEY) return res.status(403).json({ error: 'Unauthorized' });
   const dryRun = req.query.dry === '1';
 
   // Page through ALL completed Stripe Checkout Sessions
@@ -783,9 +801,13 @@ const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onR
   res.json({ dryRun, customersTotal: customers.size, stripeSessions: allSessions.length, updated, results });
 });
 
-exports.backfillEmailLogs = onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
+exports.backfillEmailLogs = onRequest({ secrets: ['STRIPE_SECRET_KEY', 'BULK_SYNC_KEY'] }, async (req, res) => {
+  if (!process.env.BULK_SYNC_KEY) {
+    console.error('[backfillEmailLogs] BULK_SYNC_KEY env var not set — refusing destructive request');
+    return res.status(503).json({ error: 'Service misconfigured' });
+  }
   const key = req.query.key || req.headers['x-api-key'];
-  if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
+  if (key !== process.env.BULK_SYNC_KEY) return res.status(403).json({ error: 'Unauthorized' });
 
   try {
     // Purge all existing email_logs first
@@ -1043,35 +1065,105 @@ exports.createDiditSession = onRequest(async (req, res) => {
   }
 });
 
+// ── Didit V3 signature helpers ────────────────────────────────────────────────
+// Per https://docs.didit.me/integration/webhooks
+// Three signature variants sent: X-Signature-V2 (recommended), X-Signature (raw),
+// X-Signature-Simple (envelope-only fallback).
+function shortenFloats(data) {
+  if (Array.isArray(data)) return data.map(shortenFloats);
+  if (data !== null && typeof data === 'object') {
+    return Object.fromEntries(
+      Object.entries(data).map(([k, v]) => [k, shortenFloats(v)])
+    );
+  }
+  if (typeof data === 'number' && !Number.isInteger(data) && data % 1 === 0) {
+    return Math.trunc(data);
+  }
+  return data;
+}
+function sortKeysRecursive(obj) {
+  if (Array.isArray(obj)) return obj.map(sortKeysRecursive);
+  if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).sort().reduce((acc, k) => {
+      acc[k] = sortKeysRecursive(obj[k]);
+      return acc;
+    }, {});
+  }
+  return obj;
+}
+function timingSafeHexEqual(a, b) {
+  const crypto = require('crypto');
+  const ab = Buffer.from(a, 'utf8');
+  const bb = Buffer.from(b, 'utf8');
+  return ab.length === bb.length && crypto.timingSafeEqual(ab, bb);
+}
+function verifyDiditSignatureV2(bodyJson, signatureHeader, secret) {
+  const crypto = require('crypto');
+  const canonical = JSON.stringify(sortKeysRecursive(shortenFloats(bodyJson)));
+  const expected = crypto.createHmac('sha256', secret).update(canonical, 'utf8').digest('hex');
+  return timingSafeHexEqual(expected, signatureHeader);
+}
+function verifyDiditSignatureRaw(rawBody, signatureHeader, secret) {
+  const crypto = require('crypto');
+  const expected = crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
+  return timingSafeHexEqual(expected, signatureHeader);
+}
+function verifyDiditSignatureSimple(bodyJson, signatureHeader, secret) {
+  const crypto = require('crypto');
+  const canonical = [
+    bodyJson.timestamp ?? '',
+    bodyJson.session_id ?? '',
+    bodyJson.status ?? '',
+    bodyJson.webhook_type ?? '',
+  ].join(':');
+  const expected = crypto.createHmac('sha256', secret).update(canonical).digest('hex');
+  return timingSafeHexEqual(expected, signatureHeader);
+}
+
 // ── diditWebhook ──────────────────────────────────────────────────────────────
-// Called by Didit when verification is complete (approved or declined)
-// Updates customer Firestore doc and lifts or keeps the gate
+// Called by Didit when verification status changes (approved/declined/etc).
+// V3 signature verification + fast-return 200 + async customer work.
+// Didit's outbound timeout is 5s — we MUST return quickly.
 exports.diditWebhook = onRequest(async (req, res) => {
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
   const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
+  if (!DIDIT_WEBHOOK_SECRET) {
+    console.error('[diditWebhook] DIDIT_WEBHOOK_SECRET env var not set — refusing request');
+    return res.status(503).send('Service misconfigured');
+  }
 
   try {
-    // Verify webhook signature if secret is configured
-    if (DIDIT_WEBHOOK_SECRET) {
-      const signature = req.headers['x-signature'] || req.headers['x-didit-signature'];
-      if (!signature) {
-        console.error('Missing Didit webhook signature');
-        return res.status(401).send('Missing signature');
-      }
-      const crypto = require('crypto');
-      const expectedSig = crypto
-        .createHmac('sha256', DIDIT_WEBHOOK_SECRET)
-        .update(JSON.stringify(req.body))
-        .digest('hex');
-      if (signature !== expectedSig && signature !== `sha256=${expectedSig}`) {
-        console.error('Invalid Didit webhook signature');
-        return res.status(401).send('Invalid signature');
-      }
+    // Timestamp freshness (5min window) — replay-attack defence
+    const tsHeader = req.headers['x-timestamp'];
+    if (!tsHeader || Math.abs(Math.floor(Date.now() / 1000) - parseInt(tsHeader, 10)) > 300) {
+      console.error('[diditWebhook] Stale or missing X-Timestamp:', tsHeader);
+      return res.status(401).send('Stale timestamp');
     }
 
-    const payload = req.body;
-    console.log('Didit webhook received:', payload?.type, payload?.status);
+    // V3 signature verification — try V2 (recommended), then raw, then Simple
+    const sigV2     = req.headers['x-signature-v2'];
+    const sigRaw    = req.headers['x-signature'];
+    const sigSimple = req.headers['x-signature-simple'];
+    const body      = req.body;
+    const rawBody   = req.rawBody ? req.rawBody.toString('utf8') : null;
+
+    let verified = false;
+    let verifiedVia = '';
+    if (sigV2 && verifyDiditSignatureV2(body, sigV2, DIDIT_WEBHOOK_SECRET)) {
+      verified = true; verifiedVia = 'v2';
+    } else if (sigRaw && rawBody && verifyDiditSignatureRaw(rawBody, sigRaw, DIDIT_WEBHOOK_SECRET)) {
+      verified = true; verifiedVia = 'raw';
+    } else if (sigSimple && verifyDiditSignatureSimple(body, sigSimple, DIDIT_WEBHOOK_SECRET)) {
+      verified = true; verifiedVia = 'simple';
+    }
+    if (!verified) {
+      console.error('[diditWebhook] Invalid signature — V2:', !!sigV2, 'raw:', !!sigRaw, 'simple:', !!sigSimple);
+      return res.status(401).send('Invalid signature');
+    }
+
+    const payload = body;
+    console.log('[diditWebhook] verified via', verifiedVia, '— event:', payload?.webhook_type, 'status:', payload?.status);
 
     // Extract key fields
     const sessionId   = payload.session_id;
@@ -1084,35 +1176,62 @@ exports.diditWebhook = onRequest(async (req, res) => {
     }
 
     // Map Didit status to our idStatus values
+    // Didit V3 sends title-case: "Approved" / "Declined" / "In Review" / "In Progress" / "Abandoned" / "Expired" / "KYC Expired" / "Resubmitted"
     let idStatus = 'pending';
     let idGate   = true;
 
     if (status === 'approved') {
       idStatus = 'approved';
       idGate   = false;   // lift the gate!
-    } else if (status === 'declined' || status === 'rejected' || status === 'expired') {
+    } else if (status === 'declined' || status === 'rejected' || status === 'expired' || status === 'kyc expired') {
       idStatus = 'declined';
       idGate   = true;    // keep gate, customer needs to retry
     }
 
-    // Update customer Firestore document
-    await db.collection('customers').doc(customerId).update({
+    // ── CRITICAL PATH (must complete before 200 response) ─────────────────────
+    // Idempotency: event_id is unique per delivery; skip if already processed
+    const eventId = payload.event_id || `${sessionId}_${payload.webhook_type}_${payload.timestamp}`;
+    const eventRef = db.collection('didit_webhook_events').doc(eventId);
+    const eventDoc = await eventRef.get();
+    if (eventDoc.exists) {
+      console.log('[diditWebhook] duplicate event, ack only:', eventId);
+      return res.status(200).json({ received: true, duplicate: true });
+    }
+
+    // Update customer doc + record event atomically
+    const batch = db.batch();
+    batch.set(eventRef, {
+      eventId,
+      sessionId,
+      customerId,
+      webhookType: payload.webhook_type || null,
+      status: payload.status || null,
+      receivedAt: admin.firestore.FieldValue.serverTimestamp(),
+      processed: false,
+    });
+    batch.update(db.collection('customers').doc(customerId), {
       idStatus,
       idGate,
       idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
       diditSessionId: sessionId,
-      diditResult: payload
+      diditResult: payload,
     });
+    await batch.commit();
 
-    console.log(`Customer ${customerId} verification result: ${idStatus}`);
+    // ── RETURN 200 IMMEDIATELY ────────────────────────────────────────────────
+    // Didit times out at 5s. Emails + Telegram are best-effort below.
+    res.status(200).json({ received: true });
 
-    // Send appropriate email via IONOS SMTP
-    const customerDoc = await db.collection('customers').doc(customerId).get();
-    if (customerDoc.exists) {
+    // ── BEST-EFFORT POST-PROCESSING (after response) ──────────────────────────
+    // Cloud Functions may kill the process after res.send(), so this is best-effort.
+    // If emails fail to send, the customer doc IS already updated; resend via staff portal.
+    try {
+      const customerDoc = await db.collection('customers').doc(customerId).get();
+      if (!customerDoc.exists) return;
       const customer = customerDoc.data();
+
       if (idStatus === 'approved') {
         await sendVerificationEmail(customer.email, customer.name || 'Customer', 'approved');
-        // Business Address: no free scans — prompt to add credits immediately after approval
         const custPkg = (customer.package || '').toUpperCase();
         if (custPkg.includes('BUSINESS')) {
           await sendMailLogged({
@@ -1128,7 +1247,6 @@ exports.diditWebhook = onRequest(async (req, res) => {
         await sendVerificationEmail(customer.email, customer.name || 'Customer', 'declined');
       }
 
-      // Notify admin
       const statusLabel = idStatus === 'approved' ? '✅ APPROVED' : idStatus === 'declined' ? '❌ DECLINED' : '⏳ PENDING';
       const mailbox = customer.mailboxId || 'N/A';
       const company = customer.company || '';
@@ -1148,13 +1266,18 @@ exports.diditWebhook = onRequest(async (req, res) => {
         template: 'admin_id_verification',
         customerEmail: customer.email || ''
       });
-    }
 
-    return res.status(200).json({ received: true });
+      await eventRef.update({ processed: true, processedAt: admin.firestore.FieldValue.serverTimestamp() });
+    } catch (asyncErr) {
+      console.error('[diditWebhook] post-response work failed (customer doc IS already updated):', asyncErr);
+      // Best-effort failure — customer state correct, just emails missed
+      await eventRef.update({ processed: false, processError: String(asyncErr && asyncErr.message || asyncErr) }).catch(() => {});
+    }
+    return;
 
   } catch (err) {
-    console.error('diditWebhook error:', err);
-    return res.status(500).send('Internal error');
+    console.error('[diditWebhook] error:', err);
+    if (!res.headersSent) return res.status(500).send('Internal error');
   }
 });
 
@@ -2374,14 +2497,13 @@ exports.getEmailLogs = onRequest(async (req, res) => {
 
   const { limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
 
-  // Validate via Firebase ID token
+  // Validate Firebase ID token AND staff role
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
   try {
-    await admin.auth().verifyIdToken(idToken);
-  } catch {
-    return res.status(401).json({ error: 'Unauthorised' });
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
   }
 
   try {
@@ -2452,8 +2574,11 @@ exports.deleteEmailLog = onRequest(async (req, res) => {
 
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
-  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
+  try {
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
+  }
 
   const { docId } = req.body || {};
   if (!docId) return res.status(400).json({ error: 'Missing docId' });
@@ -2477,8 +2602,11 @@ exports.createEmailLogSheet = onRequest(async (req, res) => {
 
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
-  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
+  try {
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
+  }
 
   try {
     const sheetAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
@@ -2547,15 +2675,13 @@ exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
-  // Verify Firebase ID token — must be a signed-in staff user
+  // Verify Firebase ID token AND staff role — comment said staff only, now enforced
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'No auth token' });
-
   try {
-    await admin.auth().verifyIdToken(idToken);
-  } catch {
-    return res.status(401).json({ error: 'Invalid token' });
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
   }
 
   try {

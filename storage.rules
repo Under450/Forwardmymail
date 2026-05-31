@@ -12,14 +12,25 @@ service firebase.storage {
     }
 
     // ─────────────────────────────────────────────
+    // HELPER: validate upload size + MIME
+    // 25 MB max; PDF or image only
+    // ─────────────────────────────────────────────
+    function validUpload() {
+      return request.resource.size < 25 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*|application/pdf');
+    }
+
+    // ─────────────────────────────────────────────
     // MAIL SCANS (uploaded by staff portal)
     // Path: mail-scans/{customerId}/{filename}
     // ─────────────────────────────────────────────
     match /mail-scans/{customerId}/{fileName} {
       // Customer can only read their own scans
       allow read: if request.auth != null && request.auth.uid == customerId;
-      // Staff can read and write all scans
-      allow read, write: if isStaff();
+      // Staff can read; writes must pass size + MIME validation
+      allow read: if isStaff();
+      allow write: if isStaff() && validUpload();
+      allow delete: if isStaff();
     }
 
     // ─────────────────────────────────────────────
@@ -29,8 +40,10 @@ service firebase.storage {
     match /scans/{customerId}/{fileName} {
       // Customer can only read their own scans
       allow read: if request.auth != null && request.auth.uid == customerId;
-      // Staff can read and write all scans
-      allow read, write: if isStaff();
+      // Staff can read; writes must pass size + MIME validation
+      allow read: if isStaff();
+      allow write: if isStaff() && validUpload();
+      allow delete: if isStaff();
     }
 
     // ─────────────────────────────────────────────
@@ -41,7 +54,7 @@ service firebase.storage {
       allow read, write: if request.auth != null && request.auth.uid == 'pY80AVfY9teBlcBD8b8EUo3rORm2';
     }
 
-        // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────
     // DENY EVERYTHING ELSE
     // ─────────────────────────────────────────────
     match /{allPaths=**} {
