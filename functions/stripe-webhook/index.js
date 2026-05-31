@@ -7,11 +7,12 @@ const admin = require('firebase-admin');
 
 // Attach all secrets to every function so process.env works
 setGlobalOptions({
-  secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SMTP_PASS', 'DIDIT_API_KEY', 'DIDIT_WEBHOOK_SECRET'],
+  secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SMTP_PASS', 'DIDIT_API_KEY', 'DIDIT_WEBHOOK_SECRET', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID'],
 });
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
+const { notifyPaidCustomer, notifyNewSignup } = require('./telegram');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECRETS — never hardcoded here. Set as environment variables in Google Cloud.
@@ -457,6 +458,30 @@ exports.stripeWebhook = onRequest(async (req, res) => {
         console.error('Failed to send admin notification:', notifyError);
       }
 
+      // Telegram push to Craig's iPhone — only for package purchases (skip credit packs)
+      try {
+        if (packageType !== 'Credit Pack') {
+          const tg = await notifyPaidCustomer({
+            sessionId: session.id,
+            name: finalCustomerData.name,
+            email: finalCustomerData.email,
+            packageType,
+            amount,
+            date: new Date(),
+          });
+          if (tg.ok) {
+            console.log(`[telegram] paid notification sent (session=${session.id}, skipped=${!!tg.skipped})`);
+          } else {
+            console.error(`[telegram] paid notification failed (session=${session.id}):`, tg);
+          }
+        } else {
+          console.log(`[telegram] skipping credit-pack purchase (session=${session.id}, amount=${amount})`);
+        }
+      } catch (tgErr) {
+        // Never let Telegram failure break the webhook response
+        console.error('[telegram] paid notification threw:', tgErr);
+      }
+
       await syncCustomerToSheet(customerId, finalCustomerData);
 
       return res.status(200).json({ received: true });
@@ -504,6 +529,25 @@ exports.onCustomerCreated = onDocumentCreated('customers/{customerId}', async (e
     });
 
     console.log(`Signup notification sent for ${customerData.email}`);
+
+    // Telegram push to Craig's iPhone — fires once per customers/{id} doc
+    try {
+      const tg = await notifyNewSignup({
+        customerId: event.params.customerId,
+        name: customerData.name,
+        email: customerData.email,
+        company: customerData.company,
+        mailboxId,
+        date: new Date(),
+      });
+      if (tg.ok) {
+        console.log(`[telegram] signup notification sent (customerId=${event.params.customerId}, skipped=${!!tg.skipped})`);
+      } else {
+        console.error(`[telegram] signup notification failed (customerId=${event.params.customerId}):`, tg);
+      }
+    } catch (tgErr) {
+      console.error('[telegram] signup notification threw:', tgErr);
+    }
 
     // Send welcome email to the customer
     try {
