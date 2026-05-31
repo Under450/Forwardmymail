@@ -11,7 +11,7 @@
       background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
     }
-    .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 100%; overflow: hidden; }
+    .container { background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 560px; width: 100%; overflow: hidden; }
     .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 40px 30px; text-align: center; }
     .header h1 { font-size: 32px; margin-bottom: 10px; }
     .header p { font-size: 16px; opacity: 0.9; }
@@ -35,23 +35,39 @@
     .links a { color: #1e3c72; text-decoration: none; font-weight: 500; }
     .links a:hover { text-decoration: underline; }
     .requirement { font-size: 14px; color: #666; margin-top: 5px; }
+    .plan-summary { background: linear-gradient(135deg, #f5f9ff 0%, #eaf2ff 100%); border: 2px solid #1e3c72; border-radius: 10px; padding: 18px 20px; margin-bottom: 25px; }
+    .plan-summary h3 { font-size: 14px; color: #1e3c72; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
+    .plan-summary .plan-name { font-size: 22px; font-weight: 700; color: #0c1e3c; margin-bottom: 10px; }
+    .plan-summary .fee-breakdown { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #444; }
+    .plan-summary .fee-breakdown div { flex: 1; min-width: 140px; padding: 8px 10px; background: white; border-radius: 6px; border: 1px solid #d0dbef; }
+    .plan-summary .fee-breakdown .fee-label { font-size: 11px; text-transform: uppercase; color: #666; font-weight: 600; margin-bottom: 4px; }
+    .plan-summary .fee-breakdown .fee-value { font-size: 16px; font-weight: 700; color: #0c1e3c; }
+    .plan-summary .fee-total { margin-top: 10px; font-size: 13px; color: #555; text-align: right; }
     .terms-container { margin: 25px 0; padding: 15px; background: #f9f9f9; border-radius: 8px; }
     .terms-notice { font-size: 14px; color: #ff9800; font-weight: 600; margin-bottom: 10px; text-align: center; }
     .terms-box {
       border: 2px solid #e0e0e0; border-radius: 8px; padding: 20px; height: 300px; overflow-y: scroll;
       background: white; margin-bottom: 15px; font-size: 13px; line-height: 1.5;
     }
-    .terms-box details { border: 1px solid #e5e7eb; border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
-    .terms-box summary { cursor: pointer; font-weight: 600; padding: 4px 0; color: #1e3c72; font-size: 12px; }
-    .terms-box details[open] { background: #fafafa; }
-    .terms-box p { margin: 10px 0; color: #333; }
+    .terms-box h2 { font-size: 16px; color: #0c1e3c; margin: 14px 0 8px; }
+    .terms-box h3 { font-size: 13px; color: #1e3c72; margin: 14px 0 6px; padding-bottom: 4px; border-bottom: 1px solid #e0e6ef; }
+    .terms-box p { margin: 8px 0; color: #333; font-size: 12px; line-height: 1.55; }
+    .terms-box ul, .terms-box ol { margin: 6px 0 10px 18px; font-size: 12px; }
+    .terms-box li { margin-bottom: 4px; }
+    .terms-box table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 11px; }
+    .terms-box th, .terms-box td { padding: 5px 7px; border-bottom: 1px solid #e0e6ef; text-align: left; }
+    .terms-box th { background: #f0f4fa; color: #1e3c72; }
+    .terms-box em { color: #666; }
+    .terms-box strong { color: #0c1e3c; }
     .terms-box::-webkit-scrollbar { width: 8px; }
     .terms-box::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
     .terms-box::-webkit-scrollbar-thumb { background: #1e3c72; border-radius: 4px; }
-    .checkbox-container { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
-    .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+    .checkbox-container { display: flex; align-items: flex-start; gap: 10px; margin-top: 15px; }
+    .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; margin-top: 2px; }
     .checkbox-container input[type="checkbox"]:disabled { cursor: not-allowed; opacity: 0.5; }
-    .checkbox-container label { margin: 0; cursor: pointer; user-select: none; font-size: 14px; }
+    .checkbox-container label { margin: 0; cursor: pointer; user-select: none; font-size: 13px; line-height: 1.5; }
+    .immediate-perf-box { margin-top: 15px; padding: 15px; background: #fff8e1; border: 1px solid #ffd54f; border-radius: 8px; }
+    .immediate-perf-box .perf-title { font-size: 12px; font-weight: 700; color: #b07000; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
   </style>
 </head>
 <body>
@@ -64,6 +80,24 @@
     <div class="content">
       <div id="errorMessage" class="error-message"></div>
       <div id="successMessage" class="success-message"></div>
+
+      <div id="planSummary" class="plan-summary" style="display:none">
+        <h3>Selected Plan</h3>
+        <div class="plan-name" id="planName"></div>
+        <div class="fee-breakdown">
+          <div>
+            <div class="fee-label">Activation Fee</div>
+            <div class="fee-value" id="planActivation"></div>
+            <div style="font-size:11px;color:#888;margin-top:3px">non-refundable on completion</div>
+          </div>
+          <div>
+            <div class="fee-label">Service Fee (year)</div>
+            <div class="fee-value" id="planService"></div>
+            <div style="font-size:11px;color:#888;margin-top:3px">pro-rata refundable</div>
+          </div>
+        </div>
+        <div class="fee-total">Total billed today: <strong id="planTotal"></strong></div>
+      </div>
 
       <form id="signupForm">
         <div class="form-group">
@@ -93,43 +127,26 @@
         </div>
 
         <div class="terms-container">
-          <div class="terms-notice">⚠️ Please scroll to the bottom to read all terms</div>
+          <div class="terms-notice">Please scroll to the bottom to read all terms</div>
           <div class="terms-box" id="termsBox">
-            <p><small><strong>Last updated: 19 December 2025</strong></small></p>
-            <p>These Terms govern the provision of mail receiving, opening/scanning, storage and forwarding services by Forward My Mail Ltd.</p>
-
-            <details><summary>1. Parties</summary><p>"FMM" means Forward My Mail Ltd, 8a Bore Street, Lichfield, Staffordshire, WS13 6PS, United Kingdom (Company No. 16912540).</p></details>
-            <details><summary>2. Service Description</summary><p>You appoint FMM as your agent to receive mail and authorise us to open and scan mail for processing and forwarding.</p></details>
-            <details><summary>3. Your Obligations</summary><p>Do not send Prohibited Items. You are responsible for customs declarations, duties and taxes.</p></details>
-            <details><summary>4. Prohibited Items</summary><p>You must comply with legal restrictions on dangerous goods, weapons, controlled drugs, cash, and illegal items.</p></details>
-            <details><summary>5. KYC/AML Controls</summary><p>An account is not active until payment is received and all KYC/AML checks are completed.</p></details>
-            <details><summary>6. Handling & Delivery</summary><p>Risk passes when items are delivered to the Carrier or collected by you. Delivery dates are estimates.</p></details>
-            <details><summary>7. Fees & Storage</summary><p>You agree to pay Service fees and shipping charges. All fees exclude VAT. For inactive accounts, we may hold mail for 14 days then return or store for a fee.</p></details>
-            <details><summary>8. Liability & Limits</summary>
-              <p><strong>Consumer rights:</strong> Nothing limits your statutory rights under the Consumer Rights Act 2015.</p>
-              <p><strong>Liability cap:</strong> FMM's aggregate liability is limited to the greater of £100 or 100% of fees paid.</p>
-              <p><strong>Non-excludable:</strong> Nothing excludes liability for death, personal injury, negligence or fraud.</p>
-            </details>
-            <details><summary>9. Your Indemnities</summary><p>You indemnify us from losses arising from your breach or misuse. For Consumers this applies only to losses caused by your fault.</p></details>
-            <details><summary>10. Data Protection</summary><p>FMM is a controller of personal data you provide. See our Privacy Notice for details.</p></details>
-            <details><summary>11. Termination</summary><p>We may suspend or terminate the Service if you breach these Terms or amounts are overdue.</p></details>
-            <details><summary>12. Changes to Terms</summary><p>We may update these Terms with at least 30 days' notice for material changes.</p></details>
-            <details><summary>13. Consumer Information</summary><p>Consumers purchasing online may have a 14-day cooling-off period.</p></details>
-            <details><summary>14. Complaints</summary><p>We aim to resolve complaints internally. If we cannot, we will provide details of an approved ADR provider.</p></details>
-            <details><summary>15. Governing Law</summary><p>These Terms are governed by the law of England and Wales.</p></details>
-            <details><summary>16. Contact</summary><p>Forward My Mail Ltd<br>8a Bore Street, Lichfield, WS13 6PS<br>Email: info@forwardmymail.co.uk</p></details>
-
-            <p style="margin-top: 20px;"><strong>By creating an account, you accept these Terms.</strong></p>
-            <p><small>For complete detailed terms including all schedules, visit our <a href="terms.html" target="_blank">full Terms & Conditions page</a>.</small></p>
+            <p>Loading terms...</p>
           </div>
-          
+
           <div class="checkbox-container">
             <input type="checkbox" id="termsCheckbox" disabled>
             <label for="termsCheckbox">I have read and agree to the Terms and Conditions</label>
           </div>
+
+          <div class="immediate-perf-box">
+            <div class="perf-title">Immediate Performance Acknowledgment (required to activate)</div>
+            <div class="checkbox-container">
+              <input type="checkbox" id="immediatePerfCheckbox" disabled>
+              <label for="immediatePerfCheckbox" id="immediatePerfLabel">I expressly request that FMM begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge the Activation Fee <span id="actLabel">(see plan above)</span> is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee <span id="svcLabel"></span> remains refundable on a pro-rata basis for the unused portion of the current period.</label>
+            </div>
+          </div>
         </div>
 
-        <button type="submit" id="signupBtn" disabled>Create Account</button>
+        <button type="submit" id="signupBtn" disabled>Create Account & Continue to Payment</button>
       </form>
 
       <div class="links">
@@ -138,10 +155,17 @@
     </div>
   </div>
 
+  <script src="terms-v4.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-    import { getFirestore, doc, setDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+    import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+    const TERMS_VERSION = (window.TERMS_V4 && window.TERMS_V4.version) || 'v2026-05-29';
+    // Inject full v4 terms into the scrollable box (always expanded - no collapsibles)
+    if (window.TERMS_V4 && window.TERMS_V4.html) {
+      document.getElementById('termsBox').innerHTML = window.TERMS_V4.html;
+    }
 
     const firebaseConfig = {
       apiKey: "AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU",
@@ -163,20 +187,71 @@
     const successMessage = document.getElementById('successMessage');
     const termsBox = document.getElementById('termsBox');
     const termsCheckbox = document.getElementById('termsCheckbox');
+    const immediatePerfCheckbox = document.getElementById('immediatePerfCheckbox');
 
-    // Enable checkbox when scrolled to bottom of terms
+    // Read selected plan from ?plan=X query param
+    const params = new URLSearchParams(window.location.search);
+    const planKey = params.get('plan') || '';
+
+    let selectedPlan = null;
+    let pricingData = null;
+
+    async function loadPricing() {
+      try {
+        const resp = await fetch('pricing.json', { cache: 'no-store' });
+        pricingData = await resp.json();
+        // Plan lookup — top-level (personal_mailbox) or nested under business.*
+        if (pricingData[planKey]) selectedPlan = pricingData[planKey];
+        else if (pricingData.business && pricingData.business[planKey]) selectedPlan = pricingData.business[planKey];
+
+        if (selectedPlan) {
+          document.getElementById('planSummary').style.display = 'block';
+          document.getElementById('planName').textContent = selectedPlan.name;
+          const act = selectedPlan.activation_fee;
+          const svc = selectedPlan.service_fee;
+          const tot = selectedPlan.price;
+          document.getElementById('planActivation').textContent = act != null ? '£' + act.toFixed(2) : 'See website';
+          document.getElementById('planService').textContent = svc != null ? '£' + svc.toFixed(2) : 'See website';
+          document.getElementById('planTotal').textContent = tot != null ? '£' + tot.toFixed(2) : 'TBC';
+          if (act != null) document.getElementById('actLabel').textContent = '(£' + act.toFixed(2) + ')';
+          if (svc != null) document.getElementById('svcLabel').textContent = '(£' + svc.toFixed(2) + ')';
+        } else {
+          // No plan selected (Create Account flow) - generic future-purchase wording
+          document.getElementById('immediatePerfLabel').innerHTML = 'I expressly request that, for any Forward My Mail plan I now or subsequently purchase, FMM may begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge that the Activation Fee for that plan will be fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee remains refundable on a pro-rata basis for the unused portion of the current period.';
+        }
+      } catch (e) {
+        console.error('Failed to load pricing.json', e);
+      }
+    }
+
+    async function getIp() {
+      try {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const j = await r.json();
+        return j.ip || 'unknown';
+      } catch { return 'unknown'; }
+    }
+
+    loadPricing();
+
+    // Enable terms checkbox when scrolled to bottom
     termsBox.addEventListener('scroll', () => {
-      const isScrolledToBottom = (termsBox.scrollHeight - termsBox.scrollTop - termsBox.clientHeight) < 10;
-      if (isScrolledToBottom) termsCheckbox.disabled = false;
+      const atBottom = (termsBox.scrollHeight - termsBox.scrollTop - termsBox.clientHeight) < 10;
+      if (atBottom) {
+        termsCheckbox.disabled = false;
+        immediatePerfCheckbox.disabled = false;
+      }
     });
 
-    termsCheckbox.addEventListener('change', (e) => {
-      signupBtn.disabled = !e.target.checked;
-    });
+    function updateBtn() {
+      signupBtn.disabled = !(termsCheckbox.checked && immediatePerfCheckbox.checked);
+    }
+    termsCheckbox.addEventListener('change', updateBtn);
+    immediatePerfCheckbox.addEventListener('change', updateBtn);
 
     signupForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const name = document.getElementById('name').value.trim();
       const company = document.getElementById('company').value.trim();
       const email = document.getElementById('email').value.trim();
@@ -187,18 +262,21 @@
       if (password.length < 6) { showError('Password must be at least 6 characters'); return; }
       if (password !== confirmPassword) { showError('Passwords do not match'); return; }
       if (!termsCheckbox.checked) { showError('Please accept the Terms and Conditions'); return; }
+      if (!immediatePerfCheckbox.checked) { showError('Please confirm the immediate performance acknowledgment'); return; }
 
       try {
         signupBtn.disabled = true;
         signupBtn.textContent = 'Creating account...';
         hideMessages();
 
+        const ipAddress = await getIp();
+        const nowIso = new Date().toISOString();
+
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
         await updateProfile(user, { displayName: name });
 
-        // 🔽 CREATE customers/{uid} WITH ALL CANONICAL FIELDS
         await setDoc(doc(db, 'customers', user.uid), {
           // core profile
           name: name,
@@ -211,13 +289,31 @@
           termsAccepted: true,
           termsAcceptedAt: serverTimestamp(),
           termsAcceptance: {
-            version: 'v2026-04-29',
+            version: TERMS_VERSION,
             userAgent: navigator.userAgent,
-            timestamp: new Date().toISOString(),
-            ipAddress: 'pending' // typically filled by backend if needed
+            timestamp: nowIso,
+            ipAddress: ipAddress
           },
 
-          // 🔥 FREE-SCAN SYSTEM DEFAULTS (present on EVERY new customer)
+          // immediate performance acknowledgment (Reg 36 CCR 2013)
+          immediatePerformanceConsent: true,
+          immediatePerformanceConsentAt: serverTimestamp(),
+          immediatePerformanceAcknowledgment: {
+            version: TERMS_VERSION,
+            userAgent: navigator.userAgent,
+            timestamp: nowIso,
+            ipAddress: ipAddress,
+            wording: 'I expressly request that FMM begin the Activation Services (KYC verification and address allocation) immediately. I acknowledge the Activation Fee is fully performed on completion of those services and is non-refundable from that point, even within the 14-day cooling-off period. The Service Fee remains refundable on a pro-rata basis for the unused portion of the current period.'
+          },
+
+          // selected plan + fee split snapshot at signup
+          selectedPlan: planKey || null,
+          selectedPlanName: selectedPlan ? selectedPlan.name : null,
+          activationFee: selectedPlan ? selectedPlan.activation_fee : null,
+          serviceFee: selectedPlan ? selectedPlan.service_fee : null,
+          totalPrice: selectedPlan ? selectedPlan.price : null,
+
+          // free-scan defaults
           freeScansRemaining: 0,
           monthlyFreeAllowance: 0,
           autoRenewFreeScans: false,
@@ -225,23 +321,47 @@
           applyAtMonthKey: null,
           resetMode: "reset",
 
-          // 🔒 ID VERIFICATION GATE — always required for new signups
+          // ID verification gate
           idGate: true,
           idRequired: true,
           idStatus: 'not_started',
           idStatusUpdatedAt: serverTimestamp()
         });
 
-        // Optional post-signup functions (your existing calls)
+        // Immutable audit-trail record in /consents (separate from the editable customers doc)
         try {
-          // Welcome email and mailboxId are handled by onCustomerCreated Cloud Function
-          console.log('Account created — welcome email will be sent automatically.');
-        } catch (functionError) {
-          console.error('Error in post-signup functions:', functionError);
+          await addDoc(collection(db, 'consents'), {
+            uid: user.uid,
+            email: email,
+            name: name,
+            recordedAt: serverTimestamp(),
+            timestamp: nowIso,
+            ipAddress: ipAddress,
+            userAgent: navigator.userAgent,
+            termsVersion: TERMS_VERSION,
+            termsAccepted: true,
+            immediatePerformanceAcknowledged: true,
+            termsCheckboxWording: 'I have read and agree to the Terms and Conditions',
+            immediatePerformanceCheckboxWording: document.getElementById('immediatePerfLabel').textContent.trim(),
+            selectedPlan: planKey || null,
+            selectedPlanName: selectedPlan ? selectedPlan.name : null,
+            activationFee: selectedPlan ? selectedPlan.activation_fee : null,
+            serviceFee: selectedPlan ? selectedPlan.service_fee : null,
+            totalPrice: selectedPlan ? selectedPlan.price : null
+          });
+        } catch (consentErr) {
+          console.warn('Consent audit log write failed (signup proceeds regardless):', consentErr);
         }
 
-        showSuccess('Account created successfully! Redirecting...');
-        setTimeout(() => { window.location.href = 'customer-portal.html'; }, 2000);
+        showSuccess('Account created. Redirecting...');
+
+        // If a plan was selected, route through confirm-purchase for per-plan immediate-perf consent
+        // Otherwise land in the customer portal
+        if (planKey && selectedPlan) {
+          setTimeout(() => { window.location.href = 'confirm-purchase.html?plan=' + encodeURIComponent(planKey); }, 1200);
+        } else {
+          setTimeout(() => { window.location.href = 'customer-portal.html'; }, 1200);
+        }
 
       } catch (error) {
         console.error('Signup error:', error);
@@ -250,7 +370,7 @@
         else if (error.code === 'auth/invalid-email') errorMsg = 'Invalid email address.';
         showError(errorMsg);
         signupBtn.disabled = false;
-        signupBtn.textContent = 'Create Account';
+        signupBtn.textContent = 'Create Account & Continue to Payment';
       }
     });
 

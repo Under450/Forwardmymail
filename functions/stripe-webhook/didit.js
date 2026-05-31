@@ -122,21 +122,24 @@ app.post('/diditWebhook', async (req, res) => {
     }
 
     // Map Didit status → our idStatus
+    // POLICY (2026-05-29): DIDIT pass no longer auto-unlocks the mailbox gate.
+    // Staff must manually click "Activate Portal" in cj-portal after reviewing the DIDIT result.
+    // Provides a human review checkpoint and stronger AML audit trail.
     let idStatus = 'pending';
-    let idGate   = true;
+    let idGate   = true;  // always locked from this webhook; only manual staff activation flips it false
 
     if (status === 'approved') {
       idStatus = 'approved';
-      idGate   = false;
+      // idGate stays true - awaiting staff activation in cj-portal
     } else if (['declined', 'rejected', 'expired'].includes(status)) {
       idStatus = 'declined';
-      idGate   = true;
+      // idGate stays true - declined, no activation possible
     }
 
     // Update Firestore
     await db.collection('customers').doc(customerId).update({
       idStatus,
-      idGate,
+      idGate,  // never set false here - only manual cj-portal activation can do that
       idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
       diditSessionId: sessionId,
       diditResult: payload

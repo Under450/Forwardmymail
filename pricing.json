@@ -1,34 +1,79 @@
 {
-  "last_updated": "2026-04-10",
+  "last_updated": "2026-05-29",
   "currency": "GBP",
+  "fee_split_note": "Per Clauses 15.2 and 15.3 of the Master Agreement, each annual package fee is split into a non-refundable Activation Fee (KYC + address allocation + onboarding, deemed fully performed on Day 1) and a pro-rata refundable Service Fee. Stripe Payment Link IDs are recorded for the redirect after signup consent.",
 
   "personal_mailbox": {
     "name": "Personal Mailbox",
     "billing": "annual",
-    "price": 125.00
+    "price": 125.00,
+    "activation_fee": 95.00,
+    "service_fee": 30.00,
+    "stripe_link": "https://buy.stripe.com/aFa28tgmUcbv2Up5Oe4Ja0h"
   },
 
   "business": {
     "business_address": {
       "name": "Business Address",
       "billing": "annual",
-      "price": 175.00
+      "price": 175.00,
+      "activation_fee": 130.00,
+      "service_fee": 45.00,
+      "stripe_link": "https://buy.stripe.com/9B628t6Mkcbv7aFb8y4Ja0i"
     },
     "registered_office": {
       "name": "Registered Office",
       "billing": "annual",
-      "price": 225.00
+      "price": 225.00,
+      "activation_fee": 170.00,
+      "service_fee": 55.00,
+      "stripe_link": "https://buy.stripe.com/8x26oJ8Usb7r52xccC4Ja0j"
     },
     "full_virtual_office": {
       "name": "Full Virtual Office",
       "billing": "annual",
-      "price": 299.00
+      "price": 299.00,
+      "activation_fee": 225.00,
+      "service_fee": 74.00,
+      "stripe_link": "https://buy.stripe.com/eVq9AV1s0grL66B6Si4Ja02"
     },
     "registered_office_plus_formation": {
       "name": "Registered Office + Company Formation",
       "billing": "annual + one-off",
       "price": null,
+      "activation_fee": null,
+      "service_fee": null,
+      "stripe_link": "https://buy.stripe.com/fZu9AV4EcgrL9iNb8y4Ja01",
       "notes": "Do NOT quote this price. Direct callers to the website/Zendo for the latest formation fee."
+    },
+    "full_virtual_office_plus_formation": {
+      "name": "Full Virtual Office + Company Formation",
+      "billing": "annual + one-off",
+      "price": null,
+      "activation_fee": null,
+      "service_fee": null,
+      "stripe_link": "https://buy.stripe.com/bJebJ35IgdfzcuZgsS4Ja00"
+    }
+  },
+
+  "upgrades": {
+    "personal_to_registered": {
+      "name": "Upgrade: Personal Mailbox → Registered Office",
+      "billing": "one-off difference",
+      "price": 100.00,
+      "activation_fee": 100.00,
+      "service_fee": 0.00,
+      "stripe_link": "https://buy.stripe.com/aFa8wRgmUejDfHb5Oe4Ja0b",
+      "notes": "Treated as fully non-refundable Activation Fee - base mailbox service was already activated; upgrade extends capability with new compliance checks + director address allocation."
+    },
+    "business_to_registered": {
+      "name": "Upgrade: Business Mailbox → Registered Office",
+      "billing": "one-off difference",
+      "price": 50.00,
+      "activation_fee": 50.00,
+      "service_fee": 0.00,
+      "stripe_link": "https://buy.stripe.com/eVq14p9Yw4J352x6Si4Ja0c",
+      "notes": "Treated as fully non-refundable Activation Fee - base service was already activated."
     }
   },
 
