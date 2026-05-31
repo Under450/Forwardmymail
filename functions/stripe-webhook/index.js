@@ -2168,6 +2168,16 @@ exports.getEmailLogs = onRequest(async (req, res) => {
       };
     });
 
+    // Backfill missing packages from customers collection
+    const missingPkg = logs.filter(l => !l.package && l.customerId);
+    if (missingPkg.length) {
+      const custIds = [...new Set(missingPkg.map(l => l.customerId))];
+      const custDocs = await Promise.all(custIds.map(id => db.collection('customers').doc(id).get()));
+      const pkgMap = {};
+      custDocs.forEach(doc => { if (doc.exists) pkgMap[doc.id] = doc.data().package || ''; });
+      logs.forEach(l => { if (!l.package && l.customerId && pkgMap[l.customerId]) l.package = pkgMap[l.customerId]; });
+    }
+
     // Client-side search filter
     if (search) {
       const s = search.toLowerCase();
@@ -2183,6 +2193,40 @@ exports.getEmailLogs = onRequest(async (req, res) => {
   } catch (err) {
     console.error('getEmailLogs error:', err);
     return res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+});
+
+// ── deleteEmailLog ────────────────────────────────────────────────────────────
+exports.deleteEmailLog = onRequest(async (req, res) => {
+  const allowedOrigins = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+  const origin = req.headers.origin;
+  if (req.method === 'OPTIONS') {
+    if (allowedOrigins.includes(origin)) {
+      res.set('Access-Control-Allow-Origin', origin);
+      res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      return res.status(204).send('');
+    }
+    return res.status(403).send('Forbidden');
+  }
+  res.set('Access-Control-Allow-Origin', origin || '*');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
+  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
+
+  const { docId } = req.body || {};
+  if (!docId) return res.status(400).json({ error: 'Missing docId' });
+
+  try {
+    await db.collection('email_logs').doc(docId).delete();
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('deleteEmailLog error:', err);
+    return res.status(500).json({ error: 'Failed to delete' });
   }
 });
 
@@ -2298,6 +2342,16 @@ exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
     return res.status(500).json({ error: err.message });
   }
 });
+
+// ── Panel API (CJ Control dashboard) ─────────────────────────────────────────
+const panelApi = require('./panel-api');
+exports.panelGetStripeBalance = panelApi.panelGetStripeBalance;
+exports.panelGetStripeEvents = panelApi.panelGetStripeEvents;
+exports.panelGetRecentSignups = panelApi.panelGetRecentSignups;
+exports.panelGetAllCustomers = panelApi.panelGetAllCustomers;
+exports.panelGetDiditQueue = panelApi.panelGetDiditQueue;
+exports.panelGetInbox = panelApi.panelGetInbox;
+exports.panelMarkViewed = panelApi.panelMarkViewed;
 
 // ── getEmailLogs — update to use Firebase ID token auth ──────────────────────
 // (replaces the hardcoded password version — existing function updated below)
