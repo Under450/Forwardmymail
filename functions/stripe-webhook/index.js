@@ -25,6 +25,17 @@ const EMAIL_PASS     = process.env.SMTP_PASS;
 admin.initializeApp();
 const db = admin.firestore();
 
+// ── Auth helpers ──────────────────────────────────────────────────────────────
+// Verify a Firebase ID token AND that the user has a doc in /staff/{uid}.
+// Returns the decoded token on success, throws Error on failure.
+async function verifyStaffToken(idToken) {
+  if (!idToken) throw new Error('No auth token');
+  const decoded = await admin.auth().verifyIdToken(idToken);
+  const staffDoc = await db.collection('staff').doc(decoded.uid).get();
+  if (!staffDoc.exists) throw new Error('Not a staff user');
+  return decoded;
+}
+
 // ── Google Sheets setup (uses Application Default Credentials on Cloud Run) ──
 const SHEET_ID = '1M4sf4aRxYB8ZXjVE2qL3owJROxKBPikEMxK_1lKGrlc';
 const auth = new google.auth.GoogleAuth({
@@ -695,9 +706,13 @@ exports.backfillTermsAcceptances = onCall(async (request) => {
   return { results };
 });
 
-exports.runBulkSync = onRequest(async (req, res) => {
+exports.runBulkSync = onRequest({ secrets: ['BULK_SYNC_KEY'] }, async (req, res) => {
+  if (!process.env.BULK_SYNC_KEY) {
+    console.error('[runBulkSync] BULK_SYNC_KEY env var not set — refusing request');
+    return res.status(503).json({ error: 'Service misconfigured' });
+  }
   const key = req.query.key || req.headers['x-api-key'];
-  if (key !== process.env.BULK_SYNC_KEY && key !== 'fmm-sync-2024') {
+  if (key !== process.env.BULK_SYNC_KEY) {
     return res.status(403).json({ error: 'Unauthorized' });
   }
   try {
@@ -713,9 +728,12 @@ exports.runBulkSync = onRequest(async (req, res) => {
 // ─── Backfill package + price (REMOVED 2026-05-29 after one-off use) ───
 // Code retained below as exported for git history only; removed from deployment.
 // To re-enable: rename `_backfillPackagePrice_REMOVED` back to `exports.backfillPackagePrice` and redeploy.
-const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
+const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onRequest({ secrets: ['STRIPE_SECRET_KEY', 'BULK_SYNC_KEY'] }, async (req, res) => {
+  if (!process.env.BULK_SYNC_KEY) {
+    return res.status(503).json({ error: 'Service misconfigured' });
+  }
   const key = req.query.key || req.headers['x-api-key'];
-  if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
+  if (key !== process.env.BULK_SYNC_KEY) return res.status(403).json({ error: 'Unauthorized' });
   const dryRun = req.query.dry === '1';
 
   // Page through ALL completed Stripe Checkout Sessions
@@ -783,9 +801,13 @@ const _backfillPackagePrice_REMOVED = require('firebase-functions/v2/https').onR
   res.json({ dryRun, customersTotal: customers.size, stripeSessions: allSessions.length, updated, results });
 });
 
-exports.backfillEmailLogs = onRequest({ secrets: ['STRIPE_SECRET_KEY'] }, async (req, res) => {
+exports.backfillEmailLogs = onRequest({ secrets: ['STRIPE_SECRET_KEY', 'BULK_SYNC_KEY'] }, async (req, res) => {
+  if (!process.env.BULK_SYNC_KEY) {
+    console.error('[backfillEmailLogs] BULK_SYNC_KEY env var not set — refusing destructive request');
+    return res.status(503).json({ error: 'Service misconfigured' });
+  }
   const key = req.query.key || req.headers['x-api-key'];
-  if (key !== 'fmm-sync-2024') return res.status(403).json({ error: 'Unauthorized' });
+  if (key !== process.env.BULK_SYNC_KEY) return res.status(403).json({ error: 'Unauthorized' });
 
   try {
     // Purge all existing email_logs first
@@ -1051,23 +1073,27 @@ exports.diditWebhook = onRequest(async (req, res) => {
 
   const DIDIT_WEBHOOK_SECRET = process.env.DIDIT_WEBHOOK_SECRET;
 
+  // SECURITY: hard-fail if secret missing — never accept unsigned webhooks
+  if (!DIDIT_WEBHOOK_SECRET) {
+    console.error('[diditWebhook] DIDIT_WEBHOOK_SECRET env var not set — refusing request');
+    return res.status(503).send('Service misconfigured');
+  }
+
   try {
-    // Verify webhook signature if secret is configured
-    if (DIDIT_WEBHOOK_SECRET) {
-      const signature = req.headers['x-signature'] || req.headers['x-didit-signature'];
-      if (!signature) {
-        console.error('Missing Didit webhook signature');
-        return res.status(401).send('Missing signature');
-      }
-      const crypto = require('crypto');
-      const expectedSig = crypto
-        .createHmac('sha256', DIDIT_WEBHOOK_SECRET)
-        .update(JSON.stringify(req.body))
-        .digest('hex');
-      if (signature !== expectedSig && signature !== `sha256=${expectedSig}`) {
-        console.error('Invalid Didit webhook signature');
-        return res.status(401).send('Invalid signature');
-      }
+    // Verify webhook signature (always — no bypass)
+    const signature = req.headers['x-signature'] || req.headers['x-didit-signature'];
+    if (!signature) {
+      console.error('Missing Didit webhook signature');
+      return res.status(401).send('Missing signature');
+    }
+    const crypto = require('crypto');
+    const expectedSig = crypto
+      .createHmac('sha256', DIDIT_WEBHOOK_SECRET)
+      .update(JSON.stringify(req.body))
+      .digest('hex');
+    if (signature !== expectedSig && signature !== `sha256=${expectedSig}`) {
+      console.error('Invalid Didit webhook signature');
+      return res.status(401).send('Invalid signature');
     }
 
     const payload = req.body;
@@ -2374,14 +2400,13 @@ exports.getEmailLogs = onRequest(async (req, res) => {
 
   const { limit: reqLimit = 200, templateFilter = '', statusFilter = '', search = '' } = req.body || {};
 
-  // Validate via Firebase ID token
+  // Validate Firebase ID token AND staff role
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
   try {
-    await admin.auth().verifyIdToken(idToken);
-  } catch {
-    return res.status(401).json({ error: 'Unauthorised' });
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
   }
 
   try {
@@ -2452,8 +2477,11 @@ exports.deleteEmailLog = onRequest(async (req, res) => {
 
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
-  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
+  try {
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
+  }
 
   const { docId } = req.body || {};
   if (!docId) return res.status(400).json({ error: 'Missing docId' });
@@ -2477,8 +2505,11 @@ exports.createEmailLogSheet = onRequest(async (req, res) => {
 
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'Unauthorised' });
-  try { await admin.auth().verifyIdToken(idToken); } catch { return res.status(401).json({ error: 'Unauthorised' }); }
+  try {
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
+  }
 
   try {
     const sheetAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/spreadsheets'] });
@@ -2547,15 +2578,13 @@ exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
-  // Verify Firebase ID token — must be a signed-in staff user
+  // Verify Firebase ID token AND staff role — comment said staff only, now enforced
   const authHeader = req.headers.authorization || '';
   const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
-  if (!idToken) return res.status(401).json({ error: 'No auth token' });
-
   try {
-    await admin.auth().verifyIdToken(idToken);
-  } catch {
-    return res.status(401).json({ error: 'Invalid token' });
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
   }
 
   try {

@@ -80,14 +80,19 @@ service cloud.firestore {
       // Customer can read their own mail items
       allow read: if isAuth() && resource.data.customerId == request.auth.uid;
 
-      // Customer can update their own mail (e.g. marking as read)
-      allow update: if isAuth() && resource.data.customerId == request.auth.uid;
+      // Customer can update ONLY whitelisted fields on their own mail.
+      // Prevents customer from rewriting cost, sender, description, customerId, etc.
+      // Whitelisted fields match what fmm-app.html actually writes (requestAction).
+      allow update: if isAuth()
+        && resource.data.customerId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['status', 'actionRequestedAt', 'actionRequestedBy', 'read', 'viewed', 'archived']);
 
       // Only staff can create or delete mail items
       allow create: if isStaff();
       allow delete: if isStaff();
 
-      // Staff can read and write all mail
+      // Staff can read and write all mail (unrestricted)
       allow read, write: if isStaff();
     }
 
