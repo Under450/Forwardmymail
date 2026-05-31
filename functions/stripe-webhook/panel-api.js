@@ -12,7 +12,7 @@ function assertPanelAuth(request) {
 const db = admin.firestore();
 
 // ── panelGetStripeBalance ────────────────────────────────────────────────────
-exports.panelGetStripeBalance = onCall(async (request) => {
+exports.panelGetStripeBalance = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
 
   const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -76,25 +76,40 @@ exports.panelGetStripeBalance = onCall(async (request) => {
 });
 
 // ── panelGetStripeEvents ─────────────────────────────────────────────────────
-exports.panelGetStripeEvents = onCall(async (request) => {
+exports.panelGetStripeEvents = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
 
   const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-  const eventsResult = await stripe.events.list({ limit: 20 });
+
+  // Get recent successful charges/payments
+  const charges = await stripe.charges.list({ limit: 30, expand: ['data.customer'] });
+
+  // Build email→customer lookup from Firestore for package info
+  const custSnapshot = await db.collection('customers').get();
+  const custByEmail = {};
+  custSnapshot.docs.forEach(doc => {
+    const d = doc.data();
+    if (d.email) custByEmail[d.email.toLowerCase()] = d;
+  });
 
   // Get lastViewed
   const stateDoc = await db.doc('panel_state/stripe_events').get();
   const lastViewed = stateDoc.exists ? stateDoc.data().lastViewed?.toDate() : null;
 
-  const events = eventsResult.data.map(e => {
-    const obj = e.data?.object || {};
-    return {
-      type: e.type,
-      created: new Date(e.created * 1000).toISOString(),
-      amount: obj.amount ? obj.amount / 100 : null,
-      description: obj.description || obj.customer_email || '',
-    };
-  });
+  const events = charges.data
+    .filter(c => c.status === 'succeeded' && c.amount > 0)
+    .map(c => {
+      const email = (c.billing_details?.email || c.receipt_email || c.customer?.email || '').toLowerCase();
+      const custData = custByEmail[email] || {};
+      return {
+        name: c.billing_details?.name || c.customer?.name || custData.name || '',
+        company: custData.company || '',
+        email,
+        amount: c.amount / 100,
+        package: custData.package || c.description || '',
+        created: new Date(c.created * 1000).toISOString(),
+      };
+    });
 
   const unreadCount = lastViewed
     ? events.filter(e => new Date(e.created) > lastViewed).length
@@ -108,7 +123,7 @@ exports.panelGetStripeEvents = onCall(async (request) => {
 });
 
 // ── panelGetRecentSignups ────────────────────────────────────────────────────
-exports.panelGetRecentSignups = onCall(async (request) => {
+exports.panelGetRecentSignups = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
 
   const snapshot = await db.collection('customers')
@@ -141,7 +156,7 @@ exports.panelGetRecentSignups = onCall(async (request) => {
 });
 
 // ── panelGetAllCustomers ─────────────────────────────────────────────────────
-exports.panelGetAllCustomers = onCall(async (request) => {
+exports.panelGetAllCustomers = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
 
   const snapshot = await db.collection('customers').get();
@@ -163,7 +178,7 @@ exports.panelGetAllCustomers = onCall(async (request) => {
 // ── panelGetDiditQueue ───────────────────────────────────────────────────────
 // Returns ALL active-subscription customers grouped by ID verification status.
 // Active = customer has a paid subscription package (not Credit Pack, not empty).
-exports.panelGetDiditQueue = onCall(async (request) => {
+exports.panelGetDiditQueue = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
 
   const SUBSCRIPTION_PACKAGES = [
@@ -222,13 +237,13 @@ exports.panelGetDiditQueue = onCall(async (request) => {
 
 // ── panelGetInbox ────────────────────────────────────────────────────────────
 // Gmail API not configured — returns notConfigured state
-exports.panelGetInbox = onCall(async (request) => {
+exports.panelGetInbox = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
   return { messages: [], unread: 0, notConfigured: true };
 });
 
 // ── panelMarkViewed ──────────────────────────────────────────────────────────
-exports.panelMarkViewed = onCall(async (request) => {
+exports.panelMarkViewed = onCall({ cors: true }, async (request) => {
   assertPanelAuth(request);
 
   const key = request.data?.key;
