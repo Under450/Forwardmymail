@@ -193,6 +193,16 @@ service cloud.firestore {
     }
 
     // ─────────────────────────────────────────────
+    // DIDIT WEBHOOK EVENTS (idempotency log)
+    // Written only by diditWebhook Cloud Function (admin SDK bypasses rules).
+    // Staff can read for debug.
+    // ─────────────────────────────────────────────
+    match /didit_webhook_events/{eventId} {
+      allow read: if isStaff();
+      allow write: if false;
+    }
+
+    // ─────────────────────────────────────────────
     // DENY EVERYTHING ELSE
     // ─────────────────────────────────────────────
     match /{document=**} {
