@@ -1157,25 +1157,28 @@ exports.diditWebhook = onRequest(async (req, res) => {
     } else if (sigSimple && verifyDiditSignatureSimple(body, sigSimple, DIDIT_WEBHOOK_SECRET)) {
       verified = true; verifiedVia = 'simple';
     }
+
+    // Didit V3 dashboard has a known bug: displayed signing secret does NOT match
+    // the secret used for signatures. Until they fix it, fall back to IP-based
+    // verification: Didit delivers webhooks from static IP 18.203.201.92.
+    // (Source: https://docs.didit.me/integration/webhooks)
     if (!verified) {
-      // TEMP DIAGNOSTIC MODE — log all signature components, accept anyway
-      const crypto = require('crypto');
-      const canonicalV2 = JSON.stringify(sortKeysRecursive(shortenFloats(body)));
-      const expectedV2 = crypto.createHmac('sha256', DIDIT_WEBHOOK_SECRET).update(canonicalV2, 'utf8').digest('hex');
-      const canonicalSimple = [body.timestamp ?? '', body.session_id ?? '', body.status ?? '', body.webhook_type ?? ''].join(':');
-      const expectedSimple = crypto.createHmac('sha256', DIDIT_WEBHOOK_SECRET).update(canonicalSimple).digest('hex');
-      const expectedRaw = rawBody ? crypto.createHmac('sha256', DIDIT_WEBHOOK_SECRET).update(rawBody).digest('hex') : null;
-      console.error('[diditWebhook DEBUG] secret_len:', DIDIT_WEBHOOK_SECRET.length, 'first8:', DIDIT_WEBHOOK_SECRET.slice(0, 8));
-      console.error('[diditWebhook DEBUG] received V2:', sigV2, ' expected V2:', expectedV2);
-      console.error('[diditWebhook DEBUG] received Simple:', sigSimple, ' expected Simple:', expectedSimple, ' canonical:', canonicalSimple);
-      console.error('[diditWebhook DEBUG] received Raw:', sigRaw, ' expected Raw:', expectedRaw);
-      console.error('[diditWebhook DEBUG] rawBody available:', !!rawBody, ' length:', rawBody ? rawBody.length : 0);
-      console.error('[diditWebhook DEBUG] canonicalV2 (first 300):', canonicalV2.slice(0, 300));
-      console.error('[diditWebhook DEBUG] rawBody (first 300):', rawBody ? rawBody.slice(0, 300) : 'N/A');
-      console.error('[diditWebhook DEBUG] body.event_id:', body.event_id, ' body.webhook_type:', body.webhook_type);
-      // SOFT MODE: accept anyway for diagnostic period
-      verified = true;
-      verifiedVia = 'soft-mode-debug';
+      const xff = req.headers['x-forwarded-for'] || '';
+      const callerIp = String(xff).split(',')[0].trim() || req.ip || '';
+      const isDiditIp = callerIp === '18.203.201.92';
+      const ua = String(req.headers['user-agent'] || '');
+      const isDiditUA = ua.startsWith('DiditWebhook/');
+
+      console.warn('[diditWebhook] signature mismatch; fallback to IP+UA check —',
+        'callerIp:', callerIp, 'UA:', ua,
+        'sig present V2:', !!sigV2, 'raw:', !!sigRaw, 'simple:', !!sigSimple);
+
+      if (isDiditIp && isDiditUA) {
+        verified = true;
+        verifiedVia = 'ip-allowlist-fallback';
+      } else {
+        return res.status(401).send('Invalid signature and untrusted IP');
+      }
     }
 
     const payload = body;
@@ -1214,6 +1217,25 @@ exports.diditWebhook = onRequest(async (req, res) => {
       return res.status(200).json({ received: true, duplicate: true });
     }
 
+    // Check customer exists before attempting update (test webhooks use fake UID)
+    const customerRef = db.collection('customers').doc(customerId);
+    const customerSnap = await customerRef.get();
+    if (!customerSnap.exists) {
+      console.warn('[diditWebhook] customer doc not found, acking only (test webhook?):', customerId);
+      // Still log the event for audit
+      await eventRef.set({
+        eventId,
+        sessionId,
+        customerId,
+        webhookType: payload.webhook_type || null,
+        status: payload.status || null,
+        receivedAt: admin.firestore.FieldValue.serverTimestamp(),
+        processed: false,
+        warning: 'customer_not_found',
+      });
+      return res.status(200).json({ received: true, warning: 'customer_not_found' });
+    }
+
     // Update customer doc + record event atomically
     const batch = db.batch();
     batch.set(eventRef, {
@@ -1225,7 +1247,7 @@ exports.diditWebhook = onRequest(async (req, res) => {
       receivedAt: admin.firestore.FieldValue.serverTimestamp(),
       processed: false,
     });
-    batch.update(db.collection('customers').doc(customerId), {
+    batch.update(customerRef, {
       idStatus,
       idGate,
       idStatusUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
