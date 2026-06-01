@@ -987,9 +987,10 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           // No deduction — scan is blocked, customer must add credits to view
           // Notify via Cloud Function (fire-and-forget)
           try {
+            const staffIdToken = await auth.currentUser.getIdToken();
             await fetch(`https://us-central1-forward-my-mail.cloudfunctions.net/notifyNonGovtScanBlocked`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + staffIdToken },
               body: JSON.stringify({
                 customerId: currentCustomer.id,
                 customerEmail: currentCustomer.email,

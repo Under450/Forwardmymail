@@ -117,8 +117,9 @@ service cloud.firestore {
     // Customers submit support messages
     // ─────────────────────────────────────────────
     match /contactRequests/{docId} {
-      // Any authenticated customer can create a contact request
-      allow create: if isAuth();
+      // Any authenticated customer can create a contact request, but only tagged with their own uid
+      allow create: if isAuth()
+        && request.resource.data.customerId == request.auth.uid;
 
       // Customer can read their own contact requests
       allow read: if isAuth() && resource.data.customerId == request.auth.uid;
@@ -133,8 +134,9 @@ service cloud.firestore {
     // read and managed by staff
     // ─────────────────────────────────────────────
     match /staff_notifications/{notifId} {
-      // Any authenticated customer can create a notification
-      allow create: if isAuth();
+      // Any authenticated customer can create a notification, but only tagged with their own uid
+      allow create: if isAuth()
+        && request.resource.data.customerId == request.auth.uid;
 
       // Staff can read, update and delete notifications
       allow read, write: if isStaff();
