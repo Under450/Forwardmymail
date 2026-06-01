@@ -269,17 +269,46 @@ async function sendMailLogged({ to, subject, html, template, customerId = '', cu
 }
 
 // ── createCheckoutSession ────────────────────────────────────────────────────
-exports.createCheckoutSession = onRequest((req, res) => {
-  cors(req, res, async () => {
-    if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Method not allowed' });
-    }
+const FMM_ALLOWED_ORIGINS = ['https://www.forwardmymail.co.uk', 'https://forwardmymail.co.uk'];
+const VALID_CHECKOUT_AMOUNTS = [10, 20, 25, 30, 50, 100, 125, 175, 225, 299];
 
+function setFmmCors(req, res) {
+  const origin = req.headers.origin;
+  if (FMM_ALLOWED_ORIGINS.includes(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+  }
+  res.set('Vary', 'Origin');
+  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
+
+exports.createCheckoutSession = onRequest((req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  (async () => {
     try {
       const { amount, customerId, customerEmail } = req.body;
-
       if (!amount || !customerId || !customerEmail) {
         return res.status(400).json({ error: 'Missing required fields' });
+      }
+
+      // Auth check: verify ID token + ensure customerId matches caller's UID
+      const authHeader = req.headers.authorization || '';
+      const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+      if (!idToken) return res.status(401).json({ error: 'Auth required' });
+      let decoded;
+      try { decoded = await admin.auth().verifyIdToken(idToken); }
+      catch { return res.status(401).json({ error: 'Invalid token' }); }
+      if (decoded.uid !== customerId) {
+        return res.status(403).json({ error: 'customerId does not match auth uid' });
+      }
+
+      // Amount must be numeric + in whitelist
+      const amt = Number(amount);
+      if (!VALID_CHECKOUT_AMOUNTS.includes(amt)) {
+        return res.status(400).json({ error: 'Invalid amount' });
       }
 
       const customerRef = db.collection('customers').doc(customerId);
@@ -305,7 +334,7 @@ exports.createCheckoutSession = onRequest((req, res) => {
               name: `£${amount} Credit Pack`,
               description: 'Mail scanning credits for Forward My Mail',
             },
-            unit_amount: amount * 100,
+            unit_amount: amt * 100,
           },
           quantity: 1,
         }],
@@ -326,7 +355,7 @@ exports.createCheckoutSession = onRequest((req, res) => {
       console.error('Error creating checkout session:', error);
       return res.status(500).json({ error: 'Internal server error' });
     }
-  });
+  })();
 });
 
 // ── stripeWebhook ────────────────────────────────────────────────────────────
@@ -507,11 +536,24 @@ exports.stripeWebhook = onRequest(async (req, res) => {
 
 // ── sendWelcomeEmail (callable) ──────────────────────────────────────────────
 exports.sendWelcomeEmail = onCall(async (request) => {
+  // Require auth — onCall passes Firebase Auth context automatically
+  if (!request.auth || !request.auth.uid) {
+    throw new HttpsError('unauthenticated', 'Auth required');
+  }
   const data = request.data;
   const { email, name, mailboxId } = data;
 
   if (!email || !name) {
     throw new HttpsError('invalid-argument', 'Missing required fields');
+  }
+
+  // Customers can only request welcome email to their own address
+  // Staff can request for anyone (used by staff portal "resend welcome" flow)
+  if (request.auth.token.email !== email) {
+    const staffDoc = await db.collection('staff').doc(request.auth.uid).get();
+    if (!staffDoc.exists) {
+      throw new HttpsError('permission-denied', 'Can only send to own email');
+    }
   }
 
   await sendWelcomeEmail(email, name, mailboxId || '');
@@ -1000,9 +1042,7 @@ exports.greyOutDeletedCustomer = onDocumentDeleted('customers/{customerId}', asy
 // Called by customer portal when customer clicks "Complete Your ID Verification"
 // Creates a Didit verification session and returns the session URL
 exports.createDiditSession = onRequest(async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setFmmCors(req, res);
   if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
@@ -1018,6 +1058,17 @@ exports.createDiditSession = onRequest(async (req, res) => {
   const { customerId, customerEmail } = req.body;
   if (!customerId || !customerEmail) {
     return res.status(400).json({ error: 'Missing customerId or customerEmail' });
+  }
+
+  // Auth check: verify ID token + ensure customerId matches caller's UID
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  if (!idToken) return res.status(401).json({ error: 'Auth required' });
+  let decoded;
+  try { decoded = await admin.auth().verifyIdToken(idToken); }
+  catch { return res.status(401).json({ error: 'Invalid token' }); }
+  if (decoded.uid !== customerId) {
+    return res.status(403).json({ error: 'customerId does not match auth uid' });
   }
 
   try {
@@ -1354,7 +1405,19 @@ function buildNonGovtBlockedEmail(name, pages, cost) {
 // ── notifyNonGovtScanBlocked ─────────────────────────────────────────────────
 // Called by staff portal when a non-govt scan is uploaded but customer has no credits
 exports.notifyNonGovtScanBlocked = onRequest(async (req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
   if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+
+  // Staff-only endpoint — verify ID token + staff role
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  try {
+    await verifyStaffToken(idToken);
+  } catch (e) {
+    return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' });
+  }
+
   try {
     const { customerId, customerEmail, customerName, pages, cost } = req.body;
     if (!customerEmail) return res.status(400).json({ error: 'Missing customerEmail' });
