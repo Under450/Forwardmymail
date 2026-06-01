@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://js.stripe.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: https: blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.cloudfunctions.net https://*.a.run.app https://verification.didit.me wss://*.firebaseio.com; frame-src 'self' https://*.firebasestorage.googleapis.com https://*.googleusercontent.com https://verification.didit.me https://js.stripe.com https://checkout.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Staff Portal - Forward My Mail</title>
@@ -420,6 +423,18 @@
     const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+
+    // ===== XSS SAFETY HELPER =====
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
 const db = getFirestore(app);
 const storage = getStorage(app);
 
@@ -1157,26 +1172,28 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
         const isDone = r.status === 'completed';
         const time = r.createdAt?.toDate ? formatReqDate(r.createdAt.toDate()) : '--';
         const addressHtml = r.forwardingAddress && r.action === 'post'
-          ? `<div class="req-address"><strong>Post to:</strong> <span>${r.forwardingAddress.replace(/\n/g, ', ')}</span></div>` : '';
+          ? `<div class="req-address"><strong>Post to:</strong> <span>${escapeHtml(String(r.forwardingAddress).replace(/\n/g, ', '))}</span></div>` : '';
         const noteHtml = r.note
-          ? `<div class="req-note">💬 "${r.note}"</div>` : '';
+          ? `<div class="req-note">💬 "${escapeHtml(r.note)}"</div>` : '';
+        const safeAction = String(r.action || '').replace(/[^a-z]/gi, '');
+        const safeId = String(r.id || '').replace(/[^a-zA-Z0-9_-]/g, '');
         const actionBtns = isDone
           ? `<span class="req-done-label">✅ Done</span>`
-          : r.action === 'shred'
-            ? `<button class="btn-req-shred" onclick="completeRequest('${r.id}')">🗑️ Confirm Shred</button>`
-            : `<button class="btn-req-done" onclick="completeRequest('${r.id}')">✅ Mark Done</button>`;
+          : safeAction === 'shred'
+            ? `<button class="btn-req-shred" data-id="${safeId}" onclick="completeRequest(this.dataset.id)">🗑️ Confirm Shred</button>`
+            : `<button class="btn-req-done" data-id="${safeId}" onclick="completeRequest(this.dataset.id)">✅ Mark Done</button>`;
 
-        return `<div class="req-card type-${r.action}" id="reqcard-${r.id}" style="${isDone ? 'opacity:0.45' : ''}">
+        return `<div class="req-card type-${safeAction}" id="reqcard-${safeId}" style="${isDone ? 'opacity:0.45' : ''}">
           <div class="req-emoji">${icon}</div>
           <div class="req-body">
             <div class="req-top">
-              <span class="req-name">${r.customerName || r.customerEmail || '--'}</span>
-              <span class="req-pill ${r.action}">${label}</span>
+              <span class="req-name">${escapeHtml(r.customerName || r.customerEmail || '--')}</span>
+              <span class="req-pill ${safeAction}">${escapeHtml(label)}</span>
             </div>
             <div class="req-detail">
-              <span>📬 ${r.mailboxId || '--'}</span>
-              <span>✉️ ${r.customerEmail || '--'}</span>
-              <span>📄 Ref: ${r.mailId ? r.mailId.slice(0,8) : '--'}</span>
+              <span>📬 ${escapeHtml(r.mailboxId || '--')}</span>
+              <span>✉️ ${escapeHtml(r.customerEmail || '--')}</span>
+              <span>📄 Ref: ${escapeHtml(r.mailId ? String(r.mailId).slice(0,8) : '--')}</span>
             </div>
             ${addressHtml}${noteHtml}
           </div>
@@ -1281,12 +1298,14 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           const bg = isUnread ? '#eff6ff' : '#fff';
           const border = isUnread ? '#bfdbfe' : '#e2e8f0';
           const weight = isUnread ? '600' : '400';
-          return '<div onclick="markNotifRead(\'' + n.id + '\')" style="padding:10px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;margin-bottom:6px;cursor:pointer;transition:background .2s;">'
+          const safeId = String(n.id || '').replace(/[^a-zA-Z0-9_-]/g, '');
+          const messageText = n.message || (n.action + ' request');
+          return '<div data-id="' + escapeHtml(safeId) + '" onclick="markNotifRead(this.dataset.id)" style="padding:10px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:8px;margin-bottom:6px;cursor:pointer;transition:background .2s;">'
             + '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-            + '<div style="font-size:13px;font-weight:' + weight + ';color:#1a1a1a;">' + icon + ' ' + (n.message || n.action + ' request') + '</div>'
-            + '<div style="font-size:11px;color:#94a3b8;white-space:nowrap;margin-left:10px;">' + ts + '</div>'
+            + '<div style="font-size:13px;font-weight:' + weight + ';color:#1a1a1a;">' + icon + ' ' + escapeHtml(messageText) + '</div>'
+            + '<div style="font-size:11px;color:#94a3b8;white-space:nowrap;margin-left:10px;">' + escapeHtml(ts) + '</div>'
             + '</div>'
-            + '<div style="font-size:11px;color:#64748b;margin-top:3px;">' + (n.customerEmail || '') + (n.mailRef ? ' &middot; ' + n.mailRef : '') + '</div>'
+            + '<div style="font-size:11px;color:#64748b;margin-top:3px;">' + escapeHtml(n.customerEmail || '') + (n.mailRef ? ' &middot; ' + escapeHtml(n.mailRef) : '') + '</div>'
             + '</div>';
         }).join('');
       });
