@@ -384,7 +384,7 @@
         <div class="requests-section" id="mailRequestsSection" style="display:none;">
           <div class="requests-header">
             <h3>📥 Mail Requests</h3>
-        <button id="sendMailAlertBtn" type="button" onclick="if(window.currentCustomer){fireMailArrivedEmail(window.currentCustomer.id)}else{alert('Pick a customer first')}" style="margin:8px 0 16px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">📧 Send Mail Alert Email</button>
+
             <span class="pending-badge zero" id="reqPendingBadge">0 pending</span>
           </div>
           <div class="req-filters">
@@ -1115,10 +1115,14 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           });
           filesHtml += '</div>';
         }
+        const notifiedAt = item.notifiedAt?.toDate ? item.notifiedAt.toDate() : null;
+        const notifyHtml = notifiedAt
+          ? `<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#15803d;background:#dcfce7;border:1px solid #86efac;padding:5px 10px;border-radius:6px;margin-left:8px;font-weight:600;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Client notified ${notifiedAt.toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>`
+          : `<button class="notify-btn" type="button" data-id="${d.id}" data-customer="${customerId}" style="display:inline-flex;align-items:center;gap:6px;background:#0f2347;color:#c9972a;border:none;font-weight:600;font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer;margin-left:8px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> Send Alert</button>`;
         html += `
           <div class="activity-item">
             <div class="activity-info">
-              <div><strong>${item.pages} page(s)</strong> ${files.length ? `- ${files.length} file(s)` : ''} ${item.letterType ? `<span style="margin-left:8px;font-size:12px;padding:2px 6px;border:1px solid #e0e0e0;border-radius:12px;">${item.letterType}</span>`:''}</div>
+              <div><strong>${item.pages} page(s)</strong> ${files.length ? `- ${files.length} file(s)` : ''} ${item.letterType ? `<span style="margin-left:8px;font-size:12px;padding:2px 6px;border:1px solid #e0e0e0;border-radius:12px;">${item.letterType}</span>`:''} ${notifyHtml}</div>
               <div class="activity-date">${date}</div>
               ${item.notes ? `<div style="color:#666;font-size:14px;margin-top:5px;">${item.notes}</div>` : ''}
               ${filesHtml}
@@ -1129,6 +1133,34 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
       });
       list.innerHTML = html;
     }
+
+    // Per-scan "Send Alert" button
+    document.addEventListener('click', async (e) => {
+      const nb = e.target.closest('.notify-btn');
+      if (!nb) return;
+      const mailId = nb.getAttribute('data-id');
+      const customerId = nb.getAttribute('data-customer');
+      if (!customerId || !mailId) return;
+      const orig = nb.innerHTML;
+      nb.disabled = true; nb.style.opacity = '0.6'; nb.innerHTML = '⏳ Sending...';
+      try {
+        const idToken = await auth.currentUser.getIdToken();
+        const res = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/notifyCustomerMailArrived', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+          body: JSON.stringify({ customerId, mailId })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        if (typeof showSuccess === 'function') showSuccess('Email sent to ' + (data.to || 'customer'));
+        // refresh activity to show the green tick
+        if (currentCustomer?.id) await loadRecentActivity(currentCustomer.id);
+      } catch (err) {
+        nb.innerHTML = orig; nb.disabled = false; nb.style.opacity = '1';
+        alert('Failed to send email: ' + err.message);
+        console.error(err);
+      }
+    });
 
     // Delete a scan (files first, then doc)
     document.addEventListener('click', async (e)=>{
