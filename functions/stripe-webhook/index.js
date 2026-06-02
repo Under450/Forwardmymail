@@ -1495,7 +1495,7 @@ ${FMM_WORDMARK}
 ${processedAt ? `<tr><td style="font-size:14px;color:#6b7280;padding:11px 16px;">Received</td><td style="font-size:14px;color:#0f2347;padding:11px 16px;font-weight:600;">${processedAt}</td></tr>` : ''}
 </table>
 ${fmmChargeBlock(chargeContext, { cost, balance, freeRemaining })}
-<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/fmm-app.html" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">${cta}</a></td></tr></table>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/customer-portal.html" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">${cta}</a></td></tr></table>
 <p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:16px 0 0 0;text-align:center;">Items are held free for 14 days · Parcels may incur storage after 24 hours</p>
 </td></tr>
 ${FMM_FOOTER}
@@ -1513,7 +1513,7 @@ ${FMM_WORDMARK}
 <p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 16px 0;">Hi ${customerName || 'there'},</p>
 <p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 24px 0;">Thanks for adding credits to your account. <strong>${unlockedCount} previously locked ${word} now available to view</strong> in your portal.</p>
 ${typeof newBalance === 'number' ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px 16px;margin:0 0 24px 0;color:#374151;font-size:14px;"><strong style="color:#0f2347;">Current balance:</strong> £${newBalance.toFixed(2)}</div>` : ''}
-<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/fmm-app.html" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">View Your Mail</a></td></tr></table>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/customer-portal.html" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">View Your Mail</a></td></tr></table>
 </td></tr>
 ${FMM_FOOTER}
 </table></td></tr></table></body></html>`;
@@ -2956,6 +2956,7 @@ exports.notifyCustomerMailArrived = onRequest(async (req, res) => {
 
   const { customerId, mailId } = req.body || {};
   if (!customerId) return res.status(400).json({ error: 'Missing customerId' });
+  if (!mailId) return res.status(400).json({ error: 'Missing mailId — per-scan notification required' });
 
   try {
     const customerDoc = await db.collection('customers').doc(customerId).get();
@@ -2963,14 +2964,10 @@ exports.notifyCustomerMailArrived = onRequest(async (req, res) => {
     const customer = customerDoc.data();
     if (!customer.email) return res.status(400).json({ error: 'Customer has no email' });
 
-    let mail = null;
-    if (mailId) {
-      const m = await db.collection('mail').doc(mailId).get();
-      if (m.exists) mail = m.data();
-    } else {
-      const q = await db.collection('mail').where('customerId', '==', customerId).orderBy('receivedAt', 'desc').limit(1).get();
-      if (!q.empty) mail = q.docs[0].data();
-    }
+    const mailRef = db.collection('mail').doc(mailId);
+    const mailSnap = await mailRef.get();
+    if (!mailSnap.exists) return res.status(404).json({ error: 'Mail item not found' });
+    const mail = mailSnap.data();
 
     const customerName = customer.name || 'Customer';
     const pages = mail ? (Number(mail.pages) || 1) : 1;
@@ -2987,19 +2984,28 @@ exports.notifyCustomerMailArrived = onRequest(async (req, res) => {
       else if (Number(mail.cost) > 0)            { chargeContext = 'paid'; chargeCost = Number(mail.cost); chargeBalance = Number(customer.credits) || 0; }
     }
 
+    // Verify staff identity for the audit log
+    const staffEmail = (await admin.auth().verifyIdToken(idToken)).email || 'staff';
+
     await sendMailLogged({
       to: customer.email,
       subject: hasScan ? 'Your scan is ready — Forward My Mail' : 'You have new mail — Forward My Mail',
       html: buildMailArrivedEmail({
         customerName,
         companyName: customer.company || '',
-        letterType: mail ? (mail.sender || mail.description || mail.type || 'Letter') : 'Mail item',
-        pages: mail ? pages : '—',
+        letterType: mail.sender || mail.description || mail.type || 'Letter',
+        pages,
         processedAt, hasScan,
         chargeContext, cost: chargeCost, balance: chargeBalance, freeRemaining: chargeFreeRemaining,
       }),
       template: 'mail_arrived_manual',
       customerId, customerEmail: customer.email,
+    });
+
+    // Stamp the mail doc so staff portal shows ✓ Notified
+    await mailRef.update({
+      notifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+      notifiedBy: staffEmail,
     });
 
     return res.status(200).json({ sent: true, to: customer.email, hasScan });
