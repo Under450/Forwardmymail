@@ -536,7 +536,7 @@ exports.stripeWebhook = onRequest(async (req, res) => {
               try {
                 await sendMailLogged({
                   to: finalCustomerData.email,
-                  subject: '🔓 Your locked scans are now available — Forward My Mail',
+                  subject: 'Your locked scans are now available — Forward My Mail',
                   html: buildScanUnlockedEmail({
                     customerName: finalCustomerData.name || 'Customer',
                     unlockedCount,
@@ -1458,6 +1458,83 @@ function buildNonGovtBlockedEmail(name, pages, cost) {
 </div>
 <div class="footer"><strong>Forward My Mail Ltd</strong><br>8a Bore Street, Lichfield, Staffordshire, WS13 6LL<br>Company No. 16912540<br><a href="mailto:info@forwardmymail.co.uk" style="color:#1e3a8a">info@forwardmymail.co.uk</a></div>
 </div></body></html>`;
+}
+
+// ── Brand assets (v2 — SVG icons + footer) ───────────────────────────────────
+const ICON_ENVELOPE = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="11" width="36" height="26" rx="3"/><path d="M6 14l18 13L42 14"/><circle cx="38" cy="14" r="5" fill="#c9972a" stroke="#c9972a"/><text x="38" y="17.5" font-size="7" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="DM Sans,Arial,sans-serif">1</text></svg>`;
+const ICON_UNLOCK = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="21" width="28" height="20" rx="3"/><path d="M16 21V13a8 8 0 0 1 15.5-2.8"/><circle cx="24" cy="31" r="3" fill="#ffffff"/></svg>`;
+const ICON_HOURGLASS = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6h20M14 42h20M16 6c0 8 6 11 8 14 2-3 8-6 8-14M16 42c0-8 6-11 8-14 2 3 8 6 8 14"/><path d="M19 12h10" stroke="#c9972a" stroke-width="3"/></svg>`;
+const FMM_FOOTER = `<tr><td bgcolor="#0f2347" style="padding:24px 32px;font-family:'DM Sans',Arial,sans-serif;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.6;"><strong style="color:#ffffff;">Forward My Mail Ltd</strong><br>8a Bore Street, Lichfield, Staffordshire, WS13 6LL<br>Company No. 16912540 · <a href="mailto:info@forwardmymail.co.uk" style="color:#c9972a;text-decoration:none;">info@forwardmymail.co.uk</a></td></tr>`;
+const FMM_WORDMARK = `<tr><td bgcolor="#0f2347" style="padding:14px 24px;font-family:'DM Sans',Arial,sans-serif;font-size:11px;letter-spacing:0.2em;color:#ffffff;text-transform:uppercase;">FORWARD MY MAIL</td></tr>`;
+
+function fmmChargeBlock(ctx, opts) {
+  opts = opts || {};
+  if (ctx === 'free_official') return `<div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin:0 0 24px 0;color:#15803d;font-size:14px;line-height:1.5;"><strong>Included in your package</strong><br>This is official government mail and is scanned free of charge under your subscription.</div>`;
+  if (ctx === 'free_quota')    return `<div style="background:#dcfce7;border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin:0 0 24px 0;color:#15803d;font-size:14px;line-height:1.5;"><strong>No charge — free scan used</strong>${opts.freeRemaining != null ? `<br>You have <strong>${opts.freeRemaining}</strong> free ${opts.freeRemaining === 1 ? 'scan' : 'scans'} remaining this month.` : ''}</div>`;
+  if (ctx === 'paid')          return `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px 16px;margin:0 0 24px 0;color:#374151;font-size:14px;line-height:1.5;"><strong style="color:#0f2347;">Cost: £${(Number(opts.cost) || 0).toFixed(2)}</strong>${typeof opts.balance === 'number' ? ` &middot; New balance: <strong>£${opts.balance.toFixed(2)}</strong>` : ''}</div>`;
+  if (ctx === 'awaiting_pay')  return `<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:14px 16px;margin:0 0 24px 0;color:#92400e;font-size:14px;line-height:1.5;"><strong>Locked until credits added</strong><br>This scan is held securely. Add at least <strong>£${(Number(opts.cost) || 0.50).toFixed(2)}</strong> in credits to unlock and view it.</div>`;
+  return '';
+}
+
+function buildMailArrivedEmail({ customerName, companyName, letterType, pages, processedAt, hasScan, chargeContext, cost, balance, freeRemaining }) {
+  const greeting = customerName + (companyName ? ' — ' + companyName : '');
+  const cta = hasScan ? 'View Your Scan' : 'Open Portal';
+  const headerSub = hasScan ? 'Your scan is ready to view' : 'New item received at your address';
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>You have new mail</title><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body style="margin:0;padding:0;background-color:#f4f2ee;font-family:'DM Sans',Arial,sans-serif;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f4f2ee"><tr><td align="center" style="padding:24px 16px;"><table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;">
+${FMM_WORDMARK}
+<tr><td bgcolor="#0f2347" style="padding:32px 32px 28px;"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td width="56" valign="middle" style="padding-right:18px;">${ICON_ENVELOPE}</td><td valign="middle"><div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;color:#ffffff;line-height:1.2;">You have new mail</div><div style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#c9972a;padding-top:6px;letter-spacing:0.05em;">${headerSub}</div></td></tr></table></td></tr>
+<tr><td bgcolor="#ffffff" style="padding:36px 32px;">
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 16px 0;">Hi ${greeting},</p>
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 24px 0;">${hasScan ? 'A new piece of mail has been scanned for you. The PDF is ready to view securely in your portal.' : 'A new item has arrived at your Forward My Mail address. Sign in to your portal to view it and choose what to do.'}</p>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom:20px;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+<tr><td colspan="2" style="font-size:12px;font-weight:700;color:#0f2347;padding:12px 16px;background-color:#f9fafb;border-bottom:1px solid #e5e7eb;text-transform:uppercase;letter-spacing:0.08em;">Item Details</td></tr>
+<tr><td style="font-size:14px;color:#6b7280;padding:11px 16px;border-bottom:1px solid #e5e7eb;width:38%;">Type</td><td style="font-size:14px;color:#0f2347;padding:11px 16px;border-bottom:1px solid #e5e7eb;font-weight:600;">${letterType || 'Letter'}</td></tr>
+<tr><td style="font-size:14px;color:#6b7280;padding:11px 16px;border-bottom:1px solid #e5e7eb;">Pages</td><td style="font-size:14px;color:#0f2347;padding:11px 16px;border-bottom:1px solid #e5e7eb;font-weight:600;">${pages || '—'}</td></tr>
+${processedAt ? `<tr><td style="font-size:14px;color:#6b7280;padding:11px 16px;">Received</td><td style="font-size:14px;color:#0f2347;padding:11px 16px;font-weight:600;">${processedAt}</td></tr>` : ''}
+</table>
+${fmmChargeBlock(chargeContext, { cost, balance, freeRemaining })}
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/fmm-app.html" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">${cta}</a></td></tr></table>
+<p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:16px 0 0 0;text-align:center;">Items are held free for 14 days · Parcels may incur storage after 24 hours</p>
+</td></tr>
+${FMM_FOOTER}
+</table></td></tr></table></body></html>`;
+}
+
+function buildScanUnlockedEmail({ customerName, unlockedCount, newBalance }) {
+  const word = unlockedCount > 1 ? 'scans are' : 'scan is';
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Scans unlocked</title><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body style="margin:0;padding:0;background-color:#f4f2ee;font-family:'DM Sans',Arial,sans-serif;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f4f2ee"><tr><td align="center" style="padding:24px 16px;"><table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;">
+${FMM_WORDMARK}
+<tr><td bgcolor="#0f2347" style="padding:32px 32px 28px;"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td width="56" valign="middle" style="padding-right:18px;">${ICON_UNLOCK}</td><td valign="middle"><div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;color:#ffffff;line-height:1.2;">Your ${word} unlocked</div><div style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#c9972a;padding-top:6px;letter-spacing:0.05em;">Thanks for topping up</div></td></tr></table></td></tr>
+<tr><td bgcolor="#ffffff" style="padding:36px 32px;">
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 16px 0;">Hi ${customerName || 'there'},</p>
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 24px 0;">Thanks for adding credits to your account. <strong>${unlockedCount} previously locked ${word} now available to view</strong> in your portal.</p>
+${typeof newBalance === 'number' ? `<div style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:14px 16px;margin:0 0 24px 0;color:#374151;font-size:14px;"><strong style="color:#0f2347;">Current balance:</strong> £${newBalance.toFixed(2)}</div>` : ''}
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/fmm-app.html" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">View Your Mail</a></td></tr></table>
+</td></tr>
+${FMM_FOOTER}
+</table></td></tr></table></body></html>`;
+}
+
+function buildMailHeldEmail({ customerName, neededCredits, packageType }) {
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Mail awaiting scan</title><link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:wght@400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"></head>
+<body style="margin:0;padding:0;background-color:#f4f2ee;font-family:'DM Sans',Arial,sans-serif;">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#f4f2ee"><tr><td align="center" style="padding:24px 16px;"><table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;">
+${FMM_WORDMARK}
+<tr><td bgcolor="#0f2347" style="padding:32px 32px 28px;"><table cellpadding="0" cellspacing="0" border="0" width="100%"><tr><td width="56" valign="middle" style="padding-right:18px;">${ICON_HOURGLASS}</td><td valign="middle"><div style="font-family:'DM Serif Display',Georgia,serif;font-size:24px;color:#ffffff;line-height:1.2;">Mail awaiting your action</div><div style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#c9972a;padding-top:6px;letter-spacing:0.05em;">Top up to unlock</div></td></tr></table></td></tr>
+<tr><td bgcolor="#ffffff" style="padding:36px 32px;">
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 16px 0;">Hi ${customerName || 'there'},</p>
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 16px 0;">A new item of mail has arrived at your Forward My Mail address.</p>
+<p style="font-size:15px;color:#374151;line-height:1.7;margin:0 0 24px 0;">Your <strong>${packageType || 'current'}</strong> package requires credits to scan and view this item. Please top up to have it processed.</p>
+<div style="background:#fef3c7;border:1px solid #fcd34d;border-radius:8px;padding:16px;margin:0 0 24px 0;color:#92400e;font-size:14px;line-height:1.5;"><strong>Credits needed:</strong> approximately <strong>£${(Number(neededCredits) || 0.50).toFixed(2)}</strong> for this scan.</div>
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:8px 0 24px 0;"><tr><td align="center"><a href="https://www.forwardmymail.co.uk/customer-portal.html#credits" style="display:inline-block;background:#c9972a;color:#0f2347;font-weight:700;font-size:15px;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.02em;">Add Credits</a></td></tr></table>
+<p style="font-size:12px;color:#9ca3af;line-height:1.6;margin:16px 0 0 0;text-align:center;">Mail is held free for 14 days · Items may be returned to sender after that</p>
+</td></tr>
+${FMM_FOOTER}
+</table></td></tr></table></body></html>`;
 }
 
 // ── notifyNonGovtScanBlocked ─────────────────────────────────────────────────
@@ -2862,6 +2939,112 @@ exports.syncAllCustomersToSheet = onRequest(async (req, res) => {
   } catch (err) {
     console.error('syncAllCustomersToSheet error:', err);
     return res.status(500).json({ error: err.message });
+  }
+});
+
+
+// ── notifyCustomerMailArrived (staff-only) ─────────────────────────────────────
+exports.notifyCustomerMailArrived = onRequest(async (req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  try { await verifyStaffToken(idToken); }
+  catch (e) { return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' }); }
+
+  const { customerId, mailId } = req.body || {};
+  if (!customerId) return res.status(400).json({ error: 'Missing customerId' });
+
+  try {
+    const customerDoc = await db.collection('customers').doc(customerId).get();
+    if (!customerDoc.exists) return res.status(404).json({ error: 'Customer not found' });
+    const customer = customerDoc.data();
+    if (!customer.email) return res.status(400).json({ error: 'Customer has no email' });
+
+    let mail = null;
+    if (mailId) {
+      const m = await db.collection('mail').doc(mailId).get();
+      if (m.exists) mail = m.data();
+    } else {
+      const q = await db.collection('mail').where('customerId', '==', customerId).orderBy('receivedAt', 'desc').limit(1).get();
+      if (!q.empty) mail = q.docs[0].data();
+    }
+
+    const customerName = customer.name || 'Customer';
+    const pages = mail ? (Number(mail.pages) || 1) : 1;
+    const processedAt = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const hasScan = !!(mail && mail.status === 'scanned' && (mail.scanUrl || (mail.files && mail.files.length)));
+
+    // Derive chargeContext from mail doc + customer state
+    let chargeContext = null, chargeCost = null, chargeBalance = null, chargeFreeRemaining = null;
+    if (mail) {
+      const govtFree = mail.govtMailCategory === 'government' || mail.isFreeOfficialMail || mail.freeOfficial;
+      if (mail.status === 'blocked_no_credits') { chargeContext = 'awaiting_pay'; chargeCost = Number(mail.cost) || 0.50; }
+      else if (govtFree)                         { chargeContext = 'free_official'; }
+      else if (mail.freeScanUsed)                { chargeContext = 'free_quota'; chargeFreeRemaining = Number(customer.freeScansRemaining) || 0; }
+      else if (Number(mail.cost) > 0)            { chargeContext = 'paid'; chargeCost = Number(mail.cost); chargeBalance = Number(customer.credits) || 0; }
+    }
+
+    await sendMailLogged({
+      to: customer.email,
+      subject: hasScan ? 'Your scan is ready — Forward My Mail' : 'You have new mail — Forward My Mail',
+      html: buildMailArrivedEmail({
+        customerName,
+        companyName: customer.company || '',
+        letterType: mail ? (mail.sender || mail.description || mail.type || 'Letter') : 'Mail item',
+        pages: mail ? pages : '—',
+        processedAt, hasScan,
+        chargeContext, cost: chargeCost, balance: chargeBalance, freeRemaining: chargeFreeRemaining,
+      }),
+      template: 'mail_arrived_manual',
+      customerId, customerEmail: customer.email,
+    });
+
+    return res.status(200).json({ sent: true, to: customer.email, hasScan });
+  } catch (err) {
+    console.error('notifyCustomerMailArrived error:', err);
+    return res.status(500).json({ error: err.message || 'Internal error' });
+  }
+});
+
+// ── notifyMailHeld (staff-only) ────────────────────────────────────────────────
+exports.notifyMailHeld = onRequest(async (req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  try { await verifyStaffToken(idToken); }
+  catch (e) { return res.status(e.message === 'Not a staff user' ? 403 : 401).json({ error: e.message || 'Unauthorised' }); }
+
+  const { customerId, neededCredits } = req.body || {};
+  if (!customerId) return res.status(400).json({ error: 'Missing customerId' });
+
+  try {
+    const customerDoc = await db.collection('customers').doc(customerId).get();
+    if (!customerDoc.exists) return res.status(404).json({ error: 'Customer not found' });
+    const customer = customerDoc.data();
+    if (!customer.email) return res.status(400).json({ error: 'Customer has no email' });
+
+    await sendMailLogged({
+      to: customer.email,
+      subject: 'Mail awaiting scan — top up to view — Forward My Mail',
+      html: buildMailHeldEmail({
+        customerName: customer.name || 'Customer',
+        neededCredits: Number(neededCredits) || 0.50,
+        packageType: customer.package || customer.packageType || customer.selectedPlanName || '',
+      }),
+      template: 'mail_held_no_credits',
+      customerId, customerEmail: customer.email,
+    });
+
+    return res.status(200).json({ sent: true, to: customer.email });
+  } catch (err) {
+    console.error('notifyMailHeld error:', err);
+    return res.status(500).json({ error: err.message || 'Internal error' });
   }
 });
 

@@ -196,6 +196,18 @@
     const params = new URLSearchParams(window.location.search);
     const planKey = params.get('plan') || '';
 
+    // ===== GATE: customer MUST come from pricing with a ?plan param =====
+    // Prevents accounts being created without a package selected.
+    // Customers without a plan get redirected to pricing.
+    if (!planKey) {
+      const msg = document.createElement('div');
+      msg.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#0f2347;color:#fff;padding:14px 20px;text-align:center;font-family:DM Sans,Arial,sans-serif;font-size:14px;z-index:9999;';
+      msg.innerHTML = 'Please choose your mailbox package first &mdash; redirecting to pricing...';
+      document.body.appendChild(msg);
+      setTimeout(() => { window.location.href = '/index.html#pricing'; }, 1500);
+      throw new Error('No plan selected — redirecting');
+    }
+
     let selectedPlan = null;
     let pricingData = null;
 
@@ -312,6 +324,8 @@
           // selected plan + fee split snapshot at signup
           selectedPlan: planKey || null,
           selectedPlanName: selectedPlan ? selectedPlan.name : null,
+          // mirror into 'package' field so staff portal + triggers work pre-payment
+          package: selectedPlan ? selectedPlan.name : null,
           activationFee: selectedPlan ? selectedPlan.activation_fee : null,
           serviceFee: selectedPlan ? selectedPlan.service_fee : null,
           totalPrice: selectedPlan ? selectedPlan.price : null,
