@@ -1427,6 +1427,9 @@ function renderMailTab(filter) {
       const scanUrl = m.scanUrl || (m.files && m.files.length ? m.files[0].url : '');
       const hasMultiple = m.files && m.files.length > 1;
       actions = `<div class="mc-action primary" data-scan="${escapeHtml(scanUrl)}" data-title="${escapeHtml(m.sender||'Scan')}" onclick="openScanModal(this.dataset.scan,this.dataset.title);event.stopPropagation()">View Scan${hasMultiple ? ' (' + m.files.length + ')' : ''}</div>`;
+    } else if (m.status === 'blocked_no_credits') {
+      const cost = Number(m.cost) || 0.50;
+      actions = `<div class="mc-action locked" onclick="window.location.href='customer-portal.html#credits';event.stopPropagation()" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:600;">🔒 Add £${cost.toFixed(2)} to unlock</div>`;
     } else {
       actions = '<div class="mc-action primary">✓ ' + getBadgeLabel(m.status) + '</div>';
     }
