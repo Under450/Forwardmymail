@@ -498,6 +498,64 @@ exports.stripeWebhook = onRequest(async (req, res) => {
         console.error('Failed to send admin notification:', notifyError);
       }
 
+      // ── Auto-unlock blocked scans after credit top-up ────────────────────────
+      if (creditsToAdd > 0) {
+        try {
+          const blockedSnap = await db.collection('mail')
+            .where('customerId', '==', customerId)
+            .where('status', '==', 'blocked_no_credits')
+            .get();
+
+          if (!blockedSnap.empty) {
+            let remaining = newCredits;
+            const batch = db.batch();
+            let unlockedCount = 0;
+            let totalDeducted = 0;
+
+            for (const docSnap of blockedSnap.docs) {
+              const mailData = docSnap.data();
+              const cost = Number(mailData.cost) || 0;
+              if (remaining < cost) break; // not enough credits to unlock more
+              batch.update(docSnap.ref, {
+                status: 'scanned',
+                blockedNonGovt: false,
+                unlockedAt: admin.firestore.FieldValue.serverTimestamp(),
+              });
+              remaining -= cost;
+              totalDeducted += cost;
+              unlockedCount += 1;
+            }
+
+            if (unlockedCount > 0) {
+              // Deduct the cost of unlocked scans from the credits
+              batch.update(customerRef, { credits: remaining });
+              await batch.commit();
+              console.log(`Auto-unlocked ${unlockedCount} blocked scans for ${customerId}, deducted £${totalDeducted}, new balance £${remaining}`);
+
+              // Send unlock email
+              try {
+                await sendMailLogged({
+                  to: finalCustomerData.email,
+                  subject: '🔓 Your locked scans are now available — Forward My Mail',
+                  html: buildScanUnlockedEmail({
+                    customerName: finalCustomerData.name || 'Customer',
+                    unlockedCount,
+                    newBalance: remaining,
+                  }),
+                  template: 'scan_unlocked',
+                  customerId,
+                  customerEmail: finalCustomerData.email,
+                });
+              } catch (unlockEmailErr) {
+                console.error('Failed to send scan unlock email:', unlockEmailErr);
+              }
+            }
+          }
+        } catch (unlockErr) {
+          console.error('Auto-unlock check failed (non-critical):', unlockErr);
+        }
+      }
+
       // Telegram push to Craig's iPhone — only for package purchases (skip credit packs)
       try {
         if (packageType !== 'Credit Pack') {

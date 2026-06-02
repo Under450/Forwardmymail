@@ -384,6 +384,7 @@
         <div class="requests-section" id="mailRequestsSection" style="display:none;">
           <div class="requests-header">
             <h3>📥 Mail Requests</h3>
+        <button id="sendMailAlertBtn" type="button" onclick="if(window.currentCustomer){fireMailArrivedEmail(window.currentCustomer.id)}else{alert('Pick a customer first')}" style="margin:8px 0 16px;background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;">📧 Send Mail Alert Email</button>
             <span class="pending-badge zero" id="reqPendingBadge">0 pending</span>
           </div>
           <div class="req-filters">
@@ -588,7 +589,7 @@ const storage = getStorage(app);
       const snap = await getDoc(doc(db,'customers', id));
       if (!snap.exists()){ hideCustomerPanels(); return; }
       currentCustomer = { id, ...snap.data() };
-      renderCustomer(currentCustomer);
+      window.currentCustomer = currentCustomer; renderCustomer(currentCustomer);
       scanForm.style.display='block';
       recentActivity.style.display='block';
       freeScansPanel.style.display='block';
@@ -908,12 +909,15 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
           payable = 0;
         } else if (credits < baseCost) {
           showScanError(`ERROR: Personal package — free scans exhausted. Credits: £${credits.toFixed(2)}, needs £${baseCost.toFixed(2)}. Customer must top up.`);
+          // Auto-fire "mail held" email so customer knows to top up
+          fireMailHeldEmail(currentCustomer.id, baseCost).catch(e => console.warn('mail-held email failed', e));
           return;
         }
       } else if (isBusiness) {
         // Business Address: no free scans, always needs credits
         if (credits < baseCost) {
           showScanError(`ERROR: Business Address — no free scans included. Credits: £${credits.toFixed(2)}, needs £${baseCost.toFixed(2)}. Customer must top up.`);
+          fireMailHeldEmail(currentCustomer.id, baseCost).catch(e => console.warn('mail-held email failed', e));
           return;
         }
       } else if (isRegOrFull) {
@@ -1051,6 +1055,45 @@ document.getElementById('resetIdBtn').addEventListener('click', async () => {
       processScanBtn.textContent = 'Process Scan';
       await loadRecentActivity(currentCustomer.id);
     });
+
+
+    // ===== EMAIL ALERT HELPERS =====
+    async function fireMailHeldEmail(customerId, neededCredits) {
+      if (!auth.currentUser) return;
+      const idToken = await auth.currentUser.getIdToken();
+      const res = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/notifyMailHeld', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+        body: JSON.stringify({ customerId, neededCredits })
+      });
+      if (!res.ok) throw new Error('mail-held send failed: ' + res.status);
+      console.log('[mail-held] email sent for', customerId);
+    }
+    async function fireMailArrivedEmail(customerId, mailId) {
+      if (!auth.currentUser) { alert('Not signed in'); return; }
+      const idToken = await auth.currentUser.getIdToken();
+      const btn = document.getElementById('sendMailAlertBtn');
+      const orig = btn ? btn.textContent : null;
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Sending...'; }
+      try {
+        const res = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/notifyCustomerMailArrived', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+          body: JSON.stringify({ customerId, mailId: mailId || null })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed');
+        if (btn) btn.textContent = '✅ Email Sent';
+        setTimeout(() => { if (btn) { btn.textContent = orig; btn.disabled = false; } }, 3000);
+        if (typeof showSuccess === 'function') showSuccess('Email sent to ' + (data.to || 'customer'));
+        else alert('Email sent to ' + (data.to || 'customer'));
+      } catch (err) {
+        if (btn) { btn.textContent = orig; btn.disabled = false; }
+        alert('Failed to send email: ' + err.message);
+        console.error(err);
+      }
+    }
+    window.fireMailArrivedEmail = fireMailArrivedEmail;
 
     async function loadRecentActivity(customerId){
       const qy = query(collection(db,'mail'), where('customerId','==', customerId), orderBy('processedAt','desc'), limit(10));
