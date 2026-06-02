@@ -161,6 +161,7 @@
   <script src="terms-v4.js"></script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
     import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -181,6 +182,13 @@
     };
 
     const app = initializeApp(firebaseConfig);
+  // ===== APP CHECK (reCAPTCHA Enterprise) =====
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider('6LcoHwktAAAAAL2GLzNDE7ZmhHHrIWHbD3iu1p72'),
+      isTokenAutoRefreshEnabled: true
+    });
+  } catch (e) { console.warn('App Check init failed:', e); }
     const auth = getAuth(app);
     const db = getFirestore(app);
 
