@@ -24,6 +24,25 @@ const EMAIL_PASS     = process.env.SMTP_PASS;
 
 admin.initializeApp();
 const db = admin.firestore();
+// ── Drive archive — auto-share root folder with these emails ─────────────────
+const FMM_DRIVE_SHARE_EMAILS = ['info@forwardmymail.co.uk', 'caj@me.com'];
+
+async function shareDriveItemWithEmails(drive, fileId, emails) {
+  for (const email of emails) {
+    try {
+      await drive.permissions.create({
+        fileId,
+        sendNotificationEmail: false,
+        requestBody: { role: 'writer', type: 'user', emailAddress: email },
+      });
+    } catch (e) {
+      if (e && e.message && /already exists|duplicate|invalid sharing/i.test(e.message)) continue;
+      console.warn('[shareDriveItem] failed for', email, ':', e && e.message);
+    }
+  }
+}
+
+
 
 // ── Auth helpers ──────────────────────────────────────────────────────────────
 // Verify a Firebase ID token AND that the user has a doc in /staff/{uid}.
@@ -2236,7 +2255,7 @@ async function getOrCreateFolder(drive, name, parentId) {
   return folder.data.id;
 }
 
-exports.archiveMailItemToDrive = onDocumentCreated('mailItems/{mailItemId}', async (event) => {
+exports.archiveMailItemToDrive = onDocumentCreated('mail/{mailItemId}', async (event) => {
   const mailData = event.data.data();
   const mailItemId = event.params.mailItemId;
 
@@ -2265,7 +2284,12 @@ exports.archiveMailItemToDrive = onDocumentCreated('mailItems/{mailItemId}', asy
 
     // Get/create folder structure: FMM Mail Archive / [Customer Folder]
     const rootId = await getOrCreateFolder(drive, 'FMM Mail Archive', null);
+    // Ensure root folder is shared with FMM admin emails (idempotent — skips dupes)
+    await shareDriveItemWithEmails(drive, rootId, FMM_DRIVE_SHARE_EMAILS);
+    console.log('[drive-archive] root folder URL: https://drive.google.com/drive/folders/' + rootId);
     const customerFolderId = await getOrCreateFolder(drive, folderName, rootId);
+    // Share customer subfolder too so it shows up neatly
+    await shareDriveItemWithEmails(drive, customerFolderId, FMM_DRIVE_SHARE_EMAILS);
 
     const processedDate = mailData.processedAt
       ? new Date(mailData.processedAt.toDate()).toLocaleDateString('en-GB')
@@ -3050,6 +3074,112 @@ exports.notifyMailHeld = onRequest(async (req, res) => {
     return res.status(200).json({ sent: true, to: customer.email });
   } catch (err) {
     console.error('notifyMailHeld error:', err);
+    return res.status(500).json({ error: err.message || 'Internal error' });
+  }
+});
+
+
+// ── backfillDriveArchive — run once to archive existing scans to Drive ────────
+// Iterates over the `mail` collection and triggers Drive archive for any scan
+// not yet flagged with driveArchivedAt.
+// Staff-only HTTP endpoint.
+exports.backfillDriveArchive = onRequest({ secrets: ['BULK_SYNC_KEY'], timeoutSeconds: 540, memory: '512MiB' }, async (req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  // Allow either staff Bearer auth OR BULK_SYNC_KEY (for manual cron-style runs)
+  const key = req.query.key || req.headers['x-api-key'];
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  let authOk = false;
+  if (process.env.BULK_SYNC_KEY && key === process.env.BULK_SYNC_KEY) authOk = true;
+  else if (idToken) {
+    try { await verifyStaffToken(idToken); authOk = true; } catch {}
+  }
+  if (!authOk) return res.status(401).json({ error: 'Auth required (staff token or BULK_SYNC_KEY)' });
+
+  try {
+    const snap = await db.collection('mail')
+      .where('driveArchivedAt', '==', null)
+      .limit(Number(req.query.limit) || 200)
+      .get();
+
+    // Workaround for Firestore — `where x == null` doesn't always match missing fields.
+    // So also pull docs without the field by reading and filtering client-side.
+    const all = await db.collection('mail').orderBy('processedAt', 'desc').limit(Number(req.query.limit) || 200).get();
+    const todo = all.docs.filter(d => !d.data().driveArchivedAt);
+
+    if (todo.length === 0) return res.status(200).json({ archived: 0, message: 'Nothing to archive' });
+
+    const driveAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/drive'] });
+    const drive = google.drive({ version: 'v3', auth: driveAuth });
+    const rootId = await getOrCreateFolder(drive, 'FMM Mail Archive', null);
+    await shareDriveItemWithEmails(drive, rootId, FMM_DRIVE_SHARE_EMAILS);
+    const rootUrl = `https://drive.google.com/drive/folders/${rootId}`;
+
+    let archived = 0;
+    const results = [];
+    const bucket = admin.storage().bucket('forward-my-mail.firebasestorage.app');
+
+    for (const doc of todo) {
+      const mailData = doc.data();
+      const mailItemId = doc.id;
+      if (!mailData.customerId) { results.push({ id: mailItemId, status: 'no_customer' }); continue; }
+
+      try {
+        const customerDoc = await db.collection('customers').doc(mailData.customerId).get();
+        if (!customerDoc.exists) { results.push({ id: mailItemId, status: 'no_customer_doc' }); continue; }
+        const customer = customerDoc.data();
+        const folderName = `${customer.mailboxId || mailData.customerId} — ${customer.name || 'Unknown'}`;
+
+        const customerFolderId = await getOrCreateFolder(drive, folderName, rootId);
+        await shareDriveItemWithEmails(drive, customerFolderId, FMM_DRIVE_SHARE_EMAILS);
+
+        const processedDate = mailData.processedAt
+          ? new Date(mailData.processedAt.toDate()).toLocaleDateString('en-GB')
+          : new Date().toLocaleDateString('en-GB');
+
+        const files = mailData.files || [];
+        const uploaded = [];
+        for (const f of files) {
+          if (!f.url) continue;
+          try {
+            const urlObj = new URL(f.url);
+            const encodedPath = urlObj.pathname.split('/o/')[1];
+            if (!encodedPath) throw new Error('bad URL');
+            const storagePath = decodeURIComponent(encodedPath.split('?')[0]);
+            const [fileBuffer] = await bucket.file(storagePath).download();
+            const bufStream = new stream.PassThrough();
+            bufStream.end(fileBuffer);
+            const mimeType = f.type || 'application/octet-stream';
+            const safeName = `${processedDate.replace(/\//g, '-')} — ${f.name || 'scan.pdf'}`;
+            await drive.files.create({
+              resource: { name: safeName, parents: [customerFolderId] },
+              media: { mimeType, body: bufStream },
+              fields: 'id',
+            });
+            uploaded.push(safeName);
+          } catch (fileErr) {
+            console.error(`[backfill] file failed ${f.name}:`, fileErr.message);
+          }
+        }
+
+        await doc.ref.update({
+          driveArchivedAt: admin.firestore.FieldValue.serverTimestamp(),
+          driveArchivedFiles: uploaded,
+        });
+        archived++;
+        results.push({ id: mailItemId, status: 'archived', files: uploaded.length });
+      } catch (err) {
+        console.error(`[backfill] failed ${mailItemId}:`, err.message);
+        results.push({ id: mailItemId, status: 'failed', error: err.message });
+      }
+    }
+
+    return res.status(200).json({ archived, rootUrl, results });
+  } catch (err) {
+    console.error('backfillDriveArchive error:', err);
     return res.status(500).json({ error: err.message || 'Internal error' });
   }
 });
