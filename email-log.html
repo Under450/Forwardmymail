@@ -157,17 +157,9 @@
 
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
   import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
   const app  = initializeApp({ apiKey:"AIzaSyCToSDWiFy0zjDo4Amfe4_IV8z7N54jrQU", authDomain:"forward-my-mail.firebaseapp.com", projectId:"forward-my-mail", storageBucket:"forward-my-mail.firebasestorage.app", messagingSenderId:"933044287958", appId:"1:933044287958:web:fa3a707dbec62b24e74c77" });
-  // ===== APP CHECK =====
-  try {
-    initializeAppCheck(app, {
-      provider: new ReCaptchaEnterpriseProvider('6LcoHwktAAAAAL2GLzNDE7ZmhHHrIWHbD3iu1p72'),
-      isTokenAutoRefreshEnabled: true
-    });
-  } catch (e) { console.warn('App Check init failed:', e); }
   const auth = getAuth(app);
 
   const LOGS_URL = 'https://us-central1-forward-my-mail.cloudfunctions.net/getEmailLogs';
