@@ -182,9 +182,78 @@ async function notifyNewSignup({ customerId, name, email, company, mailboxId, da
   return sendToTelegram(text);
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Didit error notifier — alerts Craig when Didit KYC sessions fail
+// (esp. when credits run out — visible to customers as "errors out").
+//
+// Throttle: notifications/didit-error-{kind}-{yyyymmddhh} doc — at most one
+// alert per hour per error kind. Prevents Telegram spam if 50 customers all
+// hit the same wall.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function classifyDiditError(statusCode, errText) {
+  const s = String(errText || '').toLowerCase();
+  if (s.includes('credit') || s.includes('top up') || s.includes('balance')) return 'credits_exhausted';
+  if (statusCode === 401 || statusCode === 403 || s.includes('api key') || s.includes('unauthor')) return 'auth_failed';
+  if (statusCode === 429 || s.includes('rate') || s.includes('throttle')) return 'rate_limited';
+  if (s.includes('workflow')) return 'workflow_invalid';
+  if (statusCode >= 500) return 'didit_5xx';
+  return 'unknown';
+}
+
+function buildDiditErrorMessage({ kind, customerEmail, customerId, statusCode, errText }) {
+  const headings = {
+    credits_exhausted: 'ALERT: <b>Didit OUT OF CREDITS</b>',
+    auth_failed:       'ALERT: <b>Didit API key invalid</b>',
+    rate_limited:      'WARN: <b>Didit rate-limited</b>',
+    workflow_invalid:  'WARN: <b>Didit workflow_id invalid</b>',
+    didit_5xx:         'WARN: <b>Didit upstream 5xx</b>',
+    unknown:           'WARN: <b>Didit session failed</b>',
+  };
+  const actions = {
+    credits_exhausted: 'Top up at https://business.didit.me — customers cannot verify ID until you do.',
+    auth_failed:       'Rotate DIDIT_API_KEY env var. Check Didit dashboard then API.',
+    rate_limited:      'Will recover automatically. If persistent, raise plan.',
+    workflow_invalid:  'Check DIDIT_WORKFLOW_ID in index.js. Did you change workflow in Didit dashboard?',
+    didit_5xx:         'Didit-side outage. Check status.didit.me or wait.',
+    unknown:           'Check Cloud Function logs for full error.',
+  };
+  return [
+    headings[kind] || headings.unknown,
+    `<b>Customer hit:</b> ${escapeHtml(customerEmail || customerId || 'unknown')}`,
+    `<b>Status:</b> ${statusCode || 'n/a'}`,
+    `<b>Didit said:</b> ${escapeHtml(String(errText || '').slice(0, 200))}`,
+    `<b>Time:</b> ${escapeHtml(formatLondonTime(new Date()))}`,
+    '',
+    `<b>Action:</b> ${actions[kind] || actions.unknown}`,
+  ].join('\n');
+}
+
+// Public: notify on a Didit createSession failure.
+// Throttled to once per hour per (kind) — avoids spam during outages.
+async function notifyDiditError({ customerEmail, customerId, statusCode, errText }) {
+  const kind = classifyDiditError(statusCode, errText);
+  const hourKey = new Date().toISOString().slice(0, 13).replace(/[^0-9]/g, ''); // YYYYMMDDHH
+  const idempotencyKey = `didit-error-${kind}-${hourKey}`;
+
+  const shouldSend = await claimNotification(idempotencyKey, {
+    kind, customerEmail, customerId, statusCode,
+    errText: String(errText || '').slice(0, 500),
+  });
+  if (!shouldSend) {
+    return { ok: true, skipped: true, reason: 'already-alerted-this-hour' };
+  }
+
+  const text = buildDiditErrorMessage({ kind, customerEmail, customerId, statusCode, errText });
+  const result = await sendToTelegram(text);
+  return { ...result, kind };
+}
+
 module.exports = {
   notifyPaidCustomer,
   notifyNewSignup,
+  notifyDiditError,
+  classifyDiditError,
   // exported for testing
-  _internal: { escapeHtml, formatLondonTime, formatAmount, buildPaidMessage, buildSignupMessage },
+  _internal: { escapeHtml, formatLondonTime, formatAmount, buildPaidMessage, buildSignupMessage, buildDiditErrorMessage },
 };

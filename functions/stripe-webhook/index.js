@@ -12,7 +12,7 @@ setGlobalOptions({
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
-const { notifyPaidCustomer, notifyNewSignup } = require('./telegram');
+const { notifyPaidCustomer, notifyNewSignup, notifyDiditError, classifyDiditError } = require('./telegram');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECRETS — never hardcoded here. Set as environment variables in Google Cloud.
@@ -1173,7 +1173,28 @@ exports.createDiditSession = onRequest(async (req, res) => {
     if (!diditResponse.ok) {
       const errText = await diditResponse.text();
       console.error('Didit API error:', diditResponse.status, errText);
-      return res.status(500).json({ error: 'Failed to create verification session' });
+
+      // Classify + alert Craig via Telegram (throttled to 1/hour per kind)
+      const kind = classifyDiditError(diditResponse.status, errText);
+      notifyDiditError({ customerEmail, customerId, statusCode: diditResponse.status, errText })
+        .then(r => console.log('[didit-alert] sent', { kind, skipped: !!r.skipped, ok: !!r.ok }))
+        .catch(e => console.error('[didit-alert] failed', e));
+
+      // Surface a specific error code to the frontend so the user sees a
+      // useful message instead of a generic "try again". Always 503 so the
+      // browser knows the service itself is degraded, not the request.
+      const userMessages = {
+        credits_exhausted: 'ID verification is temporarily unavailable. Please contact support.',
+        auth_failed:       'ID verification is temporarily unavailable. Please contact support.',
+        workflow_invalid:  'ID verification is temporarily unavailable. Please contact support.',
+        rate_limited:      'Too many verification attempts right now. Please try again in a few minutes.',
+        didit_5xx:         'ID verification provider is temporarily unavailable. Please try again shortly.',
+        unknown:           'ID verification failed to start. Please try again or contact support.',
+      };
+      return res.status(503).json({
+        error: userMessages[kind] || userMessages.unknown,
+        errorCode: kind,
+      });
     }
 
     const session = await diditResponse.json();
