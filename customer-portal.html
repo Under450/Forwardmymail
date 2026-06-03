@@ -560,12 +560,16 @@ function applyGateUI(data) {
     portalBody.classList.remove('gated');
   }
 
-  // Show/hide verify panel and update button state
+  // Show/hide verify panel and update button state.
+  // Hide the panel entirely once the customer is verified — even if still gated
+  // by staff activation. The banner already tells them "ID APPROVED — being activated".
+  // Otherwise both messages show at once (one says verified, one says verify) which
+  // confuses customers and looks broken.
   const verifyPanel = document.getElementById('verifyPanel');
   const startVerifyBtn = document.getElementById('startVerifyBtn');
   const verifyStatus = document.getElementById('verifyStatus');
   if (verifyPanel) {
-    verifyPanel.style.display = shouldGate ? 'block' : 'none';
+    verifyPanel.style.display = (shouldGate && !isVerified) ? 'block' : 'none';
     if (startVerifyBtn) {
       if (status === 'pending') {
         startVerifyBtn.textContent = '⏳ Continue Verification →';
