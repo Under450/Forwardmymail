@@ -25,14 +25,15 @@ const EMAIL_PASS     = process.env.SMTP_PASS;
 admin.initializeApp();
 const db = admin.firestore();
 // ── Drive archive — auto-share root folder with these emails ─────────────────
-const FMM_DRIVE_SHARE_EMAILS = ['info@forwardmymail.co.uk', 'caj@me.com'];
+const FMM_DRIVE_SHARE_EMAILS = ['sparetemp@googlemail.com'];
 
 async function shareDriveItemWithEmails(drive, fileId, emails) {
   for (const email of emails) {
     try {
       await drive.permissions.create({
         fileId,
-        sendNotificationEmail: false,
+        sendNotificationEmail: true,
+        emailMessage: 'Forward My Mail — your scan archive folder is ready.',
         requestBody: { role: 'writer', type: 'user', emailAddress: email },
       });
     } catch (e) {
@@ -3180,6 +3181,38 @@ exports.backfillDriveArchive = onRequest({ secrets: ['BULK_SYNC_KEY'], timeoutSe
     return res.status(200).json({ archived, rootUrl, results });
   } catch (err) {
     console.error('backfillDriveArchive error:', err);
+    return res.status(500).json({ error: err.message || 'Internal error' });
+  }
+});
+
+
+// ── shareDriveArchiveNow — staff-only HTTP. One-off: share root folder. ──────
+exports.shareDriveArchiveNow = onRequest({ secrets: ['BULK_SYNC_KEY'] }, async (req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const key = req.query.key || req.headers['x-api-key'];
+  const authHeader = req.headers.authorization || '';
+  const idToken = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  let authOk = false;
+  if (process.env.BULK_SYNC_KEY && key === process.env.BULK_SYNC_KEY) authOk = true;
+  else if (idToken) {
+    try { await verifyStaffToken(idToken); authOk = true; } catch {}
+  }
+  if (!authOk) return res.status(401).json({ error: 'Auth required' });
+
+  try {
+    const driveAuth = new google.auth.GoogleAuth({ scopes: ['https://www.googleapis.com/auth/drive'] });
+    const drive = google.drive({ version: 'v3', auth: driveAuth });
+    const rootId = await getOrCreateFolder(drive, 'FMM Mail Archive', null);
+    await shareDriveItemWithEmails(drive, rootId, FMM_DRIVE_SHARE_EMAILS);
+    return res.status(200).json({
+      rootUrl: `https://drive.google.com/drive/folders/${rootId}`,
+      sharedWith: FMM_DRIVE_SHARE_EMAILS,
+    });
+  } catch (err) {
+    console.error('shareDriveArchiveNow error:', err);
     return res.status(500).json({ error: err.message || 'Internal error' });
   }
 });
