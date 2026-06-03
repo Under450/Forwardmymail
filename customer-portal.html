@@ -174,7 +174,7 @@
           <button type="submit" id="loginBtn">Login</button>
           <button
             type="button"
-            onclick="window.location.href='index.html#pricing'"
+            onclick="window.location.href='index.html?signup=1#pricing'"
             style="background: white; color: #1e3c72; border: 2px solid #1e3c72; margin-top: 10px;"
           >
             Create Account
@@ -750,11 +750,6 @@ function applyGateUI(data) {
 
     // Verify panel show/hide is handled inside applyGateUI
 
-    function escapeHtml(s) {
-      return String(s == null ? '' : s)
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-        .replace(/\"/g,'&quot;').replace(/'/g,'&#39;');
-    }
     document.getElementById('startVerifyBtn').addEventListener('click', async () => {
     try {
       const startVerifyBtn = document.getElementById('startVerifyBtn');
@@ -775,14 +770,7 @@ function applyGateUI(data) {
       });
 
       if (!response.ok) {
-        // Parse the structured error from the Cloud Function (errorCode + error message)
-        let payload = {};
-        try { payload = await response.json(); } catch {}
-        const friendly = payload.error || 'Failed to start verification session';
-        const code = payload.errorCode || ('http_' + response.status);
-        const err = new Error(friendly);
-        err.code = code;
-        throw err;
+        throw new Error('Failed to start verification session');
       }
 
       const { sessionUrl } = await response.json();
@@ -797,18 +785,8 @@ function applyGateUI(data) {
       });
 
     } catch (err) {
-      console.error('Verification error:', err && err.code, err);
-      // Use the friendly message from the Cloud Function when it gave us one;
-      // otherwise fall back to a generic message.
-      const friendly = (err && err.message && err.code) ? err.message :
-        'Sorry, there was an error starting verification. Please try again.';
-      verifyStatus.textContent = friendly;
-      verifyStatus.style.color = '#b91c1c';
-      // If service-side error (not a user/network issue), nudge them to support
-      if (err && err.code && ['credits_exhausted','auth_failed','workflow_invalid','didit_5xx'].includes(err.code)) {
-        verifyStatus.innerHTML = escapeHtml(friendly) +
-          ' <a href="mailto:info@forwardmymail.co.uk?subject=ID verification issue" style="color:#0f2347;text-decoration:underline;">Contact support</a>';
-      }
+      console.error('Verification error:', err);
+      verifyStatus.textContent = 'Sorry, there was an error starting verification. Please try again.';
       startVerifyBtn.disabled = false;
       startVerifyBtn.textContent = 'Complete Your ID Verification →';
     }
