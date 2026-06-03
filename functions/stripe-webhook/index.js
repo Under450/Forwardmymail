@@ -7,12 +7,12 @@ const admin = require('firebase-admin');
 
 // Attach all secrets to every function so process.env works
 setGlobalOptions({
-  secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SMTP_PASS', 'DIDIT_API_KEY', 'DIDIT_WEBHOOK_SECRET', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID'],
+  secrets: ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'SMTP_PASS', 'DIDIT_API_KEY', 'DIDIT_WEBHOOK_SECRET', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID', 'TEST_BYPASS_CODE', 'BYPASS_EMAIL_PATTERN'],
 });
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
-const { notifyPaidCustomer, notifyNewSignup } = require('./telegram');
+const { notifyPaidCustomer, notifyNewSignup, notifyDiditError, classifyDiditError } = require('./telegram');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECRETS — never hardcoded here. Set as environment variables in Google Cloud.
@@ -1173,7 +1173,28 @@ exports.createDiditSession = onRequest(async (req, res) => {
     if (!diditResponse.ok) {
       const errText = await diditResponse.text();
       console.error('Didit API error:', diditResponse.status, errText);
-      return res.status(500).json({ error: 'Failed to create verification session' });
+
+      // Classify + alert Craig via Telegram (throttled to 1/hour per kind)
+      const kind = classifyDiditError(diditResponse.status, errText);
+      notifyDiditError({ customerEmail, customerId, statusCode: diditResponse.status, errText })
+        .then(r => console.log('[didit-alert] sent', { kind, skipped: !!r.skipped, ok: !!r.ok }))
+        .catch(e => console.error('[didit-alert] failed', e));
+
+      // Surface a specific error code to the frontend so the user sees a
+      // useful message instead of a generic "try again". Always 503 so the
+      // browser knows the service itself is degraded, not the request.
+      const userMessages = {
+        credits_exhausted: 'ID verification is temporarily unavailable. Please contact support.',
+        auth_failed:       'ID verification is temporarily unavailable. Please contact support.',
+        workflow_invalid:  'ID verification is temporarily unavailable. Please contact support.',
+        rate_limited:      'Too many verification attempts right now. Please try again in a few minutes.',
+        didit_5xx:         'ID verification provider is temporarily unavailable. Please try again shortly.',
+        unknown:           'ID verification failed to start. Please try again or contact support.',
+      };
+      return res.status(503).json({
+        error: userMessages[kind] || userMessages.unknown,
+        errorCode: kind,
+      });
     }
 
     const session = await diditResponse.json();
@@ -3229,3 +3250,195 @@ exports.panelMarkViewed = panelApi.panelMarkViewed;
 
 // ── getEmailLogs — update to use Firebase ID token auth ──────────────────────
 // (replaces the hardcoded password version — existing function updated below)
+
+// ── redeemTestBypass ──────────────────────────────────────────────────────────
+// Lets Craig walk the full signup → customer-portal flow as a fully provisioned
+// test customer (paid + ID-verified + package set) WITHOUT charging Stripe or
+// burning a Didit credit.
+//
+// Security:
+//   1. Secret code (TEST_BYPASS_CODE env var) — anyone who guesses this fails
+//      step 2 anyway, but rotating the code instantly revokes prior leaks.
+//   2. Email allowlist regex (BYPASS_EMAIL_PATTERN env var) — code ONLY works
+//      for emails matching the pattern (e.g. craig+test.*@gmail|hotmail|me).
+//   3. Telegram alert on every successful redemption — visibility on abuse.
+//   4. Logs every attempt (success + failure) to test_bypass_attempts collection.
+//   5. Marks the resulting customer doc with isTest:true so reports/staff-portal
+//      can filter them out of real metrics.
+//
+// Body: { code, email, password, name, company, planKey, planName, package,
+//         activationFee, serviceFee, totalPrice, consent }
+// Returns: { ok: true, uid, customToken } — client signs in with customToken
+//          and lands on customer-portal.html as a fully provisioned customer.
+exports.redeemTestBypass = onRequest(async (req, res) => {
+  setFmmCors(req, res);
+  if (req.method === 'OPTIONS') return res.status(204).send('');
+  if (req.method !== 'POST') return res.status(405).send('Method not allowed');
+
+  const SECRET = process.env.TEST_BYPASS_CODE;
+  const EMAIL_PATTERN = process.env.BYPASS_EMAIL_PATTERN;
+
+  if (!SECRET || !EMAIL_PATTERN) {
+    console.error('[bypass] TEST_BYPASS_CODE or BYPASS_EMAIL_PATTERN not set');
+    return res.status(503).json({ error: 'Bypass not configured' });
+  }
+
+  const { code, email, password, name, company, planKey, planName, packageType,
+          activationFee, serviceFee, totalPrice, consent } = req.body || {};
+
+  // Always log attempt (even rejections — useful for spotting abuse)
+  const attemptRef = db.collection('test_bypass_attempts').doc();
+  const attemptLog = {
+    email: email || null,
+    timestamp: admin.firestore.FieldValue.serverTimestamp(),
+    ip: req.headers['x-forwarded-for'] || req.ip || null,
+    userAgent: req.headers['user-agent'] || null,
+    codeMatchesSecret: code === SECRET,
+    emailMatchesPattern: false,
+    result: 'pending',
+  };
+
+  if (!code || !email || !password || !name) {
+    attemptLog.result = 'missing_fields';
+    attemptRef.set(attemptLog).catch(() => {});
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  // CHECK 1 — code matches secret
+  if (code !== SECRET) {
+    attemptLog.result = 'wrong_code';
+    attemptRef.set(attemptLog).catch(() => {});
+    return res.status(403).json({ error: 'Invalid code' });
+  }
+
+  // CHECK 2 — email matches allowlist pattern
+  let pattern;
+  try { pattern = new RegExp(EMAIL_PATTERN, 'i'); }
+  catch (e) {
+    console.error('[bypass] BYPASS_EMAIL_PATTERN is not a valid regex:', e.message);
+    attemptLog.result = 'pattern_invalid';
+    attemptRef.set(attemptLog).catch(() => {});
+    return res.status(503).json({ error: 'Bypass not configured' });
+  }
+  if (!pattern.test(email)) {
+    attemptLog.result = 'email_not_in_allowlist';
+    attemptRef.set(attemptLog).catch(() => {});
+    // Telegram alert — someone tried the code from a non-allowlisted email
+    try {
+      const { _internal } = require('./telegram');
+      // No public helper for this; reuse sendToTelegram via fetch directly
+      const token = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
+      if (token && chatId) {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            parse_mode: 'HTML',
+            text: `WARN: <b>Test bypass code used from non-allowlisted email</b>\n<b>Email:</b> ${email}\n<b>IP:</b> ${attemptLog.ip}\nCode was rejected. Rotate TEST_BYPASS_CODE if suspicious.`,
+          }),
+        });
+      }
+    } catch (e) { console.error('[bypass] telegram alert failed:', e.message); }
+    return res.status(403).json({ error: 'Email not allowed for bypass' });
+  }
+
+  // All checks passed — provision the test customer
+  try {
+    // Create Firebase Auth user (or use existing if email already registered)
+    let userRecord;
+    try {
+      userRecord = await admin.auth().createUser({ email, password, displayName: name });
+    } catch (err) {
+      if (err.code === 'auth/email-already-exists') {
+        userRecord = await admin.auth().getUserByEmail(email);
+        // Reset their password so the test login works
+        await admin.auth().updateUser(userRecord.uid, { password, displayName: name });
+      } else {
+        throw err;
+      }
+    }
+    const uid = userRecord.uid;
+
+    // Provision customer doc with paid + verified state
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    await db.collection('customers').doc(uid).set({
+      // core profile
+      name,
+      email,
+      company: company || '',
+      credits: 0,
+      created: now,
+
+      // plan
+      selectedPlan: planKey || null,
+      selectedPlanName: planName || null,
+      package: packageType || planName || null,
+      activationFee: activationFee || 0,
+      serviceFee: serviceFee || 0,
+      totalPrice: totalPrice || 0,
+
+      // payment — BYPASS marks as paid
+      paid: true,
+      paidAt: now,
+      paymentMethod: 'test_bypass',
+
+      // ID verification — BYPASS marks as approved
+      idGate: false,
+      idRequired: true,
+      idStatus: 'approved',
+      idStatusUpdatedAt: now,
+      idVerificationMethod: 'test_bypass',
+
+      // free scan defaults (same as real signup)
+      freeScansRemaining: 0,
+      monthlyFreeAllowance: 0,
+      autoRenewFreeScans: false,
+      lastAppliedMonthKey: "",
+      applyAtMonthKey: null,
+      resetMode: "reset",
+
+      // terms (from form)
+      termsAccepted: !!consent,
+      termsAcceptedAt: now,
+      immediatePerformanceConsent: !!consent,
+      immediatePerformanceConsentAt: now,
+
+      // === TEST MARKER ===
+      isTest: true,
+      bypassRedeemedAt: now,
+    }, { merge: true });
+
+    attemptLog.result = 'success';
+    attemptLog.uid = uid;
+    attemptRef.set(attemptLog).catch(() => {});
+
+    // Telegram alert — every successful redemption
+    try {
+      const token = process.env.TELEGRAM_BOT_TOKEN;
+      const chatId = process.env.TELEGRAM_CHAT_ID;
+      if (token && chatId) {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            parse_mode: 'HTML',
+            text: `OK: <b>Test bypass redeemed</b>\n<b>Email:</b> ${email}\n<b>Plan:</b> ${planName || planKey || 'none'}\n<b>UID:</b> ${uid}\nIf this was not you, rotate TEST_BYPASS_CODE immediately.`,
+          }),
+        });
+      }
+    } catch (e) { console.error('[bypass] telegram alert failed:', e.message); }
+
+    // Create custom token so client can sign in without password round-trip
+    const customToken = await admin.auth().createCustomToken(uid);
+    return res.status(200).json({ ok: true, uid, customToken });
+  } catch (err) {
+    console.error('[bypass] provision error:', err);
+    attemptLog.result = 'provision_error';
+    attemptLog.error = String(err.message || err);
+    attemptRef.set(attemptLog).catch(() => {});
+    return res.status(500).json({ error: 'Internal error provisioning test account' });
+  }
+});

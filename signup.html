@@ -149,6 +149,16 @@
           </div>
         </div>
 
+        <details style="margin: 10px 0 18px; font-size: 12px; color: #777;">
+          <summary style="cursor: pointer; user-select: none;">Have a test code? (internal)</summary>
+          <div style="margin-top: 10px;">
+            <label for="testCode" style="display:block; font-size: 12px; margin-bottom: 4px;">Test code</label>
+            <input type="text" id="testCode" autocomplete="off" placeholder="Leave blank if you are a real customer"
+                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace;">
+            <div style="font-size: 11px; color: #999; margin-top: 4px;">For Forward My Mail staff testing only. Skips payment + ID check.</div>
+          </div>
+        </details>
+
         <button type="submit" id="signupBtn" disabled>Create Account & Continue to Payment</button>
       </form>
 
@@ -162,7 +172,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getAuth, createUserWithEmailAndPassword, updateProfile, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
     import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
     const TERMS_VERSION = (window.TERMS_V4 && window.TERMS_V4.version) || 'v2026-05-29';
@@ -291,6 +301,40 @@
         signupBtn.disabled = true;
         signupBtn.textContent = 'Creating account...';
         hideMessages();
+
+        // ====== TEST BYPASS PATH ======
+        // If a test code was entered, call the bypass endpoint instead of the normal flow.
+        // The bypass provisions a fully paid + ID-verified test customer in one shot.
+        const testCode = (document.getElementById('testCode') || {}).value || '';
+        if (testCode.trim()) {
+          signupBtn.textContent = 'Redeeming test code...';
+          const bypassResp = await fetch('https://us-central1-forward-my-mail.cloudfunctions.net/redeemTestBypass', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              code: testCode.trim(),
+              email, password, name, company,
+              planKey: planKey || null,
+              planName: selectedPlan ? selectedPlan.name : null,
+              packageType: selectedPlan ? selectedPlan.name : null,
+              activationFee: selectedPlan ? selectedPlan.activation_fee : 0,
+              serviceFee: selectedPlan ? selectedPlan.service_fee : 0,
+              totalPrice: selectedPlan ? selectedPlan.price : 0,
+              consent: termsCheckbox.checked && immediatePerfCheckbox.checked,
+            })
+          });
+          if (!bypassResp.ok) {
+            let payload = {};
+            try { payload = await bypassResp.json(); } catch {}
+            throw new Error(payload.error || 'Test bypass rejected');
+          }
+          const { customToken } = await bypassResp.json();
+          await signInWithCustomToken(auth, customToken);
+          showSuccess('Test account ready. Redirecting to portal...');
+          setTimeout(() => { window.location.href = 'customer-portal.html'; }, 800);
+          return;
+        }
+        // ====== END TEST BYPASS PATH ======
 
         const ipAddress = await getIp();
         const nowIso = new Date().toISOString();
