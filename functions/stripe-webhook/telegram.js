@@ -249,11 +249,59 @@ async function notifyDiditError({ customerEmail, customerId, statusCode, errText
   return { ...result, kind };
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ID verification result notifier — Telegram ping when Didit reports approved,
+// declined, or pending. Idempotent per (customerId + status) — no duplicates if
+// Didit re-delivers the same webhook.
+// ─────────────────────────────────────────────────────────────────────────────
+
+function buildIdResultMessage({ status, name, email, company, package: pkg, mailboxId, customerId }) {
+  const headings = {
+    approved: 'OK: <b>ID Verification APPROVED</b>',
+    declined: 'WARN: <b>ID Verification DECLINED</b>',
+    pending:  'INFO: <b>ID Verification in review</b>',
+  };
+  const heading = headings[status] || `INFO: <b>ID Verification: ${status}</b>`;
+  const lines = [
+    heading,
+    `<b>Name:</b> ${escapeHtml(name || '—')}`,
+    `<b>Email:</b> ${escapeHtml(email || '—')}`,
+  ];
+  if (company) lines.push(`<b>Company:</b> ${escapeHtml(company)}`);
+  if (pkg)     lines.push(`<b>Package:</b> ${escapeHtml(pkg)}`);
+  if (mailboxId) lines.push(`<b>Mailbox:</b> ${escapeHtml(mailboxId)}`);
+  lines.push(`<b>Time:</b> ${escapeHtml(formatLondonTime(new Date()))}`);
+
+  if (status === 'approved') {
+    lines.push('');
+    lines.push('<b>Next step:</b> Activate the mailbox in the staff portal so the customer can use it.');
+  } else if (status === 'declined') {
+    lines.push('');
+    lines.push('<b>Next step:</b> Review the Didit result in the staff portal. Customer may need to retry.');
+  }
+  return lines.join('\n');
+}
+
+async function notifyIdVerified({ customerId, status, name, email, company, package: pkg, mailboxId, eventId }) {
+  // Idempotency: one ping per (customerId + status) per eventId.
+  // Using eventId means a Didit retry with the same event_id won't double-send.
+  const key = `didit-result-${customerId}-${status}-${eventId || 'noev'}`;
+  const shouldSend = await claimNotification(key, {
+    customerId, status, email, eventId: eventId || null,
+  });
+  if (!shouldSend) {
+    return { ok: true, skipped: true, reason: 'already-sent' };
+  }
+  const text = buildIdResultMessage({ status, name, email, company, package: pkg, mailboxId, customerId });
+  return sendToTelegram(text);
+}
+
 module.exports = {
   notifyPaidCustomer,
   notifyNewSignup,
   notifyDiditError,
+  notifyIdVerified,
   classifyDiditError,
   // exported for testing
-  _internal: { escapeHtml, formatLondonTime, formatAmount, buildPaidMessage, buildSignupMessage, buildDiditErrorMessage },
+  _internal: { escapeHtml, formatLondonTime, formatAmount, buildPaidMessage, buildSignupMessage, buildDiditErrorMessage, buildIdResultMessage },
 };
