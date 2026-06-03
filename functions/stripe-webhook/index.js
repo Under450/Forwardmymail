@@ -12,7 +12,7 @@ setGlobalOptions({
 const cors = require('cors')({ origin: true });
 const nodemailer = require('nodemailer');
 const { google } = require('googleapis');
-const { notifyPaidCustomer, notifyNewSignup, notifyDiditError, classifyDiditError } = require('./telegram');
+const { notifyPaidCustomer, notifyNewSignup, notifyDiditError, classifyDiditError, notifyIdVerified } = require('./telegram');
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SECRETS — never hardcoded here. Set as environment variables in Google Cloud.
@@ -1454,6 +1454,24 @@ exports.diditWebhook = onRequest(async (req, res) => {
         template: 'admin_id_verification',
         customerEmail: customer.email || ''
       });
+
+      // Telegram ping — Craig wants to know the moment ID verification finishes
+      // (approved or declined). Idempotent per eventId so retries don't double-send.
+      try {
+        const tg = await notifyIdVerified({
+          customerId,
+          status: idStatus,
+          name: customer.name || null,
+          email: customer.email || null,
+          company: customer.company || null,
+          package: customer.package || null,
+          mailboxId: customer.mailboxId || null,
+          eventId,
+        });
+        console.log(`[telegram] id-verified notification sent (status=${idStatus}, skipped=${!!tg.skipped}, ok=${!!tg.ok})`);
+      } catch (tgErr) {
+        console.error('[telegram] id-verified notification threw:', tgErr);
+      }
 
       await eventRef.update({ processed: true, processedAt: admin.firestore.FieldValue.serverTimestamp() });
     } catch (asyncErr) {
