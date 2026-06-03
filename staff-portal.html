@@ -146,6 +146,7 @@
     /* === end mobile fix === */
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -396,6 +397,51 @@
           </div>
           <div id="mailRequestsList"><p class="req-empty">No pending requests</p></div>
         </div>
+        <!-- 2FA / MFA Settings -->
+        <div id="mfaSection" style="background:#fff;border:1px solid #e0e0e0;border-radius:12px;padding:18px 20px;margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:16px;font-weight:700;color:#0f2347;">🔐 Two-Factor Authentication</div>
+              <div id="mfaStatusText" style="font-size:13px;color:#6b7280;margin-top:4px;">Loading...</div>
+            </div>
+            <div>
+              <button id="mfaEnableBtn" type="button" style="background:#0f2347;color:#c9972a;border:none;padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;display:none;">Enable 2FA</button>
+              <button id="mfaDisableBtn" type="button" style="background:#fff;color:#dc2626;border:1px solid #dc2626;padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;display:none;">Remove 2FA</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2FA Enrol Modal -->
+        <div id="mfaEnrollOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,35,71,0.55);z-index:9000;align-items:center;justify-content:center;padding:20px;">
+          <div style="background:#fff;border-radius:14px;max-width:460px;width:100%;padding:28px 26px;font-family:'DM Sans',sans-serif;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+              <div style="font-size:18px;font-weight:700;color:#0f2347;">Set up Authenticator App</div>
+              <button id="mfaCloseBtn" type="button" style="border:none;background:none;font-size:22px;cursor:pointer;color:#9ca3af;">×</button>
+            </div>
+            <p style="font-size:14px;color:#374151;line-height:1.55;margin:0 0 16px 0;">Open Google Authenticator, 1Password, Authy or similar. Scan the QR code or enter the key manually.</p>
+            <div id="mfaQrWrap" style="display:flex;justify-content:center;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;padding:16px;margin-bottom:14px;"></div>
+            <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Manual entry key:</div>
+            <div id="mfaSecretCode" style="font-family:'DM Mono',monospace;font-size:13px;color:#0f2347;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:8px 10px;margin-bottom:18px;word-break:break-all;letter-spacing:0.04em;"></div>
+            <label for="mfaCodeInput" style="font-size:13px;font-weight:600;color:#0f2347;">Enter the 6-digit code from your app:</label>
+            <input id="mfaCodeInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456" style="width:100%;padding:12px 14px;font-size:16px;border:1px solid #e5e7eb;border-radius:8px;margin:8px 0 16px;letter-spacing:0.3em;text-align:center;" autocomplete="one-time-code"/>
+            <div id="mfaEnrollError" style="display:none;color:#dc2626;font-size:13px;margin-bottom:12px;"></div>
+            <button id="mfaVerifyBtn" type="button" style="width:100%;background:#0f2347;color:#c9972a;border:none;padding:14px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;">Verify &amp; Activate</button>
+          </div>
+        </div>
+
+        <!-- 2FA Sign-in Challenge Modal -->
+        <div id="mfaChallengeOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,35,71,0.55);z-index:9001;align-items:center;justify-content:center;padding:20px;">
+          <div style="background:#fff;border-radius:14px;max-width:400px;width:100%;padding:28px 26px;font-family:'DM Sans',sans-serif;">
+            <div style="font-size:18px;font-weight:700;color:#0f2347;margin-bottom:8px;">Two-Factor Verification</div>
+            <p style="font-size:14px;color:#374151;line-height:1.55;margin:0 0 16px 0;">Open your authenticator app and enter the 6-digit code.</p>
+            <input id="mfaChallengeInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456" style="width:100%;padding:12px 14px;font-size:16px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:16px;letter-spacing:0.3em;text-align:center;" autocomplete="one-time-code"/>
+            <div id="mfaChallengeError" style="display:none;color:#dc2626;font-size:13px;margin-bottom:12px;"></div>
+            <button id="mfaChallengeBtn" type="button" style="width:100%;background:#0f2347;color:#c9972a;border:none;padding:14px;border-radius:8px;font-weight:700;font-size:15px;cursor:pointer;">Verify</button>
+            <button id="mfaChallengeCancel" type="button" style="width:100%;background:none;color:#6b7280;border:none;padding:10px;margin-top:8px;font-size:13px;cursor:pointer;">Cancel</button>
+          </div>
+        </div>
+
+
 
         <button id="logoutBtn" class="logout-btn" style="margin-top:20px;">Logout</button>
       </div>
@@ -405,7 +451,7 @@
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-check.js';
-    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, multiFactor, TotpMultiFactorGenerator, getMultiFactorResolver, PhoneAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
    import {
   getFirestore, collection, doc, getDoc, getDocs, query, where, orderBy, limit,
   updateDoc, addDoc, onSnapshot, serverTimestamp, increment, Timestamp, deleteDoc, deleteField
@@ -539,6 +585,8 @@ const storage = getStorage(app);
       }
     });
 
+    let _pendingMfaResolver = null;
+
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const email = document.getElementById('email').value;
@@ -546,11 +594,155 @@ const storage = getStorage(app);
       try {
         loginBtn.disabled = true; loginBtn.textContent='Logging in...';
         await signInWithEmailAndPassword(auth, email, password);
-      } catch (error){ showError('Invalid email or password'); }
+      } catch (error){
+        if (error.code === 'auth/multi-factor-auth-required') {
+          // Show MFA challenge modal
+          _pendingMfaResolver = getMultiFactorResolver(auth, error);
+          showMfaChallenge();
+        } else {
+          showError('Invalid email or password');
+        }
+      }
       finally { loginBtn.disabled = false; loginBtn.textContent='Login'; }
     });
 
+    function showMfaChallenge() {
+      document.getElementById('mfaChallengeOverlay').style.display = 'flex';
+      document.getElementById('mfaChallengeInput').focus();
+      document.getElementById('mfaChallengeError').style.display = 'none';
+    }
+    document.getElementById('mfaChallengeCancel').addEventListener('click', () => {
+      document.getElementById('mfaChallengeOverlay').style.display = 'none';
+      _pendingMfaResolver = null;
+    });
+    document.getElementById('mfaChallengeBtn').addEventListener('click', async () => {
+      if (!_pendingMfaResolver) return;
+      const code = document.getElementById('mfaChallengeInput').value.trim();
+      if (!/^\d{6}$/.test(code)) {
+        const err = document.getElementById('mfaChallengeError');
+        err.textContent = 'Enter the 6-digit code'; err.style.display = 'block'; return;
+      }
+      const btn = document.getElementById('mfaChallengeBtn');
+      btn.disabled = true; btn.textContent = 'Verifying...';
+      try {
+        const factor = _pendingMfaResolver.hints.find(h => h.factorId === TotpMultiFactorGenerator.FACTOR_ID);
+        if (!factor) throw new Error('No TOTP factor enrolled');
+        const assertion = TotpMultiFactorGenerator.assertionForSignIn(factor.uid, code);
+        await _pendingMfaResolver.resolveSignIn(assertion);
+        document.getElementById('mfaChallengeOverlay').style.display = 'none';
+        _pendingMfaResolver = null;
+      } catch (e) {
+        const err = document.getElementById('mfaChallengeError');
+        err.textContent = e.message || 'Invalid code'; err.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Verify';
+      }
+    });
+
     logoutBtn.addEventListener('click', async () => { try{ await signOut(auth); }catch(e){ showError('Error logging out'); } });
+
+    // ===== MFA management =====
+    const mfaSection = document.getElementById('mfaSection');
+    const mfaStatusText = document.getElementById('mfaStatusText');
+    const mfaEnableBtn = document.getElementById('mfaEnableBtn');
+    const mfaDisableBtn = document.getElementById('mfaDisableBtn');
+    const mfaEnrollOverlay = document.getElementById('mfaEnrollOverlay');
+    let _enrollSecret = null;
+
+    function refreshMfaStatus() {
+      const user = auth.currentUser;
+      if (!user) { mfaSection.style.display = 'none'; return; }
+      const enrolledFactors = multiFactor(user).enrolledFactors;
+      const hasTotp = enrolledFactors.some(f => f.factorId === TotpMultiFactorGenerator.FACTOR_ID);
+      if (hasTotp) {
+        mfaStatusText.textContent = '✓ Active — your account is protected by an authenticator app.';
+        mfaStatusText.style.color = '#15803d';
+        mfaEnableBtn.style.display = 'none';
+        mfaDisableBtn.style.display = 'inline-block';
+      } else {
+        mfaStatusText.textContent = 'Off — add 2FA to require an authenticator code on each sign-in.';
+        mfaStatusText.style.color = '#6b7280';
+        mfaEnableBtn.style.display = 'inline-block';
+        mfaDisableBtn.style.display = 'none';
+      }
+    }
+
+    mfaEnableBtn?.addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        mfaEnableBtn.disabled = true; mfaEnableBtn.textContent = 'Preparing...';
+        // Force a fresh sign-in if too old (Firebase requires recent reauth for MFA changes)
+        const session = await multiFactor(user).getSession();
+        _enrollSecret = await TotpMultiFactorGenerator.generateSecret(session);
+        const otpauthUrl = _enrollSecret.generateQrCodeUrl(user.email || 'Forward My Mail', 'Forward My Mail');
+
+        const qrWrap = document.getElementById('mfaQrWrap');
+        qrWrap.innerHTML = '';
+        new QRCode(qrWrap, { text: otpauthUrl, width: 200, height: 200, colorDark: '#0f2347', colorLight: '#ffffff' });
+        document.getElementById('mfaSecretCode').textContent = _enrollSecret.secretKey;
+        document.getElementById('mfaCodeInput').value = '';
+        document.getElementById('mfaEnrollError').style.display = 'none';
+        mfaEnrollOverlay.style.display = 'flex';
+      } catch (e) {
+        alert('Could not start 2FA setup: ' + (e.message || e));
+        console.error(e);
+      } finally {
+        mfaEnableBtn.disabled = false; mfaEnableBtn.textContent = 'Enable 2FA';
+      }
+    });
+
+    document.getElementById('mfaCloseBtn')?.addEventListener('click', () => {
+      mfaEnrollOverlay.style.display = 'none';
+      _enrollSecret = null;
+    });
+
+    document.getElementById('mfaVerifyBtn')?.addEventListener('click', async () => {
+      const code = document.getElementById('mfaCodeInput').value.trim();
+      const err = document.getElementById('mfaEnrollError');
+      if (!/^\d{6}$/.test(code)) {
+        err.textContent = 'Enter the 6-digit code'; err.style.display = 'block'; return;
+      }
+      if (!_enrollSecret) {
+        err.textContent = 'Session expired — close and retry'; err.style.display = 'block'; return;
+      }
+      const btn = document.getElementById('mfaVerifyBtn');
+      btn.disabled = true; btn.textContent = 'Verifying...';
+      try {
+        const user = auth.currentUser;
+        const assertion = TotpMultiFactorGenerator.assertionForEnrollment(_enrollSecret, code);
+        await multiFactor(user).enroll(assertion, 'Authenticator App');
+        mfaEnrollOverlay.style.display = 'none';
+        _enrollSecret = null;
+        showSuccess('2FA enabled — next sign-in will require a code.');
+        refreshMfaStatus();
+      } catch (e) {
+        err.textContent = e.message || 'Verification failed';
+        err.style.display = 'block';
+      } finally {
+        btn.disabled = false; btn.textContent = 'Verify & Activate';
+      }
+    });
+
+    mfaDisableBtn?.addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      if (!confirm('Remove 2FA from this account? You will be able to sign in with just your password again.')) return;
+      try {
+        const enrolled = multiFactor(user).enrolledFactors.find(f => f.factorId === TotpMultiFactorGenerator.FACTOR_ID);
+        if (!enrolled) return;
+        await multiFactor(user).unenroll(enrolled);
+        showSuccess('2FA removed.');
+        refreshMfaStatus();
+      } catch (e) {
+        alert('Could not remove 2FA: ' + (e.message || e));
+        console.error(e);
+      }
+    });
+
+    // Refresh MFA status when auth changes
+    onAuthStateChanged(auth, () => { refreshMfaStatus(); });
+
 
     async function loadCustomers(){
       const qs = await getDocs(collection(db,'customers'));
