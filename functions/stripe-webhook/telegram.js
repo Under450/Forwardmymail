@@ -75,7 +75,18 @@ function buildSignupMessage({ name, email, company, mailboxId, date }) {
 }
 
 // Core HTTP call to Telegram. Uses Node 22 native fetch (no npm deps).
-async function sendToTelegram(text) {
+// Priority levels:
+//   'urgent' — explicit disable_notification:false. Use for Didit errors,
+//              ID declined, anything Craig must see immediately.
+//   'normal' — default Telegram sound notification. ID approved, new paid customer.
+//   'silent' — disable_notification:true. Delivered but no sound. Use for
+//              low-priority signal Craig can check later (free signups,
+//              test-bypass redemptions).
+//
+// Telegram CANNOT override a chat-level mute the user set in their client.
+// If notifications are not arriving despite priority:'urgent', check the
+// bot chat is not muted in the Telegram app (tap chat → bell icon).
+async function sendToTelegram(text, options = {}) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -84,12 +95,16 @@ async function sendToTelegram(text) {
     return { ok: false, skipped: true, reason: 'secrets_missing' };
   }
 
+  const priority = options.priority || 'normal';
+  const disableNotification = priority === 'silent';
+
   const url = `${TELEGRAM_API}/bot${token}/sendMessage`;
   const body = {
     chat_id: chatId,
     text,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
+    disable_notification: disableNotification,
   };
 
   // 10s timeout — Telegram is usually <1s. Don't hang the webhook.
@@ -161,7 +176,8 @@ async function notifyPaidCustomer({ sessionId, name, email, packageType, amount,
   if (!proceed) return { ok: true, skipped: true, reason: 'duplicate' };
 
   const text = buildPaidMessage({ name, email, packageType, amount, date: date || new Date() });
-  return sendToTelegram(text);
+  // Paid customer = real money landed. Ring the phone (normal priority).
+  return sendToTelegram(text, { priority: 'normal' });
 }
 
 // Public: notify on a new customers/{id} doc creation (free signup).
@@ -179,7 +195,8 @@ async function notifyNewSignup({ customerId, name, email, company, mailboxId, da
   if (!proceed) return { ok: true, skipped: true, reason: 'duplicate' };
 
   const text = buildSignupMessage({ name, email, company, mailboxId, date: date || new Date() });
-  return sendToTelegram(text);
+  // Free signup is informational; don't ring the phone.
+  return sendToTelegram(text, { priority: 'silent' });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -245,7 +262,8 @@ async function notifyDiditError({ customerEmail, customerId, statusCode, errText
   }
 
   const text = buildDiditErrorMessage({ kind, customerEmail, customerId, statusCode, errText });
-  const result = await sendToTelegram(text);
+  // Didit failures block customers from signing up — urgent.
+  const result = await sendToTelegram(text, { priority: 'urgent' });
   return { ...result, kind };
 }
 
@@ -293,7 +311,9 @@ async function notifyIdVerified({ customerId, status, name, email, company, pack
     return { ok: true, skipped: true, reason: 'already-sent' };
   }
   const text = buildIdResultMessage({ status, name, email, company, package: pkg, mailboxId, customerId });
-  return sendToTelegram(text);
+  // Declined needs attention; approved is good news but routine.
+  const priority = status === 'declined' ? 'urgent' : 'normal';
+  return sendToTelegram(text, { priority });
 }
 
 module.exports = {
