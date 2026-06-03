@@ -1321,7 +1321,6 @@ a.cf-cta:hover * { color: #ffffff !important; }
 <style>
 </style>
 
-<!-- KEEP THESE TWO STYLES INSIDE <head>, just before 
 <style id="signup-flow-styles">
 .signup-banner { display:none; }
 body.signup-flow .signup-purchase-banner { display:block !important; }
@@ -1340,7 +1339,6 @@ body.signup-flow .hide-during-signup { display:none !important; }
 body.signup-flow article.pricing-card.most-popular { border:2px solid #c9972a !important; position:relative; }
 body.signup-flow article.pricing-card.most-popular::before { content:'Most popular'; position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#0f2347; color:#c9972a; font-size:11px; font-weight:600; padding:4px 14px; border-radius:999px; letter-spacing:0.08em; text-transform:uppercase; }
 </style>
-</head> -->
 <style id="ai-compact-overrides">
   .ai-hero-cta{ padding: 0.6rem 1.2rem; border-radius: 12px; font-size: 0.95rem; box-shadow: none; }
   .ai-pricing-features li{ padding: 0.35rem 0; font-size: 0.95rem; gap: 0.5rem; }
@@ -2821,64 +2819,6 @@ body.signup-flow article.pricing-card.most-popular::before { content:'Most popul
 <style>
 </style>
 </head><body>${dialog.outerHTML}
-<script id="signup-flow-script">
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('signup') !== '1') return;
-  document.body.classList.add('signup-flow');
-
-  // Mark Registered Office as Most popular
-  document.querySelectorAll('article.pricing-card').forEach(card => {
-    const cta = card.querySelector('a.pricing-cta[href*="signup.html?plan="]');
-    if (!cta) return;
-    const plan = (cta.getAttribute('href').match(/plan=([\w]+)/) || [])[1];
-
-    if (plan === 'registered_office') card.classList.add('most-popular');
-
-    // Hide Full Virtual cards entirely in the signup flow
-    if (plan === 'full_virtual_office' || plan === 'full_virtual_office_plus_formation') {
-      card.classList.add('hide-during-signup');
-    }
-
-    // Reword primary CTA from "Choose X" to "Continue with X →"
-    if (cta.classList.contains('btn-primary')) {
-      const labelMap = {
-        'personal_mailbox': 'Continue with Personal Mailbox →',
-        'business_address': 'Continue with Business Address →',
-        'registered_office': 'Continue with Registered Office →',
-        'registered_office_plus_formation': 'Continue with Reg Office + Formation →'
-      };
-      if (labelMap[plan]) cta.textContent = labelMap[plan];
-    }
-  });
-
-  // Hide marketing fluff above pricing (hero, FAQ banner, testimonials) but keep nav + footer
-  const pricing = document.getElementById('pricing');
-  if (pricing) {
-    // Hide every direct child of <main> (or <body>) that comes before #pricing's section
-    let walk = pricing.previousElementSibling;
-    while (walk) {
-      // Don't hide nav/header
-      if (walk.tagName !== 'HEADER' && walk.tagName !== 'NAV' && !walk.matches('header,nav')) {
-        walk.classList.add('hide-during-signup');
-      }
-      walk = walk.previousElementSibling;
-    }
-
-    // Hide sections AFTER pricing too — keep flow clean
-    walk = pricing.nextElementSibling;
-    while (walk) {
-      if (walk.tagName !== 'FOOTER' && !walk.matches('footer')) {
-        walk.classList.add('hide-during-signup');
-      }
-      walk = walk.nextElementSibling;
-    }
-
-    // Smooth-scroll to pricing after styles apply
-    setTimeout(() => { pricing.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-  }
-})();
-</script>
 </body></html>`);
         doc.close();
         w.focus();
@@ -3129,4 +3069,62 @@ document.addEventListener('DOMContentLoaded', function () {
       window.location.href = 'mailto:info@forwardmymail.co.uk?subject=' + subject + '&body=' + body;
     }
   }, false);
+</script>
+<script id="signup-flow-script">
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('signup') !== '1') return;
+  document.body.classList.add('signup-flow');
+
+  // Mark Registered Office as Most popular
+  document.querySelectorAll('article.pricing-card').forEach(card => {
+    const cta = card.querySelector('a.pricing-cta[href*="signup.html?plan="]');
+    if (!cta) return;
+    const plan = (cta.getAttribute('href').match(/plan=([\w]+)/) || [])[1];
+
+    if (plan === 'registered_office') card.classList.add('most-popular');
+
+    // Hide Full Virtual cards entirely in the signup flow
+    if (plan === 'full_virtual_office' || plan === 'full_virtual_office_plus_formation') {
+      card.classList.add('hide-during-signup');
+    }
+
+    // Reword primary CTA from "Choose X" to "Continue with X →"
+    if (cta.classList.contains('btn-primary')) {
+      const labelMap = {
+        'personal_mailbox': 'Continue with Personal Mailbox →',
+        'business_address': 'Continue with Business Address →',
+        'registered_office': 'Continue with Registered Office →',
+        'registered_office_plus_formation': 'Continue with Reg Office + Formation →'
+      };
+      if (labelMap[plan]) cta.textContent = labelMap[plan];
+    }
+  });
+
+  // Hide marketing fluff above pricing (hero, FAQ banner, testimonials) but keep nav + footer
+  const pricing = document.getElementById('pricing');
+  if (pricing) {
+    // Hide every direct child of <main> (or <body>) that comes before #pricing's section
+    let walk = pricing.previousElementSibling;
+    while (walk) {
+      // Don't hide nav/header
+      if (walk.tagName !== 'HEADER' && walk.tagName !== 'NAV' && !walk.matches('header,nav')) {
+        walk.classList.add('hide-during-signup');
+      }
+      walk = walk.previousElementSibling;
+    }
+
+    // Hide sections AFTER pricing too — keep flow clean
+    walk = pricing.nextElementSibling;
+    while (walk) {
+      if (walk.tagName !== 'FOOTER' && !walk.matches('footer')) {
+        walk.classList.add('hide-during-signup');
+      }
+      walk = walk.nextElementSibling;
+    }
+
+    // Smooth-scroll to pricing after styles apply
+    setTimeout(() => { pricing.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+  }
+})();
 </script>
