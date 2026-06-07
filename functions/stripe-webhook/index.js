@@ -407,7 +407,7 @@ exports.stripeWebhook = onRequest(async (req, res) => {
         return res.status(200).send('Already processed');
       }
 
-      let customerId = session.metadata?.customerId;
+      let customerId = session.metadata?.customerId || session.client_reference_id;
       let amount = session.metadata?.amount ? parseFloat(session.metadata.amount) : null;
       // Payment Links use customer_details.email; programmatic checkout uses customer_email
       const customerEmail = session.customer_details?.email

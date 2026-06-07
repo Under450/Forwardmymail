@@ -840,20 +840,20 @@ html, body {
     <h3 class="sheet-title">Top Up Credits</h3>
     <p class="sheet-sub">Credits are used for scanning, posting and storing your mail.</p>
     <div class="credit-packs">
-      <div class="credit-pack" data-amount="10" data-link="https://buy.stripe.com/test_cNi00i3GR5RS9zVeGt14401">
+      <div class="credit-pack" data-amount="10">
         <div class="cp-amount">£10</div><div class="cp-letters">~11 letters</div>
       </div>
-      <div class="credit-pack popular" data-amount="20" data-link="https://buy.stripe.com/test_6oUaEW1yJgww5jFbuh14402">
+      <div class="credit-pack popular" data-amount="20">
         <div class="cp-amount">£20</div><div class="cp-letters">~23 letters</div>
       </div>
-      <div class="credit-pack" data-amount="25" data-link="https://buy.stripe.com/test_6oUeVc5OZbcc3bx0PD14403">
+      <div class="credit-pack" data-amount="25">
         <div class="cp-amount">£25</div><div class="cp-letters">~28 letters</div>
       </div>
-      <div class="credit-pack" data-amount="30" data-link="https://buy.stripe.com/test_dRmbJ03GR4NOdQb8i514404">
+      <div class="credit-pack" data-amount="30">
         <div class="cp-amount">£30</div><div class="cp-letters">~34 letters</div>
       </div>
     </div>
-    <div class="credit-pack" style="margin-bottom:16px;" data-amount="50" data-link="https://buy.stripe.com/test_5kQdR83GR0xy6nJcyl14405">
+    <div class="credit-pack" style="margin-bottom:16px;" data-amount="50">
       <div class="cp-amount">£50</div><div class="cp-letters">~57 letters · Best value</div>
     </div>
     <button class="sheet-btn" id="topup-proceed">Proceed to Payment</button>
@@ -1600,7 +1600,7 @@ document.querySelectorAll('.credit-pack').forEach(pack => {
   pack.addEventListener('click', () => {
     document.querySelectorAll('.credit-pack').forEach(p => p.classList.remove('selected'));
     pack.classList.add('selected');
-    selectedPack = { amount: pack.dataset.amount, link: pack.dataset.link };
+    selectedPack = { amount: pack.dataset.amount };
   });
 });
 
@@ -1615,7 +1615,7 @@ document.getElementById('topup-proceed').addEventListener('click', async () => {
   try {
     const response = await fetch('https://createcheckoutsession-yr34k57gsq-uc.a.run.app', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + await currentUser.getIdToken() },
       body: JSON.stringify({
         amount: parseFloat(selectedPack.amount),
         customerId: currentUser.uid,

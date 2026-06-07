@@ -225,7 +225,11 @@
           totalPrice: purchaseItem.price
         });
         payBtn.textContent = 'Redirecting to Stripe...';
-        setTimeout(() => { window.location.href = purchaseItem.stripe_link; }, 600);
+        const payUrl = purchaseItem.stripe_link
+          + (purchaseItem.stripe_link.includes('?') ? '&' : '?')
+          + 'client_reference_id=' + encodeURIComponent(currentUser.uid)
+          + '&prefilled_email=' + encodeURIComponent(currentUser.email || '');
+        setTimeout(() => { window.location.href = payUrl; }, 600);
       } catch (e) {
         showError('Could not record consent: ' + e.message);
         payBtn.disabled = false;

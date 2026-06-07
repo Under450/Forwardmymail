@@ -245,10 +245,6 @@
               <div class="credit-pack" data-amount="25"><div class="pack-amount">£25</div></div>
               <div class="credit-pack" data-amount="30"><div class="pack-amount">£30</div></div>
               <div class="credit-pack" data-amount="50"><div class="pack-amount">£50</div></div>
-            <div class="credit-pack" data-amount="0.30" id="testPack" style="display: none !important;">
-                <div class="pack-amount">TEST</div>
-                <div style="font-size: 12px;">£0.30</div>
-              </div>
             </div>
           </section>
 
@@ -705,11 +701,6 @@ function applyGateUI(data) {
       const pack = e.target.closest('.credit-pack');
       if (!pack || !pack.dataset.amount) return;
       
-      // Special handling for test pack
-      if (pack.id === 'testPack') {
-        window.location.href = 'https://buy.stripe.com/5kQ5kF4Ec7VfcuZa4u4Ja0g';
-        return;
-      }
       
       const amount = parseFloat(pack.dataset.amount);
       try {
