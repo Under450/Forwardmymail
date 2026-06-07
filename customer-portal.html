@@ -640,7 +640,7 @@ function applyGateUI(data) {
           // Build file links - handle both files array and direct scanUrl
           let filesHtml = '';
           if (files.length > 0) {
-            const hasCredits = (customerCredits > 0);
+            const hasCredits = (customerCredits > 0) || item.freeItem === true;
             filesHtml = '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">';
             files.forEach((file) => {
               const fileIcon = file.type?.includes('pdf') ? '📄' : '🖼️';
@@ -659,7 +659,7 @@ function applyGateUI(data) {
             });
             filesHtml += '</div>';
           } else if (item.scanUrl) {
-            const hasCredits = (customerCredits > 0);
+            const hasCredits = (customerCredits > 0) || item.freeItem === true;
             if (hasCredits) {
               filesHtml = `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
                 <a href="${item.scanUrl}" target="_blank"

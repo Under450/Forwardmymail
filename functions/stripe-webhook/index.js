@@ -501,6 +501,52 @@ exports.stripeWebhook = onRequest(async (req, res) => {
 
       const finalCustomerData = (await customerRef.get()).data();
 
+      // Deliver welcome fact sheet as first free scan — package purchases only, once
+      if (creditsToAdd === 0 && !finalCustomerData.welcomeSheetSent) {
+        try {
+          let sheetMailboxId = finalCustomerData.mailboxId;
+          if (!sheetMailboxId) {
+            const usedIds = new Set();
+            (await db.collection('customers').select('mailboxId').get())
+              .forEach(d => { const m = d.data().mailboxId; if (m) usedIds.add(m); });
+            do { sheetMailboxId = 'FMM-' + Math.floor(10000 + Math.random() * 90000); } while (usedIds.has(sheetMailboxId));
+            await customerRef.update({ mailboxId: sheetMailboxId, mailboxIdGenerated: admin.firestore.FieldValue.serverTimestamp() });
+          }
+          const { buildWelcomeSheetPdf } = require('./welcome-sheet');
+          const crypto = require('crypto');
+          const pdfBuf = await buildWelcomeSheetPdf({
+            name: finalCustomerData.name || '',
+            company: finalCustomerData.company || '',
+            email: finalCustomerData.email || customerEmail,
+            mailboxId: sheetMailboxId,
+            package: packageType,
+          });
+          const bucket = admin.storage().bucket();
+          const token = crypto.randomUUID();
+          const filePath = `welcome-sheets/${customerId}.pdf`;
+          await bucket.file(filePath).save(pdfBuf, {
+            metadata: { contentType: 'application/pdf', metadata: { firebaseStorageDownloadTokens: token } },
+          });
+          const url = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(filePath)}?alt=media&token=${token}`;
+          await db.collection('mail').add({
+            customerId: customerId,
+            status: 'scanned',
+            description: 'Welcome to Forward My Mail — your fact sheet',
+            files: [{ url, type: 'application/pdf', name: 'Welcome fact sheet' }],
+            pages: 1,
+            cost: 0,
+            freeItem: true,
+            letterType: 'welcome',
+            receivedAt: admin.firestore.FieldValue.serverTimestamp(),
+            processedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          await customerRef.update({ welcomeSheetSent: true });
+          console.log(`Welcome fact sheet delivered for ${customerId} (${packageType})`);
+        } catch (sheetErr) {
+          console.error('Welcome sheet delivery failed:', sheetErr.message);
+        }
+      }
+
       // Confirmation email to customer
       try {
         const emailName = finalCustomerData.name || 'Customer';
