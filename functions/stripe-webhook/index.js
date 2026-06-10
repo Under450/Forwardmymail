@@ -408,6 +408,7 @@ exports.stripeWebhook = onRequest(async (req, res) => {
       }
 
       let customerId = session.metadata?.customerId || session.client_reference_id;
+      const hadReliableId = !!customerId;
       let amount = session.metadata?.amount ? parseFloat(session.metadata.amount) : null;
       // Payment Links use customer_details.email; programmatic checkout uses customer_email
       const customerEmail = session.customer_details?.email
@@ -445,15 +446,45 @@ exports.stripeWebhook = onRequest(async (req, res) => {
       }
 
       if (!customerId) {
-        const newCustomerRef = db.collection('customers').doc();
-        customerId = newCustomerRef.id;
-        await newCustomerRef.set({
-          email: customerEmail,
-          name: customerEmail.split('@')[0],
-          credits: 0,
-          created: admin.firestore.FieldValue.serverTimestamp(),
+        // SAFETY NET: no reliable signup reference (client_reference_id/metadata) AND
+        // no account matched by billing email. Do NOT silently create an orphan account
+        // nobody can log into. Record the payment as unassigned and alert staff.
+        await db.collection('transactions').add({
+          type: 'unassigned_payment',
+          amount: amount,
+          customerEmail: customerEmail,
+          stripeSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent,
+          status: 'needs_manual_assignment',
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
         });
-        console.log(`Created new customer ${customerId} for ${customerEmail}`);
+        await db.collection('staff_notifications').add({
+          type: 'unmatched_payment',
+          status: 'unread',
+          customerEmail: customerEmail,
+          amount: amount,
+          stripeSessionId: session.id,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          message: `Payment of GBP ${amount} from ${customerEmail} could NOT be matched to an account (no signup reference). Assign it to the correct customer manually.`,
+        });
+        console.warn(`Unmatched payment GBP ${amount} from ${customerEmail}, session ${session.id} - flagged for manual assignment`);
+        return res.status(200).send('Unmatched payment flagged for manual assignment');
+      }
+
+      // SAFETY NET: matched by billing email but WITHOUT a reliable signup reference.
+      // Can be the WRONG account if payer used a card/email different from signup
+      // (exactly how KSK slipped through). Apply, but flag for staff to verify.
+      if (!hadReliableId) {
+        await db.collection('staff_notifications').add({
+          type: 'payment_email_matched',
+          status: 'unread',
+          customerEmail: customerEmail,
+          amount: amount,
+          stripeSessionId: session.id,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          message: `GBP ${amount} from ${customerEmail} was matched by billing email only (no signup reference). Verify the correct customer received the right package.`,
+        });
+        console.warn(`Payment GBP ${amount} from ${customerEmail} matched by email only (session ${session.id}) - flagged to verify`);
       }
 
       // Map payment amounts to package types
